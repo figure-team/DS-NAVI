@@ -1,0 +1,398 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "ext.msg-000",
+  "domainId": "domain:ext.msg",
+  "header": {
+    "name": "웹소켓 메신저",
+    "summary": {
+      "text": "직원 간 실시간 대화를 제공하는 웹소켓 메신저 화면 영역이다. 메신저 접속 화면, 대화상대 목록이 있는 메인 화면, 개별 대화창 팝업의 세 화면으로 구성되며, 각 요청은 로그인 사용자 정보를 화면 모델에 실어 해당 화면을 반환한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+          "line": 49,
+          "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengerView.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+          "line": 61,
+          "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengerMain.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+          "line": 75,
+          "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengePopup.do\")"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "로그인 사용자 정보 — 사용자 세션에 보관된 로그인 정보로, 세 화면 모두 화면 모델에 담아 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 79,
+            "snippet": "\t\tmodel.addAttribute(\"loginVO\", session.getAttribute(\"loginVO\"));"
+          }
+        ]
+      },
+      {
+        "text": "대화창 아이디 — 개별 대화창을 식별하는 값으로, 대화창 팝업 요청에서 받아 화면 모델에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 80,
+            "snippet": "\t\tmodel.addAttribute(\"roomId\", roomId);"
+          }
+        ]
+      },
+      {
+        "text": "대화상대 이름 — 대화 상대를 표시하기 위한 값으로, 대화창 팝업 요청에서 받아 화면 모델에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 81,
+            "snippet": "\t\tmodel.addAttribute(\"username\", username);"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "모든 메신저 화면은 사용자 세션의 로그인 정보를 화면 모델에 실어 전달한다. 즉 화면 표시는 로그인 세션을 전제로 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 79,
+            "snippet": "\t\tmodel.addAttribute(\"loginVO\", session.getAttribute(\"loginVO\"));"
+          }
+        ]
+      },
+      {
+        "text": "대화창 팝업은 대화창 아이디와 대화상대 이름을 필수로 받는다. 두 값이 없으면 대화창을 띄울 수 없다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 76,
+            "snippet": "\tpublic String websocketMessengePopup(@RequestParam(value = \"roomId\") String roomId,"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 77,
+            "snippet": "\t\t\t\t\t\t\t\t\t\t @RequestParam(value = \"username\") String username,"
+          }
+        ]
+      },
+      {
+        "text": "대화 상대별로 별도의 대화창 화면을 띄우며, 대화창 화면은 말풍선 형태의 팝업 화면으로 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 82,
+            "snippet": "\t\treturn \"egovframework/com/ext/msg/popup/chatPopupBubble\";"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "로그인·인증 영역과 연계한다. 화면 표시에 필요한 로그인 사용자 정보를 직접 조회하지 않고 사용자 세션에 이미 담긴 값을 가져다 쓴다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 79,
+            "snippet": "\t\tmodel.addAttribute(\"loginVO\", session.getAttribute(\"loginVO\"));"
+          }
+        ]
+      },
+      {
+        "text": "협업(커뮤니티) 영역의 주소 체계 아래에 놓인다. 메신저 화면 요청은 모두 협업 메시지 경로로 노출된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 49,
+            "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengerView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 75,
+            "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengePopup.do\")"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "웹소켓 메신저 이용",
+        "nodes": [
+          {
+            "id": "n_start",
+            "kind": "start",
+            "label": "메신저 이용 시작"
+          },
+          {
+            "id": "n_view",
+            "kind": "activity",
+            "label": "메신저 접속 화면 이동",
+            "flowRef": "flow:ANY /cop/msg/websocketMessengerView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+                "line": 49,
+                "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengerView.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n_main",
+            "kind": "activity",
+            "label": "대화상대 목록 화면 이동",
+            "flowRef": "flow:ANY /cop/msg/websocketMessengerMain.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+                "line": 61,
+                "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengerMain.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n_popup",
+            "kind": "activity",
+            "label": "대화창 팝업 띄우기",
+            "flowRef": "flow:ANY /cop/msg/websocketMessengePopup.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+                "line": 75,
+                "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengePopup.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n_ctx",
+            "kind": "activity",
+            "label": "대화상대·대화창 정보 전달",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+                "line": 80,
+                "snippet": "\t\tmodel.addAttribute(\"roomId\", roomId);"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+                "line": 81,
+                "snippet": "\t\tmodel.addAttribute(\"username\", username);"
+              }
+            ]
+          },
+          {
+            "id": "n_end",
+            "kind": "end",
+            "label": "대화 화면 표시"
+          }
+        ],
+        "edges": [
+          { "from": "n_start", "to": "n_view" },
+          { "from": "n_view", "to": "n_main" },
+          { "from": "n_main", "to": "n_popup" },
+          { "from": "n_popup", "to": "n_ctx" },
+          { "from": "n_ctx", "to": "n_end" }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /cop/msg/websocketMessengePopup.do",
+      "name": "대화창 팝업 열기",
+      "summary": {
+        "text": "대화창 아이디와 대화상대 이름을 받아 해당 상대와의 대화창 팝업 화면을 띄운다. 로그인 사용자 정보와 함께 대화창 아이디·대화상대 이름을 화면 모델에 실어 말풍선 대화창 화면을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 75,
+            "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengePopup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 82,
+            "snippet": "\t\treturn \"egovframework/com/ext/msg/popup/chatPopupBubble\";"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/msg/websocketMessengerMain.do",
+      "name": "메신저 대화상대 목록 화면 이동",
+      "summary": {
+        "text": "웹소켓 메신저의 메인 화면인 대화상대 목록 화면으로 이동한다. 사용자 세션의 로그인 정보를 화면 모델에 담아 목록 화면을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 61,
+            "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengerMain.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/msg/websocketMessengerView.do",
+      "name": "메신저 접속 화면 이동",
+      "summary": {
+        "text": "웹소켓 메신저 접속 화면으로 이동한다. 사용자 세션의 로그인 정보를 화면 모델에 담아 메신저 진입 화면을 반환하며, 메신저 이용의 시작점 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 49,
+            "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengerView.do\")"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /cop/msg/websocketMessengePopup.do:src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+      "name": "대화창 팝업 화면 요청 처리",
+      "summary": {
+        "text": "대화창 팝업 요청을 받아 대화창 아이디와 대화상대 이름, 로그인 사용자 정보를 화면 모델에 실어 말풍선 대화창 화면을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 75,
+            "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengePopup.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메신저 대화창 팝업 요청의 진입 지점이다. 별도의 서비스나 저장소에 위임하지 않고, 요청으로 받은 대화창 아이디와 대화상대 이름 및 세션의 로그인 정보를 화면 모델에 담아 말풍선 형태의 대화창 화면으로 바로 연결하는 화면 이동 역할만 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+              "line": 75,
+              "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengePopup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+              "line": 82,
+              "snippet": "\t\treturn \"egovframework/com/ext/msg/popup/chatPopupBubble\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터로 대화창 아이디와 대화상대 이름을 필수로 받으며, 사용자 세션에서 로그인 정보를 꺼내 화면 모델에 넣는다. 별도의 형식 검증이나 권한 확인 코드는 없고, 로그인 여부는 세션 값에 의존한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+              "line": 76,
+              "snippet": "\tpublic String websocketMessengePopup(@RequestParam(value = \"roomId\") String roomId,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+              "line": 77,
+              "snippet": "\t\t\t\t\t\t\t\t\t\t @RequestParam(value = \"username\") String username,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+              "line": 79,
+              "snippet": "\t\tmodel.addAttribute(\"loginVO\", session.getAttribute(\"loginVO\"));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/msg/websocketMessengerMain.do:src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+      "name": "대화상대 목록 화면 요청 처리",
+      "summary": {
+        "text": "메신저 메인 화면 요청을 받아 로그인 사용자 정보를 화면 모델에 실어 대화상대 목록 화면을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 75,
+            "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengePopup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 61,
+            "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengerMain.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메신저 메인 화면 요청의 진입 지점이다. 대화상대 목록을 조회하는 별도 서비스 호출 없이, 세션의 로그인 정보만 화면 모델에 담아 대화상대 목록 화면으로 이동시키는 화면 이동 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+              "line": 61,
+              "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengerMain.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "별도의 요청 파라미터를 받지 않으며, 사용자 세션에서 로그인 정보를 꺼내 화면 모델에 넣는 것이 처리의 전부다. 명시적인 권한 검사 코드는 없고 로그인 여부는 세션 값에 의존한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+              "line": 61,
+              "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengerMain.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+              "line": 79,
+              "snippet": "\t\tmodel.addAttribute(\"loginVO\", session.getAttribute(\"loginVO\"));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/msg/websocketMessengerView.do:src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+      "name": "메신저 접속 화면 요청 처리",
+      "summary": {
+        "text": "메신저 접속 화면 요청을 받아 로그인 사용자 정보를 화면 모델에 실어 메신저 진입 화면을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 75,
+            "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengePopup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+            "line": 49,
+            "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengerView.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "웹소켓 메신저 이용의 첫 진입 지점이다. 세션의 로그인 정보만 화면 모델에 담아 메신저 접속 화면으로 이동시키며, 업무 처리나 저장소 접근은 하지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+              "line": 49,
+              "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengerView.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "별도의 요청 파라미터를 받지 않고 사용자 세션의 로그인 정보를 화면 모델에 넣는다. 명시적 검증·권한 확인 코드는 없으며 로그인 여부는 세션 값에 의존한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+              "line": 49,
+              "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengerView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+              "line": 79,
+              "snippet": "\t\tmodel.addAttribute(\"loginVO\", session.getAttribute(\"loginVO\"));"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

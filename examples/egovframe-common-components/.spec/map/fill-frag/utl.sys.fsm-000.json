@@ -1,0 +1,3906 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "utl.sys.fsm-000",
+  "domainId": "domain:utl.sys.fsm",
+  "header": {
+    "name": "파일시스템 모니터링",
+    "summary": {
+      "text": "파일시스템 모니터링 대상을 등록·수정·삭제·조회하고, 파일시스템의 크기와 사용량을 임계치와 견주어 점검하며 그 결과를 모니터링 로그로 조회하는 시스템 관리 업무다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+          "line": 7,
+          "snippet": " * - 파일시스템 모니터링대상에 대한 Service Interface를 정의한다."
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+          "line": 10,
+          "snippet": " * - 파일시스템 모니터링대상에 대한 등록, 수정, 삭제, 조회기능을 제공한다."
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+          "line": 25,
+          "snippet": " * - 파일시스템의 총크기와 여유크기의 결과를 제공한다."
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "파일시스템 모니터링 대상: 파일시스템ID, 파일시스템명, 파일시스템관리명, 크기, 임계치, 임계율, 사용량, 사용률, 관리자명, 관리자이메일주소, 모니터링상태, 생성일시를 관리한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+            "line": 14,
+            "snippet": " * - 파일시스템ID, 파일시스템명, 파일시스템관리명, 파일시스템크기, 파일시스템임계치, 파일시스템임계율, 파일시스템사용량, 파일시스템사용률, 관리자명, 관리자이메일주소, 서비스상태, 생성일시 항목을 관리한다."
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+            "line": 20,
+            "snippet": "public class FileSysMntrng implements Serializable  {"
+          }
+        ]
+      },
+      {
+        "text": "파일시스템 모니터링 대상 조회 정보: 대상 목록의 검색조건·검색단어와 페이지 정보를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+            "line": 11,
+            "snippet": " * - 파일시스템 모니터링대상의 목록 항목, 조회조건 등을 관리한다."
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+            "line": 19,
+            "snippet": "public class FileSysMntrngVO extends FileSysMntrng {"
+          }
+        ]
+      },
+      {
+        "text": "파일시스템 모니터링 로그 조회 정보: 로그 목록의 기간 조회조건과 페이지 정보를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+            "line": 11,
+            "snippet": " * - 파일시스템 모니터링 로그의 목록 항목, 조회조건 등을 관리한다."
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+            "line": 19,
+            "snippet": "public class FileSysMntrngLogVO extends FileSysMntrngLog {"
+          }
+        ]
+      },
+      {
+        "text": "로그인 사용자 정보: 아이디·이름·이메일주소·고유아이디 등 인증된 작업자 정보를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 41,
+            "snippet": "\t@EgovNullCheck"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "등록·수정 화면 진입 시 로그인 인증을 먼저 확인하고, 미인증이면 로그인 실패 메시지와 함께 로그인 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 113,
+            "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 114,
+            "snippet": "\t\tif (!isAuthenticated) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 116,
+            "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+          }
+        ]
+      },
+      {
+        "text": "파일시스템명·파일시스템관리명·크기·임계치·관리자명·관리자이메일주소는 필수 입력 값이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+            "line": 29,
+            "snippet": "\t@EgovNullCheck"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+            "line": 41,
+            "snippet": "\t@EgovNullCheck"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+            "line": 63,
+            "snippet": "\t@EgovNullCheck"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+            "line": 69,
+            "snippet": "\t@EgovNullCheck"
+          }
+        ]
+      },
+      {
+        "text": "파일시스템명은 60자, 파일시스템관리명은 255자, 관리자이메일주소는 50자를 넘을 수 없다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+            "line": 30,
+            "snippet": "\t@Size(max=60)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+            "line": 36,
+            "snippet": "\t@Size(max=255)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+            "line": 72,
+            "snippet": "\tprivate String mngrEmailAddr;"
+          }
+        ]
+      },
+      {
+        "text": "화면에 보여 줄 생성일시는 18자를 넘으면 앞 19자리까지만 잘라 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 145,
+            "snippet": "\t\t\tif (resultVO.getCreatDt().length() > 18) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 146,
+            "snippet": "\t\t\t\tresultVO.setCreatDt(resultVO.getCreatDt().substring(0, 19));"
+          }
+        ]
+      },
+      {
+        "text": "파일시스템 크기는 운영체제가 윈도우인지 유닉스인지에 따라 다른 방식으로 계산하며, 둘 다 아니면 판별 불가 오류로 처리한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+            "line": 78,
+            "snippet": "\t\tif (os.equals(\"WINDOWS\")) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+            "line": 80,
+            "snippet": "\t\t} else if (os.equals(\"UNIX\")) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+            "line": 83,
+            "snippet": "\t\t\tthrow new IllegalStateException(\"Exception caught when determining operating system\");"
+          }
+        ]
+      },
+      {
+        "text": "윈도우 파일시스템 경로는 드라이브 문자 형식만 허용해 상위 경로 탐색을 차단한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+            "line": 100,
+            "snippet": "\t\t// 드라이브 문자(예: C:)만 허용 - ../../ 등 경로 탐색도 여기서 차단됨"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+            "line": 101,
+            "snippet": "\t\t if (!windowsPath.matches(\"^[A-Za-z]:$\")) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+            "line": 102,
+            "snippet": "\t\t\tthrow new IOException(\"Invalid Windows drive path: \" + windowsPath);"
+          }
+        ]
+      },
+      {
+        "text": "조회 목록은 페이지 단위로 제공하며 페이지당 레코드 개수 기본값은 10건이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+            "line": 43,
+            "snippet": "    private int recordCountPerPage = 10;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+            "line": 61,
+            "snippet": "    private int recordCountPerPage = 10;"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "인증·권한 업무에 의존해 인증 여부와 인증 사용자 정보를 확인하고, 미인증 시 로그인 화면으로 이동시킨다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 58,
+            "snippet": "\tpublic static Boolean isAuthenticated() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 24,
+            "snippet": "\tpublic Boolean isAuthenticated(); "
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 116,
+            "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+          }
+        ]
+      },
+      {
+        "text": "공통 메시지 업무에 의존해 로케일에 맞는 안내·오류 메시지를 코드로 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 115,
+            "snippet": "\t\t\tredirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+          }
+        ]
+      },
+      {
+        "text": "공통 유틸리티 업무의 문자열 처리·입력값 보안 처리·자원 정리 도구를 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+            "line": 31,
+            "snippet": "public class EgovResourceCloseHelper {"
+          }
+        ]
+      },
+      {
+        "text": "공통 코드 업무에 의존해 로그 조회 화면의 선택 목록을 코드로 채운다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 29,
+            "snippet": "public class ComDefaultCodeVO implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 31,
+            "snippet": "    private String codeId = \"\";"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "모니터링 대상 관리",
+        "nodes": [
+          {
+            "id": "s1",
+            "kind": "start",
+            "label": "시작"
+          },
+          {
+            "id": "a1",
+            "kind": "activity",
+            "label": "모니터링 대상 목록 조회",
+            "flowRef": "flow:ANY /utl/sys/fsm/selectFileSysMntrngList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+                "line": 25,
+                "snippet": "\tpublic Map<String, Object> selectFileSysMntrngList(FileSysMntrngVO fileSysMntrngVO) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "d1",
+            "kind": "decision",
+            "label": "로그인 인증 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+                "line": 113,
+                "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+                "line": 114,
+                "snippet": "\t\tif (!isAuthenticated) {"
+              }
+            ]
+          },
+          {
+            "id": "a2",
+            "kind": "activity",
+            "label": "로그인 화면으로 이동",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+                "line": 116,
+                "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+              }
+            ]
+          },
+          {
+            "id": "a3",
+            "kind": "activity",
+            "label": "등록·수정 화면 표시",
+            "flowRef": "flow:ANY /utl/sys/fsm/addFileSysMntrng.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+                "line": 110,
+                "snippet": "\t\tString sLocationUrl = \"egovframework/com/utl/sys/fsm/EgovFileSysMntrngRegist\";"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+                "line": 152,
+                "snippet": "\t\treturn \"egovframework/com/utl/sys/fsm/EgovFileSysMntrngUpdt\";"
+              }
+            ]
+          },
+          {
+            "id": "a4",
+            "kind": "activity",
+            "label": "대상 정보 등록·수정",
+            "flowRef": "flow:ANY /utl/sys/fsm/insertFileSysMntrng.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+                "line": 50,
+                "snippet": "\tpublic void insertFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+                "line": 42,
+                "snippet": "\tpublic void updateFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "a5",
+            "kind": "activity",
+            "label": "대상 정보 삭제",
+            "flowRef": "flow:ANY /utl/sys/fsm/deleteFileSysMntrng.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+                "line": 58,
+                "snippet": "\tpublic void deleteFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "e1",
+            "kind": "end",
+            "label": "종료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "s1",
+            "to": "a1"
+          },
+          {
+            "from": "a1",
+            "to": "d1"
+          },
+          {
+            "from": "d1",
+            "to": "a2",
+            "label": "미인증"
+          },
+          {
+            "from": "d1",
+            "to": "a3",
+            "label": "인증됨"
+          },
+          {
+            "from": "a2",
+            "to": "e1"
+          },
+          {
+            "from": "a3",
+            "to": "a4"
+          },
+          {
+            "from": "a4",
+            "to": "e1"
+          },
+          {
+            "from": "a3",
+            "to": "a5"
+          },
+          {
+            "from": "a5",
+            "to": "e1"
+          }
+        ]
+      },
+      {
+        "title": "파일시스템 크기 점검",
+        "nodes": [
+          {
+            "id": "s1",
+            "kind": "start",
+            "label": "시작"
+          },
+          {
+            "id": "a1",
+            "kind": "activity",
+            "label": "파일시스템 크기 조회 요청",
+            "flowRef": "flow:ANY /utl/sys/fsm/selectFileSysMg.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+                "line": 67,
+                "snippet": "\tpublic int selectFileSysMg(FileSysMntrng fileSysMntrng) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "d1",
+            "kind": "decision",
+            "label": "운영체제 종류",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+                "line": 78,
+                "snippet": "\t\tif (os.equals(\"WINDOWS\")) {"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+                "line": 80,
+                "snippet": "\t\t} else if (os.equals(\"UNIX\")) {"
+              }
+            ]
+          },
+          {
+            "id": "a2",
+            "kind": "activity",
+            "label": "윈도우 기준 크기 계산",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+                "line": 79,
+                "snippet": "\t\t\treturn totalSpaceWindows(path);"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+                "line": 94,
+                "snippet": "\tlong totalSpaceWindows(String path) throws IOException {"
+              }
+            ]
+          },
+          {
+            "id": "a3",
+            "kind": "activity",
+            "label": "유닉스 기준 크기 계산",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+                "line": 81,
+                "snippet": "\t\t\treturn totalSpaceUnix(path);"
+              }
+            ]
+          },
+          {
+            "id": "a4",
+            "kind": "activity",
+            "label": "판별 불가 오류 처리",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+                "line": 83,
+                "snippet": "\t\t\tthrow new IllegalStateException(\"Exception caught when determining operating system\");"
+              }
+            ]
+          },
+          {
+            "id": "a5",
+            "kind": "activity",
+            "label": "모니터링 상태 갱신",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+                "line": 75,
+                "snippet": "\tpublic void updateFileSysMntrngSttus(FileSysMntrng fileSysMntrng) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "e1",
+            "kind": "end",
+            "label": "종료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "s1",
+            "to": "a1"
+          },
+          {
+            "from": "a1",
+            "to": "d1"
+          },
+          {
+            "from": "d1",
+            "to": "a2",
+            "label": "윈도우"
+          },
+          {
+            "from": "d1",
+            "to": "a3",
+            "label": "유닉스"
+          },
+          {
+            "from": "d1",
+            "to": "a4",
+            "label": "그 외"
+          },
+          {
+            "from": "a2",
+            "to": "a5"
+          },
+          {
+            "from": "a3",
+            "to": "a5"
+          },
+          {
+            "from": "a4",
+            "to": "e1"
+          },
+          {
+            "from": "a5",
+            "to": "e1"
+          }
+        ]
+      },
+      {
+        "title": "모니터링 로그 조회",
+        "nodes": [
+          {
+            "id": "s1",
+            "kind": "start",
+            "label": "시작"
+          },
+          {
+            "id": "a1",
+            "kind": "activity",
+            "label": "로그 목록 조회",
+            "flowRef": "flow:ANY /utl/sys/fsm/selectFileSysMntrngLogList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+                "line": 84,
+                "snippet": "\tpublic Map<String, Object> selectFileSysMntrngLogList(FileSysMntrngLogVO fileSysMntrngLogVO) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "a2",
+            "kind": "activity",
+            "label": "로그 상세 조회",
+            "flowRef": "flow:ANY /utl/sys/fsm/selectFileSysMntrngLog.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+                "line": 19,
+                "snippet": "public class FileSysMntrngLogVO extends FileSysMntrngLog {"
+              }
+            ]
+          },
+          {
+            "id": "e1",
+            "kind": "end",
+            "label": "종료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "s1",
+            "to": "a1"
+          },
+          {
+            "from": "a1",
+            "to": "a2"
+          },
+          {
+            "from": "a2",
+            "to": "e1"
+          }
+        ]
+      },
+      {
+        "title": "대상 상세 조회",
+        "nodes": [
+          {
+            "id": "s1",
+            "kind": "start",
+            "label": "시작"
+          },
+          {
+            "id": "a1",
+            "kind": "activity",
+            "label": "대상 상세 정보 조회",
+            "flowRef": "flow:ANY /utl/sys/fsm/selectFileSysMntrng.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+                "line": 164,
+                "snippet": "\t\tFileSysMntrng fileSysMntrng = fileSysMntrngService.selectFileSysMntrng(fileSysMntrngVO);"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+                "line": 34,
+                "snippet": "\tpublic FileSysMntrngVO selectFileSysMntrng(FileSysMntrngVO fileSysMntrngVO) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "a2",
+            "kind": "activity",
+            "label": "생성일시 표시 형식 정리",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+                "line": 167,
+                "snippet": "\t\t\tif (fileSysMntrng.getCreatDt().length() > 18) {"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+                "line": 168,
+                "snippet": "\t\t\t\tfileSysMntrng.setCreatDt(fileSysMntrng.getCreatDt().substring(0, 19));"
+              }
+            ]
+          },
+          {
+            "id": "a3",
+            "kind": "activity",
+            "label": "상세 화면 표시",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+                "line": 171,
+                "snippet": "\t\tmodel.addAttribute(\"fileSysMntrngVO\", fileSysMntrng);"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+                "line": 173,
+                "snippet": "\t\treturn \"egovframework/com/utl/sys/fsm/EgovFileSysMntrngDetail\";"
+              }
+            ]
+          },
+          {
+            "id": "e1",
+            "kind": "end",
+            "label": "종료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "s1",
+            "to": "a1"
+          },
+          {
+            "from": "a1",
+            "to": "a2"
+          },
+          {
+            "from": "a2",
+            "to": "a3"
+          },
+          {
+            "from": "a3",
+            "to": "e1"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/addFileSysMntrng.do",
+      "name": "파일시스템 모니터링 대상 등록 화면 이동",
+      "summary": {
+        "text": "로그인 인증을 확인한 뒤 파일시스템 모니터링 대상 등록 화면으로 이동하며, 미인증 사용자는 로그인 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 113,
+            "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 116,
+            "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/deleteFileSysMntrng.do",
+      "name": "파일시스템 모니터링 대상 삭제",
+      "summary": {
+        "text": "선택한 파일시스템 모니터링 대상을 삭제한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 259,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/deleteFileSysMntrng.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+            "line": 58,
+            "snippet": "\tpublic void deleteFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/insertFileSysMntrng.do",
+      "name": "파일시스템 모니터링 대상 등록",
+      "summary": {
+        "text": "입력받은 파일시스템 모니터링 대상 정보를 검증 후 신규 등록한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 216,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/insertFileSysMntrng.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+            "line": 50,
+            "snippet": "\tpublic void insertFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/modifyFileSysMntrng.do",
+      "name": "파일시스템 모니터링 대상 수정 화면 이동",
+      "summary": {
+        "text": "로그인 인증을 확인한 뒤 대상 상세 정보를 조회해 수정 화면에 채워 보여준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 129,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/modifyFileSysMntrng.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 138,
+            "snippet": "\t\tFileSysMntrngVO resultVO = fileSysMntrngService.selectFileSysMntrng(fileSysMntrngVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/selectFileSysMg.do",
+      "name": "파일시스템 크기 조회",
+      "summary": {
+        "text": "등록된 파일시스템 경로의 총 크기를 운영체제 종류에 맞춰 계산해 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 278,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/selectFileSysMg.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+            "line": 67,
+            "snippet": "\tpublic int selectFileSysMg(FileSysMntrng fileSysMntrng) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/selectFileSysMntrng.do",
+      "name": "파일시스템 모니터링 대상 상세 조회",
+      "summary": {
+        "text": "선택한 파일시스템 모니터링 대상의 상세 정보를 조회해 상세 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 162,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/selectFileSysMntrng.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 164,
+            "snippet": "\t\tFileSysMntrng fileSysMntrng = fileSysMntrngService.selectFileSysMntrng(fileSysMntrngVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/selectFileSysMntrngList.do",
+      "name": "파일시스템 모니터링 대상 목록 조회",
+      "summary": {
+        "text": "파일시스템 모니터링 대상 목록을 검색 조건과 페이지 단위로 조회해 목록 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 73,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/selectFileSysMntrngList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+            "line": 25,
+            "snippet": "\tpublic Map<String, Object> selectFileSysMntrngList(FileSysMntrngVO fileSysMntrngVO) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/selectFileSysMntrngLog.do",
+      "name": "파일시스템 모니터링 로그 상세 조회",
+      "summary": {
+        "text": "선택한 파일시스템 모니터링 로그의 상세 내용을 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 366,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/selectFileSysMntrngLog.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/selectFileSysMntrngLogList.do",
+      "name": "파일시스템 모니터링 로그 목록 조회",
+      "summary": {
+        "text": "기간·검색 조건으로 파일시스템 모니터링 로그 목록을 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 303,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/selectFileSysMntrngLogList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+            "line": 84,
+            "snippet": "\tpublic Map<String, Object> selectFileSysMntrngLogList(FileSysMntrngLogVO fileSysMntrngLogVO) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/updateFileSysMntrng.do",
+      "name": "파일시스템 모니터링 대상 수정",
+      "summary": {
+        "text": "입력받은 파일시스템 모니터링 대상 정보를 검증 후 수정 저장한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 183,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/updateFileSysMntrng.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+            "line": 42,
+            "snippet": "\tpublic void updateFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /utl/sys/fsm/addFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "다국어 메시지 조회",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 등록 화면 이동] 로케일에 맞는 안내·오류 메시지를 코드로 조회해 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증 실패 등 처리 결과를 사용자에게 알릴 때 필요한 메시지를 메시지 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 48,
+              "snippet": "\t * 정의된 메세지 조회"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 매개변수, 로케일 조합으로 정의된 메시지를 조회하며 로케일이 없으면 시스템 기본 로케일을 적용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/addFileSysMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "인증 사용자 정보 서비스",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 등록 화면 이동] 인증된 사용자 정보와 권한 목록, 인증 여부를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "현재 요청자가 인증된 사용자인지, 어떤 권한을 가졌는지 판단할 근거를 업무 화면에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 8,
+              "snippet": "\t * 인증된 사용자객체를 VO형식으로 가져온다."
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인 세 가지를 규정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/addFileSysMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 확인 보조 도구",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 등록 화면 이동] 화면에서 인증 사용자 정보와 인증 여부를 간편하게 확인하도록 돕는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증 사용자 정보 서비스를 대신 호출해, 화면 처리 시작 시점에 인증 여부와 사용자 정보를 확인하는 통로 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 사용자 정보 서비스를 보관하고, 인증 사용자 객체·권한 목록·인증 여부 확인 결과를 그대로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 42,
+              "snippet": "\t\treturn egovUserDetailsService.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 51,
+              "snippet": "\t\treturn egovUserDetailsService.getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "\t\treturn egovUserDetailsService.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/addFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "name": "파일시스템 모니터링 화면 제어",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 등록 화면 이동] 파일시스템 모니터링 대상과 로그에 대한 화면 요청을 받아 인증을 확인하고 업무 서비스에 위임한 뒤 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이 흐름의 진입점으로 화면 요청 파라미터를 받아 로그인 인증 여부를 확인하고, 파일시스템 모니터링 업무 서비스에 처리를 위임한 뒤 이동할 화면 경로를 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 138,
+              "snippet": "\t\tFileSysMntrngVO resultVO = fileSysMntrngService.selectFileSysMntrng(fileSysMntrngVO);"
+            }
+          ]
+        },
+        "request": {
+          "text": "모니터링 대상 정보를 화면 객체로 받아 처리하며, 처리 전에 로그인 인증 여부를 확인해 미인증이면 로그인 실패 메시지와 함께 로그인 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 113,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 114,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 116,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/deleteFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "다국어 메시지 조회",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 삭제] 로케일에 맞는 안내·오류 메시지를 코드로 조회해 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증 실패 등 처리 결과를 사용자에게 알릴 때 필요한 메시지를 메시지 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 48,
+              "snippet": "\t * 정의된 메세지 조회"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 매개변수, 로케일 조합으로 정의된 메시지를 조회하며 로케일이 없으면 시스템 기본 로케일을 적용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/deleteFileSysMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "인증 사용자 정보 서비스",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 삭제] 인증된 사용자 정보와 권한 목록, 인증 여부를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "현재 요청자가 인증된 사용자인지, 어떤 권한을 가졌는지 판단할 근거를 업무 화면에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 8,
+              "snippet": "\t * 인증된 사용자객체를 VO형식으로 가져온다."
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인 세 가지를 규정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/deleteFileSysMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 확인 보조 도구",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 삭제] 화면에서 인증 사용자 정보와 인증 여부를 간편하게 확인하도록 돕는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증 사용자 정보 서비스를 대신 호출해, 화면 처리 시작 시점에 인증 여부와 사용자 정보를 확인하는 통로 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 사용자 정보 서비스를 보관하고, 인증 사용자 객체·권한 목록·인증 여부 확인 결과를 그대로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 42,
+              "snippet": "\t\treturn egovUserDetailsService.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 51,
+              "snippet": "\t\treturn egovUserDetailsService.getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "\t\treturn egovUserDetailsService.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/deleteFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "name": "파일시스템 모니터링 업무 서비스",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 삭제] 파일시스템 모니터링 대상의 등록·수정·삭제·조회와 크기 조회, 모니터링 로그 조회 업무를 정의한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+            "line": 16,
+            "snippet": "public interface EgovFileSysMntrngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 모니터링 대상에 대한 등록, 수정, 삭제, 조회 기능을 제공하며 조회는 목록조회와 상세조회로 구분된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 7,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 Service Interface를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 10,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 등록, 수정, 삭제, 조회기능을 제공한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링대상의 조회기능은 목록조회, 상세조회로 구분된다."
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "모니터링 대상 목록·상세 조회, 등록·수정·삭제, 파일시스템 크기 조회와 모니터링 상태 갱신, 모니터링 로그 목록 조회를 업무 단위로 규정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 25,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngList(FileSysMntrngVO fileSysMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 50,
+              "snippet": "\tpublic void insertFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 58,
+              "snippet": "\tpublic void deleteFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 67,
+              "snippet": "\tpublic int selectFileSysMg(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 75,
+              "snippet": "\tpublic void updateFileSysMntrngSttus(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 84,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngLogList(FileSysMntrngLogVO fileSysMntrngLogVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/deleteFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "name": "파일시스템 모니터링 화면 제어",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 삭제] 파일시스템 모니터링 대상과 로그에 대한 화면 요청을 받아 인증을 확인하고 업무 서비스에 위임한 뒤 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이 흐름의 진입점으로 화면 요청 파라미터를 받아 로그인 인증 여부를 확인하고, 파일시스템 모니터링 업무 서비스에 처리를 위임한 뒤 이동할 화면 경로를 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 138,
+              "snippet": "\t\tFileSysMntrngVO resultVO = fileSysMntrngService.selectFileSysMntrng(fileSysMntrngVO);"
+            }
+          ]
+        },
+        "request": {
+          "text": "모니터링 대상 정보를 화면 객체로 받아 처리하며, 처리 전에 로그인 인증 여부를 확인해 미인증이면 로그인 실패 메시지와 함께 로그인 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 113,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 114,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 116,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "다국어 메시지 조회",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 등록] 로케일에 맞는 안내·오류 메시지를 코드로 조회해 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증 실패 등 처리 결과를 사용자에게 알릴 때 필요한 메시지를 메시지 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 48,
+              "snippet": "\t * 정의된 메세지 조회"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 매개변수, 로케일 조합으로 정의된 메시지를 조회하며 로케일이 없으면 시스템 기본 로케일을 적용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "입력값 보안 처리 도구",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 등록] 화면 입력값의 위험 문자와 경로 조작 위험을 제거한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면에서 넘어온 입력값에 포함된 스크립트 삽입·경로 조작 위험 문자를 걸러 내는 보안 처리 도구로 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "입력값이 비었으면 빈 문자열을 돌려주고, 그렇지 않으면 위험 문자를 치환하거나 상위 경로 표기를 제거한 문자열을 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "\t\tif (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 33,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "\tpublic static String filePathBlackList(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 등록] 로그인한 사용자의 식별·소속·연락처 정보를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "등록·수정 처리 시 작업자를 식별하기 위해 인증된 로그인 사용자 정보를 담아 전달하는 데이터 구조다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일주소는 필수 값으로 관리하며 고유아이디, 사용자구분, 조직 정보 등을 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 44,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 49,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 확인 보조 도구",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 등록] 화면에서 인증 사용자 정보와 인증 여부를 간편하게 확인하도록 돕는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증 사용자 정보 서비스를 대신 호출해, 화면 처리 시작 시점에 인증 여부와 사용자 정보를 확인하는 통로 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 사용자 정보 서비스를 보관하고, 인증 사용자 객체·권한 목록·인증 여부 확인 결과를 그대로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 42,
+              "snippet": "\t\treturn egovUserDetailsService.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 51,
+              "snippet": "\t\treturn egovUserDetailsService.getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "\t\treturn egovUserDetailsService.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 도구",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 등록] 문자열 자르기와 빈 값 검증 등 공통 문자열 처리를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "입력 문자열의 길이 제한 처리와 빈 값 여부 판정을 담당하는 공통 도구로 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 71,
+              "snippet": "\t * 문자열이 지정한 길이를 초과했을때 지정한길이에다가 해당 문자열을 붙여주는 메서드."
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 기준값을 두고, 지정 길이를 넘으면 잘라 내고 넘지 않으면 원본을 그대로 유지한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 99,
+              "snippet": "\t\t\t\tresult = source.substring(0, slength);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "name": "파일시스템 모니터링 업무 서비스",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 등록] 파일시스템 모니터링 대상의 등록·수정·삭제·조회와 크기 조회, 모니터링 로그 조회 업무를 정의한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+            "line": 16,
+            "snippet": "public interface EgovFileSysMntrngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 모니터링 대상에 대한 등록, 수정, 삭제, 조회 기능을 제공하며 조회는 목록조회와 상세조회로 구분된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 7,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 Service Interface를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 10,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 등록, 수정, 삭제, 조회기능을 제공한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링대상의 조회기능은 목록조회, 상세조회로 구분된다."
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "모니터링 대상 목록·상세 조회, 등록·수정·삭제, 파일시스템 크기 조회와 모니터링 상태 갱신, 모니터링 로그 목록 조회를 업무 단위로 규정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 25,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngList(FileSysMntrngVO fileSysMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 50,
+              "snippet": "\tpublic void insertFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 58,
+              "snippet": "\tpublic void deleteFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 67,
+              "snippet": "\tpublic int selectFileSysMg(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 75,
+              "snippet": "\tpublic void updateFileSysMntrngSttus(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 84,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngLogList(FileSysMntrngLogVO fileSysMntrngLogVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+      "name": "파일시스템 모니터링 대상 조회 정보",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 등록] 모니터링 대상 목록의 검색 조건과 페이지 정보를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+            "line": 18,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 모니터링 대상의 목록 항목과 조회조건을 담아 화면과 업무 서비스 사이를 오가는 데이터 구조다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 8,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 Vo 클래스를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링대상의 목록 항목, 조회조건 등을 관리한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 19,
+              "snippet": "public class FileSysMntrngVO extends FileSysMntrng {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "모니터링 대상 항목을 물려받고 검색조건·검색단어와 현재페이지·페이지당 레코드 개수 등 페이지 정보를 기본값과 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 19,
+              "snippet": "public class FileSysMntrngVO extends FileSysMntrng {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 22,
+              "snippet": "    private String searchCnd = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 28,
+              "snippet": "    private int pageIndex = 1;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 43,
+              "snippet": "    private int recordCountPerPage = 10;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "name": "파일시스템 모니터링 화면 제어",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 등록] 파일시스템 모니터링 대상과 로그에 대한 화면 요청을 받아 인증을 확인하고 업무 서비스에 위임한 뒤 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이 흐름의 진입점으로 화면 요청 파라미터를 받아 로그인 인증 여부를 확인하고, 파일시스템 모니터링 업무 서비스에 처리를 위임한 뒤 이동할 화면 경로를 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 138,
+              "snippet": "\t\tFileSysMntrngVO resultVO = fileSysMntrngService.selectFileSysMntrng(fileSysMntrngVO);"
+            }
+          ]
+        },
+        "request": {
+          "text": "모니터링 대상 정보를 화면 객체로 받아 처리하며, 처리 전에 로그인 인증 여부를 확인해 미인증이면 로그인 실패 메시지와 함께 로그인 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 113,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 114,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 116,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "다국어 메시지 조회",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 수정 화면 이동] 로케일에 맞는 안내·오류 메시지를 코드로 조회해 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증 실패 등 처리 결과를 사용자에게 알릴 때 필요한 메시지를 메시지 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 48,
+              "snippet": "\t * 정의된 메세지 조회"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 매개변수, 로케일 조합으로 정의된 메시지를 조회하며 로케일이 없으면 시스템 기본 로케일을 적용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "인증 사용자 정보 서비스",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 수정 화면 이동] 인증된 사용자 정보와 권한 목록, 인증 여부를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "현재 요청자가 인증된 사용자인지, 어떤 권한을 가졌는지 판단할 근거를 업무 화면에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 8,
+              "snippet": "\t * 인증된 사용자객체를 VO형식으로 가져온다."
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인 세 가지를 규정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 확인 보조 도구",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 수정 화면 이동] 화면에서 인증 사용자 정보와 인증 여부를 간편하게 확인하도록 돕는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증 사용자 정보 서비스를 대신 호출해, 화면 처리 시작 시점에 인증 여부와 사용자 정보를 확인하는 통로 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 사용자 정보 서비스를 보관하고, 인증 사용자 객체·권한 목록·인증 여부 확인 결과를 그대로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 42,
+              "snippet": "\t\treturn egovUserDetailsService.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 51,
+              "snippet": "\t\treturn egovUserDetailsService.getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "\t\treturn egovUserDetailsService.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "name": "파일시스템 모니터링 업무 서비스",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 수정 화면 이동] 파일시스템 모니터링 대상의 등록·수정·삭제·조회와 크기 조회, 모니터링 로그 조회 업무를 정의한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+            "line": 16,
+            "snippet": "public interface EgovFileSysMntrngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 모니터링 대상에 대한 등록, 수정, 삭제, 조회 기능을 제공하며 조회는 목록조회와 상세조회로 구분된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 7,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 Service Interface를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 10,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 등록, 수정, 삭제, 조회기능을 제공한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링대상의 조회기능은 목록조회, 상세조회로 구분된다."
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "모니터링 대상 목록·상세 조회, 등록·수정·삭제, 파일시스템 크기 조회와 모니터링 상태 갱신, 모니터링 로그 목록 조회를 업무 단위로 규정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 25,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngList(FileSysMntrngVO fileSysMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 50,
+              "snippet": "\tpublic void insertFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 58,
+              "snippet": "\tpublic void deleteFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 67,
+              "snippet": "\tpublic int selectFileSysMg(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 75,
+              "snippet": "\tpublic void updateFileSysMntrngSttus(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 84,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngLogList(FileSysMntrngLogVO fileSysMntrngLogVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+      "name": "파일시스템 모니터링 대상 조회 정보",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 수정 화면 이동] 모니터링 대상 목록의 검색 조건과 페이지 정보를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+            "line": 18,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 모니터링 대상의 목록 항목과 조회조건을 담아 화면과 업무 서비스 사이를 오가는 데이터 구조다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 8,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 Vo 클래스를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링대상의 목록 항목, 조회조건 등을 관리한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 19,
+              "snippet": "public class FileSysMntrngVO extends FileSysMntrng {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "모니터링 대상 항목을 물려받고 검색조건·검색단어와 현재페이지·페이지당 레코드 개수 등 페이지 정보를 기본값과 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 19,
+              "snippet": "public class FileSysMntrngVO extends FileSysMntrng {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 22,
+              "snippet": "    private String searchCnd = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 28,
+              "snippet": "    private int pageIndex = 1;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 43,
+              "snippet": "    private int recordCountPerPage = 10;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "name": "파일시스템 모니터링 화면 제어",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 수정 화면 이동] 파일시스템 모니터링 대상과 로그에 대한 화면 요청을 받아 인증을 확인하고 업무 서비스에 위임한 뒤 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이 흐름의 진입점으로 화면 요청 파라미터를 받아 로그인 인증 여부를 확인하고, 파일시스템 모니터링 업무 서비스에 처리를 위임한 뒤 이동할 화면 경로를 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 138,
+              "snippet": "\t\tFileSysMntrngVO resultVO = fileSysMntrngService.selectFileSysMntrng(fileSysMntrngVO);"
+            }
+          ]
+        },
+        "request": {
+          "text": "모니터링 대상 정보를 화면 객체로 받아 처리하며, 처리 전에 로그인 인증 여부를 확인해 미인증이면 로그인 실패 메시지와 함께 로그인 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 113,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 114,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 116,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "입력값 보안 처리 도구",
+      "summary": {
+        "text": "[파일시스템 크기 조회] 화면 입력값의 위험 문자와 경로 조작 위험을 제거한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면에서 넘어온 입력값에 포함된 스크립트 삽입·경로 조작 위험 문자를 걸러 내는 보안 처리 도구로 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "입력값이 비었으면 빈 문자열을 돌려주고, 그렇지 않으면 위험 문자를 치환하거나 상위 경로 표기를 제거한 문자열을 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "\t\tif (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 33,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "\tpublic static String filePathBlackList(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+      "name": "기본 로그 기록 도구",
+      "summary": {
+        "text": "[파일시스템 크기 조회] 무시 가능한 예외와 디버그·일반 정보를 기록한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+            "line": 24,
+            "snippet": "public class EgovBasicLogger {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "크기 조회 과정에서 기록이나 처리가 불필요한 예외와 디버그·일반 정보를 남기는 로그 도구로 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 24,
+              "snippet": "public class EgovBasicLogger {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 34,
+              "snippet": "\t * 기록이나 처리가 불필요한 경우 사용."
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "무시·디버그·정보 세 등급의 기록 통로를 두고 메시지와 예외를 함께 받거나 메시지만 받아 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 29,
+              "snippet": "\tprivate static final Logger IGNORE_LOGGER = Logger.getLogger(\"ignore\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 39,
+              "snippet": "\tpublic static void ignore(String message, Exception exception) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 63,
+              "snippet": "\tpublic static void debug(String message, Exception exception) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 87,
+              "snippet": "\tpublic static void info(String message) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+      "name": "자원 정리 도구",
+      "summary": {
+        "text": "[파일시스템 크기 조회] 파일·데이터베이스·소켓 자원을 안전하게 닫는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+            "line": 31,
+            "snippet": "public class EgovResourceCloseHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 크기 조회 과정에서 사용한 자원을 마무리 단계에서 안전하게 닫아 주는 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+              "line": 31,
+              "snippet": "public class EgovResourceCloseHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+              "line": 33,
+              "snippet": "\t * Resource close 처리."
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "자원이 비어 있지 않을 때만 닫고 닫는 중 발생한 예외는 무시 기록으로 남기며, 처리 대상이 아닌 유형이 들어오면 잘못된 요청으로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+              "line": 39,
+              "snippet": "\t\t\tif (resource != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+              "line": 43,
+              "snippet": "\t\t\t\t\tEgovBasicLogger.ignore(\"Occurred IOException to close resource is ingored!!\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+              "line": 56,
+              "snippet": "\t\t\tif (object != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+              "line": 76,
+              "snippet": "\t\t\t\t\tthrow new IllegalArgumentException(\"Wrapper type is not found : \" + object.toString());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 도구",
+      "summary": {
+        "text": "[파일시스템 크기 조회] 문자열 자르기와 빈 값 검증 등 공통 문자열 처리를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "입력 문자열의 길이 제한 처리와 빈 값 여부 판정을 담당하는 공통 도구로 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 71,
+              "snippet": "\t * 문자열이 지정한 길이를 초과했을때 지정한길이에다가 해당 문자열을 붙여주는 메서드."
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 기준값을 두고, 지정 길이를 넘으면 잘라 내고 넘지 않으면 원본을 그대로 유지한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 99,
+              "snippet": "\t\t\t\tresult = source.substring(0, slength);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+      "name": "파일시스템 모니터링 대상 조회 정보",
+      "summary": {
+        "text": "[파일시스템 크기 조회] 모니터링 대상 목록의 검색 조건과 페이지 정보를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+            "line": 18,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 모니터링 대상의 목록 항목과 조회조건을 담아 화면과 업무 서비스 사이를 오가는 데이터 구조다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 8,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 Vo 클래스를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링대상의 목록 항목, 조회조건 등을 관리한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 19,
+              "snippet": "public class FileSysMntrngVO extends FileSysMntrng {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "모니터링 대상 항목을 물려받고 검색조건·검색단어와 현재페이지·페이지당 레코드 개수 등 페이지 정보를 기본값과 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 19,
+              "snippet": "public class FileSysMntrngVO extends FileSysMntrng {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 22,
+              "snippet": "    private String searchCnd = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 28,
+              "snippet": "    private int pageIndex = 1;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 43,
+              "snippet": "    private int recordCountPerPage = 10;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+      "name": "파일시스템 크기 점검 도구",
+      "summary": {
+        "text": "[파일시스템 크기 조회] 운영체제 종류에 맞춰 파일시스템의 총 크기와 여유 크기를 계산한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+            "line": 35,
+            "snippet": "public class FileSystemChecker {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템의 총크기와 여유크기 결과를 제공해 크기 조회 업무가 사용량과 임계치를 판단할 수 있게 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+              "line": 25,
+              "snippet": " * - 파일시스템의 총크기와 여유크기의 결과를 제공한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+              "line": 35,
+              "snippet": "public class FileSystemChecker {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+              "line": 49,
+              "snippet": "\tpublic static int freeSpaceGb(String path) throws IOException {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "경로를 받아 기가바이트 단위 크기를 돌려주며, 경로가 없으면 오류로 처리하고 운영체제가 윈도우도 유닉스도 아니면 판별 불가로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+              "line": 50,
+              "snippet": "\t\treturn (int) (FileSystemUtils.freeSpaceKb(path) / 1024 / 1024);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+              "line": 60,
+              "snippet": "\tpublic static int totalSpaceGb(String path) throws IOException {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+              "line": 74,
+              "snippet": "\t\tif (path == null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+              "line": 78,
+              "snippet": "\t\tif (os.equals(\"WINDOWS\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+              "line": 80,
+              "snippet": "\t\t} else if (os.equals(\"UNIX\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+              "line": 83,
+              "snippet": "\t\t\tthrow new IllegalStateException(\"Exception caught when determining operating system\");"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "name": "파일시스템 모니터링 화면 제어",
+      "summary": {
+        "text": "[파일시스템 크기 조회] 파일시스템 모니터링 대상과 로그에 대한 화면 요청을 받아 인증을 확인하고 업무 서비스에 위임한 뒤 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이 흐름의 진입점으로 화면 요청 파라미터를 받아 로그인 인증 여부를 확인하고, 파일시스템 모니터링 업무 서비스에 처리를 위임한 뒤 이동할 화면 경로를 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 138,
+              "snippet": "\t\tFileSysMntrngVO resultVO = fileSysMntrngService.selectFileSysMntrng(fileSysMntrngVO);"
+            }
+          ]
+        },
+        "request": {
+          "text": "모니터링 대상 정보를 화면 객체로 받아 처리하며, 처리 전에 로그인 인증 여부를 확인해 미인증이면 로그인 실패 메시지와 함께 로그인 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 113,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 114,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 116,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "name": "파일시스템 모니터링 업무 서비스",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 상세 조회] 파일시스템 모니터링 대상의 등록·수정·삭제·조회와 크기 조회, 모니터링 로그 조회 업무를 정의한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+            "line": 16,
+            "snippet": "public interface EgovFileSysMntrngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 모니터링 대상에 대한 등록, 수정, 삭제, 조회 기능을 제공하며 조회는 목록조회와 상세조회로 구분된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 7,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 Service Interface를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 10,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 등록, 수정, 삭제, 조회기능을 제공한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링대상의 조회기능은 목록조회, 상세조회로 구분된다."
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "모니터링 대상 목록·상세 조회, 등록·수정·삭제, 파일시스템 크기 조회와 모니터링 상태 갱신, 모니터링 로그 목록 조회를 업무 단위로 규정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 25,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngList(FileSysMntrngVO fileSysMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 50,
+              "snippet": "\tpublic void insertFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 58,
+              "snippet": "\tpublic void deleteFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 67,
+              "snippet": "\tpublic int selectFileSysMg(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 75,
+              "snippet": "\tpublic void updateFileSysMntrngSttus(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 84,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngLogList(FileSysMntrngLogVO fileSysMntrngLogVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+      "name": "파일시스템 모니터링 대상 정보",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 상세 조회] 파일시스템 식별·용량·임계치·관리자 정보를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+            "line": 19,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 식별 정보와 크기·임계치·사용량, 관리자 연락처, 모니터링 상태를 담는 업무 데이터 구조다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 model 클래스를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+              "line": 14,
+              "snippet": " * - 파일시스템ID, 파일시스템명, 파일시스템관리명, 파일시스템크기, 파일시스템임계치, 파일시스템임계율, 파일시스템사용량, 파일시스템사용률, 관리자명, 관리자이메일주소, 서비스상태, 생성일시 항목을 관리한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+              "line": 20,
+              "snippet": "public class FileSysMntrng implements Serializable  {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "파일시스템명은 60자, 파일시스템관리명은 255자, 관리자이메일주소는 50자를 넘을 수 없고 파일시스템명·관리명·크기·임계치·관리자명·관리자이메일주소는 필수 값이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+              "line": 30,
+              "snippet": "\t@Size(max=60)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+              "line": 36,
+              "snippet": "\t@Size(max=255)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+              "line": 46,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+              "line": 70,
+              "snippet": "\t@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+              "line": 72,
+              "snippet": "\tprivate String mngrEmailAddr;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "name": "파일시스템 모니터링 화면 제어",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 상세 조회] 파일시스템 모니터링 대상과 로그에 대한 화면 요청을 받아 인증을 확인하고 업무 서비스에 위임한 뒤 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이 흐름의 진입점으로 화면 요청 파라미터를 받아 로그인 인증 여부를 확인하고, 파일시스템 모니터링 업무 서비스에 처리를 위임한 뒤 이동할 화면 경로를 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 138,
+              "snippet": "\t\tFileSysMntrngVO resultVO = fileSysMntrngService.selectFileSysMntrng(fileSysMntrngVO);"
+            }
+          ]
+        },
+        "request": {
+          "text": "모니터링 대상 정보를 화면 객체로 받아 처리하며, 처리 전에 로그인 인증 여부를 확인해 미인증이면 로그인 실패 메시지와 함께 로그인 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 113,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 114,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 116,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngList.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "name": "파일시스템 모니터링 업무 서비스",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 목록 조회] 파일시스템 모니터링 대상의 등록·수정·삭제·조회와 크기 조회, 모니터링 로그 조회 업무를 정의한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+            "line": 16,
+            "snippet": "public interface EgovFileSysMntrngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 모니터링 대상에 대한 등록, 수정, 삭제, 조회 기능을 제공하며 조회는 목록조회와 상세조회로 구분된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 7,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 Service Interface를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 10,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 등록, 수정, 삭제, 조회기능을 제공한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링대상의 조회기능은 목록조회, 상세조회로 구분된다."
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "모니터링 대상 목록·상세 조회, 등록·수정·삭제, 파일시스템 크기 조회와 모니터링 상태 갱신, 모니터링 로그 목록 조회를 업무 단위로 규정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 25,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngList(FileSysMntrngVO fileSysMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 50,
+              "snippet": "\tpublic void insertFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 58,
+              "snippet": "\tpublic void deleteFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 67,
+              "snippet": "\tpublic int selectFileSysMg(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 75,
+              "snippet": "\tpublic void updateFileSysMntrngSttus(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 84,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngLogList(FileSysMntrngLogVO fileSysMntrngLogVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngList.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+      "name": "파일시스템 모니터링 대상 조회 정보",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 목록 조회] 모니터링 대상 목록의 검색 조건과 페이지 정보를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+            "line": 18,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 모니터링 대상의 목록 항목과 조회조건을 담아 화면과 업무 서비스 사이를 오가는 데이터 구조다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 8,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 Vo 클래스를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링대상의 목록 항목, 조회조건 등을 관리한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 19,
+              "snippet": "public class FileSysMntrngVO extends FileSysMntrng {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "모니터링 대상 항목을 물려받고 검색조건·검색단어와 현재페이지·페이지당 레코드 개수 등 페이지 정보를 기본값과 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 19,
+              "snippet": "public class FileSysMntrngVO extends FileSysMntrng {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 22,
+              "snippet": "    private String searchCnd = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 28,
+              "snippet": "    private int pageIndex = 1;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 43,
+              "snippet": "    private int recordCountPerPage = 10;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngList.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "name": "파일시스템 모니터링 화면 제어",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 목록 조회] 파일시스템 모니터링 대상과 로그에 대한 화면 요청을 받아 인증을 확인하고 업무 서비스에 위임한 뒤 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이 흐름의 진입점으로 화면 요청 파라미터를 받아 로그인 인증 여부를 확인하고, 파일시스템 모니터링 업무 서비스에 처리를 위임한 뒤 이동할 화면 경로를 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 138,
+              "snippet": "\t\tFileSysMntrngVO resultVO = fileSysMntrngService.selectFileSysMntrng(fileSysMntrngVO);"
+            }
+          ]
+        },
+        "request": {
+          "text": "모니터링 대상 정보를 화면 객체로 받아 처리하며, 처리 전에 로그인 인증 여부를 확인해 미인증이면 로그인 실패 메시지와 함께 로그인 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 113,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 114,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 116,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngLog.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "name": "파일시스템 모니터링 업무 서비스",
+      "summary": {
+        "text": "[파일시스템 모니터링 로그 상세 조회] 파일시스템 모니터링 대상의 등록·수정·삭제·조회와 크기 조회, 모니터링 로그 조회 업무를 정의한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+            "line": 16,
+            "snippet": "public interface EgovFileSysMntrngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 모니터링 대상에 대한 등록, 수정, 삭제, 조회 기능을 제공하며 조회는 목록조회와 상세조회로 구분된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 7,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 Service Interface를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 10,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 등록, 수정, 삭제, 조회기능을 제공한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링대상의 조회기능은 목록조회, 상세조회로 구분된다."
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "모니터링 대상 목록·상세 조회, 등록·수정·삭제, 파일시스템 크기 조회와 모니터링 상태 갱신, 모니터링 로그 목록 조회를 업무 단위로 규정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 25,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngList(FileSysMntrngVO fileSysMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 50,
+              "snippet": "\tpublic void insertFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 58,
+              "snippet": "\tpublic void deleteFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 67,
+              "snippet": "\tpublic int selectFileSysMg(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 75,
+              "snippet": "\tpublic void updateFileSysMntrngSttus(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 84,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngLogList(FileSysMntrngLogVO fileSysMntrngLogVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngLog.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+      "name": "파일시스템 모니터링 로그 조회 정보",
+      "summary": {
+        "text": "[파일시스템 모니터링 로그 상세 조회] 모니터링 로그 목록의 기간·검색 조건과 페이지 정보를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+            "line": 18,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 모니터링 로그의 목록 항목과 조회조건을 담아 로그 조회 화면과 업무 서비스 사이를 오가는 데이터 구조다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+              "line": 8,
+              "snippet": " * - 파일시스템 모니터링 로그에 대한 Vo 클래스를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링 로그의 목록 항목, 조회조건 등을 관리한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+              "line": 19,
+              "snippet": "public class FileSysMntrngLogVO extends FileSysMntrngLog {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "검색조건·검색단어와 함께 시작일자·시작시간·종료일자·종료시간 등 기간 조회조건을 두고 페이지 정보를 기본값과 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+              "line": 22,
+              "snippet": "    private String searchCnd = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+              "line": 28,
+              "snippet": "    private String searchBgnDe = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+              "line": 37,
+              "snippet": "    private String searchEndDe = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+              "line": 46,
+              "snippet": "    private int pageIndex = 1;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngLog.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "name": "파일시스템 모니터링 화면 제어",
+      "summary": {
+        "text": "[파일시스템 모니터링 로그 상세 조회] 파일시스템 모니터링 대상과 로그에 대한 화면 요청을 받아 인증을 확인하고 업무 서비스에 위임한 뒤 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이 흐름의 진입점으로 화면 요청 파라미터를 받아 로그인 인증 여부를 확인하고, 파일시스템 모니터링 업무 서비스에 처리를 위임한 뒤 이동할 화면 경로를 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 138,
+              "snippet": "\t\tFileSysMntrngVO resultVO = fileSysMntrngService.selectFileSysMntrng(fileSysMntrngVO);"
+            }
+          ]
+        },
+        "request": {
+          "text": "모니터링 대상 정보를 화면 객체로 받아 처리하며, 처리 전에 로그인 인증 여부를 확인해 미인증이면 로그인 실패 메시지와 함께 로그인 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 113,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 114,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 116,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngLogList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통 코드 조회 정보",
+      "summary": {
+        "text": "[파일시스템 모니터링 로그 목록 조회] 화면 선택 목록을 채울 공통 코드 조회 조건을 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "로그 조회 화면의 선택 목록을 채우기 위해 어떤 코드를 어떤 조건으로 가져올지 지정하는 데이터 구조다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 30,
+              "snippet": "    /** 코드 ID */"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드 ID와 상세코드·코드명·코드설명을 담고, 특정 테이블에서 코드를 뽑을 때 쓸 테이블명과 상세 조건 여부·상세 조건을 함께 보관하며 상세 조건 여부 기본값은 사용 안 함이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 34,
+              "snippet": "    private String code = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngLogList.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "name": "파일시스템 모니터링 업무 서비스",
+      "summary": {
+        "text": "[파일시스템 모니터링 로그 목록 조회] 파일시스템 모니터링 대상의 등록·수정·삭제·조회와 크기 조회, 모니터링 로그 조회 업무를 정의한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+            "line": 16,
+            "snippet": "public interface EgovFileSysMntrngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 모니터링 대상에 대한 등록, 수정, 삭제, 조회 기능을 제공하며 조회는 목록조회와 상세조회로 구분된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 7,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 Service Interface를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 10,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 등록, 수정, 삭제, 조회기능을 제공한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링대상의 조회기능은 목록조회, 상세조회로 구분된다."
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "모니터링 대상 목록·상세 조회, 등록·수정·삭제, 파일시스템 크기 조회와 모니터링 상태 갱신, 모니터링 로그 목록 조회를 업무 단위로 규정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 25,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngList(FileSysMntrngVO fileSysMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 50,
+              "snippet": "\tpublic void insertFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 58,
+              "snippet": "\tpublic void deleteFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 67,
+              "snippet": "\tpublic int selectFileSysMg(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 75,
+              "snippet": "\tpublic void updateFileSysMntrngSttus(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 84,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngLogList(FileSysMntrngLogVO fileSysMntrngLogVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngLogList.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+      "name": "파일시스템 모니터링 로그 조회 정보",
+      "summary": {
+        "text": "[파일시스템 모니터링 로그 목록 조회] 모니터링 로그 목록의 기간·검색 조건과 페이지 정보를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+            "line": 18,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 모니터링 로그의 목록 항목과 조회조건을 담아 로그 조회 화면과 업무 서비스 사이를 오가는 데이터 구조다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+              "line": 8,
+              "snippet": " * - 파일시스템 모니터링 로그에 대한 Vo 클래스를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링 로그의 목록 항목, 조회조건 등을 관리한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+              "line": 19,
+              "snippet": "public class FileSysMntrngLogVO extends FileSysMntrngLog {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "검색조건·검색단어와 함께 시작일자·시작시간·종료일자·종료시간 등 기간 조회조건을 두고 페이지 정보를 기본값과 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+              "line": 22,
+              "snippet": "    private String searchCnd = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+              "line": 28,
+              "snippet": "    private String searchBgnDe = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+              "line": 37,
+              "snippet": "    private String searchEndDe = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+              "line": 46,
+              "snippet": "    private int pageIndex = 1;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngLogList.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "name": "파일시스템 모니터링 화면 제어",
+      "summary": {
+        "text": "[파일시스템 모니터링 로그 목록 조회] 파일시스템 모니터링 대상과 로그에 대한 화면 요청을 받아 인증을 확인하고 업무 서비스에 위임한 뒤 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이 흐름의 진입점으로 화면 요청 파라미터를 받아 로그인 인증 여부를 확인하고, 파일시스템 모니터링 업무 서비스에 처리를 위임한 뒤 이동할 화면 경로를 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 138,
+              "snippet": "\t\tFileSysMntrngVO resultVO = fileSysMntrngService.selectFileSysMntrng(fileSysMntrngVO);"
+            }
+          ]
+        },
+        "request": {
+          "text": "모니터링 대상 정보를 화면 객체로 받아 처리하며, 처리 전에 로그인 인증 여부를 확인해 미인증이면 로그인 실패 메시지와 함께 로그인 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 113,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 114,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 116,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/updateFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "입력값 보안 처리 도구",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 수정] 화면 입력값의 위험 문자와 경로 조작 위험을 제거한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면에서 넘어온 입력값에 포함된 스크립트 삽입·경로 조작 위험 문자를 걸러 내는 보안 처리 도구로 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "입력값이 비었으면 빈 문자열을 돌려주고, 그렇지 않으면 위험 문자를 치환하거나 상위 경로 표기를 제거한 문자열을 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "\t\tif (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 33,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "\tpublic static String filePathBlackList(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/updateFileSysMntrng.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 수정] 로그인한 사용자의 식별·소속·연락처 정보를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "등록·수정 처리 시 작업자를 식별하기 위해 인증된 로그인 사용자 정보를 담아 전달하는 데이터 구조다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일주소는 필수 값으로 관리하며 고유아이디, 사용자구분, 조직 정보 등을 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 44,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 49,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/updateFileSysMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "인증 사용자 정보 서비스",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 수정] 인증된 사용자 정보와 권한 목록, 인증 여부를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "현재 요청자가 인증된 사용자인지, 어떤 권한을 가졌는지 판단할 근거를 업무 화면에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 8,
+              "snippet": "\t * 인증된 사용자객체를 VO형식으로 가져온다."
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인 세 가지를 규정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/updateFileSysMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 확인 보조 도구",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 수정] 화면에서 인증 사용자 정보와 인증 여부를 간편하게 확인하도록 돕는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증 사용자 정보 서비스를 대신 호출해, 화면 처리 시작 시점에 인증 여부와 사용자 정보를 확인하는 통로 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 사용자 정보 서비스를 보관하고, 인증 사용자 객체·권한 목록·인증 여부 확인 결과를 그대로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 42,
+              "snippet": "\t\treturn egovUserDetailsService.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 51,
+              "snippet": "\t\treturn egovUserDetailsService.getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "\t\treturn egovUserDetailsService.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/updateFileSysMntrng.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 도구",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 수정] 문자열 자르기와 빈 값 검증 등 공통 문자열 처리를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "입력 문자열의 길이 제한 처리와 빈 값 여부 판정을 담당하는 공통 도구로 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 71,
+              "snippet": "\t * 문자열이 지정한 길이를 초과했을때 지정한길이에다가 해당 문자열을 붙여주는 메서드."
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 기준값을 두고, 지정 길이를 넘으면 잘라 내고 넘지 않으면 원본을 그대로 유지한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 99,
+              "snippet": "\t\t\t\tresult = source.substring(0, slength);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/updateFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "name": "파일시스템 모니터링 업무 서비스",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 수정] 파일시스템 모니터링 대상의 등록·수정·삭제·조회와 크기 조회, 모니터링 로그 조회 업무를 정의한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+            "line": 16,
+            "snippet": "public interface EgovFileSysMntrngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 모니터링 대상에 대한 등록, 수정, 삭제, 조회 기능을 제공하며 조회는 목록조회와 상세조회로 구분된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 7,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 Service Interface를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 10,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 등록, 수정, 삭제, 조회기능을 제공한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링대상의 조회기능은 목록조회, 상세조회로 구분된다."
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "모니터링 대상 목록·상세 조회, 등록·수정·삭제, 파일시스템 크기 조회와 모니터링 상태 갱신, 모니터링 로그 목록 조회를 업무 단위로 규정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 25,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngList(FileSysMntrngVO fileSysMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 50,
+              "snippet": "\tpublic void insertFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 58,
+              "snippet": "\tpublic void deleteFileSysMntrng(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 67,
+              "snippet": "\tpublic int selectFileSysMg(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 75,
+              "snippet": "\tpublic void updateFileSysMntrngSttus(FileSysMntrng fileSysMntrng) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+              "line": 84,
+              "snippet": "\tpublic Map<String, Object> selectFileSysMntrngLogList(FileSysMntrngLogVO fileSysMntrngLogVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/updateFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+      "name": "파일시스템 모니터링 대상 조회 정보",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 수정] 모니터링 대상 목록의 검색 조건과 페이지 정보를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+            "line": 18,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일시스템 모니터링 대상의 목록 항목과 조회조건을 담아 화면과 업무 서비스 사이를 오가는 데이터 구조다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 8,
+              "snippet": " * - 파일시스템 모니터링대상에 대한 Vo 클래스를 정의한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 11,
+              "snippet": " * - 파일시스템 모니터링대상의 목록 항목, 조회조건 등을 관리한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 19,
+              "snippet": "public class FileSysMntrngVO extends FileSysMntrng {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "모니터링 대상 항목을 물려받고 검색조건·검색단어와 현재페이지·페이지당 레코드 개수 등 페이지 정보를 기본값과 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 19,
+              "snippet": "public class FileSysMntrngVO extends FileSysMntrng {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 22,
+              "snippet": "    private String searchCnd = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 28,
+              "snippet": "    private int pageIndex = 1;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+              "line": 43,
+              "snippet": "    private int recordCountPerPage = 10;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/updateFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "name": "파일시스템 모니터링 화면 제어",
+      "summary": {
+        "text": "[파일시스템 모니터링 대상 수정] 파일시스템 모니터링 대상과 로그에 대한 화면 요청을 받아 인증을 확인하고 업무 서비스에 위임한 뒤 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이 흐름의 진입점으로 화면 요청 파라미터를 받아 로그인 인증 여부를 확인하고, 파일시스템 모니터링 업무 서비스에 처리를 위임한 뒤 이동할 화면 경로를 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 138,
+              "snippet": "\t\tFileSysMntrngVO resultVO = fileSysMntrngService.selectFileSysMntrng(fileSysMntrngVO);"
+            }
+          ]
+        },
+        "request": {
+          "text": "모니터링 대상 정보를 화면 객체로 받아 처리하며, 처리 전에 로그인 인증 여부를 확인해 미인증이면 로그인 실패 메시지와 함께 로그인 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 109,
+              "snippet": "\tpublic String addFileSysMntrng(@ModelAttribute(\"fileSysMntrngVO\") FileSysMntrngVO fileSysMntrngVO, RedirectAttributes redirectAttributes) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 113,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 114,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+              "line": 116,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

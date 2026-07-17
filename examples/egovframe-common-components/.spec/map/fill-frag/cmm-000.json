@@ -1,0 +1,4288 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "cmm-000",
+  "domainId": "domain:cmm",
+  "header": {
+    "name": "공통 기반(화면 프레임·첨부파일)",
+    "summary": {
+      "text": "메인·상하단·본문·좌측메뉴 등 공통 화면 프레임과 첨부파일 조회·다운로드·미리보기·삭제, 그리고 페이지 이동·모달·입력 검증 규칙 같은 공통 보조 기능을 제공하는 영역이다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+          "line": 71,
+          "snippet": "@RequestMapping(\"/index.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+          "line": 120,
+          "snippet": "@RequestMapping(\"/EgovLeft.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+          "line": 70,
+          "snippet": "@RequestMapping(value = \"/cmm/fms/FileDown.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+          "line": 151,
+          "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+          "line": 108,
+          "snippet": "@RequestMapping(\"/validator.do\")"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "첨부파일 정보: 첨부파일 아이디·파일연번·파일저장경로·원파일명·저장파일명·파일확장자·파일크기를 담는 핵심 자료이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 26,
+            "snippet": "public String atchFileId = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 46,
+            "snippet": "public String fileSn = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 50,
+            "snippet": "public String fileStreCours = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 54,
+            "snippet": "public String orignlFileNm = \"\";"
+          }
+        ]
+      },
+      {
+        "text": "로그인 사용자 정보: 아이디·이름·이메일·사용자구분·조직 아이디·고유아이디 등 인증 사용자를 나타내는 자료이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 42,
+            "snippet": "private String id;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 61,
+            "snippet": "private String userSe;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "private String uniqId;"
+          }
+        ]
+      },
+      {
+        "text": "메뉴 구성 정보: 좌측 메뉴에 표시할 이름·목록 주소·정렬순서·그룹 번호를 담는 자료이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/IncludedCompInfoVO.java",
+            "line": 29,
+            "snippet": "public class IncludedCompInfoVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/IncludedCompInfoVO.java",
+            "line": 31,
+            "snippet": "private String name;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/IncludedCompInfoVO.java",
+            "line": 33,
+            "snippet": "private int order;"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "첨부파일 다운로드는 인증된 사용자만 수행할 수 있다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+            "line": 74,
+            "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+            "line": 76,
+            "snippet": "if (isAuthenticated) {"
+          }
+        ]
+      },
+      {
+        "text": "첨부파일 식별자는 암호화되어 전달되며, 복호화한 세션값이 현재 세션과 다르면 다운로드와 미리보기를 중단한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+            "line": 94,
+            "snippet": "boolean isSameSessionId = StringUtils.equals(decodedSessionId, sessionId);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+            "line": 96,
+            "snippet": "if (!isSameSessionId) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+            "line": 91,
+            "snippet": "boolean isSameSessionId = StringUtils.equals(decodedSessionId, sessionId);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+            "line": 93,
+            "snippet": "if (!isSameSessionId) {"
+          }
+        ]
+      },
+      {
+        "text": "첨부파일 삭제는 인증된 사용자인 경우에만 실행된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 156,
+            "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 158,
+            "snippet": "if (isAuthenticated) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 159,
+            "snippet": "fileService.deleteFileInf(fileVO);"
+          }
+        ]
+      },
+      {
+        "text": "이미지 미리보기에서 파일연번이 지정되지 않으면 해당 첨부파일의 마지막 파일을 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+            "line": 105,
+            "snippet": "if (fileSn == null || fileSn.equals(\"\")) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+            "line": 106,
+            "snippet": "int newMaxFileSN = fileService.getMaxFileSN(vo);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+            "line": 107,
+            "snippet": "vo.setFileSn(Integer.toString(newMaxFileSN - 1));"
+          }
+        ]
+      },
+      {
+        "text": "본문 화면은 설정된 비밀번호 유효기간과 비밀번호 변경 후 경과일수를 비교해 만료 경과 일수를 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 90,
+            "snippet": "String propertyExpirePwdDay = EgovProperties.getProperty(\"Globals.ExpirePwdDay\");"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 109,
+            "snippet": "passedDayChangePWD = loginService.selectPassedDayChangePWD(loginVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 115,
+            "snippet": "model.addAttribute(\"elapsedTimeExpiration\", passedDayChangePWD - expirePwdDay);"
+          }
+        ]
+      },
+      {
+        "text": "화면 이동 주소와 파일 저장경로는 상위 경로 표기 등 위험 문자를 제거한 뒤 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 90,
+            "snippet": "link = EgovWebUtil.filePathBlackList(link);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+            "line": 115,
+            "snippet": "String fileStreCours = EgovWebUtil.filePathBlackList(fvo.getFileStreCours());"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 85,
+            "snippet": "returnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+          }
+        ]
+      },
+      {
+        "text": "좌측 메뉴는 메뉴 정보가 선언된 화면 처리 메서드만 모아 정렬 순서·그룹과 함께 구성한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 138,
+            "snippet": "annotation = methods[i].getAnnotation(IncludedInfo.class);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 140,
+            "snippet": "if (annotation != null) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 144,
+            "snippet": "zooVO.setOrder(annotation.order());"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 145,
+            "snippet": "zooVO.setGid(annotation.gid());"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "본문 화면 구성 시 로그인 업무의 비밀번호 변경 경과일수 조회를 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 109,
+            "snippet": "passedDayChangePWD = loginService.selectPassedDayChangePWD(loginVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+            "line": 98,
+            "snippet": "int selectPassedDayChangePWD(LoginVO vo) throws Exception;"
+          }
+        ]
+      },
+      {
+        "text": "인증 여부와 인증 사용자 정보는 사용자 인증정보 서비스를 통해 확인한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "public static Object getAuthenticatedUser() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 11,
+            "snippet": "public Object getAuthenticatedUser();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 24,
+            "snippet": "public Boolean isAuthenticated();"
+          }
+        ]
+      },
+      {
+        "text": "좌측 메뉴는 각 업무 화면 컨트롤러에 선언된 메뉴 정보를 수집해 구성하므로 전 업무 영역과 연결된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 129,
+            "snippet": "Map<String, Object> myZoos = applicationContext.getBeansWithAnnotation(Controller.class);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 138,
+            "snippet": "annotation = methods[i].getAnnotation(IncludedInfo.class);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 143,
+            "snippet": "zooVO.setName(annotation.name());"
+          }
+        ]
+      },
+      {
+        "text": "운영 기준값은 공통 환경설정 파일에서 읽어 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 90,
+            "snippet": "String propertyExpirePwdDay = EgovProperties.getProperty(\"Globals.ExpirePwdDay\");"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 72,
+            "snippet": "public static String getProperty(String keyName) {"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "공통 화면 프레임 구성",
+        "nodes": [
+          {
+            "id": "p1_s",
+            "kind": "start",
+            "label": "화면 요청"
+          },
+          {
+            "id": "p1_main",
+            "kind": "activity",
+            "label": "메인 화면 반환",
+            "flowRef": "flow:ANY /index.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 71,
+                "snippet": "@RequestMapping(\"/index.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p1_top",
+            "kind": "activity",
+            "label": "상단 영역 반환",
+            "flowRef": "flow:ANY /EgovTop.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 76,
+                "snippet": "@RequestMapping(\"/EgovTop.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p1_left",
+            "kind": "activity",
+            "label": "좌측 메뉴 구성",
+            "flowRef": "flow:ANY /EgovLeft.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 120,
+                "snippet": "@RequestMapping(\"/EgovLeft.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p1_cont",
+            "kind": "activity",
+            "label": "본문 화면 구성",
+            "flowRef": "flow:ANY /EgovContent.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 86,
+                "snippet": "@RequestMapping(\"/EgovContent.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p1_bot",
+            "kind": "activity",
+            "label": "하단 영역 반환",
+            "flowRef": "flow:ANY /EgovBottom.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 81,
+                "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p1_e",
+            "kind": "end",
+            "label": "화면 표시"
+          }
+        ],
+        "edges": [
+          {
+            "from": "p1_s",
+            "to": "p1_main"
+          },
+          {
+            "from": "p1_main",
+            "to": "p1_top"
+          },
+          {
+            "from": "p1_top",
+            "to": "p1_left"
+          },
+          {
+            "from": "p1_left",
+            "to": "p1_cont"
+          },
+          {
+            "from": "p1_cont",
+            "to": "p1_bot"
+          },
+          {
+            "from": "p1_bot",
+            "to": "p1_e"
+          }
+        ]
+      },
+      {
+        "title": "본문 비밀번호 안내",
+        "nodes": [
+          {
+            "id": "p2_s",
+            "kind": "start",
+            "label": "본문 화면 요청"
+          },
+          {
+            "id": "p2_prop",
+            "kind": "activity",
+            "label": "비밀번호 유효기간 조회",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 90,
+                "snippet": "String propertyExpirePwdDay = EgovProperties.getProperty(\"Globals.ExpirePwdDay\");"
+              }
+            ]
+          },
+          {
+            "id": "p2_user",
+            "kind": "activity",
+            "label": "인증 사용자 정보 조회",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 101,
+                "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+              }
+            ]
+          },
+          {
+            "id": "p2_d",
+            "kind": "decision",
+            "label": "로그인 사용자 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 104,
+                "snippet": "if (loginVO != null) {"
+              }
+            ]
+          },
+          {
+            "id": "p2_pass",
+            "kind": "activity",
+            "label": "비밀번호 경과일수 조회",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 109,
+                "snippet": "passedDayChangePWD = loginService.selectPassedDayChangePWD(loginVO);"
+              }
+            ]
+          },
+          {
+            "id": "p2_calc",
+            "kind": "activity",
+            "label": "만료 경과일수 전달",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 115,
+                "snippet": "model.addAttribute(\"elapsedTimeExpiration\", passedDayChangePWD - expirePwdDay);"
+              }
+            ]
+          },
+          {
+            "id": "p2_e",
+            "kind": "end",
+            "label": "본문 화면 표시"
+          }
+        ],
+        "edges": [
+          {
+            "from": "p2_s",
+            "to": "p2_prop"
+          },
+          {
+            "from": "p2_prop",
+            "to": "p2_user"
+          },
+          {
+            "from": "p2_user",
+            "to": "p2_d"
+          },
+          {
+            "from": "p2_d",
+            "to": "p2_pass",
+            "label": "로그인 상태"
+          },
+          {
+            "from": "p2_d",
+            "to": "p2_calc",
+            "label": "미로그인"
+          },
+          {
+            "from": "p2_pass",
+            "to": "p2_calc"
+          },
+          {
+            "from": "p2_calc",
+            "to": "p2_e"
+          }
+        ]
+      },
+      {
+        "title": "좌측 메뉴 수집",
+        "nodes": [
+          {
+            "id": "p3_s",
+            "kind": "start",
+            "label": "좌측 메뉴 요청"
+          },
+          {
+            "id": "p3_scan",
+            "kind": "activity",
+            "label": "업무 화면 목록 수집",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 129,
+                "snippet": "Map<String, Object> myZoos = applicationContext.getBeansWithAnnotation(Controller.class);"
+              }
+            ]
+          },
+          {
+            "id": "p3_d",
+            "kind": "decision",
+            "label": "메뉴 정보 선언 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 138,
+                "snippet": "annotation = methods[i].getAnnotation(IncludedInfo.class);"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 140,
+                "snippet": "if (annotation != null) {"
+              }
+            ]
+          },
+          {
+            "id": "p3_add",
+            "kind": "activity",
+            "label": "메뉴 항목 등록",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 142,
+                "snippet": "zooVO = new IncludedCompInfoVO();"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 143,
+                "snippet": "zooVO.setName(annotation.name());"
+              }
+            ]
+          },
+          {
+            "id": "p3_skip",
+            "kind": "activity",
+            "label": "해당 화면 제외",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 137,
+                "snippet": "for (int i = 0; i < methods.length; i++) {"
+              }
+            ]
+          },
+          {
+            "id": "p3_e",
+            "kind": "end",
+            "label": "메뉴 목록 완성"
+          }
+        ],
+        "edges": [
+          {
+            "from": "p3_s",
+            "to": "p3_scan"
+          },
+          {
+            "from": "p3_scan",
+            "to": "p3_d"
+          },
+          {
+            "from": "p3_d",
+            "to": "p3_add",
+            "label": "선언 있음"
+          },
+          {
+            "from": "p3_d",
+            "to": "p3_skip",
+            "label": "선언 없음"
+          },
+          {
+            "from": "p3_add",
+            "to": "p3_e"
+          },
+          {
+            "from": "p3_skip",
+            "to": "p3_e"
+          }
+        ]
+      },
+      {
+        "title": "첨부파일 다운로드",
+        "nodes": [
+          {
+            "id": "p4_s",
+            "kind": "start",
+            "label": "다운로드 요청"
+          },
+          {
+            "id": "p4_auth",
+            "kind": "decision",
+            "label": "인증 사용자 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+                "line": 70,
+                "snippet": "@RequestMapping(value = \"/cmm/fms/FileDown.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+                "line": 74,
+                "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+                "line": 76,
+                "snippet": "if (isAuthenticated) {"
+              }
+            ]
+          },
+          {
+            "id": "p4_dec",
+            "kind": "activity",
+            "label": "파일 식별자 복호화",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+                "line": 83,
+                "snippet": "String decodedString = cryptoService.decrypt(new String(decodedBytes));"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+                "line": 85,
+                "snippet": "String decodedFileId = StringUtils.substringAfter(decodedString, \"|\");"
+              }
+            ]
+          },
+          {
+            "id": "p4_sess",
+            "kind": "decision",
+            "label": "세션 일치 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+                "line": 94,
+                "snippet": "boolean isSameSessionId = StringUtils.equals(decodedSessionId, sessionId);"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+                "line": 96,
+                "snippet": "if (!isSameSessionId) {"
+              }
+            ]
+          },
+          {
+            "id": "p4_info",
+            "kind": "activity",
+            "label": "파일 정보 조회",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+                "line": 103,
+                "snippet": "FileVO fvo = fileService.selectFileInf(fileVO);"
+              }
+            ]
+          },
+          {
+            "id": "p4_send",
+            "kind": "activity",
+            "label": "파일 내용 전송",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+                "line": 122,
+                "snippet": "response.setHeader(\"Content-Disposition\", contentDisposition);"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+                "line": 132,
+                "snippet": "FileCopyUtils.copy(in, out);"
+              }
+            ]
+          },
+          {
+            "id": "p4_stop",
+            "kind": "end",
+            "label": "요청 차단"
+          },
+          {
+            "id": "p4_e",
+            "kind": "end",
+            "label": "다운로드 완료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "p4_s",
+            "to": "p4_auth"
+          },
+          {
+            "from": "p4_auth",
+            "to": "p4_dec",
+            "label": "인증됨"
+          },
+          {
+            "from": "p4_auth",
+            "to": "p4_stop",
+            "label": "미인증"
+          },
+          {
+            "from": "p4_dec",
+            "to": "p4_sess"
+          },
+          {
+            "from": "p4_sess",
+            "to": "p4_info",
+            "label": "일치"
+          },
+          {
+            "from": "p4_sess",
+            "to": "p4_stop",
+            "label": "불일치"
+          },
+          {
+            "from": "p4_info",
+            "to": "p4_send"
+          },
+          {
+            "from": "p4_send",
+            "to": "p4_e"
+          }
+        ]
+      },
+      {
+        "title": "이미지 미리보기",
+        "nodes": [
+          {
+            "id": "p5_s",
+            "kind": "start",
+            "label": "미리보기 요청"
+          },
+          {
+            "id": "p5_dec",
+            "kind": "activity",
+            "label": "파일 식별자 복호화",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+                "line": 74,
+                "snippet": "@RequestMapping(\"/cmm/fms/getImage.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+                "line": 83,
+                "snippet": "String decodedString = cryptoService.decrypt(new String(decodedBytes));"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+                "line": 85,
+                "snippet": "String decodedFileId = StringUtils.substringAfter(decodedString, \"|\");"
+              }
+            ]
+          },
+          {
+            "id": "p5_sess",
+            "kind": "decision",
+            "label": "세션 일치 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+                "line": 91,
+                "snippet": "boolean isSameSessionId = StringUtils.equals(decodedSessionId, sessionId);"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+                "line": 93,
+                "snippet": "if (!isSameSessionId) {"
+              }
+            ]
+          },
+          {
+            "id": "p5_sn",
+            "kind": "decision",
+            "label": "파일연번 지정 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+                "line": 105,
+                "snippet": "if (fileSn == null || fileSn.equals(\"\")) {"
+              }
+            ]
+          },
+          {
+            "id": "p5_last",
+            "kind": "activity",
+            "label": "마지막 파일 선택",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+                "line": 106,
+                "snippet": "int newMaxFileSN = fileService.getMaxFileSN(vo);"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+                "line": 107,
+                "snippet": "vo.setFileSn(Integer.toString(newMaxFileSN - 1));"
+              }
+            ]
+          },
+          {
+            "id": "p5_info",
+            "kind": "activity",
+            "label": "파일 정보 조회",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+                "line": 111,
+                "snippet": "FileVO fvo = fileService.selectFileInf(vo);"
+              }
+            ]
+          },
+          {
+            "id": "p5_send",
+            "kind": "activity",
+            "label": "이미지 전송",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+                "line": 140,
+                "snippet": "response.setHeader(\"Content-Type\", EgovWebUtil.removeCRLF(type));"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+                "line": 143,
+                "snippet": "bStream.writeTo(response.getOutputStream());"
+              }
+            ]
+          },
+          {
+            "id": "p5_stop",
+            "kind": "end",
+            "label": "요청 차단"
+          },
+          {
+            "id": "p5_e",
+            "kind": "end",
+            "label": "미리보기 표시"
+          }
+        ],
+        "edges": [
+          {
+            "from": "p5_s",
+            "to": "p5_dec"
+          },
+          {
+            "from": "p5_dec",
+            "to": "p5_sess"
+          },
+          {
+            "from": "p5_sess",
+            "to": "p5_sn",
+            "label": "일치"
+          },
+          {
+            "from": "p5_sess",
+            "to": "p5_stop",
+            "label": "불일치"
+          },
+          {
+            "from": "p5_sn",
+            "to": "p5_info",
+            "label": "지정됨"
+          },
+          {
+            "from": "p5_sn",
+            "to": "p5_last",
+            "label": "미지정"
+          },
+          {
+            "from": "p5_last",
+            "to": "p5_info"
+          },
+          {
+            "from": "p5_info",
+            "to": "p5_send"
+          },
+          {
+            "from": "p5_send",
+            "to": "p5_e"
+          }
+        ]
+      },
+      {
+        "title": "첨부파일 관리",
+        "nodes": [
+          {
+            "id": "p6_s",
+            "kind": "start",
+            "label": "첨부파일 화면 요청"
+          },
+          {
+            "id": "p6_list",
+            "kind": "activity",
+            "label": "첨부파일 목록 조회",
+            "flowRef": "flow:ANY /cmm/fms/selectFileInfs.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+                "line": 70,
+                "snippet": "@RequestMapping(\"/cmm/fms/selectFileInfs.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+                "line": 30,
+                "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "p6_upd",
+            "kind": "activity",
+            "label": "수정용 목록 조회",
+            "flowRef": "flow:ANY /cmm/fms/selectFileInfsForUpdate.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+                "line": 109,
+                "snippet": "@RequestMapping(\"/cmm/fms/selectFileInfsForUpdate.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p6_auth",
+            "kind": "decision",
+            "label": "인증 사용자 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+                "line": 156,
+                "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+                "line": 158,
+                "snippet": "if (isAuthenticated) {"
+              }
+            ]
+          },
+          {
+            "id": "p6_del",
+            "kind": "activity",
+            "label": "첨부파일 삭제",
+            "flowRef": "flow:ANY /cmm/fms/deleteFileInfs.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+                "line": 151,
+                "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+                "line": 159,
+                "snippet": "fileService.deleteFileInf(fileVO);"
+              }
+            ]
+          },
+          {
+            "id": "p6_skip",
+            "kind": "end",
+            "label": "삭제 미수행"
+          },
+          {
+            "id": "p6_e",
+            "kind": "end",
+            "label": "처리 완료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "p6_s",
+            "to": "p6_list"
+          },
+          {
+            "from": "p6_list",
+            "to": "p6_upd"
+          },
+          {
+            "from": "p6_upd",
+            "to": "p6_auth"
+          },
+          {
+            "from": "p6_auth",
+            "to": "p6_del",
+            "label": "인증됨"
+          },
+          {
+            "from": "p6_auth",
+            "to": "p6_skip",
+            "label": "미인증"
+          },
+          {
+            "from": "p6_del",
+            "to": "p6_e"
+          }
+        ]
+      },
+      {
+        "title": "공통 보조 화면 제공",
+        "nodes": [
+          {
+            "id": "p7_s",
+            "kind": "start",
+            "label": "보조 화면 요청"
+          },
+          {
+            "id": "p7_link",
+            "kind": "activity",
+            "label": "이동 주소 정제 후 이동",
+            "flowRef": "flow:ANY /EgovPageLink.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+                "line": 68,
+                "snippet": "@RequestMapping(value = \"/EgovPageLink.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+                "line": 90,
+                "snippet": "link = EgovWebUtil.filePathBlackList(link);"
+              }
+            ]
+          },
+          {
+            "id": "p7_modal",
+            "kind": "activity",
+            "label": "모달 화면 반환",
+            "flowRef": "flow:ANY /EgovModal.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+                "line": 100,
+                "snippet": "@RequestMapping(value = \"/EgovModal.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+                "line": 102,
+                "snippet": "return \"egovframework/com/cmm/EgovModal\";"
+              }
+            ]
+          },
+          {
+            "id": "p7_val",
+            "kind": "activity",
+            "label": "입력 검증 규칙 반환",
+            "flowRef": "flow:ANY /validator.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+                "line": 108,
+                "snippet": "@RequestMapping(\"/validator.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+                "line": 110,
+                "snippet": "return \"egovframework/com/cmm/validator\";"
+              }
+            ]
+          },
+          {
+            "id": "p7_e",
+            "kind": "end",
+            "label": "보조 화면 표시"
+          }
+        ],
+        "edges": [
+          {
+            "from": "p7_s",
+            "to": "p7_link"
+          },
+          {
+            "from": "p7_link",
+            "to": "p7_modal"
+          },
+          {
+            "from": "p7_modal",
+            "to": "p7_val"
+          },
+          {
+            "from": "p7_val",
+            "to": "p7_e"
+          }
+        ]
+      },
+      {
+        "title": "위변조 요청 차단",
+        "nodes": [
+          {
+            "id": "p8_s",
+            "kind": "start",
+            "label": "위변조 판정 요청"
+          },
+          {
+            "id": "p8_deny",
+            "kind": "activity",
+            "label": "차단 안내 화면 이동",
+            "flowRef": "flow:ANY /egovCSRFAccessDenied.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+                "line": 171,
+                "snippet": "@RequestMapping(\"/egovCSRFAccessDenied.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p8_e",
+            "kind": "end",
+            "label": "차단 안내 표시"
+          }
+        ],
+        "edges": [
+          {
+            "from": "p8_s",
+            "to": "p8_deny"
+          },
+          {
+            "from": "p8_deny",
+            "to": "p8_e"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /EgovBottom.do",
+      "name": "하단 영역 화면 표시",
+      "summary": {
+        "text": "화면 하단 공통 영역을 구성해 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 81,
+            "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 83,
+            "snippet": "return \"egovframework/com/cmm/EgovUnitBottom\";"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /EgovContent.do",
+      "name": "본문 화면 표시 및 비밀번호 만료 안내",
+      "summary": {
+        "text": "로그인 사용자 정보와 비밀번호 유효기간·경과일수를 계산해 본문 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 86,
+            "snippet": "@RequestMapping(\"/EgovContent.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 90,
+            "snippet": "String propertyExpirePwdDay = EgovProperties.getProperty(\"Globals.ExpirePwdDay\");"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 101,
+            "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 109,
+            "snippet": "passedDayChangePWD = loginService.selectPassedDayChangePWD(loginVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 115,
+            "snippet": "model.addAttribute(\"elapsedTimeExpiration\", passedDayChangePWD - expirePwdDay);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /EgovLeft.do",
+      "name": "좌측 메뉴 구성",
+      "summary": {
+        "text": "업무 컨트롤러에 선언된 메뉴 정보를 모아 좌측 메뉴 목록을 만든다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 120,
+            "snippet": "@RequestMapping(\"/EgovLeft.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 129,
+            "snippet": "Map<String, Object> myZoos = applicationContext.getBeansWithAnnotation(Controller.class);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 138,
+            "snippet": "annotation = methods[i].getAnnotation(IncludedInfo.class);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 143,
+            "snippet": "zooVO.setName(annotation.name());"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /EgovModal.do",
+      "name": "모달 화면 표시",
+      "summary": {
+        "text": "공통 모달 화면을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 100,
+            "snippet": "@RequestMapping(value = \"/EgovModal.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 102,
+            "snippet": "return \"egovframework/com/cmm/EgovModal\";"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /EgovPageLink.do",
+      "name": "페이지 이동 처리",
+      "summary": {
+        "text": "요청된 이동 대상 주소를 정제한 뒤 해당 화면으로 이동시킨다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 68,
+            "snippet": "@RequestMapping(value = \"/EgovPageLink.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 90,
+            "snippet": "link = EgovWebUtil.filePathBlackList(link);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 92,
+            "snippet": "return link;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /EgovTop.do",
+      "name": "상단 영역 화면 표시",
+      "summary": {
+        "text": "화면 상단 공통 영역을 구성해 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 76,
+            "snippet": "@RequestMapping(\"/EgovTop.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 78,
+            "snippet": "return \"egovframework/com/cmm/EgovUnitTop\";"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cmm/fms/FileDown.do",
+      "name": "첨부파일 다운로드",
+      "summary": {
+        "text": "인증 사용자에 한해 첨부파일 식별자를 복호화하고 세션 일치를 확인한 뒤 파일을 내려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+            "line": 70,
+            "snippet": "@RequestMapping(value = \"/cmm/fms/FileDown.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+            "line": 74,
+            "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+            "line": 94,
+            "snippet": "boolean isSameSessionId = StringUtils.equals(decodedSessionId, sessionId);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+            "line": 103,
+            "snippet": "FileVO fvo = fileService.selectFileInf(fileVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+            "line": 122,
+            "snippet": "response.setHeader(\"Content-Disposition\", contentDisposition);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cmm/fms/deleteFileInfs.do",
+      "name": "첨부파일 삭제",
+      "summary": {
+        "text": "인증된 사용자인 경우에만 지정된 첨부파일을 삭제한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 156,
+            "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 158,
+            "snippet": "if (isAuthenticated) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 159,
+            "snippet": "fileService.deleteFileInf(fileVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cmm/fms/getImage.do",
+      "name": "이미지 미리보기",
+      "summary": {
+        "text": "첨부 이미지 식별자를 복호화해 세션 일치를 확인한 뒤 이미지를 미리보기로 내려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+            "line": 74,
+            "snippet": "@RequestMapping(\"/cmm/fms/getImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+            "line": 91,
+            "snippet": "boolean isSameSessionId = StringUtils.equals(decodedSessionId, sessionId);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+            "line": 105,
+            "snippet": "if (fileSn == null || fileSn.equals(\"\")) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+            "line": 111,
+            "snippet": "FileVO fvo = fileService.selectFileInf(vo);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+            "line": 140,
+            "snippet": "response.setHeader(\"Content-Type\", EgovWebUtil.removeCRLF(type));"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cmm/fms/selectFileInfs.do",
+      "name": "첨부파일 목록 조회",
+      "summary": {
+        "text": "첨부파일 식별자로 등록된 파일 목록을 조회해 화면에 보여준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 70,
+            "snippet": "@RequestMapping(\"/cmm/fms/selectFileInfs.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 30,
+            "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cmm/fms/selectFileInfsForUpdate.do",
+      "name": "수정용 첨부파일 목록 조회",
+      "summary": {
+        "text": "수정 화면에서 다룰 첨부파일 목록을 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 109,
+            "snippet": "@RequestMapping(\"/cmm/fms/selectFileInfsForUpdate.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 30,
+            "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /egovCSRFAccessDenied.do",
+      "name": "위변조 요청 차단 안내",
+      "summary": {
+        "text": "위변조로 판정된 요청을 차단하고 안내 화면으로 보낸다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 171,
+            "snippet": "@RequestMapping(\"/egovCSRFAccessDenied.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /index.do",
+      "name": "메인 화면 표시",
+      "summary": {
+        "text": "초기 진입 요청을 받아 통합 메인 화면을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 71,
+            "snippet": "@RequestMapping(\"/index.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 73,
+            "snippet": "return \"egovframework/com/cmm/EgovUnitMain\";"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /validator.do",
+      "name": "입력 검증 규칙 제공",
+      "summary": {
+        "text": "화면에서 사용할 입력 검증 규칙 스크립트를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(\"/validator.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 110,
+            "snippet": "return \"egovframework/com/cmm/validator\";"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /EgovBottom.do:src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+      "name": "공통 화면 컨트롤러",
+      "summary": {
+        "text": "[하단 영역 화면 표시] 메인·상단·하단·본문·좌측메뉴 등 공통 화면 요청을 받아 해당 화면을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 81,
+            "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통 레이아웃 화면 요청의 진입점으로, 각 주소별 요청을 받아 대응하는 화면 이름을 돌려주고 본문 화면에는 로그인 정보와 비밀번호 경과 정보를 담아 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 81,
+              "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 71,
+              "snippet": "@RequestMapping(\"/index.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 86,
+              "snippet": "@RequestMapping(\"/EgovContent.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 117,
+              "snippet": "return \"egovframework/com/cmm/EgovUnitContent\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "각 요청 주소에 화면 처리 메서드가 연결되어 있으며, 본문 화면 요청은 인증된 사용자 정보를 조회해 존재할 때만 비밀번호 경과일수를 계산한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 81,
+              "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 76,
+              "snippet": "@RequestMapping(\"/EgovTop.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 101,
+              "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 104,
+              "snippet": "if (loginVO != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 109,
+              "snippet": "passedDayChangePWD = loginService.selectPassedDayChangePWD(loginVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "화면 입력 보안 처리 도구",
+      "summary": {
+        "text": "[본문 화면 표시 및 비밀번호 만료 안내] 화면 입력값의 위험 문자 제거와 파일경로 위험 문자 차단을 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면 이동 주소나 파일 경로에 섞인 위험 문자를 제거해 경로 조작과 악성 스크립트 삽입을 막는 협력 도구이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "public static String clearXSSMinimum(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "public static String filePathBlackList(String value) {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "문자열 하나를 받아 정제된 문자열을 돌려주며, 값이 없으면 빈 문자열을 반환하고 상위 경로 표기는 제거한다는 규칙을 지킨다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "if (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 81,
+              "snippet": "if (returnValue == null || returnValue.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "returnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "[본문 화면 표시 및 비밀번호 만료 안내] 아이디·이름·이메일·사용자구분·조직 등 로그인 사용자 속성을 담는 자료 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "본문 화면 구성 시 인증된 사용자 정보를 담아 화면과 비밀번호 경과일수 조회에 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "private String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "private String uniqId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일은 필수값 검사 대상이고 이메일은 형식 검사를 함께 받으며, 사용자구분·조직 아이디·고유아이디·접속 아이피 등을 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 50,
+              "snippet": "@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 61,
+              "snippet": "private String userSe;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 71,
+              "snippet": "private String ip;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "name": "공통 환경설정 조회 도구",
+      "summary": {
+        "text": "[본문 화면 표시 및 비밀번호 만료 안내] 전역 설정 파일에서 운영 기준값을 읽어오는 협력 도구이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "본문 화면 흐름에서 비밀번호 유효기간 같은 운영 기준값을 전역 설정 파일에서 읽어 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "public static String getProperty(String keyName) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 77,
+              "snippet": "return getPropertyValueByKey(keyName);"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "설정 파일 위치는 상대경로 기준값과 파일구분자를 조합해 정해지며, 키 이름을 받아 설정값 또는 절대 경로값을 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 54,
+              "snippet": "final static String FILE_SEPARATOR = System.getProperty(\"file.separator\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "public static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 85,
+              "snippet": "public static String getPathProperty(String keyName) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 88,
+              "snippet": "return RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(keyName);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "사용자 인증정보 서비스",
+      "summary": {
+        "text": "[본문 화면 표시 및 비밀번호 만료 안내] 인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 서비스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면과 파일 업무에서 필요한 인증 사용자 정보·권한 목록·인증 여부 확인 수단을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증 사용자 객체 조회, 권한 목록 조회, 인증 여부 판정 세 가지 업무를 규정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "public List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증정보 조회 도우미",
+      "summary": {
+        "text": "[본문 화면 표시 및 비밀번호 만료 안내] 인증된 사용자 정보와 인증 여부를 간편하게 가져오도록 돕는 협력 도구이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면·파일 흐름에서 인증 사용자 정보와 인증 여부를 조회할 수 있도록 사용자 인증정보 서비스를 대신 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "사용자 인증정보 서비스를 하나 보관하며, 인증 사용자 객체·권한 목록·인증 여부 세 가지 조회 수단을 노출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "static EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 42,
+              "snippet": "return egovUserDetailsService.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 51,
+              "snippet": "return egovUserDetailsService.getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "return egovUserDetailsService.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+      "name": "공통 화면 컨트롤러",
+      "summary": {
+        "text": "[본문 화면 표시 및 비밀번호 만료 안내] 메인·상단·하단·본문·좌측메뉴 등 공통 화면 요청을 받아 해당 화면을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 81,
+            "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통 레이아웃 화면 요청의 진입점으로, 각 주소별 요청을 받아 대응하는 화면 이름을 돌려주고 본문 화면에는 로그인 정보와 비밀번호 경과 정보를 담아 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 81,
+              "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 71,
+              "snippet": "@RequestMapping(\"/index.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 86,
+              "snippet": "@RequestMapping(\"/EgovContent.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 117,
+              "snippet": "return \"egovframework/com/cmm/EgovUnitContent\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "각 요청 주소에 화면 처리 메서드가 연결되어 있으며, 본문 화면 요청은 인증된 사용자 정보를 조회해 존재할 때만 비밀번호 경과일수를 계산한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 81,
+              "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 76,
+              "snippet": "@RequestMapping(\"/EgovTop.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 101,
+              "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 104,
+              "snippet": "if (loginVO != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 109,
+              "snippet": "passedDayChangePWD = loginService.selectPassedDayChangePWD(loginVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+      "name": "로그인 서비스",
+      "summary": {
+        "text": "[본문 화면 표시 및 비밀번호 만료 안내] 로그인 처리와 비밀번호 변경 경과일수 조회 등 인증 관련 업무를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+            "line": 31,
+            "snippet": "public interface EgovLoginService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "본문 화면에서 필요한 비밀번호 변경 경과일수 조회를 비롯해 일반·인증서 로그인, 아이디·비밀번호 찾기 업무를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+              "line": 31,
+              "snippet": "public interface EgovLoginService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+              "line": 48,
+              "snippet": "LoginVO actionLogin(LoginVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+              "line": 98,
+              "snippet": "int selectPassedDayChangePWD(LoginVO vo) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "로그인 인증제한 조회·처리와 비밀번호 수정 후 경과 일수 조회가 별도 업무로 규정되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+              "line": 31,
+              "snippet": "public interface EgovLoginService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+              "line": 82,
+              "snippet": "String processLoginIncorrect(LoginVO vo, Map<?,?> mapLockUserInfo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+              "line": 90,
+              "snippet": "Map<?,?> selectLoginIncorrect(LoginVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+              "line": 98,
+              "snippet": "int selectPassedDayChangePWD(LoginVO vo) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 도구",
+      "summary": {
+        "text": "[본문 화면 표시 및 비밀번호 만료 안내] 문자열 자르기·빈값 판정 등 공통 문자열 처리를 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "설정값 조회와 화면 표시 과정에서 문자열 길이 제한, 빈값 판정 같은 공통 문자열 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "public static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "public static String cutString(String source, int slength) {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 기준값과 난수 생성기를 보관하며, 지정 길이를 넘으면 잘라내고 원본이 없으면 결과를 만들지 않는 규칙을 지킨다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 50,
+              "snippet": "private static SecureRandom rnd = new SecureRandom();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 79,
+              "snippet": "if (source != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "if (source.length() > slength) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovLeft.do:src/main/java/egovframework/com/cmm/IncludedCompInfoVO.java",
+      "name": "메뉴 구성 정보",
+      "summary": {
+        "text": "[좌측 메뉴 구성] 좌측 메뉴 항목의 이름·목록 주소·정렬순서·그룹을 담는 자료 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/IncludedCompInfoVO.java",
+            "line": 29,
+            "snippet": "public class IncludedCompInfoVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "좌측 메뉴 구성 흐름에서 각 업무 메뉴 항목의 표시 정보를 담아 화면으로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/IncludedCompInfoVO.java",
+              "line": 29,
+              "snippet": "public class IncludedCompInfoVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/IncludedCompInfoVO.java",
+              "line": 31,
+              "snippet": "private String name;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "메뉴 이름, 목록 화면 주소, 정렬 순서, 메뉴 그룹 번호 네 항목으로 구성된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/IncludedCompInfoVO.java",
+              "line": 29,
+              "snippet": "public class IncludedCompInfoVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/IncludedCompInfoVO.java",
+              "line": 31,
+              "snippet": "private String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/IncludedCompInfoVO.java",
+              "line": 32,
+              "snippet": "private String listUrl;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/IncludedCompInfoVO.java",
+              "line": 33,
+              "snippet": "private int order;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/IncludedCompInfoVO.java",
+              "line": 34,
+              "snippet": "private int gid;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovLeft.do:src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+      "name": "공통 화면 컨트롤러",
+      "summary": {
+        "text": "[좌측 메뉴 구성] 메인·상단·하단·본문·좌측메뉴 등 공통 화면 요청을 받아 해당 화면을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 81,
+            "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통 레이아웃 화면 요청의 진입점으로, 각 주소별 요청을 받아 대응하는 화면 이름을 돌려주고 본문 화면에는 로그인 정보와 비밀번호 경과 정보를 담아 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 81,
+              "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 71,
+              "snippet": "@RequestMapping(\"/index.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 86,
+              "snippet": "@RequestMapping(\"/EgovContent.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 117,
+              "snippet": "return \"egovframework/com/cmm/EgovUnitContent\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "각 요청 주소에 화면 처리 메서드가 연결되어 있으며, 본문 화면 요청은 인증된 사용자 정보를 조회해 존재할 때만 비밀번호 경과일수를 계산한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 81,
+              "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 76,
+              "snippet": "@RequestMapping(\"/EgovTop.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 101,
+              "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 104,
+              "snippet": "if (loginVO != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 109,
+              "snippet": "passedDayChangePWD = loginService.selectPassedDayChangePWD(loginVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovModal.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+      "name": "공통 유틸 화면 컨트롤러",
+      "summary": {
+        "text": "[모달 화면 표시] 페이지 이동, 모달, 입력 검증 규칙 등 공통 보조 화면 요청을 처리한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 100,
+            "snippet": "@RequestMapping(value = \"/EgovModal.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이동 대상 주소 정제, 모달 화면 제공, 입력 검증 규칙 제공 같은 공통 보조 기능을 화면 요청으로 노출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 100,
+              "snippet": "@RequestMapping(value = \"/EgovModal.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 92,
+              "snippet": "return link;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(\"/validator.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "이동 요청 주소는 파일경로 금지 문자 제거를 거친 뒤 사용되고, 모달·검증 규칙 요청은 파라미터 없이 화면 이름만 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 100,
+              "snippet": "@RequestMapping(value = \"/EgovModal.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 90,
+              "snippet": "link = EgovWebUtil.filePathBlackList(link);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 101,
+              "snippet": "public String selectUtlJsonInquire()  throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 109,
+              "snippet": "public String validate(){"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovPageLink.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "화면 입력 보안 처리 도구",
+      "summary": {
+        "text": "[페이지 이동 처리] 화면 입력값의 위험 문자 제거와 파일경로 위험 문자 차단을 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면 이동 주소나 파일 경로에 섞인 위험 문자를 제거해 경로 조작과 악성 스크립트 삽입을 막는 협력 도구이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "public static String clearXSSMinimum(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "public static String filePathBlackList(String value) {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "문자열 하나를 받아 정제된 문자열을 돌려주며, 값이 없으면 빈 문자열을 반환하고 상위 경로 표기는 제거한다는 규칙을 지킨다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "if (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 81,
+              "snippet": "if (returnValue == null || returnValue.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "returnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovPageLink.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+      "name": "공통 유틸 화면 컨트롤러",
+      "summary": {
+        "text": "[페이지 이동 처리] 페이지 이동, 모달, 입력 검증 규칙 등 공통 보조 화면 요청을 처리한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 100,
+            "snippet": "@RequestMapping(value = \"/EgovModal.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이동 대상 주소 정제, 모달 화면 제공, 입력 검증 규칙 제공 같은 공통 보조 기능을 화면 요청으로 노출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 100,
+              "snippet": "@RequestMapping(value = \"/EgovModal.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 92,
+              "snippet": "return link;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(\"/validator.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "이동 요청 주소는 파일경로 금지 문자 제거를 거친 뒤 사용되고, 모달·검증 규칙 요청은 파라미터 없이 화면 이름만 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 100,
+              "snippet": "@RequestMapping(value = \"/EgovModal.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 90,
+              "snippet": "link = EgovWebUtil.filePathBlackList(link);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 101,
+              "snippet": "public String selectUtlJsonInquire()  throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 109,
+              "snippet": "public String validate(){"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovTop.do:src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+      "name": "공통 화면 컨트롤러",
+      "summary": {
+        "text": "[상단 영역 화면 표시] 메인·상단·하단·본문·좌측메뉴 등 공통 화면 요청을 받아 해당 화면을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 81,
+            "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통 레이아웃 화면 요청의 진입점으로, 각 주소별 요청을 받아 대응하는 화면 이름을 돌려주고 본문 화면에는 로그인 정보와 비밀번호 경과 정보를 담아 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 81,
+              "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 71,
+              "snippet": "@RequestMapping(\"/index.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 86,
+              "snippet": "@RequestMapping(\"/EgovContent.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 117,
+              "snippet": "return \"egovframework/com/cmm/EgovUnitContent\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "각 요청 주소에 화면 처리 메서드가 연결되어 있으며, 본문 화면 요청은 인증된 사용자 정보를 조회해 존재할 때만 비밀번호 경과일수를 계산한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 81,
+              "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 76,
+              "snippet": "@RequestMapping(\"/EgovTop.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 101,
+              "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 104,
+              "snippet": "if (loginVO != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 109,
+              "snippet": "passedDayChangePWD = loginService.selectPassedDayChangePWD(loginVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/EgovBrowserUtil.java",
+      "name": "접속 브라우저 판별 도구",
+      "summary": {
+        "text": "[첨부파일 다운로드] 접속 브라우저 종류와 버전을 판별해 파일 전송 형식 결정에 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovBrowserUtil.java",
+            "line": 21,
+            "snippet": "public class EgovBrowserUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "다운로드 흐름에서 접속 브라우저 종류를 판별해 파일 전송 형식과 파일명 표기 방식을 정하도록 돕는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovBrowserUtil.java",
+              "line": 21,
+              "snippet": "public class EgovBrowserUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovBrowserUtil.java",
+              "line": 35,
+              "snippet": "public static HashMap<String,String> getBrowser(String userAgent) {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "판별 결과는 종류와 버전 두 항목을 담은 값으로 반환되며, 지원 종류는 익스플로러·엣지·파이어폭스·오페라·웨일 등으로 정의되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovBrowserUtil.java",
+              "line": 21,
+              "snippet": "public class EgovBrowserUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovBrowserUtil.java",
+              "line": 27,
+              "snippet": "public static final String MSIE = \"MSIE\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovBrowserUtil.java",
+              "line": 32,
+              "snippet": "public static final String TYPEKEY = \"type\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovBrowserUtil.java",
+              "line": 33,
+              "snippet": "public static final String VERSIONKEY = \"version\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovBrowserUtil.java",
+              "line": 37,
+              "snippet": "HashMap<String,String> result = new HashMap<String,String>();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "화면 입력 보안 처리 도구",
+      "summary": {
+        "text": "[첨부파일 다운로드] 화면 입력값의 위험 문자 제거와 파일경로 위험 문자 차단을 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면 이동 주소나 파일 경로에 섞인 위험 문자를 제거해 경로 조작과 악성 스크립트 삽입을 막는 협력 도구이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "public static String clearXSSMinimum(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "public static String filePathBlackList(String value) {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "문자열 하나를 받아 정제된 문자열을 돌려주며, 값이 없으면 빈 문자열을 반환하고 상위 경로 표기는 제거한다는 규칙을 지킨다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "if (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 81,
+              "snippet": "if (returnValue == null || returnValue.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "returnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "파일 관리 서비스",
+      "summary": {
+        "text": "[첨부파일 다운로드] 첨부파일 정보의 조회·등록·수정·삭제 업무를 규정한 공통 파일 관리 서비스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일 목록·상세 조회, 등록, 수정, 삭제, 파일연번 최대값 산출 등 파일 관리 업무를 화면 컨트롤러에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 30,
+              "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 79,
+              "snippet": "public FileVO selectFileInf(FileVO fvo) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록 조회, 단건·다건 등록과 수정, 단건·다건 삭제, 상세 조회, 파일 구분자 최대값 조회가 각각 별도 업무 단위로 정의되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 30,
+              "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 62,
+              "snippet": "public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 70,
+              "snippet": "public void deleteFileInf(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 88,
+              "snippet": "public int getMaxFileSN(FileVO fvo) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "사용자 인증정보 서비스",
+      "summary": {
+        "text": "[첨부파일 다운로드] 인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 서비스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면과 파일 업무에서 필요한 인증 사용자 정보·권한 목록·인증 여부 확인 수단을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증 사용자 객체 조회, 권한 목록 조회, 인증 여부 판정 세 가지 업무를 규정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "public List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "name": "첨부파일 정보",
+      "summary": {
+        "text": "[첨부파일 다운로드] 첨부파일 아이디·파일연번·저장경로·원파일명 등 첨부파일 속성을 담는 자료 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일 조회·다운로드·삭제 흐름에서 파일을 식별하고 저장 위치를 전달하는 자료 구조로 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 21,
+              "snippet": "public class FileVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 26,
+              "snippet": "public String atchFileId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 50,
+              "snippet": "public String fileStreCours = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "첨부파일 아이디, 생성일자, 파일내용, 파일확장자, 파일크기, 파일연번, 파일저장경로, 원파일명, 저장파일명 항목을 가지며 모두 빈 문자열로 초기화된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 26,
+              "snippet": "public String atchFileId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 38,
+              "snippet": "public String fileExtsn = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 46,
+              "snippet": "public String fileSn = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 54,
+              "snippet": "public String orignlFileNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 58,
+              "snippet": "public String streFileNm = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+      "name": "공통 기록 도구",
+      "summary": {
+        "text": "[첨부파일 다운로드] 무시 가능한 오류와 디버그·일반 정보를 구분해 기록한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+            "line": 24,
+            "snippet": "public class EgovBasicLogger {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일 다운로드·미리보기 중 발생한 무시 가능한 오류를 조용히 기록해 사용자 흐름이 끊기지 않게 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 24,
+              "snippet": "public class EgovBasicLogger {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 39,
+              "snippet": "public static void ignore(String message, Exception exception) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 87,
+              "snippet": "public static void info(String message) {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "무시·디버그·일반 세 등급의 기록 수단을 각각 별도 기록기로 보관하며, 예외가 없으면 메시지만 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 24,
+              "snippet": "public class EgovBasicLogger {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 29,
+              "snippet": "private static final Logger IGNORE_LOGGER = Logger.getLogger(\"ignore\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 30,
+              "snippet": "private static final Logger DEBUG_LOGGER = Logger.getLogger(\"debug\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 31,
+              "snippet": "private static final Logger INFO_LOGGER = Logger.getLogger(\"info\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 40,
+              "snippet": "if (exception == null) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증정보 조회 도우미",
+      "summary": {
+        "text": "[첨부파일 다운로드] 인증된 사용자 정보와 인증 여부를 간편하게 가져오도록 돕는 협력 도구이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면·파일 흐름에서 인증 사용자 정보와 인증 여부를 조회할 수 있도록 사용자 인증정보 서비스를 대신 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "사용자 인증정보 서비스를 하나 보관하며, 인증 사용자 객체·권한 목록·인증 여부 세 가지 조회 수단을 노출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "static EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 42,
+              "snippet": "return egovUserDetailsService.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 51,
+              "snippet": "return egovUserDetailsService.getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "return egovUserDetailsService.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+      "name": "첨부파일 다운로드 컨트롤러",
+      "summary": {
+        "text": "[첨부파일 다운로드] 인증·세션 확인을 거쳐 첨부파일을 내려받게 하는 요청을 처리한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+            "line": 70,
+            "snippet": "@RequestMapping(value = \"/cmm/fms/FileDown.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일 다운로드 요청을 받아 인증 여부와 세션 일치를 확인하고, 파일 정보를 조회해 응답 본문으로 파일 내용을 전송한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+              "line": 70,
+              "snippet": "@RequestMapping(value = \"/cmm/fms/FileDown.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+              "line": 103,
+              "snippet": "FileVO fvo = fileService.selectFileInf(fileVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+              "line": 132,
+              "snippet": "FileCopyUtils.copy(in, out);"
+            }
+          ]
+        },
+        "request": {
+          "text": "첨부파일 식별자와 파일연번을 요청 파라미터로 받고, 인증된 사용자만 진행하며 복호화한 세션값이 현재 세션과 다르면 처리를 중단한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+              "line": 70,
+              "snippet": "@RequestMapping(value = \"/cmm/fms/FileDown.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+              "line": 71,
+              "snippet": "public void cvplFileDownload(@RequestParam Map<String, Object> commandMap, HttpServletRequest request,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+              "line": 74,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+              "line": 76,
+              "snippet": "if (isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+              "line": 94,
+              "snippet": "boolean isSameSessionId = StringUtils.equals(decodedSessionId, sessionId);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+              "line": 96,
+              "snippet": "if (!isSameSessionId) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/deleteFileInfs.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "파일 관리 서비스",
+      "summary": {
+        "text": "[첨부파일 삭제] 첨부파일 정보의 조회·등록·수정·삭제 업무를 규정한 공통 파일 관리 서비스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일 목록·상세 조회, 등록, 수정, 삭제, 파일연번 최대값 산출 등 파일 관리 업무를 화면 컨트롤러에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 30,
+              "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 79,
+              "snippet": "public FileVO selectFileInf(FileVO fvo) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록 조회, 단건·다건 등록과 수정, 단건·다건 삭제, 상세 조회, 파일 구분자 최대값 조회가 각각 별도 업무 단위로 정의되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 30,
+              "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 62,
+              "snippet": "public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 70,
+              "snippet": "public void deleteFileInf(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 88,
+              "snippet": "public int getMaxFileSN(FileVO fvo) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/deleteFileInfs.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "사용자 인증정보 서비스",
+      "summary": {
+        "text": "[첨부파일 삭제] 인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 서비스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면과 파일 업무에서 필요한 인증 사용자 정보·권한 목록·인증 여부 확인 수단을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증 사용자 객체 조회, 권한 목록 조회, 인증 여부 판정 세 가지 업무를 규정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "public List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/deleteFileInfs.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증정보 조회 도우미",
+      "summary": {
+        "text": "[첨부파일 삭제] 인증된 사용자 정보와 인증 여부를 간편하게 가져오도록 돕는 협력 도구이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면·파일 흐름에서 인증 사용자 정보와 인증 여부를 조회할 수 있도록 사용자 인증정보 서비스를 대신 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "사용자 인증정보 서비스를 하나 보관하며, 인증 사용자 객체·권한 목록·인증 여부 세 가지 조회 수단을 노출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "static EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 42,
+              "snippet": "return egovUserDetailsService.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 51,
+              "snippet": "return egovUserDetailsService.getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "return egovUserDetailsService.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/deleteFileInfs.do:src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+      "name": "첨부파일 관리 컨트롤러",
+      "summary": {
+        "text": "[첨부파일 삭제] 첨부파일 목록 조회와 삭제 요청을 처리하고 파일 식별자 암복호화를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일 목록 조회·수정용 목록 조회·삭제 요청을 받아 파일 관리 서비스에 위임하고, 파일 식별자의 암호화·복호화 수단을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 159,
+              "snippet": "fileService.deleteFileInf(fileVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 186,
+              "snippet": "public static String encryptSession(String atchFileId, String sessionId) {"
+            }
+          ]
+        },
+        "request": {
+          "text": "삭제 요청은 첨부파일 정보를 요청 객체로 받고 인증된 사용자일 때만 삭제를 수행한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 152,
+              "snippet": "public String deleteFileInf(@ModelAttribute(\"searchVO\") FileVO fileVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 156,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 158,
+              "snippet": "if (isAuthenticated) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/getImage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "화면 입력 보안 처리 도구",
+      "summary": {
+        "text": "[이미지 미리보기] 화면 입력값의 위험 문자 제거와 파일경로 위험 문자 차단을 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면 이동 주소나 파일 경로에 섞인 위험 문자를 제거해 경로 조작과 악성 스크립트 삽입을 막는 협력 도구이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "public static String clearXSSMinimum(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "public static String filePathBlackList(String value) {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "문자열 하나를 받아 정제된 문자열을 돌려주며, 값이 없으면 빈 문자열을 반환하고 상위 경로 표기는 제거한다는 규칙을 지킨다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "if (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 81,
+              "snippet": "if (returnValue == null || returnValue.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "returnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/getImage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "파일 관리 서비스",
+      "summary": {
+        "text": "[이미지 미리보기] 첨부파일 정보의 조회·등록·수정·삭제 업무를 규정한 공통 파일 관리 서비스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일 목록·상세 조회, 등록, 수정, 삭제, 파일연번 최대값 산출 등 파일 관리 업무를 화면 컨트롤러에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 30,
+              "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 79,
+              "snippet": "public FileVO selectFileInf(FileVO fvo) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록 조회, 단건·다건 등록과 수정, 단건·다건 삭제, 상세 조회, 파일 구분자 최대값 조회가 각각 별도 업무 단위로 정의되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 30,
+              "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 62,
+              "snippet": "public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 70,
+              "snippet": "public void deleteFileInf(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 88,
+              "snippet": "public int getMaxFileSN(FileVO fvo) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/getImage.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "name": "첨부파일 정보",
+      "summary": {
+        "text": "[이미지 미리보기] 첨부파일 아이디·파일연번·저장경로·원파일명 등 첨부파일 속성을 담는 자료 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일 조회·다운로드·삭제 흐름에서 파일을 식별하고 저장 위치를 전달하는 자료 구조로 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 21,
+              "snippet": "public class FileVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 26,
+              "snippet": "public String atchFileId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 50,
+              "snippet": "public String fileStreCours = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "첨부파일 아이디, 생성일자, 파일내용, 파일확장자, 파일크기, 파일연번, 파일저장경로, 원파일명, 저장파일명 항목을 가지며 모두 빈 문자열로 초기화된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 26,
+              "snippet": "public String atchFileId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 38,
+              "snippet": "public String fileExtsn = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 46,
+              "snippet": "public String fileSn = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 54,
+              "snippet": "public String orignlFileNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 58,
+              "snippet": "public String streFileNm = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/getImage.do:src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+      "name": "공통 기록 도구",
+      "summary": {
+        "text": "[이미지 미리보기] 무시 가능한 오류와 디버그·일반 정보를 구분해 기록한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+            "line": 24,
+            "snippet": "public class EgovBasicLogger {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "파일 다운로드·미리보기 중 발생한 무시 가능한 오류를 조용히 기록해 사용자 흐름이 끊기지 않게 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 24,
+              "snippet": "public class EgovBasicLogger {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 39,
+              "snippet": "public static void ignore(String message, Exception exception) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 87,
+              "snippet": "public static void info(String message) {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "무시·디버그·일반 세 등급의 기록 수단을 각각 별도 기록기로 보관하며, 예외가 없으면 메시지만 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 24,
+              "snippet": "public class EgovBasicLogger {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 29,
+              "snippet": "private static final Logger IGNORE_LOGGER = Logger.getLogger(\"ignore\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 30,
+              "snippet": "private static final Logger DEBUG_LOGGER = Logger.getLogger(\"debug\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 31,
+              "snippet": "private static final Logger INFO_LOGGER = Logger.getLogger(\"info\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+              "line": 40,
+              "snippet": "if (exception == null) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/getImage.do:src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+      "name": "자원 정리 도우미",
+      "summary": {
+        "text": "[이미지 미리보기] 파일·데이터베이스·통신 자원을 안전하게 닫아 누수를 막는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+            "line": 31,
+            "snippet": "public class EgovResourceCloseHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이미지 미리보기 등에서 사용한 자원을 닫아 자원 누수를 막고, 닫는 중 발생한 오류는 무시 기록으로 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+              "line": 31,
+              "snippet": "public class EgovResourceCloseHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+              "line": 37,
+              "snippet": "public static void close(Closeable... resources) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+              "line": 43,
+              "snippet": "EgovBasicLogger.ignore(\"Occurred IOException to close resource is ingored!!\");"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "닫을 대상이 비어 있으면 건너뛰며, 데이터베이스 자원은 조회결과·명령·연결 종류별로 구분해 닫고 알 수 없는 종류는 오류로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+              "line": 31,
+              "snippet": "public class EgovResourceCloseHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+              "line": 39,
+              "snippet": "if (resource != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+              "line": 57,
+              "snippet": "if (object instanceof ResultSet) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+              "line": 69,
+              "snippet": "} else if (object instanceof Connection) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+              "line": 76,
+              "snippet": "throw new IllegalArgumentException(\"Wrapper type is not found : \" + object.toString());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/getImage.do:src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+      "name": "이미지 미리보기 컨트롤러",
+      "summary": {
+        "text": "[이미지 미리보기] 첨부된 이미지 파일을 세션 확인 후 미리보기로 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+            "line": 74,
+            "snippet": "@RequestMapping(\"/cmm/fms/getImage.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부 이미지 미리보기 요청을 받아 파일 정보를 조회하고 확장자에 맞는 형식으로 이미지 내용을 응답에 실어 보낸다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+              "line": 74,
+              "snippet": "@RequestMapping(\"/cmm/fms/getImage.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+              "line": 111,
+              "snippet": "FileVO fvo = fileService.selectFileInf(vo);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+              "line": 143,
+              "snippet": "bStream.writeTo(response.getOutputStream());"
+            }
+          ]
+        },
+        "request": {
+          "text": "첨부파일 식별자와 파일연번을 파라미터로 받아 복호화하며, 세션이 일치하지 않으면 처리를 중단하고 파일연번이 없으면 마지막 파일을 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+              "line": 74,
+              "snippet": "@RequestMapping(\"/cmm/fms/getImage.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+              "line": 75,
+              "snippet": "public void getImageInf(SessionVO sessionVO, ModelMap model, @RequestParam Map<String, Object> commandMap,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+              "line": 91,
+              "snippet": "boolean isSameSessionId = StringUtils.equals(decodedSessionId, sessionId);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+              "line": 93,
+              "snippet": "if (!isSameSessionId) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+              "line": 105,
+              "snippet": "if (fileSn == null || fileSn.equals(\"\")) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/selectFileInfs.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "파일 관리 서비스",
+      "summary": {
+        "text": "[첨부파일 목록 조회] 첨부파일 정보의 조회·등록·수정·삭제 업무를 규정한 공통 파일 관리 서비스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일 목록·상세 조회, 등록, 수정, 삭제, 파일연번 최대값 산출 등 파일 관리 업무를 화면 컨트롤러에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 30,
+              "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 79,
+              "snippet": "public FileVO selectFileInf(FileVO fvo) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록 조회, 단건·다건 등록과 수정, 단건·다건 삭제, 상세 조회, 파일 구분자 최대값 조회가 각각 별도 업무 단위로 정의되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 30,
+              "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 62,
+              "snippet": "public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 70,
+              "snippet": "public void deleteFileInf(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 88,
+              "snippet": "public int getMaxFileSN(FileVO fvo) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/selectFileInfs.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "name": "첨부파일 정보",
+      "summary": {
+        "text": "[첨부파일 목록 조회] 첨부파일 아이디·파일연번·저장경로·원파일명 등 첨부파일 속성을 담는 자료 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일 조회·다운로드·삭제 흐름에서 파일을 식별하고 저장 위치를 전달하는 자료 구조로 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 21,
+              "snippet": "public class FileVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 26,
+              "snippet": "public String atchFileId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 50,
+              "snippet": "public String fileStreCours = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "첨부파일 아이디, 생성일자, 파일내용, 파일확장자, 파일크기, 파일연번, 파일저장경로, 원파일명, 저장파일명 항목을 가지며 모두 빈 문자열로 초기화된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 26,
+              "snippet": "public String atchFileId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 38,
+              "snippet": "public String fileExtsn = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 46,
+              "snippet": "public String fileSn = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 54,
+              "snippet": "public String orignlFileNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 58,
+              "snippet": "public String streFileNm = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/selectFileInfs.do:src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+      "name": "첨부파일 관리 컨트롤러",
+      "summary": {
+        "text": "[첨부파일 목록 조회] 첨부파일 목록 조회와 삭제 요청을 처리하고 파일 식별자 암복호화를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일 목록 조회·수정용 목록 조회·삭제 요청을 받아 파일 관리 서비스에 위임하고, 파일 식별자의 암호화·복호화 수단을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 159,
+              "snippet": "fileService.deleteFileInf(fileVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 186,
+              "snippet": "public static String encryptSession(String atchFileId, String sessionId) {"
+            }
+          ]
+        },
+        "request": {
+          "text": "삭제 요청은 첨부파일 정보를 요청 객체로 받고 인증된 사용자일 때만 삭제를 수행한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 152,
+              "snippet": "public String deleteFileInf(@ModelAttribute(\"searchVO\") FileVO fileVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 156,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 158,
+              "snippet": "if (isAuthenticated) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/selectFileInfsForUpdate.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "파일 관리 서비스",
+      "summary": {
+        "text": "[수정용 첨부파일 목록 조회] 첨부파일 정보의 조회·등록·수정·삭제 업무를 규정한 공통 파일 관리 서비스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일 목록·상세 조회, 등록, 수정, 삭제, 파일연번 최대값 산출 등 파일 관리 업무를 화면 컨트롤러에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 30,
+              "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 79,
+              "snippet": "public FileVO selectFileInf(FileVO fvo) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록 조회, 단건·다건 등록과 수정, 단건·다건 삭제, 상세 조회, 파일 구분자 최대값 조회가 각각 별도 업무 단위로 정의되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 30,
+              "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 62,
+              "snippet": "public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 70,
+              "snippet": "public void deleteFileInf(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 88,
+              "snippet": "public int getMaxFileSN(FileVO fvo) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/selectFileInfsForUpdate.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "name": "첨부파일 정보",
+      "summary": {
+        "text": "[수정용 첨부파일 목록 조회] 첨부파일 아이디·파일연번·저장경로·원파일명 등 첨부파일 속성을 담는 자료 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일 조회·다운로드·삭제 흐름에서 파일을 식별하고 저장 위치를 전달하는 자료 구조로 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 21,
+              "snippet": "public class FileVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 26,
+              "snippet": "public String atchFileId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 50,
+              "snippet": "public String fileStreCours = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "첨부파일 아이디, 생성일자, 파일내용, 파일확장자, 파일크기, 파일연번, 파일저장경로, 원파일명, 저장파일명 항목을 가지며 모두 빈 문자열로 초기화된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 26,
+              "snippet": "public String atchFileId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 38,
+              "snippet": "public String fileExtsn = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 46,
+              "snippet": "public String fileSn = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 54,
+              "snippet": "public String orignlFileNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 58,
+              "snippet": "public String streFileNm = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/selectFileInfsForUpdate.do:src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+      "name": "첨부파일 관리 컨트롤러",
+      "summary": {
+        "text": "[수정용 첨부파일 목록 조회] 첨부파일 목록 조회와 삭제 요청을 처리하고 파일 식별자 암복호화를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일 목록 조회·수정용 목록 조회·삭제 요청을 받아 파일 관리 서비스에 위임하고, 파일 식별자의 암호화·복호화 수단을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 159,
+              "snippet": "fileService.deleteFileInf(fileVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 186,
+              "snippet": "public static String encryptSession(String atchFileId, String sessionId) {"
+            }
+          ]
+        },
+        "request": {
+          "text": "삭제 요청은 첨부파일 정보를 요청 객체로 받고 인증된 사용자일 때만 삭제를 수행한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 152,
+              "snippet": "public String deleteFileInf(@ModelAttribute(\"searchVO\") FileVO fileVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 156,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+              "line": 158,
+              "snippet": "if (isAuthenticated) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /egovCSRFAccessDenied.do:src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+      "name": "공통 화면 컨트롤러",
+      "summary": {
+        "text": "[위변조 요청 차단 안내] 메인·상단·하단·본문·좌측메뉴 등 공통 화면 요청을 받아 해당 화면을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 81,
+            "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통 레이아웃 화면 요청의 진입점으로, 각 주소별 요청을 받아 대응하는 화면 이름을 돌려주고 본문 화면에는 로그인 정보와 비밀번호 경과 정보를 담아 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 81,
+              "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 71,
+              "snippet": "@RequestMapping(\"/index.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 86,
+              "snippet": "@RequestMapping(\"/EgovContent.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 117,
+              "snippet": "return \"egovframework/com/cmm/EgovUnitContent\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "각 요청 주소에 화면 처리 메서드가 연결되어 있으며, 본문 화면 요청은 인증된 사용자 정보를 조회해 존재할 때만 비밀번호 경과일수를 계산한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 81,
+              "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 76,
+              "snippet": "@RequestMapping(\"/EgovTop.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 101,
+              "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 104,
+              "snippet": "if (loginVO != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 109,
+              "snippet": "passedDayChangePWD = loginService.selectPassedDayChangePWD(loginVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /index.do:src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+      "name": "공통 화면 컨트롤러",
+      "summary": {
+        "text": "[메인 화면 표시] 메인·상단·하단·본문·좌측메뉴 등 공통 화면 요청을 받아 해당 화면을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 81,
+            "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통 레이아웃 화면 요청의 진입점으로, 각 주소별 요청을 받아 대응하는 화면 이름을 돌려주고 본문 화면에는 로그인 정보와 비밀번호 경과 정보를 담아 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 81,
+              "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 71,
+              "snippet": "@RequestMapping(\"/index.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 86,
+              "snippet": "@RequestMapping(\"/EgovContent.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 117,
+              "snippet": "return \"egovframework/com/cmm/EgovUnitContent\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "각 요청 주소에 화면 처리 메서드가 연결되어 있으며, 본문 화면 요청은 인증된 사용자 정보를 조회해 존재할 때만 비밀번호 경과일수를 계산한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 81,
+              "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 76,
+              "snippet": "@RequestMapping(\"/EgovTop.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 101,
+              "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 104,
+              "snippet": "if (loginVO != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+              "line": 109,
+              "snippet": "passedDayChangePWD = loginService.selectPassedDayChangePWD(loginVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /validator.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+      "name": "공통 유틸 화면 컨트롤러",
+      "summary": {
+        "text": "[입력 검증 규칙 제공] 페이지 이동, 모달, 입력 검증 규칙 등 공통 보조 화면 요청을 처리한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 100,
+            "snippet": "@RequestMapping(value = \"/EgovModal.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이동 대상 주소 정제, 모달 화면 제공, 입력 검증 규칙 제공 같은 공통 보조 기능을 화면 요청으로 노출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 100,
+              "snippet": "@RequestMapping(value = \"/EgovModal.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 92,
+              "snippet": "return link;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(\"/validator.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "이동 요청 주소는 파일경로 금지 문자 제거를 거친 뒤 사용되고, 모달·검증 규칙 요청은 파라미터 없이 화면 이름만 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 100,
+              "snippet": "@RequestMapping(value = \"/EgovModal.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 90,
+              "snippet": "link = EgovWebUtil.filePathBlackList(link);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 101,
+              "snippet": "public String selectUtlJsonInquire()  throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 109,
+              "snippet": "public String validate(){"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

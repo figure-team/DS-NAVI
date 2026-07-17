@@ -1,0 +1,4703 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "ssi.iis-000",
+  "domainId": "domain:ssi.iis",
+  "header": {
+    "name": "연계기관 정보 관리",
+    "summary": {
+      "text": "행정 시스템 간 연계를 위해 연계기관과 그 하위의 연계시스템·연계서비스를 등록·수정·삭제·조회하는 업무 영역이다. 연계서비스는 주고받을 요청·응답 연계메시지를 함께 지정한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+          "line": 166,
+          "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+          "line": 25,
+          "snippet": "public interface EgovCntcInsttService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+          "line": 77,
+          "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "연계기관 — 연계 대상이 되는 기관으로 기관ID와 기관명, 등록자·수정자를 가진다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+            "line": 25,
+            "snippet": "public class CntcInstt implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+            "line": 39,
+            "snippet": "\tprivate String insttNm        = \"\";"
+          }
+        ]
+      },
+      {
+        "text": "연계시스템 — 연계기관에 소속된 시스템으로 시스템명과 시스템 주소를 가진다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+            "line": 25,
+            "snippet": "public class CntcSystem implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+            "line": 46,
+            "snippet": "\tprivate String sysNm          = \"\";"
+          }
+        ]
+      },
+      {
+        "text": "연계서비스 — 연계시스템이 제공하는 서비스로 서비스명과 요청·응답 메시지를 가진다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+            "line": 25,
+            "snippet": "public class CntcService implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+            "line": 58,
+            "snippet": "\tprivate String requestMessageId = \"\";"
+          }
+        ]
+      },
+      {
+        "text": "연계메시지 — 연계서비스가 주고받는 요청·응답 메시지로 목록에서 선택해 지정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+            "line": 29,
+            "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+            "line": 77,
+            "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+          }
+        ]
+      },
+      {
+        "text": "로그인 사용자 — 연계 정보의 최초등록자·최종수정자로 기록되는 인증 사용자다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "\tprivate String uniqId;"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "기관명은 필수 입력이며 최대 60자로 제한된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+            "line": 38,
+            "snippet": "\t@Size(max=60)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+            "line": 39,
+            "snippet": "\tprivate String insttNm        = \"\";"
+          }
+        ]
+      },
+      {
+        "text": "시스템명은 필수 입력이며 소속 기관ID·시스템ID와 함께 관리된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+            "line": 46,
+            "snippet": "\tprivate String sysNm          = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+            "line": 25,
+            "snippet": "public class CntcSystem implements Serializable {"
+          }
+        ]
+      },
+      {
+        "text": "서비스명은 필수 입력이며 소속 기관ID·시스템ID가 함께 지정되어야 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+            "line": 53,
+            "snippet": "\tprivate String svcNm            = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+            "line": 25,
+            "snippet": "public class CntcService implements Serializable {"
+          }
+        ]
+      },
+      {
+        "text": "등록·수정 요청에 검증 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 171,
+            "snippet": "\t\tif (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 166,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+          }
+        ]
+      },
+      {
+        "text": "연계기관·연계시스템·연계서비스의 식별자는 저장 직전에 채번 서비스로 새로 발급한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 181,
+            "snippet": "\t\tString sInsttId = idgenService.getNextStringId();"
+          }
+        ]
+      },
+      {
+        "text": "등록 시 최초등록자는 인증된 로그인 사용자의 고유아이디로 기록한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 176,
+            "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "\tprivate String uniqId;"
+          }
+        ]
+      },
+      {
+        "text": "등록 처리가 끝나면 연계기관 목록 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 186,
+            "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "인증 영역 — 등록자·수정자 기록을 위해 인증 사용자 조회 도우미를 통해 현재 로그인 사용자를 가져온다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "\tpublic static Object getAuthenticatedUser() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 176,
+            "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          }
+        ]
+      },
+      {
+        "text": "인증 사용자 정보 서비스 — 인증 사용자 정보와 권한, 인증 여부를 공통 계약으로 제공받는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      {
+        "text": "연계메시지 영역 — 연계서비스에 지정할 요청·응답 메시지 목록을 연계메시지 관리 서비스에서 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcMessageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+            "line": 77,
+            "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+          }
+        ]
+      },
+      {
+        "text": "식별자 채번 영역 — 신규 연계 정보의 식별자를 공통 채번 서비스에서 발급받는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 181,
+            "snippet": "\t\tString sInsttId = idgenService.getNextStringId();"
+          }
+        ]
+      },
+      {
+        "text": "공통 유틸 영역 — 사용자 고유아이디의 널 처리를 문자열 처리 공통 유틸에 의존한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 176,
+            "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "연계기관 관리",
+        "nodes": [
+          {
+            "id": "s",
+            "kind": "start",
+            "label": "연계기관 관리 시작"
+          },
+          {
+            "id": "list",
+            "kind": "activity",
+            "label": "연계기관 목록 조회",
+            "flowRef": "flow:ANY /ssi/syi/iis/getCntcInsttList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 424,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/getCntcInsttList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "d1",
+            "kind": "decision",
+            "label": "수행할 작업 선택",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 149,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+              }
+            ]
+          },
+          {
+            "id": "addv",
+            "kind": "activity",
+            "label": "등록 화면 이동",
+            "flowRef": "flow:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 149,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+              }
+            ]
+          },
+          {
+            "id": "add",
+            "kind": "activity",
+            "label": "연계기관 등록",
+            "flowRef": "flow:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 166,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 184,
+                "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+              }
+            ]
+          },
+          {
+            "id": "dtl",
+            "kind": "activity",
+            "label": "연계기관 상세 조회",
+            "flowRef": "flow:ANY /ssi/syi/iis/getCntcInsttDetail.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 379,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/getCntcInsttDetail.do\")"
+              }
+            ]
+          },
+          {
+            "id": "updv",
+            "kind": "activity",
+            "label": "수정 화면 이동",
+            "flowRef": "flow:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 461,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcInstt.do\", params = \"!cmd\")"
+              }
+            ]
+          },
+          {
+            "id": "upd",
+            "kind": "activity",
+            "label": "연계기관 수정",
+            "flowRef": "flow:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 481,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcInstt.do\", params = \"cmd=Modify\")"
+              }
+            ]
+          },
+          {
+            "id": "del",
+            "kind": "activity",
+            "label": "연계기관 삭제",
+            "flowRef": "flow:ANY /ssi/syi/iis/removeCntcInstt.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 104,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/removeCntcInstt.do\")"
+              }
+            ]
+          },
+          {
+            "id": "d2",
+            "kind": "decision",
+            "label": "입력값 검증 통과",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 171,
+                "snippet": "\t\tif (bindingResult.hasErrors()) {"
+              }
+            ]
+          },
+          {
+            "id": "e",
+            "kind": "end",
+            "label": "목록 화면으로 이동"
+          }
+        ],
+        "edges": [
+          {
+            "from": "s",
+            "to": "list"
+          },
+          {
+            "from": "list",
+            "to": "d1"
+          },
+          {
+            "from": "d1",
+            "to": "addv",
+            "label": "등록"
+          },
+          {
+            "from": "d1",
+            "to": "dtl",
+            "label": "상세"
+          },
+          {
+            "from": "d1",
+            "to": "del",
+            "label": "삭제"
+          },
+          {
+            "from": "addv",
+            "to": "add"
+          },
+          {
+            "from": "dtl",
+            "to": "updv"
+          },
+          {
+            "from": "updv",
+            "to": "upd"
+          },
+          {
+            "from": "add",
+            "to": "d2"
+          },
+          {
+            "from": "upd",
+            "to": "d2"
+          },
+          {
+            "from": "d2",
+            "to": "e",
+            "label": "통과"
+          },
+          {
+            "from": "d2",
+            "to": "addv",
+            "label": "오류"
+          },
+          {
+            "from": "del",
+            "to": "e"
+          }
+        ]
+      },
+      {
+        "title": "연계시스템 관리",
+        "nodes": [
+          {
+            "id": "s",
+            "kind": "start",
+            "label": "연계시스템 관리 시작"
+          },
+          {
+            "id": "addv",
+            "kind": "activity",
+            "label": "등록 화면 이동",
+            "flowRef": "flow:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 198,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcSystem.do\", params = \"!cmd\")"
+              }
+            ]
+          },
+          {
+            "id": "add",
+            "kind": "activity",
+            "label": "연계시스템 등록",
+            "flowRef": "flow:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 224,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcSystem.do\", params = \"cmd=Regist\")"
+              }
+            ]
+          },
+          {
+            "id": "updv",
+            "kind": "activity",
+            "label": "수정 화면 이동",
+            "flowRef": "flow:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 508,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcSystem.do\", params = \"!cmd\")"
+              }
+            ]
+          },
+          {
+            "id": "upd",
+            "kind": "activity",
+            "label": "연계시스템 수정",
+            "flowRef": "flow:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 538,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcSystem.do\", params = \"cmd=Modify\")"
+              }
+            ]
+          },
+          {
+            "id": "del",
+            "kind": "activity",
+            "label": "연계시스템 삭제",
+            "flowRef": "flow:ANY /ssi/syi/iis/removeCntcSystem.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 119,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/removeCntcSystem.do\")"
+              }
+            ]
+          },
+          {
+            "id": "d1",
+            "kind": "decision",
+            "label": "수행할 작업 선택",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 198,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcSystem.do\", params = \"!cmd\")"
+              }
+            ]
+          },
+          {
+            "id": "e",
+            "kind": "end",
+            "label": "목록 화면으로 이동"
+          }
+        ],
+        "edges": [
+          {
+            "from": "s",
+            "to": "d1"
+          },
+          {
+            "from": "d1",
+            "to": "addv",
+            "label": "등록"
+          },
+          {
+            "from": "d1",
+            "to": "updv",
+            "label": "수정"
+          },
+          {
+            "from": "d1",
+            "to": "del",
+            "label": "삭제"
+          },
+          {
+            "from": "addv",
+            "to": "add"
+          },
+          {
+            "from": "updv",
+            "to": "upd"
+          },
+          {
+            "from": "add",
+            "to": "e"
+          },
+          {
+            "from": "upd",
+            "to": "e"
+          },
+          {
+            "from": "del",
+            "to": "e"
+          }
+        ]
+      },
+      {
+        "title": "연계서비스 관리",
+        "nodes": [
+          {
+            "id": "s",
+            "kind": "start",
+            "label": "연계서비스 관리 시작"
+          },
+          {
+            "id": "addv",
+            "kind": "activity",
+            "label": "등록 화면 이동",
+            "flowRef": "flow:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 263,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcService.do\", params = \"!cmd\")"
+              }
+            ]
+          },
+          {
+            "id": "msg",
+            "kind": "activity",
+            "label": "연계메시지 목록 조회",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+                "line": 77,
+                "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "add",
+            "kind": "activity",
+            "label": "연계서비스 등록",
+            "flowRef": "flow:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 314,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcService.do\", params = \"cmd=Regist\")"
+              }
+            ]
+          },
+          {
+            "id": "updv",
+            "kind": "activity",
+            "label": "수정 화면 이동",
+            "flowRef": "flow:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 574,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcService.do\", params = \"!cmd\")"
+              }
+            ]
+          },
+          {
+            "id": "upd",
+            "kind": "activity",
+            "label": "연계서비스 수정",
+            "flowRef": "flow:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 628,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcService.do\", params = \"cmd=Modify\")"
+              }
+            ]
+          },
+          {
+            "id": "del",
+            "kind": "activity",
+            "label": "연계서비스 삭제",
+            "flowRef": "flow:ANY /ssi/syi/iis/removeCntcService.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 134,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/removeCntcService.do\")"
+              }
+            ]
+          },
+          {
+            "id": "d1",
+            "kind": "decision",
+            "label": "수행할 작업 선택",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+                "line": 263,
+                "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcService.do\", params = \"!cmd\")"
+              }
+            ]
+          },
+          {
+            "id": "e",
+            "kind": "end",
+            "label": "목록 화면으로 이동"
+          }
+        ],
+        "edges": [
+          {
+            "from": "s",
+            "to": "d1"
+          },
+          {
+            "from": "d1",
+            "to": "addv",
+            "label": "등록"
+          },
+          {
+            "from": "d1",
+            "to": "updv",
+            "label": "수정"
+          },
+          {
+            "from": "d1",
+            "to": "del",
+            "label": "삭제"
+          },
+          {
+            "from": "addv",
+            "to": "msg"
+          },
+          {
+            "from": "msg",
+            "to": "add"
+          },
+          {
+            "from": "updv",
+            "to": "upd"
+          },
+          {
+            "from": "add",
+            "to": "e"
+          },
+          {
+            "from": "upd",
+            "to": "e"
+          },
+          {
+            "from": "del",
+            "to": "e"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계기관 등록 화면 이동",
+      "summary": {
+        "text": "연계기관 등록 입력 화면을 여는 흐름이다. 명령 파라미터가 없는 등록 요청을 받아 연계기관 등록 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166",
+      "name": "연계기관 등록",
+      "summary": {
+        "text": "입력된 연계기관 정보를 검증하고 기관ID를 채번한 뒤 등록하는 흐름이다. 등록 후 연계기관 목록으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 166,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계서비스 등록 화면 이동",
+      "summary": {
+        "text": "연계서비스 등록 입력 화면을 여는 흐름이다. 선택용 연계기관·연계시스템·연계메시지 목록을 함께 준비한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 263,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcService.do\", params = \"!cmd\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314",
+      "name": "연계서비스 등록",
+      "summary": {
+        "text": "입력된 연계서비스 정보를 검증하고 서비스ID를 채번한 뒤 등록하는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 314,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcService.do\", params = \"cmd=Regist\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계시스템 등록 화면 이동",
+      "summary": {
+        "text": "연계시스템 등록 입력 화면을 여는 흐름이다. 소속 기관 선택을 위해 연계기관 목록을 함께 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 198,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcSystem.do\", params = \"!cmd\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224",
+      "name": "연계시스템 등록",
+      "summary": {
+        "text": "입력된 연계시스템 정보를 검증하고 시스템ID를 채번한 뒤 등록하는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 224,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcSystem.do\", params = \"cmd=Regist\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/getCntcInsttDetail.do",
+      "name": "연계기관 상세 조회",
+      "summary": {
+        "text": "선택한 연계기관의 상세 정보와 소속 연계시스템·연계서비스 정보를 함께 조회하는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 379,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/getCntcInsttDetail.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/getCntcInsttList.do",
+      "name": "연계기관 목록 조회",
+      "summary": {
+        "text": "검색조건과 페이지 정보로 연계기관 목록을 조회하여 목록 화면에 표시하는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 424,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/getCntcInsttList.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/removeCntcInstt.do",
+      "name": "연계기관 삭제",
+      "summary": {
+        "text": "선택한 연계기관을 삭제하는 흐름이다. 삭제 후 연계기관 목록으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 104,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/removeCntcInstt.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/removeCntcService.do",
+      "name": "연계서비스 삭제",
+      "summary": {
+        "text": "선택한 연계서비스를 삭제하는 흐름이다. 삭제 후 목록 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 134,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/removeCntcService.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/removeCntcSystem.do",
+      "name": "연계시스템 삭제",
+      "summary": {
+        "text": "선택한 연계시스템을 삭제하는 흐름이다. 삭제 후 목록 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 119,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/removeCntcSystem.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계기관 수정 화면 이동",
+      "summary": {
+        "text": "수정 대상 연계기관의 현재 정보를 조회하여 수정 화면에 표시하는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 461,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481",
+      "name": "연계기관 수정",
+      "summary": {
+        "text": "수정 입력된 연계기관 정보를 검증하고 최종수정자를 기록하여 반영하는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 481,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcInstt.do\", params = \"cmd=Modify\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계서비스 수정 화면 이동",
+      "summary": {
+        "text": "수정 대상 연계서비스의 현재 정보와 선택 목록을 조회하여 수정 화면에 표시하는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 574,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcService.do\", params = \"!cmd\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628",
+      "name": "연계서비스 수정",
+      "summary": {
+        "text": "수정 입력된 연계서비스 정보를 검증하고 최종수정자를 기록하여 반영하는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 628,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcService.do\", params = \"cmd=Modify\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계시스템 수정 화면 이동",
+      "summary": {
+        "text": "수정 대상 연계시스템의 현재 정보와 연계기관 목록을 조회하여 수정 화면에 표시하는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 508,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcSystem.do\", params = \"!cmd\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538",
+      "name": "연계시스템 수정",
+      "summary": {
+        "text": "수정 입력된 연계시스템 정보를 검증하고 최종수정자를 기록하여 반영하는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 538,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcSystem.do\", params = \"cmd=Modify\")"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "인증된 로그인 사용자의 아이디·이름·소속과 고유아이디를 담는 공통 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 시 최초등록자·최종수정자로 기록할 사용자 고유아이디를 제공하는 공통 사용자 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일 등 사용자 기본 정보와 조직 정보를 가지며, 등록자·수정자 기록에는 고유아이디가 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "인증 사용자 정보 서비스",
+      "summary": {
+        "text": "현재 인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 시 등록자·수정자를 기록하기 위해 필요한 인증 사용자 정보를 제공하는 공통 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 정보 조회, 권한 목록 조회, 인증 여부 확인의 세 가지 업무를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 조회 도우미",
+      "summary": {
+        "text": "현재 인증된 사용자 정보와 권한을 어디서나 꺼내 쓰도록 돕는 공통 도우미다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 흐름에서 현재 인증된 로그인 사용자를 조회해 등록자·수정자 기록에 사용하도록 돕는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 사용자 정보 서비스를 보관하고 인증 사용자 조회·권한 조회·인증 여부 확인을 그대로 위임한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+      "name": "연계기관 정보",
+      "summary": {
+        "text": "연계 대상 기관의 기관ID와 기관명, 등록자·수정자를 담는 업무 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+            "line": 25,
+            "snippet": "public class CntcInstt implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 등록·수정·삭제 흐름에서 화면 입력값을 담아 서비스 계층으로 전달하는 업무 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+              "line": 25,
+              "snippet": "public class CntcInstt implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+              "line": 39,
+              "snippet": "\tprivate String insttNm        = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "기관ID와 기관명, 최초등록자·최종수정자를 가지며 기관명은 필수이고 최대 60자로 제한된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+              "line": 38,
+              "snippet": "\t@Size(max=60)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+              "line": 39,
+              "snippet": "\tprivate String insttNm        = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 공통 유틸",
+      "summary": {
+        "text": "문자열 널 처리와 자르기 등 공통 문자열 가공 기능을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 시 인증 사용자에서 가져온 고유아이디가 비어 있을 때 빈 문자열로 안전하게 변환하는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 상수와 문자열 자르기·널 검사 등 정적 가공 기능만 가지며 상태를 보관하지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 조회 도우미",
+      "summary": {
+        "text": "현재 인증된 사용자 정보와 권한을 어디서나 꺼내 쓰도록 돕는 공통 도우미다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 흐름에서 현재 인증된 로그인 사용자를 조회해 등록자·수정자 기록에 사용하도록 돕는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 사용자 정보 서비스를 보관하고 인증 사용자 조회·권한 조회·인증 여부 확인을 그대로 위임한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "name": "연계기관 조회조건 정보",
+      "summary": {
+        "text": "연계기관 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+            "line": 29,
+            "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 목록 조회와 선택용 기관 목록 조회에서 검색조건과 페이지 범위를 전달하는 조회용 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계기관 정보를 확장하여 검색조건·검색어·사용여부와 현재 페이지·페이지당 건수 등 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+      "name": "연계서비스 정보",
+      "summary": {
+        "text": "연계서비스의 기관·시스템 소속과 서비스명, 요청·응답 메시지 정보를 담는 업무 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+            "line": 25,
+            "snippet": "public class CntcService implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계서비스 등록·수정 흐름에서 입력받은 서비스 정보를 담아 서비스 계층으로 전달하는 업무 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 25,
+              "snippet": "public class CntcService implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 53,
+              "snippet": "\tprivate String svcNm            = \"\";"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "기관ID·시스템ID·서비스명은 필수이며 서비스명은 최대 60자로 제한된다. 요청메시지와 응답메시지를 지정하여 주고받을 메시지를 정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 53,
+              "snippet": "\tprivate String svcNm            = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 58,
+              "snippet": "\tprivate String requestMessageId = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+      "name": "연계시스템 조회조건 정보",
+      "summary": {
+        "text": "연계시스템 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+            "line": 29,
+            "snippet": "public class CntcSystemVO extends CntcSystem implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 상세와 연계서비스 등록 화면에서 소속 연계시스템 목록을 조회할 때 검색조건과 페이지 범위를 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 25,
+              "snippet": "public class CntcSystem implements Serializable {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계시스템 정보를 확장하여 검색조건과 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 25,
+              "snippet": "public class CntcSystem implements Serializable {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "name": "연계메시지 조회조건 정보",
+      "summary": {
+        "text": "연계메시지 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+            "line": 29,
+            "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계서비스 등록·수정 화면에서 선택할 요청·응답 메시지 목록을 조회할 때 검색조건과 페이지 범위를 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+              "line": 29,
+              "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 77,
+              "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계메시지 정보를 확장하여 검색조건과 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+              "line": 29,
+              "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "name": "연계메시지 관리 서비스",
+      "summary": {
+        "text": "연계서비스가 주고받는 요청·응답 연계메시지를 등록·조회·삭제하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcMessageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계서비스 등록·수정 시 선택할 요청·응답 메시지 목록을 제공하고, 연계메시지와 메시지 항목의 등록·삭제·조회 업무를 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcMessageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 77,
+              "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "연계메시지 목록은 검색조건 정보를 받아 조회하며, 메시지와 메시지 항목이 별도 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 77,
+              "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "name": "연계기관 조회조건 정보",
+      "summary": {
+        "text": "연계기관 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+            "line": 29,
+            "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 목록 조회와 선택용 기관 목록 조회에서 검색조건과 페이지 범위를 전달하는 조회용 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계기관 정보를 확장하여 검색조건·검색어·사용여부와 현재 페이지·페이지당 건수 등 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+      "name": "연계서비스 정보",
+      "summary": {
+        "text": "연계서비스의 기관·시스템 소속과 서비스명, 요청·응답 메시지 정보를 담는 업무 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+            "line": 25,
+            "snippet": "public class CntcService implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계서비스 등록·수정 흐름에서 입력받은 서비스 정보를 담아 서비스 계층으로 전달하는 업무 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 25,
+              "snippet": "public class CntcService implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 53,
+              "snippet": "\tprivate String svcNm            = \"\";"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "기관ID·시스템ID·서비스명은 필수이며 서비스명은 최대 60자로 제한된다. 요청메시지와 응답메시지를 지정하여 주고받을 메시지를 정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 53,
+              "snippet": "\tprivate String svcNm            = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 58,
+              "snippet": "\tprivate String requestMessageId = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+      "name": "연계시스템 조회조건 정보",
+      "summary": {
+        "text": "연계시스템 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+            "line": 29,
+            "snippet": "public class CntcSystemVO extends CntcSystem implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 상세와 연계서비스 등록 화면에서 소속 연계시스템 목록을 조회할 때 검색조건과 페이지 범위를 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 25,
+              "snippet": "public class CntcSystem implements Serializable {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계시스템 정보를 확장하여 검색조건과 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 25,
+              "snippet": "public class CntcSystem implements Serializable {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "name": "연계메시지 조회조건 정보",
+      "summary": {
+        "text": "연계메시지 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+            "line": 29,
+            "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계서비스 등록·수정 화면에서 선택할 요청·응답 메시지 목록을 조회할 때 검색조건과 페이지 범위를 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+              "line": 29,
+              "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 77,
+              "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계메시지 정보를 확장하여 검색조건과 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+              "line": 29,
+              "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "name": "연계메시지 관리 서비스",
+      "summary": {
+        "text": "연계서비스가 주고받는 요청·응답 연계메시지를 등록·조회·삭제하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcMessageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계서비스 등록·수정 시 선택할 요청·응답 메시지 목록을 제공하고, 연계메시지와 메시지 항목의 등록·삭제·조회 업무를 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcMessageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 77,
+              "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "연계메시지 목록은 검색조건 정보를 받아 조회하며, 메시지와 메시지 항목이 별도 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 77,
+              "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "인증된 로그인 사용자의 아이디·이름·소속과 고유아이디를 담는 공통 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 시 최초등록자·최종수정자로 기록할 사용자 고유아이디를 제공하는 공통 사용자 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일 등 사용자 기본 정보와 조직 정보를 가지며, 등록자·수정자 기록에는 고유아이디가 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "인증 사용자 정보 서비스",
+      "summary": {
+        "text": "현재 인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 시 등록자·수정자를 기록하기 위해 필요한 인증 사용자 정보를 제공하는 공통 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 정보 조회, 권한 목록 조회, 인증 여부 확인의 세 가지 업무를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 조회 도우미",
+      "summary": {
+        "text": "현재 인증된 사용자 정보와 권한을 어디서나 꺼내 쓰도록 돕는 공통 도우미다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 흐름에서 현재 인증된 로그인 사용자를 조회해 등록자·수정자 기록에 사용하도록 돕는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 사용자 정보 서비스를 보관하고 인증 사용자 조회·권한 조회·인증 여부 확인을 그대로 위임한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "name": "연계기관 조회조건 정보",
+      "summary": {
+        "text": "연계기관 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+            "line": 29,
+            "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 목록 조회와 선택용 기관 목록 조회에서 검색조건과 페이지 범위를 전달하는 조회용 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계기관 정보를 확장하여 검색조건·검색어·사용여부와 현재 페이지·페이지당 건수 등 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+      "name": "연계시스템 정보",
+      "summary": {
+        "text": "연계시스템의 소속 기관과 시스템명, 시스템 주소를 담는 업무 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+            "line": 25,
+            "snippet": "public class CntcSystem implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계시스템 등록·수정·삭제 흐름에서 화면 입력값을 담아 서비스 계층으로 전달하는 업무 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 25,
+              "snippet": "public class CntcSystem implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 46,
+              "snippet": "\tprivate String sysNm          = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "소속 기관ID와 시스템ID, 시스템명, 시스템 주소를 가지며 시스템명은 필수이고 최대 60자로 제한된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 46,
+              "snippet": "\tprivate String sysNm          = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 공통 유틸",
+      "summary": {
+        "text": "문자열 널 처리와 자르기 등 공통 문자열 가공 기능을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 시 인증 사용자에서 가져온 고유아이디가 비어 있을 때 빈 문자열로 안전하게 변환하는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 상수와 문자열 자르기·널 검사 등 정적 가공 기능만 가지며 상태를 보관하지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "name": "연계기관 조회조건 정보",
+      "summary": {
+        "text": "연계기관 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+            "line": 29,
+            "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 목록 조회와 선택용 기관 목록 조회에서 검색조건과 페이지 범위를 전달하는 조회용 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계기관 정보를 확장하여 검색조건·검색어·사용여부와 현재 페이지·페이지당 건수 등 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/iis/service/CntcServiceVO.java",
+      "name": "연계서비스 조회조건 정보",
+      "summary": {
+        "text": "연계서비스 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcServiceVO.java",
+            "line": 29,
+            "snippet": "public class CntcServiceVO extends CntcService implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 상세 화면에서 해당 기관의 연계서비스 목록을 조회할 때 검색조건과 페이지 범위를 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 25,
+              "snippet": "public class CntcService implements Serializable {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계서비스 정보를 확장하여 검색조건과 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 25,
+              "snippet": "public class CntcService implements Serializable {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+      "name": "연계시스템 조회조건 정보",
+      "summary": {
+        "text": "연계시스템 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+            "line": 29,
+            "snippet": "public class CntcSystemVO extends CntcSystem implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 상세와 연계서비스 등록 화면에서 소속 연계시스템 목록을 조회할 때 검색조건과 페이지 범위를 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 25,
+              "snippet": "public class CntcSystem implements Serializable {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계시스템 정보를 확장하여 검색조건과 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 25,
+              "snippet": "public class CntcSystem implements Serializable {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "name": "연계메시지 조회조건 정보",
+      "summary": {
+        "text": "연계메시지 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+            "line": 29,
+            "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계서비스 등록·수정 화면에서 선택할 요청·응답 메시지 목록을 조회할 때 검색조건과 페이지 범위를 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+              "line": 29,
+              "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 77,
+              "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계메시지 정보를 확장하여 검색조건과 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+              "line": 29,
+              "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "name": "연계메시지 관리 서비스",
+      "summary": {
+        "text": "연계서비스가 주고받는 요청·응답 연계메시지를 등록·조회·삭제하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcMessageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계서비스 등록·수정 시 선택할 요청·응답 메시지 목록을 제공하고, 연계메시지와 메시지 항목의 등록·삭제·조회 업무를 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcMessageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 77,
+              "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "연계메시지 목록은 검색조건 정보를 받아 조회하며, 메시지와 메시지 항목이 별도 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 77,
+              "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttList.do:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "name": "연계기관 조회조건 정보",
+      "summary": {
+        "text": "연계기관 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+            "line": 29,
+            "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 목록 조회와 선택용 기관 목록 조회에서 검색조건과 페이지 범위를 전달하는 조회용 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계기관 정보를 확장하여 검색조건·검색어·사용여부와 현재 페이지·페이지당 건수 등 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttList.do:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttList.do:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/removeCntcInstt.do:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/removeCntcInstt.do:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/removeCntcService.do:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/removeCntcService.do:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/removeCntcSystem.do:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/removeCntcSystem.do:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "인증된 로그인 사용자의 아이디·이름·소속과 고유아이디를 담는 공통 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 시 최초등록자·최종수정자로 기록할 사용자 고유아이디를 제공하는 공통 사용자 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일 등 사용자 기본 정보와 조직 정보를 가지며, 등록자·수정자 기록에는 고유아이디가 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "인증 사용자 정보 서비스",
+      "summary": {
+        "text": "현재 인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 시 등록자·수정자를 기록하기 위해 필요한 인증 사용자 정보를 제공하는 공통 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 정보 조회, 권한 목록 조회, 인증 여부 확인의 세 가지 업무를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 조회 도우미",
+      "summary": {
+        "text": "현재 인증된 사용자 정보와 권한을 어디서나 꺼내 쓰도록 돕는 공통 도우미다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 흐름에서 현재 인증된 로그인 사용자를 조회해 등록자·수정자 기록에 사용하도록 돕는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 사용자 정보 서비스를 보관하고 인증 사용자 조회·권한 조회·인증 여부 확인을 그대로 위임한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+      "name": "연계기관 정보",
+      "summary": {
+        "text": "연계 대상 기관의 기관ID와 기관명, 등록자·수정자를 담는 업무 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+            "line": 25,
+            "snippet": "public class CntcInstt implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 등록·수정·삭제 흐름에서 화면 입력값을 담아 서비스 계층으로 전달하는 업무 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+              "line": 25,
+              "snippet": "public class CntcInstt implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+              "line": 39,
+              "snippet": "\tprivate String insttNm        = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "기관ID와 기관명, 최초등록자·최종수정자를 가지며 기관명은 필수이고 최대 60자로 제한된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+              "line": 38,
+              "snippet": "\t@Size(max=60)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+              "line": 39,
+              "snippet": "\tprivate String insttNm        = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 공통 유틸",
+      "summary": {
+        "text": "문자열 널 처리와 자르기 등 공통 문자열 가공 기능을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 시 인증 사용자에서 가져온 고유아이디가 비어 있을 때 빈 문자열로 안전하게 변환하는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 상수와 문자열 자르기·널 검사 등 정적 가공 기능만 가지며 상태를 보관하지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 조회 도우미",
+      "summary": {
+        "text": "현재 인증된 사용자 정보와 권한을 어디서나 꺼내 쓰도록 돕는 공통 도우미다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 흐름에서 현재 인증된 로그인 사용자를 조회해 등록자·수정자 기록에 사용하도록 돕는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 사용자 정보 서비스를 보관하고 인증 사용자 조회·권한 조회·인증 여부 확인을 그대로 위임한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "name": "연계기관 조회조건 정보",
+      "summary": {
+        "text": "연계기관 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+            "line": 29,
+            "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 목록 조회와 선택용 기관 목록 조회에서 검색조건과 페이지 범위를 전달하는 조회용 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계기관 정보를 확장하여 검색조건·검색어·사용여부와 현재 페이지·페이지당 건수 등 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+      "name": "연계서비스 정보",
+      "summary": {
+        "text": "연계서비스의 기관·시스템 소속과 서비스명, 요청·응답 메시지 정보를 담는 업무 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+            "line": 25,
+            "snippet": "public class CntcService implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계서비스 등록·수정 흐름에서 입력받은 서비스 정보를 담아 서비스 계층으로 전달하는 업무 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 25,
+              "snippet": "public class CntcService implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 53,
+              "snippet": "\tprivate String svcNm            = \"\";"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "기관ID·시스템ID·서비스명은 필수이며 서비스명은 최대 60자로 제한된다. 요청메시지와 응답메시지를 지정하여 주고받을 메시지를 정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 53,
+              "snippet": "\tprivate String svcNm            = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 58,
+              "snippet": "\tprivate String requestMessageId = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+      "name": "연계시스템 조회조건 정보",
+      "summary": {
+        "text": "연계시스템 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+            "line": 29,
+            "snippet": "public class CntcSystemVO extends CntcSystem implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 상세와 연계서비스 등록 화면에서 소속 연계시스템 목록을 조회할 때 검색조건과 페이지 범위를 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 25,
+              "snippet": "public class CntcSystem implements Serializable {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계시스템 정보를 확장하여 검색조건과 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 25,
+              "snippet": "public class CntcSystem implements Serializable {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "name": "연계메시지 조회조건 정보",
+      "summary": {
+        "text": "연계메시지 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+            "line": 29,
+            "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계서비스 등록·수정 화면에서 선택할 요청·응답 메시지 목록을 조회할 때 검색조건과 페이지 범위를 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+              "line": 29,
+              "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 77,
+              "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계메시지 정보를 확장하여 검색조건과 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+              "line": 29,
+              "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "name": "연계메시지 관리 서비스",
+      "summary": {
+        "text": "연계서비스가 주고받는 요청·응답 연계메시지를 등록·조회·삭제하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcMessageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계서비스 등록·수정 시 선택할 요청·응답 메시지 목록을 제공하고, 연계메시지와 메시지 항목의 등록·삭제·조회 업무를 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcMessageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 77,
+              "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "연계메시지 목록은 검색조건 정보를 받아 조회하며, 메시지와 메시지 항목이 별도 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 77,
+              "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "name": "연계기관 조회조건 정보",
+      "summary": {
+        "text": "연계기관 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+            "line": 29,
+            "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 목록 조회와 선택용 기관 목록 조회에서 검색조건과 페이지 범위를 전달하는 조회용 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계기관 정보를 확장하여 검색조건·검색어·사용여부와 현재 페이지·페이지당 건수 등 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+      "name": "연계서비스 정보",
+      "summary": {
+        "text": "연계서비스의 기관·시스템 소속과 서비스명, 요청·응답 메시지 정보를 담는 업무 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+            "line": 25,
+            "snippet": "public class CntcService implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계서비스 등록·수정 흐름에서 입력받은 서비스 정보를 담아 서비스 계층으로 전달하는 업무 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 25,
+              "snippet": "public class CntcService implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 53,
+              "snippet": "\tprivate String svcNm            = \"\";"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "기관ID·시스템ID·서비스명은 필수이며 서비스명은 최대 60자로 제한된다. 요청메시지와 응답메시지를 지정하여 주고받을 메시지를 정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 53,
+              "snippet": "\tprivate String svcNm            = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+              "line": 58,
+              "snippet": "\tprivate String requestMessageId = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+      "name": "연계시스템 조회조건 정보",
+      "summary": {
+        "text": "연계시스템 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+            "line": 29,
+            "snippet": "public class CntcSystemVO extends CntcSystem implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 상세와 연계서비스 등록 화면에서 소속 연계시스템 목록을 조회할 때 검색조건과 페이지 범위를 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 25,
+              "snippet": "public class CntcSystem implements Serializable {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계시스템 정보를 확장하여 검색조건과 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 25,
+              "snippet": "public class CntcSystem implements Serializable {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "name": "연계메시지 조회조건 정보",
+      "summary": {
+        "text": "연계메시지 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+            "line": 29,
+            "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계서비스 등록·수정 화면에서 선택할 요청·응답 메시지 목록을 조회할 때 검색조건과 페이지 범위를 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+              "line": 29,
+              "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 77,
+              "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계메시지 정보를 확장하여 검색조건과 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+              "line": 29,
+              "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "name": "연계메시지 관리 서비스",
+      "summary": {
+        "text": "연계서비스가 주고받는 요청·응답 연계메시지를 등록·조회·삭제하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcMessageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계서비스 등록·수정 시 선택할 요청·응답 메시지 목록을 제공하고, 연계메시지와 메시지 항목의 등록·삭제·조회 업무를 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcMessageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 77,
+              "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "연계메시지 목록은 검색조건 정보를 받아 조회하며, 메시지와 메시지 항목이 별도 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+              "line": 77,
+              "snippet": "\tList<EgovMap> selectCntcMessageList(CntcMessageVO searchVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "인증된 로그인 사용자의 아이디·이름·소속과 고유아이디를 담는 공통 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 시 최초등록자·최종수정자로 기록할 사용자 고유아이디를 제공하는 공통 사용자 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일 등 사용자 기본 정보와 조직 정보를 가지며, 등록자·수정자 기록에는 고유아이디가 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "인증 사용자 정보 서비스",
+      "summary": {
+        "text": "현재 인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 시 등록자·수정자를 기록하기 위해 필요한 인증 사용자 정보를 제공하는 공통 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 정보 조회, 권한 목록 조회, 인증 여부 확인의 세 가지 업무를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 조회 도우미",
+      "summary": {
+        "text": "현재 인증된 사용자 정보와 권한을 어디서나 꺼내 쓰도록 돕는 공통 도우미다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 흐름에서 현재 인증된 로그인 사용자를 조회해 등록자·수정자 기록에 사용하도록 돕는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 사용자 정보 서비스를 보관하고 인증 사용자 조회·권한 조회·인증 여부 확인을 그대로 위임한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "name": "연계기관 조회조건 정보",
+      "summary": {
+        "text": "연계기관 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+            "line": 29,
+            "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 목록 조회와 선택용 기관 목록 조회에서 검색조건과 페이지 범위를 전달하는 조회용 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계기관 정보를 확장하여 검색조건·검색어·사용여부와 현재 페이지·페이지당 건수 등 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+      "name": "연계시스템 정보",
+      "summary": {
+        "text": "연계시스템의 소속 기관과 시스템명, 시스템 주소를 담는 업무 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+            "line": 25,
+            "snippet": "public class CntcSystem implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계시스템 등록·수정·삭제 흐름에서 화면 입력값을 담아 서비스 계층으로 전달하는 업무 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 25,
+              "snippet": "public class CntcSystem implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 46,
+              "snippet": "\tprivate String sysNm          = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "소속 기관ID와 시스템ID, 시스템명, 시스템 주소를 가지며 시스템명은 필수이고 최대 60자로 제한된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+              "line": 46,
+              "snippet": "\tprivate String sysNm          = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 공통 유틸",
+      "summary": {
+        "text": "문자열 널 처리와 자르기 등 공통 문자열 가공 기능을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 등록·수정 시 인증 사용자에서 가져온 고유아이디가 비어 있을 때 빈 문자열로 안전하게 변환하는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 상수와 문자열 자르기·널 검사 등 정적 가공 기능만 가지며 상태를 보관하지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "name": "연계기관 조회조건 정보",
+      "summary": {
+        "text": "연계기관 목록 조회의 검색조건과 페이지 정보를 담는 조회용 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+            "line": 29,
+            "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관 목록 조회와 선택용 기관 목록 조회에서 검색조건과 페이지 범위를 전달하는 조회용 정보다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연계기관 정보를 확장하여 검색조건·검색어·사용여부와 현재 페이지·페이지당 건수 등 페이지 정보를 함께 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+              "line": 37,
+              "snippet": "    private String searchKeyword = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "name": "연계 정보 관리 서비스",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 업무를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+            "line": 25,
+            "snippet": "public interface EgovCntcInsttService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계기관과 그 하위의 연계시스템·연계서비스에 대한 등록·삭제·상세 조회·목록 조회 업무를 한데 묶어 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 25,
+              "snippet": "public interface EgovCntcInsttService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록·삭제 등 각 업무는 개별 메서드로 분리되어 있으며, 연계기관·연계시스템·연계서비스가 각각 독립된 등록·삭제 단위로 관리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 53,
+              "snippet": "\tvoid insertCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+              "line": 32,
+              "snippet": "\tvoid deleteCntcInstt(CntcInstt cntcInstt) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "name": "연계 정보 관리 요청 처리",
+      "summary": {
+        "text": "연계기관·연계시스템·연계서비스의 등록·수정·삭제·조회 요청을 받아 검증한 뒤 연계 정보 관리 서비스로 위임하는 창구다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "연계 정보 관리 화면에서 들어온 요청을 받아 입력값 검증, 사용자 식별, 식별자 채번을 거쳐 연계 정보 관리 서비스에 실제 처리를 위임하고, 처리 후 목록 화면으로 이동시키는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 184,
+              "snippet": "\t\tcntcInsttService.insertCntcInstt(cntcInstt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 186,
+              "snippet": "\t\treturn \"forward:/ssi/syi/iis/getCntcInsttList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 검색조건 정보와 연계기관 정보를 파라미터로 받으며, 등록·수정 요청은 검증 오류가 있으면 입력 화면으로 되돌린다. 등록자 정보는 인증된 로그인 사용자에서 가져온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 166,
+              "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 171,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 176,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

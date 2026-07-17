@@ -1,0 +1,3693 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "ro_s",
+          "to": "ro_auth"
+        },
+        {
+          "from": "ro_auth",
+          "label": "NO",
+          "to": "ro_login"
+        },
+        {
+          "from": "ro_auth",
+          "label": "YES",
+          "to": "ro_list"
+        },
+        {
+          "from": "ro_list",
+          "to": "ro_act"
+        },
+        {
+          "from": "ro_act",
+          "label": "등록",
+          "to": "ro_regv"
+        },
+        {
+          "from": "ro_act",
+          "label": "수정",
+          "to": "ro_updv"
+        },
+        {
+          "from": "ro_act",
+          "label": "상세·삭제",
+          "to": "ro_det"
+        },
+        {
+          "from": "ro_regv",
+          "to": "ro_reg"
+        },
+        {
+          "from": "ro_reg",
+          "to": "ro_e"
+        },
+        {
+          "from": "ro_updv",
+          "to": "ro_upd"
+        },
+        {
+          "from": "ro_upd",
+          "to": "ro_e"
+        },
+        {
+          "from": "ro_det",
+          "to": "ro_del"
+        },
+        {
+          "from": "ro_del",
+          "label": "YES",
+          "to": "ro_delng"
+        },
+        {
+          "from": "ro_del",
+          "label": "NO",
+          "to": "ro_delok"
+        },
+        {
+          "from": "ro_delok",
+          "to": "ro_e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "ro_s",
+          "kind": "start",
+          "label": "지식정보 요청 화면 진입"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 174,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            }
+          ],
+          "id": "ro_auth",
+          "kind": "decision",
+          "label": "로그인 사용자인가"
+        },
+        {
+          "id": "ro_login",
+          "kind": "end",
+          "label": "로그인 화면으로 이동"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 99,
+              "snippet": "\t@RequestMapping(value = \"/dam/spe/req/listRequestOffer.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /dam/spe/req/listRequestOffer.do",
+          "id": "ro_list",
+          "kind": "activity",
+          "label": "요청 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 167,
+              "snippet": "\t@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+            }
+          ],
+          "id": "ro_act",
+          "kind": "decision",
+          "label": "수행할 작업 선택"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 400,
+              "snippet": "\t@RequestMapping(value = \"/dam/spe/req/registRequestOffer.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /dam/spe/req/registRequestOffer.do",
+          "id": "ro_regv",
+          "kind": "activity",
+          "label": "등록 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 460,
+              "snippet": "\t@RequestMapping(value = \"/dam/spe/req/registRequestOfferActor.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /dam/spe/req/registRequestOfferActor.do",
+          "id": "ro_reg",
+          "kind": "activity",
+          "label": "요청 등록 처리"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 259,
+              "snippet": "\t@RequestMapping(value = \"/dam/spe/req/updtRequestOffer.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /dam/spe/req/updtRequestOffer.do",
+          "id": "ro_updv",
+          "kind": "activity",
+          "label": "수정 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 314,
+              "snippet": "\t@RequestMapping(value = \"/dam/spe/req/updtRequestOfferActor.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /dam/spe/req/updtRequestOfferActor.do",
+          "id": "ro_upd",
+          "kind": "activity",
+          "label": "요청 수정 처리"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 167,
+              "snippet": "\t@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /dam/spe/req/detailRequestOffer.do",
+          "id": "ro_det",
+          "kind": "activity",
+          "label": "요청 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 191,
+              "snippet": "\t\t\tif (egovRequestOfferVOService.selectRequestOfferDelCnt(hmParam) > 0) {"
+            }
+          ],
+          "id": "ro_del",
+          "kind": "decision",
+          "label": "하위 답변이 있는가"
+        },
+        {
+          "id": "ro_delng",
+          "kind": "end",
+          "label": "삭제 불가 안내"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 191,
+              "snippet": "\t\t\tif (egovRequestOfferVOService.selectRequestOfferDelCnt(hmParam) > 0) {"
+            }
+          ],
+          "id": "ro_delok",
+          "kind": "activity",
+          "label": "요청 건 삭제"
+        },
+        {
+          "id": "ro_e",
+          "kind": "end",
+          "label": "목록 화면으로 복귀"
+        }
+      ],
+      "title": "지식정보 제공·요청 관리"
+    },
+    {
+      "edges": [
+        {
+          "from": "sp_s",
+          "to": "sp_list"
+        },
+        {
+          "from": "sp_list",
+          "to": "sp_act"
+        },
+        {
+          "from": "sp_act",
+          "label": "상세",
+          "to": "sp_det"
+        },
+        {
+          "from": "sp_act",
+          "label": "등록",
+          "to": "sp_regv"
+        },
+        {
+          "from": "sp_act",
+          "label": "수정",
+          "to": "sp_updv"
+        },
+        {
+          "from": "sp_act",
+          "label": "삭제",
+          "to": "sp_rem"
+        },
+        {
+          "from": "sp_det",
+          "to": "sp_e"
+        },
+        {
+          "from": "sp_regv",
+          "to": "sp_reg"
+        },
+        {
+          "from": "sp_reg",
+          "to": "sp_val"
+        },
+        {
+          "from": "sp_updv",
+          "to": "sp_upd"
+        },
+        {
+          "from": "sp_upd",
+          "to": "sp_val"
+        },
+        {
+          "from": "sp_val",
+          "label": "NO",
+          "to": "sp_back"
+        },
+        {
+          "from": "sp_val",
+          "label": "YES",
+          "to": "sp_e"
+        },
+        {
+          "from": "sp_rem",
+          "to": "sp_e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "sp_s",
+          "kind": "start",
+          "label": "지식전문가 화면 진입"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 85,
+              "snippet": "\t@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialistList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /dam/spe/spe/EgovComDamSpecialistList.do",
+          "id": "sp_list",
+          "kind": "activity",
+          "label": "전문가 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "\t@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "id": "sp_act",
+          "kind": "decision",
+          "label": "수행할 작업 선택"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "\t@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /dam/spe/spe/EgovComDamSpecialist.do",
+          "id": "sp_det",
+          "kind": "activity",
+          "label": "전문가 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 134,
+              "snippet": "\t@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialistRegistView.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /dam/spe/spe/EgovComDamSpecialistRegistView.do",
+          "id": "sp_regv",
+          "kind": "activity",
+          "label": "등록 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 174,
+              "snippet": "\t@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialistRegist.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /dam/spe/spe/EgovComDamSpecialistRegist.do",
+          "id": "sp_reg",
+          "kind": "activity",
+          "label": "전문가 등록 처리"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 234,
+              "snippet": "\t@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialistModifyView.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /dam/spe/spe/EgovComDamSpecialistModifyView.do",
+          "id": "sp_updv",
+          "kind": "activity",
+          "label": "수정 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 251,
+              "snippet": "\t@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialistModify.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /dam/spe/spe/EgovComDamSpecialistModify.do",
+          "id": "sp_upd",
+          "kind": "activity",
+          "label": "전문가 수정 처리"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 189,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            }
+          ],
+          "id": "sp_val",
+          "kind": "decision",
+          "label": "입력값 검증 통과"
+        },
+        {
+          "id": "sp_back",
+          "kind": "end",
+          "label": "입력 화면으로 복귀"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 280,
+              "snippet": "\t@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialistRemove.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /dam/spe/spe/EgovComDamSpecialistRemove.do",
+          "id": "sp_rem",
+          "kind": "activity",
+          "label": "전문가 삭제 처리"
+        },
+        {
+          "id": "sp_e",
+          "kind": "end",
+          "label": "목록 화면으로 복귀"
+        }
+      ],
+      "title": "지식전문가 관리"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+          "line": 174,
+          "snippet": "\t\tif (!isAuthenticated) {"
+        }
+      ],
+      "text": "로그인하지 않은 사용자는 지식전문가·지식정보 요청 화면을 이용할 수 없으며, 로그인 필요 안내와 함께 로그인 화면으로 되돌려진다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+          "line": 191,
+          "snippet": "\t\t\tif (egovRequestOfferVOService.selectRequestOfferDelCnt(hmParam) > 0) {"
+        }
+      ],
+      "text": "지식정보 요청 건에 하위 답변이 한 건이라도 등록되어 있으면 삭제할 수 없고 삭제 불가 안내가 표시된다. 하위 답변이 없을 때만 삭제 후 목록으로 되돌아간다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+          "line": 189,
+          "snippet": "\t\tif (bindingResult.hasErrors()) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/KnoSpecialist.java",
+          "line": 23,
+          "snippet": "\tprivate String speId;"
+        }
+      ],
+      "text": "지식전문가 등록·수정 시 필수 항목과 길이 기준을 검증하며, 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+          "line": 75,
+          "snippet": "\tint knoTypeCdCheck(String knoTypeCd) throws Exception;"
+        }
+      ],
+      "text": "지식유형은 지식유형코드의 중복 여부를 확인한 뒤 등록한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+          "line": 16,
+          "snippet": "public interface EgovMapMaterialService {"
+        }
+      ],
+      "text": "등록·수정 화면의 지식유형 선택 항목은 선택한 조직에 속한 지식유형만 조회해 제공한다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 25,
+          "snippet": "public class EgovUserDetailsHelper {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 5,
+          "snippet": "public interface EgovUserDetailsService {"
+        }
+      ],
+      "text": "인증·권한 확인은 공통 사용자인증 영역에 위임하며, 인증 여부와 로그인 사용자 정보를 공통 도우미를 통해 받는다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        }
+      ],
+      "text": "화면에 표시할 안내·오류 문구는 공통 메시지 영역에서 코드로 조회해 사용한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+          "line": 16,
+          "snippet": "public interface EgovMapTeamService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+          "line": 16,
+          "snippet": "public interface EgovMapMaterialService {"
+        }
+      ],
+      "text": "조직 및 지식유형 선택 항목은 지식맵 영역(조직별 지식맵·지식유형)의 조회 서비스를 호출해 채운다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+          "line": 49,
+          "snippet": "public class EgovProperties {"
+        }
+      ],
+      "text": "운영 설정값은 공통 환경설정 영역에서 키 이름으로 조회한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 43,
+          "snippet": "public class EgovStringUtil {"
+        }
+      ],
+      "text": "문자열 가공은 공통 유틸리티 영역의 기능을 사용한다."
+    }
+  ],
+  "domainId": "domain:dam.spe",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/KnoSpecialist.java",
+          "line": 16,
+          "snippet": "public class KnoSpecialist {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/KnoSpecialist.java",
+          "line": 23,
+          "snippet": "\tprivate String speId;"
+        }
+      ],
+      "text": "지식전문가 — 전문가ID·소속조직·담당 지식유형·승인유형·전문가설명·승인일자로 관리되는 이 업무의 핵심 관리 대상이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+          "line": 22,
+          "snippet": "public class RequestOfferVO extends RequestOffer {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/dam/spe/req/service/EgovRequestOfferService.java",
+          "line": 23,
+          "snippet": "public interface EgovRequestOfferService {"
+        }
+      ],
+      "text": "지식정보 제공·요청 — 사용자가 등록하는 지식정보 제공 건과 지식정보 요청 건으로, 목록·상세 조회와 등록·수정·삭제의 대상이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterial.java",
+          "line": 16,
+          "snippet": "public class MapMaterial {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterial.java",
+          "line": 23,
+          "snippet": "\tprivate String knoTypeCd = \"\";"
+        }
+      ],
+      "text": "지식유형(지식맵) — 지식유형코드·조직·전문가·분류일자·지식 주소를 관리하며, 전문가와 요청 건을 분류하는 기준이 된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+          "line": 16,
+          "snippet": "public interface EgovMapTeamService {"
+        }
+      ],
+      "text": "조직별 지식맵 — 조직 단위로 관리되는 지식맵으로, 등록·수정 화면의 조직 선택 항목을 제공한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        }
+      ],
+      "text": "로그인 사용자 — 아이디·이름·소속조직·고유아이디를 보유하며, 등록·수정 건의 작성자와 최종수정자를 식별한다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /dam/spe/req/detailRequestOffer.do",
+      "name": "지식정보 제공·요청 상세조회 및 삭제",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+            "line": 167,
+            "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+          }
+        ],
+        "text": "선택한 지식정보 제공·요청 건의 상세 내용을 조회해 화면에 표시하고, 삭제 요청인 경우 하위 답변 건수를 먼저 확인한 뒤 삭제 여부를 결정한다. 상세 화면에는 조직별 지식맵 목록과 해당 조직의 지식유형 목록이 함께 조회되어 선택 항목으로 제공된다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /dam/spe/req/listRequestOffer.do",
+      "name": "지식정보 제공·요청 목록조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+            "line": 99,
+            "snippet": "@RequestMapping(value = \"/dam/spe/req/listRequestOffer.do\")"
+          }
+        ],
+        "text": "검색조건과 검색어, 페이지 정보를 받아 지식정보 제공·요청 목록과 전체 건수를 조회하고 목록 화면에 표시한다. 로그인한 사용자 정보를 함께 넘겨 본인 등록 건 여부를 화면에서 구분할 수 있도록 한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /dam/spe/req/registRequestOffer.do",
+      "name": "지식정보 요청 등록 화면 열기",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+            "line": 400,
+            "snippet": "@RequestMapping(value = \"/dam/spe/req/registRequestOffer.do\")"
+          }
+        ],
+        "text": "지식정보 요청을 새로 작성하기 위한 등록 화면을 연다. 화면에 필요한 조직별 지식맵 목록과 지식유형 목록을 미리 조회해 선택 항목으로 내려준다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /dam/spe/req/registRequestOfferActor.do",
+      "name": "지식정보 요청 등록 처리",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+            "line": 460,
+            "snippet": "@RequestMapping(value = \"/dam/spe/req/registRequestOfferActor.do\")"
+          }
+        ],
+        "text": "등록 화면에서 입력한 지식정보 요청 내용을 검증한 뒤 신규 건으로 저장한다. 검증에 실패하면 입력 화면으로 되돌리고, 성공하면 목록 화면으로 이동한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /dam/spe/req/updtRequestOffer.do",
+      "name": "지식정보 요청 수정 화면 열기",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+            "line": 259,
+            "snippet": "@RequestMapping(value = \"/dam/spe/req/updtRequestOffer.do\")"
+          }
+        ],
+        "text": "기존 지식정보 요청 건을 고쳐 쓰기 위한 수정 화면을 연다. 기존 등록 내용과 함께 조직별 지식맵·지식유형 선택 항목을 조회해 화면에 채워 준다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /dam/spe/req/updtRequestOfferActor.do",
+      "name": "지식정보 요청 수정 처리",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+            "line": 314,
+            "snippet": "@RequestMapping(value = \"/dam/spe/req/updtRequestOfferActor.do\")"
+          }
+        ],
+        "text": "수정 화면에서 입력한 지식정보 요청 내용을 검증한 뒤 기존 건에 반영한다. 검증에 실패하면 수정 화면으로 되돌리고, 성공하면 목록 화면으로 이동한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /dam/spe/spe/EgovComDamSpecialist.do",
+      "name": "지식전문가 상세조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+            "line": 120,
+            "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+          }
+        ],
+        "text": "선택한 지식전문가 한 건의 상세 정보를 조회해 상세 화면에 표시한다. 소속조직, 지식유형, 승인유형, 전문가 설명과 승인일자가 함께 제공된다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /dam/spe/spe/EgovComDamSpecialistList.do",
+      "name": "지식전문가 목록조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+            "line": 85,
+            "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialistList.do\")"
+          }
+        ],
+        "text": "검색조건과 페이지 정보를 받아 등록된 지식전문가 목록과 전체 건수를 조회해 목록 화면에 표시한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /dam/spe/spe/EgovComDamSpecialistModify.do",
+      "name": "지식전문가 수정 처리",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+            "line": 251,
+            "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialistModify.do\")"
+          }
+        ],
+        "text": "수정 화면에서 입력한 지식전문가 정보를 필수항목·길이 기준으로 검증한 뒤 기존 전문가 정보에 반영한다. 검증 오류가 있으면 수정 화면으로 되돌린다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /dam/spe/spe/EgovComDamSpecialistModifyView.do",
+      "name": "지식전문가 수정 화면 열기",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+            "line": 234,
+            "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialistModifyView.do\")"
+          }
+        ],
+        "text": "기존 지식전문가 정보를 고쳐 쓰기 위한 수정 화면을 연다. 현재 등록된 전문가 상세 정보를 조회해 화면에 채워 준다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /dam/spe/spe/EgovComDamSpecialistRegist.do",
+      "name": "지식전문가 등록 처리",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+            "line": 174,
+            "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialistRegist.do\")"
+          }
+        ],
+        "text": "등록 화면에서 입력한 지식전문가 정보를 필수항목·길이 기준으로 검증한 뒤 신규 전문가로 등록한다. 검증 오류가 있으면 등록 화면으로 되돌린다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /dam/spe/spe/EgovComDamSpecialistRegistView.do",
+      "name": "지식전문가 등록 화면 열기",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+            "line": 134,
+            "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialistRegistView.do\")"
+          }
+        ],
+        "text": "지식전문가를 새로 등록하기 위한 등록 화면을 연다. 조직별 지식맵 목록과 선택한 조직에 속한 지식유형 목록을 조회해 선택 항목으로 내려준다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /dam/spe/spe/EgovComDamSpecialistRemove.do",
+      "name": "지식전문가 삭제 처리",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+            "line": 280,
+            "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialistRemove.do\")"
+          }
+        ],
+        "text": "선택한 지식전문가 정보를 삭제하고 목록 화면으로 되돌아간다."
+      }
+    }
+  ],
+  "name": "지식전문가·지식정보 요청 관리",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 매개변수, 로케일 조합으로 정의된 메시지 문구를 반환하는 공통 조회 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+        }
+      },
+      "name": "공통 안내 메시지 조회",
+      "stepId": "step:ANY /dam/spe/req/detailRequestOffer.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 공통 인증 서비스에 위임해 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+        }
+      },
+      "name": "인증·권한 확인 도우미",
+      "stepId": "step:ANY /dam/spe/req/detailRequestOffer.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ],
+          "text": "지식유형 정보를 확장해 검색조건, 검색어, 페이지 번호와 페이지당 건수 등 목록 조회용 항목을 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ],
+          "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 지식유형 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목을 채우기 위해 조직 기준으로 조회할 때 사용한다."
+        }
+      },
+      "name": "지식유형 조회 조건",
+      "stepId": "step:ANY /dam/spe/req/detailRequestOffer.do:src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+            "line": 18,
+            "snippet": "public class MapMaterialVO extends MapMaterial {"
+          }
+        ],
+        "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 지식유형 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목을 채우기 위해 조직 기준으로 조회할 때 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ],
+          "text": "조직별 지식맵 목록·총건수·상세 조회와 등록·수정·삭제 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ],
+          "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 조직별 지식맵의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 조직 목록을 이 서비스로 조회한다."
+        }
+      },
+      "name": "조직별 지식맵 서비스",
+      "stepId": "step:ANY /dam/spe/req/detailRequestOffer.do:src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapTeamService {"
+          }
+        ],
+        "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 조직별 지식맵의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 조직 목록을 이 서비스로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ],
+          "text": "조직별 지식맵 정보를 확장해 검색조건, 검색어, 페이지 번호와 페이지당 건수 등 목록 조회용 항목을 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ],
+          "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 조직별 지식맵 목록을 조회할 때 쓰는 검색조건과 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목 전체를 받기 위해 페이지당 건수를 크게 지정해 사용한다."
+        }
+      },
+      "name": "조직별 지식맵 조회 조건",
+      "stepId": "step:ANY /dam/spe/req/detailRequestOffer.do:src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+            "line": 18,
+            "snippet": "public class MapTeamVO extends MapTeam {"
+          }
+        ],
+        "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 조직별 지식맵 목록을 조회할 때 쓰는 검색조건과 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목 전체를 받기 위해 페이지당 건수를 크게 지정해 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/EgovRequestOfferService.java",
+              "line": 23,
+              "snippet": "public interface EgovRequestOfferService {"
+            }
+          ],
+          "text": "삭제 시 하위 답변 건수 조회, 지식전문가 등록 여부 확인, 목록·전체 건수·상세 조회, 등록·수정·삭제 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/EgovRequestOfferService.java",
+              "line": 23,
+              "snippet": "public interface EgovRequestOfferService {"
+            }
+          ],
+          "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 지식정보 제공과 지식정보 요청 건의 목록·상세 조회와 등록·수정·삭제를 담당하는 서비스 규약 역할을 한다. 삭제 전 하위 답변 건수 확인도 이 규약에 포함된다."
+        }
+      },
+      "name": "지식정보 제공·요청 서비스",
+      "stepId": "step:ANY /dam/spe/req/detailRequestOffer.do:src/main/java/egovframework/com/dam/spe/req/service/EgovRequestOfferService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/service/EgovRequestOfferService.java",
+            "line": 23,
+            "snippet": "public interface EgovRequestOfferService {"
+          }
+        ],
+        "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 지식정보 제공과 지식정보 요청 건의 목록·상세 조회와 등록·수정·삭제를 담당하는 서비스 규약 역할을 한다. 삭제 전 하위 답변 건수 확인도 이 규약에 포함된다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+              "line": 22,
+              "snippet": "public class RequestOfferVO extends RequestOffer {"
+            }
+          ],
+          "text": "지식정보 제공·요청 기본 정보를 확장해 명령어, 검색조건, 검색어, 페이지 번호와 페이지당 건수를 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+              "line": 22,
+              "snippet": "public class RequestOfferVO extends RequestOffer {"
+            }
+          ],
+          "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 지식정보 제공·요청 건의 내용과 함께 화면에서 넘어온 명령어, 검색조건, 페이지 정보를 담는 정보 묶음 역할을 한다. 상세·삭제 분기는 이 묶음의 명령어 값으로 판정한다."
+        }
+      },
+      "name": "지식정보 제공·요청 정보",
+      "stepId": "step:ANY /dam/spe/req/detailRequestOffer.do:src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+            "line": 22,
+            "snippet": "public class RequestOfferVO extends RequestOffer {"
+          }
+        ],
+        "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 지식정보 제공·요청 건의 내용과 함께 화면에서 넘어온 명령어, 검색조건, 페이지 정보를 담는 정보 묶음 역할을 한다. 상세·삭제 분기는 이 묶음의 명령어 값으로 판정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 167,
+              "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 지식정보 제공·요청 정보 묶음과 명령어 맵으로 받고, 인증 여부를 먼저 확인해 미인증이면 로그인 안내 메시지와 함께 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 167,
+              "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+            }
+          ],
+          "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 지식정보 제공·요청 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증을 확인한 뒤 해당 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+        }
+      },
+      "name": "지식정보 제공·요청 화면 처리",
+      "stepId": "step:ANY /dam/spe/req/detailRequestOffer.do:src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+            "line": 167,
+            "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+          }
+        ],
+        "text": "지식정보 제공·요청 상세조회 및 삭제 흐름에서 지식정보 제공·요청 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증을 확인한 뒤 해당 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 매개변수, 로케일 조합으로 정의된 메시지 문구를 반환하는 공통 조회 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "지식정보 제공·요청 목록조회 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+        }
+      },
+      "name": "공통 안내 메시지 조회",
+      "stepId": "step:ANY /dam/spe/req/listRequestOffer.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "지식정보 제공·요청 목록조회 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "아이디·이름·이메일 등 필수 항목과 조직ID, 조직명, 고유아이디, 사용자 IP 정보를 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "지식정보 제공·요청 목록조회 흐름에서 현재 로그인한 사용자의 아이디, 이름, 소속조직, 고유아이디 등을 담아 전달하는 정보 묶음 역할을 한다. 등록·수정 시 작성자와 최종수정자를 식별하는 근거가 된다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /dam/spe/req/listRequestOffer.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "지식정보 제공·요청 목록조회 흐름에서 현재 로그인한 사용자의 아이디, 이름, 소속조직, 고유아이디 등을 담아 전달하는 정보 묶음 역할을 한다. 등록·수정 시 작성자와 최종수정자를 식별하는 근거가 된다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인의 세 가지 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "지식정보 제공·요청 목록조회 흐름에서 인증된 사용자 객체와 권한 목록, 인증 여부를 제공하는 공통 인증 서비스 규약 역할을 한다. 이 업무는 이 규약을 통해 접근 자격을 확인한다."
+        }
+      },
+      "name": "인증 사용자 정보 서비스",
+      "stepId": "step:ANY /dam/spe/req/listRequestOffer.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "지식정보 제공·요청 목록조회 흐름에서 인증된 사용자 객체와 권한 목록, 인증 여부를 제공하는 공통 인증 서비스 규약 역할을 한다. 이 업무는 이 규약을 통해 접근 자격을 확인한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 공통 인증 서비스에 위임해 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "지식정보 제공·요청 목록조회 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+        }
+      },
+      "name": "인증·권한 확인 도우미",
+      "stepId": "step:ANY /dam/spe/req/listRequestOffer.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "지식정보 제공·요청 목록조회 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/EgovRequestOfferService.java",
+              "line": 23,
+              "snippet": "public interface EgovRequestOfferService {"
+            }
+          ],
+          "text": "삭제 시 하위 답변 건수 조회, 지식전문가 등록 여부 확인, 목록·전체 건수·상세 조회, 등록·수정·삭제 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/EgovRequestOfferService.java",
+              "line": 23,
+              "snippet": "public interface EgovRequestOfferService {"
+            }
+          ],
+          "text": "지식정보 제공·요청 목록조회 흐름에서 지식정보 제공과 지식정보 요청 건의 목록·상세 조회와 등록·수정·삭제를 담당하는 서비스 규약 역할을 한다. 삭제 전 하위 답변 건수 확인도 이 규약에 포함된다."
+        }
+      },
+      "name": "지식정보 제공·요청 서비스",
+      "stepId": "step:ANY /dam/spe/req/listRequestOffer.do:src/main/java/egovframework/com/dam/spe/req/service/EgovRequestOfferService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/service/EgovRequestOfferService.java",
+            "line": 23,
+            "snippet": "public interface EgovRequestOfferService {"
+          }
+        ],
+        "text": "지식정보 제공·요청 목록조회 흐름에서 지식정보 제공과 지식정보 요청 건의 목록·상세 조회와 등록·수정·삭제를 담당하는 서비스 규약 역할을 한다. 삭제 전 하위 답변 건수 확인도 이 규약에 포함된다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+              "line": 22,
+              "snippet": "public class RequestOfferVO extends RequestOffer {"
+            }
+          ],
+          "text": "지식정보 제공·요청 기본 정보를 확장해 명령어, 검색조건, 검색어, 페이지 번호와 페이지당 건수를 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+              "line": 22,
+              "snippet": "public class RequestOfferVO extends RequestOffer {"
+            }
+          ],
+          "text": "지식정보 제공·요청 목록조회 흐름에서 지식정보 제공·요청 건의 내용과 함께 화면에서 넘어온 명령어, 검색조건, 페이지 정보를 담는 정보 묶음 역할을 한다. 상세·삭제 분기는 이 묶음의 명령어 값으로 판정한다."
+        }
+      },
+      "name": "지식정보 제공·요청 정보",
+      "stepId": "step:ANY /dam/spe/req/listRequestOffer.do:src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+            "line": 22,
+            "snippet": "public class RequestOfferVO extends RequestOffer {"
+          }
+        ],
+        "text": "지식정보 제공·요청 목록조회 흐름에서 지식정보 제공·요청 건의 내용과 함께 화면에서 넘어온 명령어, 검색조건, 페이지 정보를 담는 정보 묶음 역할을 한다. 상세·삭제 분기는 이 묶음의 명령어 값으로 판정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 167,
+              "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 지식정보 제공·요청 정보 묶음과 명령어 맵으로 받고, 인증 여부를 먼저 확인해 미인증이면 로그인 안내 메시지와 함께 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 167,
+              "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+            }
+          ],
+          "text": "지식정보 제공·요청 목록조회 흐름에서 지식정보 제공·요청 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증을 확인한 뒤 해당 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+        }
+      },
+      "name": "지식정보 제공·요청 화면 처리",
+      "stepId": "step:ANY /dam/spe/req/listRequestOffer.do:src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+            "line": 167,
+            "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+          }
+        ],
+        "text": "지식정보 제공·요청 목록조회 흐름에서 지식정보 제공·요청 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증을 확인한 뒤 해당 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "빈 문자열 상수와 함께 지정 길이 초과 시 자르기, 빈 값 여부 검증 등의 공통 문자열 가공 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "지식정보 제공·요청 목록조회 흐름에서 값이 비었을 때 빈 문자열로 바꾸거나 지정 길이로 자르는 등 공통 문자열 가공을 제공하는 유틸리티 역할을 한다. 로그인 사용자 고유아이디를 화면에 넘길 때 사용한다."
+        }
+      },
+      "name": "문자열 처리 유틸리티",
+      "stepId": "step:ANY /dam/spe/req/listRequestOffer.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "지식정보 제공·요청 목록조회 흐름에서 값이 비었을 때 빈 문자열로 바꾸거나 지정 길이로 자르는 등 공통 문자열 가공을 제공하는 유틸리티 역할을 한다. 로그인 사용자 고유아이디를 화면에 넘길 때 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 매개변수, 로케일 조합으로 정의된 메시지 문구를 반환하는 공통 조회 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "지식정보 요청 등록 화면 열기 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+        }
+      },
+      "name": "공통 안내 메시지 조회",
+      "stepId": "step:ANY /dam/spe/req/registRequestOffer.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "지식정보 요청 등록 화면 열기 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 공통 인증 서비스에 위임해 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "지식정보 요청 등록 화면 열기 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+        }
+      },
+      "name": "인증·권한 확인 도우미",
+      "stepId": "step:ANY /dam/spe/req/registRequestOffer.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "지식정보 요청 등록 화면 열기 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapMaterialService {"
+            }
+          ],
+          "text": "지식유형 목록·총건수·상세 조회와 등록·수정·삭제, 그리고 지식유형코드 중복 여부 확인 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapMaterialService {"
+            }
+          ],
+          "text": "지식정보 요청 등록 화면 열기 흐름에서 지식유형(지식맵)의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 지식유형 목록을 이 서비스로 조회한다."
+        }
+      },
+      "name": "지식유형(지식맵) 관리 서비스",
+      "stepId": "step:ANY /dam/spe/req/registRequestOffer.do:src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapMaterialService {"
+          }
+        ],
+        "text": "지식정보 요청 등록 화면 열기 흐름에서 지식유형(지식맵)의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 지식유형 목록을 이 서비스로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ],
+          "text": "지식유형 정보를 확장해 검색조건, 검색어, 페이지 번호와 페이지당 건수 등 목록 조회용 항목을 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ],
+          "text": "지식정보 요청 등록 화면 열기 흐름에서 지식유형 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목을 채우기 위해 조직 기준으로 조회할 때 사용한다."
+        }
+      },
+      "name": "지식유형 조회 조건",
+      "stepId": "step:ANY /dam/spe/req/registRequestOffer.do:src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+            "line": 18,
+            "snippet": "public class MapMaterialVO extends MapMaterial {"
+          }
+        ],
+        "text": "지식정보 요청 등록 화면 열기 흐름에서 지식유형 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목을 채우기 위해 조직 기준으로 조회할 때 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ],
+          "text": "조직별 지식맵 목록·총건수·상세 조회와 등록·수정·삭제 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ],
+          "text": "지식정보 요청 등록 화면 열기 흐름에서 조직별 지식맵의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 조직 목록을 이 서비스로 조회한다."
+        }
+      },
+      "name": "조직별 지식맵 서비스",
+      "stepId": "step:ANY /dam/spe/req/registRequestOffer.do:src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapTeamService {"
+          }
+        ],
+        "text": "지식정보 요청 등록 화면 열기 흐름에서 조직별 지식맵의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 조직 목록을 이 서비스로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ],
+          "text": "조직별 지식맵 정보를 확장해 검색조건, 검색어, 페이지 번호와 페이지당 건수 등 목록 조회용 항목을 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ],
+          "text": "지식정보 요청 등록 화면 열기 흐름에서 조직별 지식맵 목록을 조회할 때 쓰는 검색조건과 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목 전체를 받기 위해 페이지당 건수를 크게 지정해 사용한다."
+        }
+      },
+      "name": "조직별 지식맵 조회 조건",
+      "stepId": "step:ANY /dam/spe/req/registRequestOffer.do:src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+            "line": 18,
+            "snippet": "public class MapTeamVO extends MapTeam {"
+          }
+        ],
+        "text": "지식정보 요청 등록 화면 열기 흐름에서 조직별 지식맵 목록을 조회할 때 쓰는 검색조건과 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목 전체를 받기 위해 페이지당 건수를 크게 지정해 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+              "line": 22,
+              "snippet": "public class RequestOfferVO extends RequestOffer {"
+            }
+          ],
+          "text": "지식정보 제공·요청 기본 정보를 확장해 명령어, 검색조건, 검색어, 페이지 번호와 페이지당 건수를 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+              "line": 22,
+              "snippet": "public class RequestOfferVO extends RequestOffer {"
+            }
+          ],
+          "text": "지식정보 요청 등록 화면 열기 흐름에서 지식정보 제공·요청 건의 내용과 함께 화면에서 넘어온 명령어, 검색조건, 페이지 정보를 담는 정보 묶음 역할을 한다. 상세·삭제 분기는 이 묶음의 명령어 값으로 판정한다."
+        }
+      },
+      "name": "지식정보 제공·요청 정보",
+      "stepId": "step:ANY /dam/spe/req/registRequestOffer.do:src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+            "line": 22,
+            "snippet": "public class RequestOfferVO extends RequestOffer {"
+          }
+        ],
+        "text": "지식정보 요청 등록 화면 열기 흐름에서 지식정보 제공·요청 건의 내용과 함께 화면에서 넘어온 명령어, 검색조건, 페이지 정보를 담는 정보 묶음 역할을 한다. 상세·삭제 분기는 이 묶음의 명령어 값으로 판정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 167,
+              "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 지식정보 제공·요청 정보 묶음과 명령어 맵으로 받고, 인증 여부를 먼저 확인해 미인증이면 로그인 안내 메시지와 함께 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 167,
+              "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+            }
+          ],
+          "text": "지식정보 요청 등록 화면 열기 흐름에서 지식정보 제공·요청 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증을 확인한 뒤 해당 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+        }
+      },
+      "name": "지식정보 제공·요청 화면 처리",
+      "stepId": "step:ANY /dam/spe/req/registRequestOffer.do:src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+            "line": 167,
+            "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+          }
+        ],
+        "text": "지식정보 요청 등록 화면 열기 흐름에서 지식정보 제공·요청 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증을 확인한 뒤 해당 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 매개변수, 로케일 조합으로 정의된 메시지 문구를 반환하는 공통 조회 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "지식정보 요청 등록 처리 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+        }
+      },
+      "name": "공통 안내 메시지 조회",
+      "stepId": "step:ANY /dam/spe/req/registRequestOfferActor.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "지식정보 요청 등록 처리 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            }
+          ],
+          "text": "설정 파일의 물리적 위치를 상대경로 기준으로 계산하고, 키 이름으로 설정값 또는 절대경로 설정값을 조회한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            }
+          ],
+          "text": "지식정보 요청 등록 처리 흐름에서 시스템 공통 설정 파일에 정의된 설정값을 키 이름으로 꺼내 주는 공통 기능 역할을 한다. 등록·수정 처리 과정에서 필요한 운영 설정을 참조한다."
+        }
+      },
+      "name": "환경 설정값 조회",
+      "stepId": "step:ANY /dam/spe/req/registRequestOfferActor.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "지식정보 요청 등록 처리 흐름에서 시스템 공통 설정 파일에 정의된 설정값을 키 이름으로 꺼내 주는 공통 기능 역할을 한다. 등록·수정 처리 과정에서 필요한 운영 설정을 참조한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 공통 인증 서비스에 위임해 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "지식정보 요청 등록 처리 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+        }
+      },
+      "name": "인증·권한 확인 도우미",
+      "stepId": "step:ANY /dam/spe/req/registRequestOfferActor.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "지식정보 요청 등록 처리 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ],
+          "text": "지식유형 정보를 확장해 검색조건, 검색어, 페이지 번호와 페이지당 건수 등 목록 조회용 항목을 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ],
+          "text": "지식정보 요청 등록 처리 흐름에서 지식유형 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목을 채우기 위해 조직 기준으로 조회할 때 사용한다."
+        }
+      },
+      "name": "지식유형 조회 조건",
+      "stepId": "step:ANY /dam/spe/req/registRequestOfferActor.do:src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+            "line": 18,
+            "snippet": "public class MapMaterialVO extends MapMaterial {"
+          }
+        ],
+        "text": "지식정보 요청 등록 처리 흐름에서 지식유형 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목을 채우기 위해 조직 기준으로 조회할 때 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ],
+          "text": "조직별 지식맵 목록·총건수·상세 조회와 등록·수정·삭제 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ],
+          "text": "지식정보 요청 등록 처리 흐름에서 조직별 지식맵의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 조직 목록을 이 서비스로 조회한다."
+        }
+      },
+      "name": "조직별 지식맵 서비스",
+      "stepId": "step:ANY /dam/spe/req/registRequestOfferActor.do:src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapTeamService {"
+          }
+        ],
+        "text": "지식정보 요청 등록 처리 흐름에서 조직별 지식맵의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 조직 목록을 이 서비스로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ],
+          "text": "조직별 지식맵 정보를 확장해 검색조건, 검색어, 페이지 번호와 페이지당 건수 등 목록 조회용 항목을 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ],
+          "text": "지식정보 요청 등록 처리 흐름에서 조직별 지식맵 목록을 조회할 때 쓰는 검색조건과 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목 전체를 받기 위해 페이지당 건수를 크게 지정해 사용한다."
+        }
+      },
+      "name": "조직별 지식맵 조회 조건",
+      "stepId": "step:ANY /dam/spe/req/registRequestOfferActor.do:src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+            "line": 18,
+            "snippet": "public class MapTeamVO extends MapTeam {"
+          }
+        ],
+        "text": "지식정보 요청 등록 처리 흐름에서 조직별 지식맵 목록을 조회할 때 쓰는 검색조건과 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목 전체를 받기 위해 페이지당 건수를 크게 지정해 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+              "line": 22,
+              "snippet": "public class RequestOfferVO extends RequestOffer {"
+            }
+          ],
+          "text": "지식정보 제공·요청 기본 정보를 확장해 명령어, 검색조건, 검색어, 페이지 번호와 페이지당 건수를 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+              "line": 22,
+              "snippet": "public class RequestOfferVO extends RequestOffer {"
+            }
+          ],
+          "text": "지식정보 요청 등록 처리 흐름에서 지식정보 제공·요청 건의 내용과 함께 화면에서 넘어온 명령어, 검색조건, 페이지 정보를 담는 정보 묶음 역할을 한다. 상세·삭제 분기는 이 묶음의 명령어 값으로 판정한다."
+        }
+      },
+      "name": "지식정보 제공·요청 정보",
+      "stepId": "step:ANY /dam/spe/req/registRequestOfferActor.do:src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+            "line": 22,
+            "snippet": "public class RequestOfferVO extends RequestOffer {"
+          }
+        ],
+        "text": "지식정보 요청 등록 처리 흐름에서 지식정보 제공·요청 건의 내용과 함께 화면에서 넘어온 명령어, 검색조건, 페이지 정보를 담는 정보 묶음 역할을 한다. 상세·삭제 분기는 이 묶음의 명령어 값으로 판정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 167,
+              "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 지식정보 제공·요청 정보 묶음과 명령어 맵으로 받고, 인증 여부를 먼저 확인해 미인증이면 로그인 안내 메시지와 함께 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 167,
+              "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+            }
+          ],
+          "text": "지식정보 요청 등록 처리 흐름에서 지식정보 제공·요청 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증을 확인한 뒤 해당 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+        }
+      },
+      "name": "지식정보 제공·요청 화면 처리",
+      "stepId": "step:ANY /dam/spe/req/registRequestOfferActor.do:src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+            "line": 167,
+            "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+          }
+        ],
+        "text": "지식정보 요청 등록 처리 흐름에서 지식정보 제공·요청 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증을 확인한 뒤 해당 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 매개변수, 로케일 조합으로 정의된 메시지 문구를 반환하는 공통 조회 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "지식정보 요청 수정 화면 열기 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+        }
+      },
+      "name": "공통 안내 메시지 조회",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOffer.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "지식정보 요청 수정 화면 열기 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 공통 인증 서비스에 위임해 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "지식정보 요청 수정 화면 열기 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+        }
+      },
+      "name": "인증·권한 확인 도우미",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOffer.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "지식정보 요청 수정 화면 열기 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ],
+          "text": "지식유형 정보를 확장해 검색조건, 검색어, 페이지 번호와 페이지당 건수 등 목록 조회용 항목을 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ],
+          "text": "지식정보 요청 수정 화면 열기 흐름에서 지식유형 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목을 채우기 위해 조직 기준으로 조회할 때 사용한다."
+        }
+      },
+      "name": "지식유형 조회 조건",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOffer.do:src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+            "line": 18,
+            "snippet": "public class MapMaterialVO extends MapMaterial {"
+          }
+        ],
+        "text": "지식정보 요청 수정 화면 열기 흐름에서 지식유형 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목을 채우기 위해 조직 기준으로 조회할 때 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ],
+          "text": "조직별 지식맵 목록·총건수·상세 조회와 등록·수정·삭제 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ],
+          "text": "지식정보 요청 수정 화면 열기 흐름에서 조직별 지식맵의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 조직 목록을 이 서비스로 조회한다."
+        }
+      },
+      "name": "조직별 지식맵 서비스",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOffer.do:src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapTeamService {"
+          }
+        ],
+        "text": "지식정보 요청 수정 화면 열기 흐름에서 조직별 지식맵의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 조직 목록을 이 서비스로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ],
+          "text": "조직별 지식맵 정보를 확장해 검색조건, 검색어, 페이지 번호와 페이지당 건수 등 목록 조회용 항목을 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ],
+          "text": "지식정보 요청 수정 화면 열기 흐름에서 조직별 지식맵 목록을 조회할 때 쓰는 검색조건과 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목 전체를 받기 위해 페이지당 건수를 크게 지정해 사용한다."
+        }
+      },
+      "name": "조직별 지식맵 조회 조건",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOffer.do:src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+            "line": 18,
+            "snippet": "public class MapTeamVO extends MapTeam {"
+          }
+        ],
+        "text": "지식정보 요청 수정 화면 열기 흐름에서 조직별 지식맵 목록을 조회할 때 쓰는 검색조건과 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목 전체를 받기 위해 페이지당 건수를 크게 지정해 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/EgovRequestOfferService.java",
+              "line": 23,
+              "snippet": "public interface EgovRequestOfferService {"
+            }
+          ],
+          "text": "삭제 시 하위 답변 건수 조회, 지식전문가 등록 여부 확인, 목록·전체 건수·상세 조회, 등록·수정·삭제 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/EgovRequestOfferService.java",
+              "line": 23,
+              "snippet": "public interface EgovRequestOfferService {"
+            }
+          ],
+          "text": "지식정보 요청 수정 화면 열기 흐름에서 지식정보 제공과 지식정보 요청 건의 목록·상세 조회와 등록·수정·삭제를 담당하는 서비스 규약 역할을 한다. 삭제 전 하위 답변 건수 확인도 이 규약에 포함된다."
+        }
+      },
+      "name": "지식정보 제공·요청 서비스",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOffer.do:src/main/java/egovframework/com/dam/spe/req/service/EgovRequestOfferService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/service/EgovRequestOfferService.java",
+            "line": 23,
+            "snippet": "public interface EgovRequestOfferService {"
+          }
+        ],
+        "text": "지식정보 요청 수정 화면 열기 흐름에서 지식정보 제공과 지식정보 요청 건의 목록·상세 조회와 등록·수정·삭제를 담당하는 서비스 규약 역할을 한다. 삭제 전 하위 답변 건수 확인도 이 규약에 포함된다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+              "line": 22,
+              "snippet": "public class RequestOfferVO extends RequestOffer {"
+            }
+          ],
+          "text": "지식정보 제공·요청 기본 정보를 확장해 명령어, 검색조건, 검색어, 페이지 번호와 페이지당 건수를 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+              "line": 22,
+              "snippet": "public class RequestOfferVO extends RequestOffer {"
+            }
+          ],
+          "text": "지식정보 요청 수정 화면 열기 흐름에서 지식정보 제공·요청 건의 내용과 함께 화면에서 넘어온 명령어, 검색조건, 페이지 정보를 담는 정보 묶음 역할을 한다. 상세·삭제 분기는 이 묶음의 명령어 값으로 판정한다."
+        }
+      },
+      "name": "지식정보 제공·요청 정보",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOffer.do:src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+            "line": 22,
+            "snippet": "public class RequestOfferVO extends RequestOffer {"
+          }
+        ],
+        "text": "지식정보 요청 수정 화면 열기 흐름에서 지식정보 제공·요청 건의 내용과 함께 화면에서 넘어온 명령어, 검색조건, 페이지 정보를 담는 정보 묶음 역할을 한다. 상세·삭제 분기는 이 묶음의 명령어 값으로 판정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 167,
+              "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 지식정보 제공·요청 정보 묶음과 명령어 맵으로 받고, 인증 여부를 먼저 확인해 미인증이면 로그인 안내 메시지와 함께 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 167,
+              "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+            }
+          ],
+          "text": "지식정보 요청 수정 화면 열기 흐름에서 지식정보 제공·요청 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증을 확인한 뒤 해당 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+        }
+      },
+      "name": "지식정보 제공·요청 화면 처리",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOffer.do:src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+            "line": 167,
+            "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+          }
+        ],
+        "text": "지식정보 요청 수정 화면 열기 흐름에서 지식정보 제공·요청 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증을 확인한 뒤 해당 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 매개변수, 로케일 조합으로 정의된 메시지 문구를 반환하는 공통 조회 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "지식정보 요청 수정 처리 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+        }
+      },
+      "name": "공통 안내 메시지 조회",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOfferActor.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "지식정보 요청 수정 처리 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            }
+          ],
+          "text": "설정 파일의 물리적 위치를 상대경로 기준으로 계산하고, 키 이름으로 설정값 또는 절대경로 설정값을 조회한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            }
+          ],
+          "text": "지식정보 요청 수정 처리 흐름에서 시스템 공통 설정 파일에 정의된 설정값을 키 이름으로 꺼내 주는 공통 기능 역할을 한다. 등록·수정 처리 과정에서 필요한 운영 설정을 참조한다."
+        }
+      },
+      "name": "환경 설정값 조회",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOfferActor.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "지식정보 요청 수정 처리 흐름에서 시스템 공통 설정 파일에 정의된 설정값을 키 이름으로 꺼내 주는 공통 기능 역할을 한다. 등록·수정 처리 과정에서 필요한 운영 설정을 참조한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 공통 인증 서비스에 위임해 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "지식정보 요청 수정 처리 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+        }
+      },
+      "name": "인증·권한 확인 도우미",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOfferActor.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "지식정보 요청 수정 처리 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ],
+          "text": "지식유형 정보를 확장해 검색조건, 검색어, 페이지 번호와 페이지당 건수 등 목록 조회용 항목을 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ],
+          "text": "지식정보 요청 수정 처리 흐름에서 지식유형 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목을 채우기 위해 조직 기준으로 조회할 때 사용한다."
+        }
+      },
+      "name": "지식유형 조회 조건",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOfferActor.do:src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+            "line": 18,
+            "snippet": "public class MapMaterialVO extends MapMaterial {"
+          }
+        ],
+        "text": "지식정보 요청 수정 처리 흐름에서 지식유형 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목을 채우기 위해 조직 기준으로 조회할 때 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ],
+          "text": "조직별 지식맵 목록·총건수·상세 조회와 등록·수정·삭제 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ],
+          "text": "지식정보 요청 수정 처리 흐름에서 조직별 지식맵의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 조직 목록을 이 서비스로 조회한다."
+        }
+      },
+      "name": "조직별 지식맵 서비스",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOfferActor.do:src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapTeamService {"
+          }
+        ],
+        "text": "지식정보 요청 수정 처리 흐름에서 조직별 지식맵의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 조직 목록을 이 서비스로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ],
+          "text": "조직별 지식맵 정보를 확장해 검색조건, 검색어, 페이지 번호와 페이지당 건수 등 목록 조회용 항목을 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ],
+          "text": "지식정보 요청 수정 처리 흐름에서 조직별 지식맵 목록을 조회할 때 쓰는 검색조건과 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목 전체를 받기 위해 페이지당 건수를 크게 지정해 사용한다."
+        }
+      },
+      "name": "조직별 지식맵 조회 조건",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOfferActor.do:src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+            "line": 18,
+            "snippet": "public class MapTeamVO extends MapTeam {"
+          }
+        ],
+        "text": "지식정보 요청 수정 처리 흐름에서 조직별 지식맵 목록을 조회할 때 쓰는 검색조건과 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목 전체를 받기 위해 페이지당 건수를 크게 지정해 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+              "line": 22,
+              "snippet": "public class RequestOfferVO extends RequestOffer {"
+            }
+          ],
+          "text": "지식정보 제공·요청 기본 정보를 확장해 명령어, 검색조건, 검색어, 페이지 번호와 페이지당 건수를 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+              "line": 22,
+              "snippet": "public class RequestOfferVO extends RequestOffer {"
+            }
+          ],
+          "text": "지식정보 요청 수정 처리 흐름에서 지식정보 제공·요청 건의 내용과 함께 화면에서 넘어온 명령어, 검색조건, 페이지 정보를 담는 정보 묶음 역할을 한다. 상세·삭제 분기는 이 묶음의 명령어 값으로 판정한다."
+        }
+      },
+      "name": "지식정보 제공·요청 정보",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOfferActor.do:src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/service/RequestOfferVO.java",
+            "line": 22,
+            "snippet": "public class RequestOfferVO extends RequestOffer {"
+          }
+        ],
+        "text": "지식정보 요청 수정 처리 흐름에서 지식정보 제공·요청 건의 내용과 함께 화면에서 넘어온 명령어, 검색조건, 페이지 정보를 담는 정보 묶음 역할을 한다. 상세·삭제 분기는 이 묶음의 명령어 값으로 판정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 167,
+              "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 지식정보 제공·요청 정보 묶음과 명령어 맵으로 받고, 인증 여부를 먼저 확인해 미인증이면 로그인 안내 메시지와 함께 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+              "line": 167,
+              "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+            }
+          ],
+          "text": "지식정보 요청 수정 처리 흐름에서 지식정보 제공·요청 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증을 확인한 뒤 해당 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+        }
+      },
+      "name": "지식정보 제공·요청 화면 처리",
+      "stepId": "step:ANY /dam/spe/req/updtRequestOfferActor.do:src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/req/web/EgovRequestOfferController.java",
+            "line": 167,
+            "snippet": "@RequestMapping(value = \"/dam/spe/req/detailRequestOffer.do\")"
+          }
+        ],
+        "text": "지식정보 요청 수정 처리 흐름에서 지식정보 제공·요청 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증을 확인한 뒤 해당 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+              "line": 16,
+              "snippet": "public interface EgovKnoSpecialistService {"
+            }
+          ],
+          "text": "지식전문가 목록·총건수·상세 조회와 등록·수정·삭제 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+              "line": 16,
+              "snippet": "public interface EgovKnoSpecialistService {"
+            }
+          ],
+          "text": "지식전문가 상세조회 흐름에서 지식전문가의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 지식전문가 업무의 실제 처리는 모두 이 규약을 거친다."
+        }
+      },
+      "name": "지식전문가 관리 서비스",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialist.do:src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+            "line": 16,
+            "snippet": "public interface EgovKnoSpecialistService {"
+          }
+        ],
+        "text": "지식전문가 상세조회 흐름에서 지식전문가의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 지식전문가 업무의 실제 처리는 모두 이 규약을 거친다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 지식전문가 정보 묶음으로 받아 필수·길이 검증을 수행하고, 인증 여부를 먼저 확인해 미인증이면 로그인 안내 메시지와 함께 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "text": "지식전문가 상세조회 흐름에서 지식전문가 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증 확인과 입력값 검증을 거친 뒤 지식전문가 관리 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+        }
+      },
+      "name": "지식전문가 화면 처리",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialist.do:src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+            "line": 120,
+            "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+          }
+        ],
+        "text": "지식전문가 상세조회 흐름에서 지식전문가 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증 확인과 입력값 검증을 거친 뒤 지식전문가 관리 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+              "line": 16,
+              "snippet": "public interface EgovKnoSpecialistService {"
+            }
+          ],
+          "text": "지식전문가 목록·총건수·상세 조회와 등록·수정·삭제 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+              "line": 16,
+              "snippet": "public interface EgovKnoSpecialistService {"
+            }
+          ],
+          "text": "지식전문가 목록조회 흐름에서 지식전문가의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 지식전문가 업무의 실제 처리는 모두 이 규약을 거친다."
+        }
+      },
+      "name": "지식전문가 관리 서비스",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistList.do:src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+            "line": 16,
+            "snippet": "public interface EgovKnoSpecialistService {"
+          }
+        ],
+        "text": "지식전문가 목록조회 흐름에서 지식전문가의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 지식전문가 업무의 실제 처리는 모두 이 규약을 거친다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/KnoSpecialistVO.java",
+              "line": 18,
+              "snippet": "public class KnoSpecialistVO extends KnoSpecialist {"
+            }
+          ],
+          "text": "지식전문가 정보를 확장해 검색조건, 검색어, 페이지 번호와 페이지당 건수 등 목록 조회용 항목을 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/KnoSpecialistVO.java",
+              "line": 18,
+              "snippet": "public class KnoSpecialistVO extends KnoSpecialist {"
+            }
+          ],
+          "text": "지식전문가 목록조회 흐름에서 지식전문가 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다."
+        }
+      },
+      "name": "지식전문가 조회 조건",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistList.do:src/main/java/egovframework/com/dam/spe/spe/service/KnoSpecialistVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/KnoSpecialistVO.java",
+            "line": 18,
+            "snippet": "public class KnoSpecialistVO extends KnoSpecialist {"
+          }
+        ],
+        "text": "지식전문가 목록조회 흐름에서 지식전문가 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 지식전문가 정보 묶음으로 받아 필수·길이 검증을 수행하고, 인증 여부를 먼저 확인해 미인증이면 로그인 안내 메시지와 함께 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "text": "지식전문가 목록조회 흐름에서 지식전문가 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증 확인과 입력값 검증을 거친 뒤 지식전문가 관리 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+        }
+      },
+      "name": "지식전문가 화면 처리",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistList.do:src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+            "line": 120,
+            "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+          }
+        ],
+        "text": "지식전문가 목록조회 흐름에서 지식전문가 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증 확인과 입력값 검증을 거친 뒤 지식전문가 관리 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "아이디·이름·이메일 등 필수 항목과 조직ID, 조직명, 고유아이디, 사용자 IP 정보를 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "지식전문가 수정 처리 흐름에서 현재 로그인한 사용자의 아이디, 이름, 소속조직, 고유아이디 등을 담아 전달하는 정보 묶음 역할을 한다. 등록·수정 시 작성자와 최종수정자를 식별하는 근거가 된다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistModify.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "지식전문가 수정 처리 흐름에서 현재 로그인한 사용자의 아이디, 이름, 소속조직, 고유아이디 등을 담아 전달하는 정보 묶음 역할을 한다. 등록·수정 시 작성자와 최종수정자를 식별하는 근거가 된다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인의 세 가지 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "지식전문가 수정 처리 흐름에서 인증된 사용자 객체와 권한 목록, 인증 여부를 제공하는 공통 인증 서비스 규약 역할을 한다. 이 업무는 이 규약을 통해 접근 자격을 확인한다."
+        }
+      },
+      "name": "인증 사용자 정보 서비스",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistModify.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "지식전문가 수정 처리 흐름에서 인증된 사용자 객체와 권한 목록, 인증 여부를 제공하는 공통 인증 서비스 규약 역할을 한다. 이 업무는 이 규약을 통해 접근 자격을 확인한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 공통 인증 서비스에 위임해 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "지식전문가 수정 처리 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+        }
+      },
+      "name": "인증·권한 확인 도우미",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistModify.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "지식전문가 수정 처리 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+              "line": 16,
+              "snippet": "public interface EgovKnoSpecialistService {"
+            }
+          ],
+          "text": "지식전문가 목록·총건수·상세 조회와 등록·수정·삭제 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+              "line": 16,
+              "snippet": "public interface EgovKnoSpecialistService {"
+            }
+          ],
+          "text": "지식전문가 수정 처리 흐름에서 지식전문가의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 지식전문가 업무의 실제 처리는 모두 이 규약을 거친다."
+        }
+      },
+      "name": "지식전문가 관리 서비스",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistModify.do:src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+            "line": 16,
+            "snippet": "public interface EgovKnoSpecialistService {"
+          }
+        ],
+        "text": "지식전문가 수정 처리 흐름에서 지식전문가의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 지식전문가 업무의 실제 처리는 모두 이 규약을 거친다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/KnoSpecialist.java",
+              "line": 16,
+              "snippet": "public class KnoSpecialist {"
+            }
+          ],
+          "text": "전문가ID·소속조직ID·지식유형코드·승인유형코드·전문가설명·전문가승인일이 필수 항목이며 각각 길이 제한이 걸려 있고, 최초등록자·최종수정자 이력 항목을 함께 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/KnoSpecialist.java",
+              "line": 16,
+              "snippet": "public class KnoSpecialist {"
+            }
+          ],
+          "text": "지식전문가 수정 처리 흐름에서 전문가와 소속조직, 담당 지식유형, 승인유형, 전문가 설명, 승인일자를 담는 지식전문가 정보 묶음 역할을 한다. 이 업무의 핵심 관리 대상이다."
+        }
+      },
+      "name": "지식전문가 정보",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistModify.do:src/main/java/egovframework/com/dam/spe/spe/service/KnoSpecialist.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/KnoSpecialist.java",
+            "line": 16,
+            "snippet": "public class KnoSpecialist {"
+          }
+        ],
+        "text": "지식전문가 수정 처리 흐름에서 전문가와 소속조직, 담당 지식유형, 승인유형, 전문가 설명, 승인일자를 담는 지식전문가 정보 묶음 역할을 한다. 이 업무의 핵심 관리 대상이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 지식전문가 정보 묶음으로 받아 필수·길이 검증을 수행하고, 인증 여부를 먼저 확인해 미인증이면 로그인 안내 메시지와 함께 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "text": "지식전문가 수정 처리 흐름에서 지식전문가 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증 확인과 입력값 검증을 거친 뒤 지식전문가 관리 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+        }
+      },
+      "name": "지식전문가 화면 처리",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistModify.do:src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+            "line": 120,
+            "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+          }
+        ],
+        "text": "지식전문가 수정 처리 흐름에서 지식전문가 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증 확인과 입력값 검증을 거친 뒤 지식전문가 관리 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "빈 문자열 상수와 함께 지정 길이 초과 시 자르기, 빈 값 여부 검증 등의 공통 문자열 가공 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "지식전문가 수정 처리 흐름에서 값이 비었을 때 빈 문자열로 바꾸거나 지정 길이로 자르는 등 공통 문자열 가공을 제공하는 유틸리티 역할을 한다. 로그인 사용자 고유아이디를 화면에 넘길 때 사용한다."
+        }
+      },
+      "name": "문자열 처리 유틸리티",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistModify.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "지식전문가 수정 처리 흐름에서 값이 비었을 때 빈 문자열로 바꾸거나 지정 길이로 자르는 등 공통 문자열 가공을 제공하는 유틸리티 역할을 한다. 로그인 사용자 고유아이디를 화면에 넘길 때 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+              "line": 16,
+              "snippet": "public interface EgovKnoSpecialistService {"
+            }
+          ],
+          "text": "지식전문가 목록·총건수·상세 조회와 등록·수정·삭제 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+              "line": 16,
+              "snippet": "public interface EgovKnoSpecialistService {"
+            }
+          ],
+          "text": "지식전문가 수정 화면 열기 흐름에서 지식전문가의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 지식전문가 업무의 실제 처리는 모두 이 규약을 거친다."
+        }
+      },
+      "name": "지식전문가 관리 서비스",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistModifyView.do:src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+            "line": 16,
+            "snippet": "public interface EgovKnoSpecialistService {"
+          }
+        ],
+        "text": "지식전문가 수정 화면 열기 흐름에서 지식전문가의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 지식전문가 업무의 실제 처리는 모두 이 규약을 거친다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 지식전문가 정보 묶음으로 받아 필수·길이 검증을 수행하고, 인증 여부를 먼저 확인해 미인증이면 로그인 안내 메시지와 함께 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "text": "지식전문가 수정 화면 열기 흐름에서 지식전문가 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증 확인과 입력값 검증을 거친 뒤 지식전문가 관리 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+        }
+      },
+      "name": "지식전문가 화면 처리",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistModifyView.do:src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+            "line": 120,
+            "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+          }
+        ],
+        "text": "지식전문가 수정 화면 열기 흐름에서 지식전문가 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증 확인과 입력값 검증을 거친 뒤 지식전문가 관리 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 매개변수, 로케일 조합으로 정의된 메시지 문구를 반환하는 공통 조회 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "지식전문가 등록 처리 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+        }
+      },
+      "name": "공통 안내 메시지 조회",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "지식전문가 등록 처리 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 공통 인증 서비스에 위임해 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "지식전문가 등록 처리 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+        }
+      },
+      "name": "인증·권한 확인 도우미",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "지식전문가 등록 처리 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapMaterialService {"
+            }
+          ],
+          "text": "지식유형 목록·총건수·상세 조회와 등록·수정·삭제, 그리고 지식유형코드 중복 여부 확인 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapMaterialService {"
+            }
+          ],
+          "text": "지식전문가 등록 처리 흐름에서 지식유형(지식맵)의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 지식유형 목록을 이 서비스로 조회한다."
+        }
+      },
+      "name": "지식유형(지식맵) 관리 서비스",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegist.do:src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapMaterialService {"
+          }
+        ],
+        "text": "지식전문가 등록 처리 흐름에서 지식유형(지식맵)의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 지식유형 목록을 이 서비스로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterial.java",
+              "line": 16,
+              "snippet": "public class MapMaterial {"
+            }
+          ],
+          "text": "지식유형코드·조직ID·지식유형명·분류일자·지식URL이 필수 항목이며 각각 길이 제한이 걸려 있고, 최초등록자·최종수정자 이력 항목을 함께 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterial.java",
+              "line": 16,
+              "snippet": "public class MapMaterial {"
+            }
+          ],
+          "text": "지식전문가 등록 처리 흐름에서 지식유형코드, 조직, 전문가, 분류일자, 지식 주소를 담는 지식유형 정보 묶음 역할을 한다. 조직에 속한 지식유형을 고르는 기준이 된다."
+        }
+      },
+      "name": "지식유형(지식맵) 정보",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegist.do:src/main/java/egovframework/com/dam/map/mat/service/MapMaterial.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterial.java",
+            "line": 16,
+            "snippet": "public class MapMaterial {"
+          }
+        ],
+        "text": "지식전문가 등록 처리 흐름에서 지식유형코드, 조직, 전문가, 분류일자, 지식 주소를 담는 지식유형 정보 묶음 역할을 한다. 조직에 속한 지식유형을 고르는 기준이 된다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ],
+          "text": "지식유형 정보를 확장해 검색조건, 검색어, 페이지 번호와 페이지당 건수 등 목록 조회용 항목을 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ],
+          "text": "지식전문가 등록 처리 흐름에서 지식유형 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목을 채우기 위해 조직 기준으로 조회할 때 사용한다."
+        }
+      },
+      "name": "지식유형 조회 조건",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegist.do:src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+            "line": 18,
+            "snippet": "public class MapMaterialVO extends MapMaterial {"
+          }
+        ],
+        "text": "지식전문가 등록 처리 흐름에서 지식유형 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목을 채우기 위해 조직 기준으로 조회할 때 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ],
+          "text": "조직별 지식맵 목록·총건수·상세 조회와 등록·수정·삭제 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ],
+          "text": "지식전문가 등록 처리 흐름에서 조직별 지식맵의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 조직 목록을 이 서비스로 조회한다."
+        }
+      },
+      "name": "조직별 지식맵 서비스",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegist.do:src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapTeamService {"
+          }
+        ],
+        "text": "지식전문가 등록 처리 흐름에서 조직별 지식맵의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 조직 목록을 이 서비스로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ],
+          "text": "조직별 지식맵 정보를 확장해 검색조건, 검색어, 페이지 번호와 페이지당 건수 등 목록 조회용 항목을 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ],
+          "text": "지식전문가 등록 처리 흐름에서 조직별 지식맵 목록을 조회할 때 쓰는 검색조건과 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목 전체를 받기 위해 페이지당 건수를 크게 지정해 사용한다."
+        }
+      },
+      "name": "조직별 지식맵 조회 조건",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegist.do:src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+            "line": 18,
+            "snippet": "public class MapTeamVO extends MapTeam {"
+          }
+        ],
+        "text": "지식전문가 등록 처리 흐름에서 조직별 지식맵 목록을 조회할 때 쓰는 검색조건과 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목 전체를 받기 위해 페이지당 건수를 크게 지정해 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 지식전문가 정보 묶음으로 받아 필수·길이 검증을 수행하고, 인증 여부를 먼저 확인해 미인증이면 로그인 안내 메시지와 함께 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "text": "지식전문가 등록 처리 흐름에서 지식전문가 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증 확인과 입력값 검증을 거친 뒤 지식전문가 관리 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+        }
+      },
+      "name": "지식전문가 화면 처리",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegist.do:src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+            "line": 120,
+            "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+          }
+        ],
+        "text": "지식전문가 등록 처리 흐름에서 지식전문가 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증 확인과 입력값 검증을 거친 뒤 지식전문가 관리 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 매개변수, 로케일 조합으로 정의된 메시지 문구를 반환하는 공통 조회 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "지식전문가 등록 화면 열기 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+        }
+      },
+      "name": "공통 안내 메시지 조회",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegistView.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "지식전문가 등록 화면 열기 흐름에서 코드로 지정한 안내·오류 메시지를 언어 설정에 맞춰 꺼내 주는 공통 메시지 저장소 역할을 한다. 로그인 필요 안내처럼 화면에 보여줄 문구를 이 곳에서 가져온다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 공통 인증 서비스에 위임해 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "지식전문가 등록 화면 열기 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+        }
+      },
+      "name": "인증·권한 확인 도우미",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegistView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "지식전문가 등록 화면 열기 흐름에서 현재 요청자가 로그인한 사용자인지 확인하고 로그인 사용자 정보를 꺼내 주는 공통 도우미 역할을 한다. 각 화면 처리의 첫머리에서 접근 자격을 판정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapMaterialService {"
+            }
+          ],
+          "text": "지식유형 목록·총건수·상세 조회와 등록·수정·삭제, 그리고 지식유형코드 중복 여부 확인 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapMaterialService {"
+            }
+          ],
+          "text": "지식전문가 등록 화면 열기 흐름에서 지식유형(지식맵)의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 지식유형 목록을 이 서비스로 조회한다."
+        }
+      },
+      "name": "지식유형(지식맵) 관리 서비스",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegistView.do:src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapMaterialService {"
+          }
+        ],
+        "text": "지식전문가 등록 화면 열기 흐름에서 지식유형(지식맵)의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 지식유형 목록을 이 서비스로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterial.java",
+              "line": 16,
+              "snippet": "public class MapMaterial {"
+            }
+          ],
+          "text": "지식유형코드·조직ID·지식유형명·분류일자·지식URL이 필수 항목이며 각각 길이 제한이 걸려 있고, 최초등록자·최종수정자 이력 항목을 함께 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterial.java",
+              "line": 16,
+              "snippet": "public class MapMaterial {"
+            }
+          ],
+          "text": "지식전문가 등록 화면 열기 흐름에서 지식유형코드, 조직, 전문가, 분류일자, 지식 주소를 담는 지식유형 정보 묶음 역할을 한다. 조직에 속한 지식유형을 고르는 기준이 된다."
+        }
+      },
+      "name": "지식유형(지식맵) 정보",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegistView.do:src/main/java/egovframework/com/dam/map/mat/service/MapMaterial.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterial.java",
+            "line": 16,
+            "snippet": "public class MapMaterial {"
+          }
+        ],
+        "text": "지식전문가 등록 화면 열기 흐름에서 지식유형코드, 조직, 전문가, 분류일자, 지식 주소를 담는 지식유형 정보 묶음 역할을 한다. 조직에 속한 지식유형을 고르는 기준이 된다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ],
+          "text": "지식유형 정보를 확장해 검색조건, 검색어, 페이지 번호와 페이지당 건수 등 목록 조회용 항목을 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ],
+          "text": "지식전문가 등록 화면 열기 흐름에서 지식유형 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목을 채우기 위해 조직 기준으로 조회할 때 사용한다."
+        }
+      },
+      "name": "지식유형 조회 조건",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegistView.do:src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+            "line": 18,
+            "snippet": "public class MapMaterialVO extends MapMaterial {"
+          }
+        ],
+        "text": "지식전문가 등록 화면 열기 흐름에서 지식유형 목록을 조회할 때 쓰는 검색조건·검색어와 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목을 채우기 위해 조직 기준으로 조회할 때 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ],
+          "text": "조직별 지식맵 목록·총건수·상세 조회와 등록·수정·삭제 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ],
+          "text": "지식전문가 등록 화면 열기 흐름에서 조직별 지식맵의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 조직 목록을 이 서비스로 조회한다."
+        }
+      },
+      "name": "조직별 지식맵 서비스",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegistView.do:src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapTeamService {"
+          }
+        ],
+        "text": "지식전문가 등록 화면 열기 흐름에서 조직별 지식맵의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 화면에서 선택할 조직 목록을 이 서비스로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ],
+          "text": "조직별 지식맵 정보를 확장해 검색조건, 검색어, 페이지 번호와 페이지당 건수 등 목록 조회용 항목을 추가로 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ],
+          "text": "지식전문가 등록 화면 열기 흐름에서 조직별 지식맵 목록을 조회할 때 쓰는 검색조건과 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목 전체를 받기 위해 페이지당 건수를 크게 지정해 사용한다."
+        }
+      },
+      "name": "조직별 지식맵 조회 조건",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegistView.do:src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+            "line": 18,
+            "snippet": "public class MapTeamVO extends MapTeam {"
+          }
+        ],
+        "text": "지식전문가 등록 화면 열기 흐름에서 조직별 지식맵 목록을 조회할 때 쓰는 검색조건과 페이지 정보를 담는 조회 조건 묶음 역할을 한다. 화면 선택 항목 전체를 받기 위해 페이지당 건수를 크게 지정해 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 지식전문가 정보 묶음으로 받아 필수·길이 검증을 수행하고, 인증 여부를 먼저 확인해 미인증이면 로그인 안내 메시지와 함께 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "text": "지식전문가 등록 화면 열기 흐름에서 지식전문가 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증 확인과 입력값 검증을 거친 뒤 지식전문가 관리 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+        }
+      },
+      "name": "지식전문가 화면 처리",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRegistView.do:src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+            "line": 120,
+            "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+          }
+        ],
+        "text": "지식전문가 등록 화면 열기 흐름에서 지식전문가 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증 확인과 입력값 검증을 거친 뒤 지식전문가 관리 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+              "line": 16,
+              "snippet": "public interface EgovKnoSpecialistService {"
+            }
+          ],
+          "text": "지식전문가 목록·총건수·상세 조회와 등록·수정·삭제 기능을 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+              "line": 16,
+              "snippet": "public interface EgovKnoSpecialistService {"
+            }
+          ],
+          "text": "지식전문가 삭제 처리 흐름에서 지식전문가의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 지식전문가 업무의 실제 처리는 모두 이 규약을 거친다."
+        }
+      },
+      "name": "지식전문가 관리 서비스",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRemove.do:src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+            "line": 16,
+            "snippet": "public interface EgovKnoSpecialistService {"
+          }
+        ],
+        "text": "지식전문가 삭제 처리 흐름에서 지식전문가의 등록·수정·삭제·목록조회·상세조회를 담당하는 서비스 규약 역할을 한다. 지식전문가 업무의 실제 처리는 모두 이 규약을 거친다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 지식전문가 정보 묶음으로 받아 필수·길이 검증을 수행하고, 인증 여부를 먼저 확인해 미인증이면 로그인 안내 메시지와 함께 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+            }
+          ],
+          "text": "지식전문가 삭제 처리 흐름에서 지식전문가 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증 확인과 입력값 검증을 거친 뒤 지식전문가 관리 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+        }
+      },
+      "name": "지식전문가 화면 처리",
+      "stepId": "step:ANY /dam/spe/spe/EgovComDamSpecialistRemove.do:src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/spe/spe/web/EgovKnoSpecialistController.java",
+            "line": 120,
+            "snippet": "@RequestMapping(value = \"/dam/spe/spe/EgovComDamSpecialist.do\")"
+          }
+        ],
+        "text": "지식전문가 삭제 처리 흐름에서 지식전문가 업무의 목록·상세·등록·수정·삭제 화면 요청을 받아 인증 확인과 입력값 검증을 거친 뒤 지식전문가 관리 서비스로 위임하고 결과 화면을 결정하는 역할을 한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/dam/spe/spe/service/EgovKnoSpecialistService.java",
+        "line": 16,
+        "snippet": "public interface EgovKnoSpecialistService {"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/dam/spe/req/service/EgovRequestOfferService.java",
+        "line": 23,
+        "snippet": "public interface EgovRequestOfferService {"
+      }
+    ],
+    "text": "조직별로 지식전문가를 등록·승인 관리하고, 사용자가 올린 지식정보 제공·요청 건을 접수·조회·수정·삭제하는 업무 영역이다. 두 업무 모두 로그인한 사용자만 이용할 수 있고, 조직별 지식맵과 지식유형(지식맵)을 선택 항목으로 참조한다."
+  }
+}

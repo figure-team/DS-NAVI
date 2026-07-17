@@ -1,0 +1,237 @@
+{
+  "chunkId": "ssi.ist-000",
+  "domainId": "domain:ssi.ist",
+  "domainName": "",
+  "files": [
+    {
+      "className": "CntcSttusVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/ssi/syi/ist/service/CntcSttusVO.java — java 파일",
+        "tags": []
+      },
+      "line": 27,
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ist/service/CntcSttusVO.java",
+      "slice": {
+        "endLine": 61,
+        "startLine": 17,
+        "text": " * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호          최초 생성\n *   2025.05.26  기여자          Lombok @Getter/@Setter 적용으로 보일러플레이트 제거\n *\n * Copyright (C) 2009 by MOPAS  All rights reserved.\n * </pre>\n */\n@Getter\n@Setter\npublic class CntcSttusVO extends CntcSttus implements Serializable {\n\n\tprivate static final long serialVersionUID = 2829343622660649488L;\n\n\t/** 검색조건 */\n    private String searchCondition = \"\";\n\n    /** 검색Keyword */\n    private String searchKeyword = \"\";\n\n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n\n    /** 현재페이지 */\n    private int pageIndex = 1;\n\n    /** 페이지개수 */\n    private int pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private int pageSize = 10;\n\n    /** firstIndex */\n    private int firstIndex = 1;\n\n    /** lastIndex */\n    private int lastIndex = 1;\n\n    /** recordCountPerPage */\n    private int recordCountPerPage = 10;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCntcSttusService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/ssi/syi/ist/service/EgovCntcSttusService.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ist/service/EgovCntcSttusService.java",
+      "slice": {
+        "endLine": 54,
+        "startLine": 15,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호          최초 생성\n *   2025.06.28  이백행          컨트리뷰션 PMD로 소프트웨어 보안약점 진단하고 제거하기-FormalParameterNamingConventions(변수명에 밑줄 사용)\n *\n *      </pre>\n */\npublic interface EgovCntcSttusService {\n\n\t/**\n\t * 연계현황 상세항목을 조회한다.\n\t * \n\t * @param cntcMessage\n\t * @return CntcMessage(연계현황)\n\t * @throws Exception\n\t */\n\tCntcSttus selectCntcSttusDetail(CntcSttus cntcSttus) throws Exception;\n\n\t/**\n\t * 연계현황 목록을 조회한다.\n\t * \n\t * @param searchVO\n\t * @return List(연계현황 목록)\n\t * @throws Exception\n\t */\n\tList<EgovMap> selectCntcSttusList(CntcSttusVO searchVO) throws Exception;\n\n\t/**\n\t * 연계현황 총 개수를 조회한다.\n\t * \n\t * @param searchVO\n\t * @return int(연계현황 총 개수)\n\t */\n\tint selectCntcSttusListTotCnt(CntcSttusVO searchVO) throws Exception;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCntcSttusController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java — java 파일",
+        "tags": []
+      },
+      "line": 60,
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java",
+      "slice": {
+        "endLine": 121,
+        "startLine": 50,
+        "text": "\n\t/**\n\t * 연계현황 상세내역을 조회한다.\n\t * \n\t * @param loginVO\n\t * @param cntcSttus\n\t * @param model\n\t * @return \"egovframework/com/cmm/sym/ccm/EgovCcmCntcSttusDetail\"\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/ssi/syi/ist/getCntcSttusDetail.do\")\n\tpublic String selectCntcSttusLogDetail(CntcSttus cntcSttus, ModelMap model) throws Exception {\n\t\tCntcSttus vo = cntcSttusService.selectCntcSttusDetail(cntcSttus);\n\t\tmodel.addAttribute(\"result\", vo);\n\n\t\treturn \"egovframework/com/ssi/syi/ist/EgovCntcSttusDetail\";\n\t}\n\n\t/**\n\t * 연계현황 목록을 조회한다.\n\t * \n\t * @param loginVO\n\t * @param searchVO\n\t * @param model\n\t * @return \"egovframework/com/cmm/sym/ccm/EgovCcmCntcSttusList\"\n\t * @throws Exception\n\t */\n\t@IncludedInfo(name = \"연계현황관리\", listUrl = \"/ssi/syi/ist/getCntcSttusList.do\", order = 1220, gid = 70)\n\t@RequestMapping(value = \"/ssi/syi/ist/getCntcSttusList.do\")\n\tpublic String selectCntcSttusLogList(@ModelAttribute(\"searchVO\") CntcSttusVO searchVO, ModelMap model)\n\t\t\tthrows Exception {\n\t\t/** EgovPropertyService.sample */\n\t\tsearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));\n\t\tsearchVO.setPageSize(propertiesService.getInt(\"pageSize\"));\n\n\t\t/** pageing */\n\t\tPaginationInfo paginationInfo = new PaginationInfo();\n\t\tpaginationInfo.setCurrentPageNo(searchVO.getPageIndex());\n\t\tpaginationInfo.setRecordCountPerPage(searchVO.getPageUnit());\n\t\tpaginationInfo.setPageSize(searchVO.getPageSize());\n\n\t\tsearchVO.setFirstIndex(paginationInfo.getFirstRecordIndex());\n\t\tsearchVO.setLastIndex(paginationInfo.getLastRecordIndex());\n\t\tsearchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());\n\n\t\tList<EgovMap> resultList = cntcSttusService.selectCntcSttusList(searchVO);\n\t\tmodel.addAttribute(\"resultList\", resultList);\n\n\t\tint totCnt = cntcSttusService.selectCntcSttusListTotCnt(searchVO);\n\t\tpaginationInfo.setTotalRecordCount(totCnt);\n\t\tmodel.addAttribute(\"paginationInfo\", paginationInfo);\n\n\t\treturn \"egovframework/com/ssi/syi/ist/EgovCntcSttusList\";\n\t}\n\n\t/**\n\t * Map 내용을 확인한다.\n\t * \n\t * @param commandMap\n\t * @return\n\t */\n\tpublic String printParameterMap(@RequestParam Map<?, ?> commandMap) {\n\t\tString ret = \"\";\n\t\tfor (Object key : commandMap.keySet()) {\n\t\t\tObject value = commandMap.get(key);\n\n\t\t\tret += \"key:\" + key.toString() + \" value:\" + value.toString();\n\t\t}\n\t\treturn ret;\n\t}\n\n}",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovCntcSttusController#selectCntcSttusLogDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java",
+      "flowId": "flow:ANY /ssi/syi/ist/getCntcSttusDetail.do",
+      "line": 60,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java",
+        "line": 60,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/ist/getCntcSttusDetail.do\")"
+      },
+      "stepIds": [
+        "step:ANY /ssi/syi/ist/getCntcSttusDetail.do:src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java",
+        "step:ANY /ssi/syi/ist/getCntcSttusDetail.do:src/main/java/egovframework/com/ssi/syi/ist/service/EgovCntcSttusService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCntcSttusController#selectCntcSttusLogList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java",
+      "flowId": "flow:ANY /ssi/syi/ist/getCntcSttusList.do",
+      "line": 78,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java",
+        "line": 78,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/ist/getCntcSttusList.do\")"
+      },
+      "stepIds": [
+        "step:ANY /ssi/syi/ist/getCntcSttusList.do:src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java",
+        "step:ANY /ssi/syi/ist/getCntcSttusList.do:src/main/java/egovframework/com/ssi/syi/ist/service/CntcSttusVO.java",
+        "step:ANY /ssi/syi/ist/getCntcSttusList.do:src/main/java/egovframework/com/ssi/syi/ist/service/EgovCntcSttusService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "header": {
+    "flowIndex": [
+      {
+        "entryPoint": "EgovCntcSttusController#selectCntcSttusLogDetail",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java",
+        "flowId": "flow:ANY /ssi/syi/ist/getCntcSttusDetail.do",
+        "line": 60,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java",
+          "line": 60,
+          "snippet": "@RequestMapping(value = \"/ssi/syi/ist/getCntcSttusDetail.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCntcSttusController#selectCntcSttusLogList",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java",
+        "flowId": "flow:ANY /ssi/syi/ist/getCntcSttusList.do",
+        "line": 78,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java",
+          "line": 78,
+          "snippet": "@RequestMapping(value = \"/ssi/syi/ist/getCntcSttusList.do\")"
+        }
+      }
+    ]
+  },
+  "isHeaderChunk": true,
+  "key": "ssi.ist",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ist/service/EgovCntcSttusService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcSttusService {"
+      },
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ist/service/EgovCntcSttusService.java",
+      "stepId": "step:ANY /ssi/syi/ist/getCntcSttusDetail.do:src/main/java/egovframework/com/ssi/syi/ist/service/EgovCntcSttusService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java",
+        "line": 60,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/ist/getCntcSttusDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java",
+      "stepId": "step:ANY /ssi/syi/ist/getCntcSttusDetail.do:src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ist/service/CntcSttusVO.java",
+        "line": 29,
+        "snippet": "public class CntcSttusVO extends CntcSttus implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ist/service/CntcSttusVO.java",
+      "stepId": "step:ANY /ssi/syi/ist/getCntcSttusList.do:src/main/java/egovframework/com/ssi/syi/ist/service/CntcSttusVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ist/service/EgovCntcSttusService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcSttusService {"
+      },
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ist/service/EgovCntcSttusService.java",
+      "stepId": "step:ANY /ssi/syi/ist/getCntcSttusList.do:src/main/java/egovframework/com/ssi/syi/ist/service/EgovCntcSttusService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java",
+        "line": 60,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/ist/getCntcSttusDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java",
+      "stepId": "step:ANY /ssi/syi/ist/getCntcSttusList.do:src/main/java/egovframework/com/ssi/syi/ist/web/EgovCntcSttusController.java"
+    }
+  ]
+}

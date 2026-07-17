@@ -1,0 +1,1306 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "sym.log.tlg-000",
+  "domainId": "domain:sym.log.tlg",
+  "header": {
+    "name": "송수신 로그 관리",
+    "summary": {
+      "text": "기관 간 연계 서비스의 요청·응답 송수신 이력을 기록하고 조회하는 업무 영역이다. 송수신 로그 목록 조회, 단건 상세 조회, 테스트용 로그 등록 화면과 등록 처리의 네 가지 처리로 구성되며, 모든 처리는 송/수신로그관리 메뉴 아래 하나의 화면 흐름으로 묶인다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+          "line": 69,
+          "snippet": "@RequestMapping(value = \"/sym/log/tlg/SelectTrsmrcvLogList.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+          "line": 21,
+          "snippet": "public interface EgovTrsmrcvLogService {"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "송수신 로그: 연계 요청 한 건의 이력을 나타내는 핵심 업무 정보로, 요청아이디를 식별자로 삼아 발생일자·송수신구분코드·연계ID·제공기관/시스템/서비스·요청기관/시스템·요청 및 응답의 송신·수신 시각·결과코드·결과메시지·요청자아이디를 보관한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/TrsmrcvLog.java",
+            "line": 21,
+            "snippet": "public class TrsmrcvLog implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/TrsmrcvLog.java",
+            "line": 28,
+            "snippet": "private String requstId = \"\";"
+          }
+        ]
+      },
+      {
+        "text": "공통코드 조회조건: 로그 등록 화면에서 송수신구분 선택 목록을 채우기 위해 사용하는 코드 조회 조건으로, 코드 ID·상세코드·코드명·코드설명 등을 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 29,
+            "snippet": "public class ComDefaultCodeVO implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 31,
+            "snippet": "private String codeId = \"\";"
+          }
+        ]
+      },
+      {
+        "text": "로그인 사용자: 로그 등록 시 요청자를 식별하기 위해 참조하는 인증 사용자 정보로, 고유아이디를 비롯한 아이디·이름·조직 정보를 보유한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "private String uniqId;"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "상세 조회 시 요청아이디가 비어 있으면 상세 화면을 열지 않고 실패 안내 메시지를 담아 목록 화면으로 되돌린다. 이는 보안점검 대응으로 도입된 필수 입력 검증이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 109,
+            "snippet": "if (ObjectUtils.isEmpty(requstId)) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 111,
+            "snippet": "return \"forward:/sym/log/tlg/SelectTrsmrcvLogList.do\";"
+          }
+        ]
+      },
+      {
+        "text": "로그 등록은 인증된 사용자만 수행할 수 있으며, 미인증 상태에서는 등록을 건너뛰고 목록 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 146,
+            "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 148,
+            "snippet": "if (isAuthenticated) {"
+          }
+        ]
+      },
+      {
+        "text": "등록되는 로그의 요청자아이디는 인증 사용자의 고유아이디로 채우되, 사용자 정보나 고유아이디가 없으면 빈 값으로 대체한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 150,
+            "snippet": "trsmrcvLog.setRqesterId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());"
+          }
+        ]
+      },
+      {
+        "text": "등록 처리 완료 후에는 별도 완료 화면 없이 송수신 로그 목록 조회로 포워딩하여 결과를 확인하게 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 154,
+            "snippet": "return \"forward:/sym/log/tlg/SelectTrsmrcvLogList.do\";"
+          }
+        ]
+      },
+      {
+        "text": "목록 조회는 운영 환경설정에 정의된 페이지 단위와 페이지 크기를 적용해 페이징 처리하며, 전체 건수를 함께 산출해 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 85,
+            "snippet": "Map<String, Object> map = trsmrcvLogService.selectTrsmrcvLogInf(trsmrcvLog);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 94,
+            "snippet": "return \"egovframework/com/sym/log/tlg/EgovTrsmrcvLogList\";"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "공통코드 도메인에 의존한다. 로그 등록 화면은 공통코드 서비스로 송수신구분 코드(COM002) 상세 목록을 조회해 선택 항목을 구성한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 130,
+            "snippet": "vo.setCodeId(\"COM002\");"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          }
+        ]
+      },
+      {
+        "text": "인증·권한 도메인에 의존한다. 로그 등록 시 사용자 인증 여부와 인증 사용자 정보를 사용자 상세 조회 서비스로부터 조회해 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 11,
+            "snippet": "public Object getAuthenticatedUser();"
+          }
+        ]
+      },
+      {
+        "text": "다국어 메시지 도메인에 의존한다. 상세 조회 실패 시 안내 문구를 메시지 리소스에서 코드로 조회해 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 110,
+            "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.request.msg\"));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "송수신 로그 조회",
+        "nodes": [
+          {
+            "id": "n1",
+            "kind": "start",
+            "label": "송/수신로그관리 메뉴 진입"
+          },
+          {
+            "id": "n2",
+            "kind": "activity",
+            "label": "송수신 로그 목록 조회",
+            "flowRef": "flow:ANY /sym/log/tlg/SelectTrsmrcvLogList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+                "line": 69,
+                "snippet": "@RequestMapping(value = \"/sym/log/tlg/SelectTrsmrcvLogList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n3",
+            "kind": "activity",
+            "label": "목록 화면 표시",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+                "line": 94,
+                "snippet": "return \"egovframework/com/sym/log/tlg/EgovTrsmrcvLogList\";"
+              }
+            ]
+          },
+          {
+            "id": "n4",
+            "kind": "activity",
+            "label": "로그 상세 조회 요청",
+            "flowRef": "flow:ANY /sym/log/tlg/InqireTrsmrcvLog.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+                "line": 105,
+                "snippet": "@RequestMapping(value = \"/sym/log/tlg/InqireTrsmrcvLog.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n5",
+            "kind": "decision",
+            "label": "요청아이디 입력 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+                "line": 109,
+                "snippet": "if (ObjectUtils.isEmpty(requstId)) {"
+              }
+            ]
+          },
+          {
+            "id": "n6",
+            "kind": "activity",
+            "label": "실패 안내 후 목록 복귀",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+                "line": 111,
+                "snippet": "return \"forward:/sym/log/tlg/SelectTrsmrcvLogList.do\";"
+              }
+            ]
+          },
+          {
+            "id": "n7",
+            "kind": "activity",
+            "label": "로그 단건 조회",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+                "line": 115,
+                "snippet": "TrsmrcvLog vo = trsmrcvLogService.selectTrsmrcvLog(trsmrcvLog);"
+              }
+            ]
+          },
+          {
+            "id": "n8",
+            "kind": "activity",
+            "label": "상세 화면 표시",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+                "line": 117,
+                "snippet": "return \"egovframework/com/sym/log/tlg/EgovTrsmrcvLogInqire\";"
+              }
+            ]
+          },
+          {
+            "id": "n9",
+            "kind": "end",
+            "label": "조회 종료"
+          }
+        ],
+        "edges": [
+          { "from": "n1", "to": "n2" },
+          { "from": "n2", "to": "n3" },
+          { "from": "n3", "to": "n4" },
+          { "from": "n4", "to": "n5" },
+          { "from": "n5", "to": "n6", "label": "요청아이디 없음" },
+          { "from": "n5", "to": "n7", "label": "요청아이디 있음" },
+          { "from": "n6", "to": "n9" },
+          { "from": "n7", "to": "n8" },
+          { "from": "n8", "to": "n9" }
+        ]
+      },
+      {
+        "title": "송수신 로그 등록",
+        "nodes": [
+          {
+            "id": "m1",
+            "kind": "start",
+            "label": "로그 등록 화면 요청"
+          },
+          {
+            "id": "m2",
+            "kind": "activity",
+            "label": "송수신구분 코드 목록 조회",
+            "flowRef": "flow:ANY /sym/log/tlg/AddTrsmrcvLog.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+                "line": 131,
+                "snippet": "List<CmmnDetailCode> resultList = cmmUseService.selectCmmCodeDetail(vo);"
+              }
+            ]
+          },
+          {
+            "id": "m3",
+            "kind": "activity",
+            "label": "등록 화면 표시",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+                "line": 133,
+                "snippet": "return \"egovframework/com/sym/log/tlg/EgovTrsmrcvLogRegist\";"
+              }
+            ]
+          },
+          {
+            "id": "m4",
+            "kind": "activity",
+            "label": "로그 등록 요청",
+            "flowRef": "flow:ANY /sym/log/tlg/InsertTrsmrcvLog.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+                "line": 143,
+                "snippet": "@RequestMapping(value = \"/sym/log/tlg/InsertTrsmrcvLog.do\")"
+              }
+            ]
+          },
+          {
+            "id": "m5",
+            "kind": "decision",
+            "label": "인증된 사용자 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+                "line": 148,
+                "snippet": "if (isAuthenticated) {"
+              }
+            ]
+          },
+          {
+            "id": "m6",
+            "kind": "activity",
+            "label": "요청자아이디 설정",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+                "line": 150,
+                "snippet": "trsmrcvLog.setRqesterId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());"
+              }
+            ]
+          },
+          {
+            "id": "m7",
+            "kind": "activity",
+            "label": "송수신 로그 저장",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+                "line": 151,
+                "snippet": "trsmrcvLogService.logInsertTrsmrcvLog(trsmrcvLog);"
+              }
+            ]
+          },
+          {
+            "id": "m8",
+            "kind": "activity",
+            "label": "목록 화면으로 이동",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+                "line": 154,
+                "snippet": "return \"forward:/sym/log/tlg/SelectTrsmrcvLogList.do\";"
+              }
+            ]
+          },
+          {
+            "id": "m9",
+            "kind": "end",
+            "label": "등록 종료"
+          }
+        ],
+        "edges": [
+          { "from": "m1", "to": "m2" },
+          { "from": "m2", "to": "m3" },
+          { "from": "m3", "to": "m4" },
+          { "from": "m4", "to": "m5" },
+          { "from": "m5", "to": "m6", "label": "인증됨" },
+          { "from": "m5", "to": "m8", "label": "미인증" },
+          { "from": "m6", "to": "m7" },
+          { "from": "m7", "to": "m8" },
+          { "from": "m8", "to": "m9" }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /sym/log/tlg/AddTrsmrcvLog.do",
+      "name": "송수신 로그 등록 화면 조회",
+      "summary": {
+        "text": "송수신 로그를 수기로 등록하기 위한 입력 화면을 연다. 화면 구성을 위해 송수신구분 공통코드(COM002) 상세 목록을 조회해 선택 항목으로 전달한 뒤 등록 화면을 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 127,
+            "snippet": "@RequestMapping(value = \"/sym/log/tlg/AddTrsmrcvLog.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 130,
+            "snippet": "vo.setCodeId(\"COM002\");"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/log/tlg/InqireTrsmrcvLog.do",
+      "name": "송수신 로그 상세 조회",
+      "summary": {
+        "text": "요청아이디를 받아 송수신 로그 한 건의 상세 내용을 조회해 상세 화면에 표시한다. 요청아이디가 비어 있으면 실패 안내 메시지를 담아 목록 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/sym/log/tlg/InqireTrsmrcvLog.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 115,
+            "snippet": "TrsmrcvLog vo = trsmrcvLogService.selectTrsmrcvLog(trsmrcvLog);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/log/tlg/InsertTrsmrcvLog.do",
+      "name": "송수신 로그 등록",
+      "summary": {
+        "text": "입력된 송수신 로그를 저장한다. 인증된 사용자인 경우에만 요청자아이디를 인증 사용자의 고유아이디로 채워 로그를 등록하며, 처리 후 목록 조회 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 143,
+            "snippet": "@RequestMapping(value = \"/sym/log/tlg/InsertTrsmrcvLog.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 151,
+            "snippet": "trsmrcvLogService.logInsertTrsmrcvLog(trsmrcvLog);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/log/tlg/SelectTrsmrcvLogList.do",
+      "name": "송수신 로그 목록 조회",
+      "summary": {
+        "text": "송/수신로그관리 메뉴의 기본 화면으로, 검색 조건과 페이징 설정에 따라 송수신 로그 목록과 전체 건수를 조회해 목록 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 69,
+            "snippet": "@RequestMapping(value = \"/sym/log/tlg/SelectTrsmrcvLogList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 85,
+            "snippet": "Map<String, Object> map = trsmrcvLogService.selectTrsmrcvLogInf(trsmrcvLog);"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /sym/log/tlg/AddTrsmrcvLog.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통코드 조회조건",
+      "summary": {
+        "text": "등록 화면에 표시할 송수신구분 코드 목록을 요청하기 위한 조회조건 정보를 담는다. 코드 ID를 설정해 공통코드 조회에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 31,
+            "snippet": "private String codeId = \"\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "등록 화면 조회 흐름에서 공통코드 조회의 입력 조건 역할을 한다. 화면이 필요로 하는 코드 ID를 담아 공통코드 서비스에 전달하고, 그 결과로 받은 상세코드 목록이 화면의 선택 항목이 된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 129,
+              "snippet": "ComDefaultCodeVO vo = new ComDefaultCodeVO();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 130,
+              "snippet": "vo.setCodeId(\"COM002\");"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드 ID, 상세코드, 코드명, 코드설명을 주요 항목으로 가지며 모두 빈 문자열로 초기화된다. 이 흐름에서는 코드 ID만 설정해 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/log/tlg/AddTrsmrcvLog.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 활용 서비스",
+      "summary": {
+        "text": "코드 ID로 공통코드 상세 목록을 조회해 주는 공통 서비스로, 등록 화면의 송수신구분 선택 항목을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "등록 화면 조회 흐름에서 코드 조회를 담당한다. 조회조건에 담긴 코드 ID를 받아 해당 공통코드의 상세코드 목록을 반환하며, 컨트롤러는 그 결과를 화면 모델에 그대로 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 131,
+              "snippet": "List<CmmnDetailCode> resultList = cmmUseService.selectCmmCodeDetail(vo);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "공통코드 조회 외에 여러 코드 목록의 일괄 조회, 조직정보와 그룹정보를 코드 형태로 변환해 제공하는 기능을 함께 규정한다. 송수신 로그 등록 화면에서는 단건 코드 상세 조회만 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 130,
+              "snippet": "vo.setCodeId(\"COM002\");"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/log/tlg/AddTrsmrcvLog.do:src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+      "name": "송수신 로그 등록 화면 처리",
+      "summary": {
+        "text": "등록 화면 요청을 받아 송수신구분 공통코드 목록을 조회한 뒤 등록 화면을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 127,
+            "snippet": "@RequestMapping(value = \"/sym/log/tlg/AddTrsmrcvLog.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 133,
+            "snippet": "return \"egovframework/com/sym/log/tlg/EgovTrsmrcvLogRegist\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면 진입점 역할을 한다. 등록 화면 요청을 받아 공통코드 서비스에 코드 목록 조회를 위임하고, 조회 결과를 화면 모델에 담아 등록 화면을 표시한다. 저장 처리는 하지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 131,
+              "snippet": "List<CmmnDetailCode> resultList = cmmUseService.selectCmmCodeDetail(vo);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 132,
+              "snippet": "model.addAttribute(\"resultList\", resultList);"
+            }
+          ]
+        },
+        "request": {
+          "text": "검색 조건 객체를 화면 모델 속성으로 받고 화면 모델을 함께 전달받는다. 별도의 입력 검증이나 인증 확인 없이 화면을 열어 준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 128,
+              "snippet": "public String addTrsmrcvLog(@ModelAttribute(\"searchVO\") TrsmrcvLog trsmrcvLog, ModelMap model) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 127,
+              "snippet": "@RequestMapping(value = \"/sym/log/tlg/AddTrsmrcvLog.do\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/log/tlg/InqireTrsmrcvLog.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "다국어 메시지 제공",
+      "summary": {
+        "text": "메시지 코드로 안내 문구를 조회해 주는 공통 메시지 자원으로, 상세 조회 실패 시 안내 메시지를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 110,
+            "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.request.msg\"));"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "상세 조회 흐름에서 사용자 안내 문구 제공을 맡는다. 요청아이디 누락으로 조회를 중단할 때 실패 메시지 코드를 문구로 변환해 화면 모델에 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 110,
+              "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.request.msg\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 28,
+              "snippet": "private ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 자원 번들을 재적재 가능한 형태로 보유하고, 메시지 코드와 필요 시 매개변수·로케일을 함께 받아 문구를 반환한다. 이 흐름에서는 로케일을 지정하지 않는 기본 조회만 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 28,
+              "snippet": "private ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/log/tlg/InqireTrsmrcvLog.do:src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+      "name": "송수신 로그 서비스",
+      "summary": {
+        "text": "송수신 로그의 등록·요약·단건 조회·목록 조회를 규정하는 업무 서비스로, 상세 조회 흐름에서는 요청아이디에 해당하는 로그 한 건을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+            "line": 21,
+            "snippet": "public interface EgovTrsmrcvLogService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+            "line": 45,
+            "snippet": "public TrsmrcvLog selectTrsmrcvLog(TrsmrcvLog trsmrcvLog) throws Exception;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "상세 조회 흐름에서 로그 단건 조회를 담당한다. 요청아이디가 설정된 조회 조건을 받아 해당 송수신 로그 정보를 반환하며, 컨트롤러는 그 결과를 상세 화면에 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+              "line": 45,
+              "snippet": "public TrsmrcvLog selectTrsmrcvLog(TrsmrcvLog trsmrcvLog) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 115,
+              "snippet": "TrsmrcvLog vo = trsmrcvLogService.selectTrsmrcvLog(trsmrcvLog);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "송수신 로그 생성, 로그정보 요약, 단건 조회, 목록 조회의 네 가지 업무 작업을 규정한다. 상세 조회 흐름은 이 중 단건 조회만 사용하며 조회 실패는 예외로 전파된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+              "line": 28,
+              "snippet": "public void logInsertTrsmrcvLog(TrsmrcvLog trsmrcvLog) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+              "line": 45,
+              "snippet": "public TrsmrcvLog selectTrsmrcvLog(TrsmrcvLog trsmrcvLog) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/log/tlg/InqireTrsmrcvLog.do:src/main/java/egovframework/com/sym/log/tlg/service/TrsmrcvLog.java",
+      "name": "송수신 로그 정보",
+      "summary": {
+        "text": "송수신 로그 한 건의 업무 정보를 담는 구조로, 상세 조회 흐름에서는 요청아이디를 조회 조건으로 담고 조회 결과를 담아 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/TrsmrcvLog.java",
+            "line": 21,
+            "snippet": "public class TrsmrcvLog implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 113,
+            "snippet": "trsmrcvLog.setRequstId(requstId.trim());"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "상세 조회 흐름에서 조회 조건이자 조회 결과를 담는 이중 역할을 한다. 화면에서 받은 요청아이디를 앞뒤 공백을 제거해 담아 서비스에 넘기고, 서비스가 반환한 로그 내용을 그대로 상세 화면 모델에 실어 보낸다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 113,
+              "snippet": "trsmrcvLog.setRequstId(requstId.trim());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 116,
+              "snippet": "model.addAttribute(\"result\", vo);"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "요청아이디를 식별 항목으로 삼고 발생일자, 송수신구분코드와 그 명칭, 연계ID, 제공기관·시스템·서비스ID, 요청기관·시스템ID, 요청·응답의 송신 및 수신 시각, 결과코드, 결과메시지, 최초등록시점, 요청자아이디를 보유한다. 문자열 항목은 대체로 빈 문자열로 초기화된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/TrsmrcvLog.java",
+              "line": 28,
+              "snippet": "private String requstId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/TrsmrcvLog.java",
+              "line": 21,
+              "snippet": "public class TrsmrcvLog implements Serializable {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/log/tlg/InqireTrsmrcvLog.do:src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+      "name": "송수신 로그 상세 조회 처리",
+      "summary": {
+        "text": "요청아이디를 받아 필수 입력 여부를 검증한 뒤 로그 단건을 조회해 상세 화면에 전달하고, 요청아이디가 없으면 안내 메시지와 함께 목록으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/sym/log/tlg/InqireTrsmrcvLog.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 117,
+            "snippet": "return \"egovframework/com/sym/log/tlg/EgovTrsmrcvLogInqire\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "상세 조회의 진입점 역할을 한다. 목록 화면에서 선택한 요청아이디를 받아 검증하고, 유효하면 송수신 로그 서비스에 단건 조회를 위임한 뒤 결과를 상세 화면에 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 115,
+              "snippet": "TrsmrcvLog vo = trsmrcvLogService.selectTrsmrcvLog(trsmrcvLog);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 116,
+              "snippet": "model.addAttribute(\"result\", vo);"
+            }
+          ]
+        },
+        "request": {
+          "text": "검색 조건 객체와 요청 파라미터 요청아이디, 화면 모델을 받는다. 요청아이디가 비어 있으면 실패 메시지를 모델에 담아 목록 조회로 포워딩하며, 유효한 경우 앞뒤 공백을 제거해 조회 조건으로 설정한다. 별도의 인증 확인은 수행하지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 106,
+              "snippet": "public String selectTrsmrcvLog(@ModelAttribute(\"searchVO\") TrsmrcvLog trsmrcvLog, @RequestParam(\"requstId\") String requstId, ModelMap model) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 109,
+              "snippet": "if (ObjectUtils.isEmpty(requstId)) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/log/tlg/InsertTrsmrcvLog.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "인증된 사용자 정보를 담는 구조로, 등록 흐름에서는 요청자아이디를 채우기 위해 고유아이디를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "private String uniqId;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "등록 흐름에서 요청자 식별 정보를 공급하는 협력 객체 역할을 한다. 인증 사용자 조회 결과를 이 형식으로 변환해 고유아이디를 꺼내 로그의 요청자아이디로 설정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 149,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 150,
+              "snippet": "trsmrcvLog.setRqesterId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디, 이름, 이메일주소, 비밀번호와 힌트·정답, 사용자구분, 조직(부서)ID와 명칭, 고유아이디, 사용자 IP정보, 인증 DN, 디지털원패스 사용자키와 세션값을 보유한다. 아이디·이름·이메일 등 일부 항목은 필수 입력 규칙이 지정되어 있으나, 이 흐름은 고유아이디만 사용하며 값이 없을 수 있음을 전제로 방어한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "private String uniqId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 150,
+              "snippet": "trsmrcvLog.setRqesterId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/log/tlg/InsertTrsmrcvLog.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "인증 사용자 조회 서비스",
+      "summary": {
+        "text": "인증된 사용자 객체와 권한 목록, 인증 여부를 제공하는 공통 서비스로, 등록 흐름의 인증 확인과 요청자 식별에 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 24,
+            "snippet": "public Boolean isAuthenticated();"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "등록 흐름에서 인증 정보 제공을 담당한다. 인증 여부 확인과 인증 사용자 객체 반환을 규정하며, 컨트롤러는 이를 보조 유틸리티를 통해 간접 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인의 세 가지 작업을 규정한다. 송수신 로그 등록에서는 권한 목록은 사용하지 않고 인증 여부와 사용자 객체만 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 146,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/log/tlg/InsertTrsmrcvLog.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 정보 조회 보조 도구",
+      "summary": {
+        "text": "인증 사용자 조회 서비스를 정적으로 호출할 수 있게 감싸 주는 보조 도구로, 등록 흐름에서 인증 여부와 인증 사용자를 얻는 통로가 된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 146,
+            "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "등록 흐름에서 인증 정보 접근의 창구 역할을 한다. 주입된 인증 사용자 조회 서비스를 보관하고, 인증 여부 확인과 인증 사용자 객체 조회 요청을 그 서비스로 그대로 위임한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "static EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 149,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 사용자 조회 서비스 한 개를 정적 항목으로 보유한다. 정적으로 공유되므로 사용 전에 서비스가 설정되어 있어야 하며, 반환되는 사용자 객체는 형식이 정해지지 않아 호출 측에서 로그인 사용자 정보로 변환해 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "static EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 149,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/log/tlg/InsertTrsmrcvLog.do:src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+      "name": "송수신 로그 서비스",
+      "summary": {
+        "text": "송수신 로그의 등록·요약·조회를 규정하는 업무 서비스로, 등록 흐름에서는 전달된 로그 정보를 생성한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+            "line": 21,
+            "snippet": "public interface EgovTrsmrcvLogService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+            "line": 28,
+            "snippet": "public void logInsertTrsmrcvLog(TrsmrcvLog trsmrcvLog) throws Exception;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "등록 흐름에서 로그 생성 작업을 담당한다. 요청자아이디까지 채워진 송수신 로그 정보를 받아 이력으로 등록하며, 컨트롤러는 인증된 경우에만 이 작업을 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+              "line": 28,
+              "snippet": "public void logInsertTrsmrcvLog(TrsmrcvLog trsmrcvLog) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 151,
+              "snippet": "trsmrcvLogService.logInsertTrsmrcvLog(trsmrcvLog);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "로그 생성 외에 송수신 로그정보를 요약하는 작업을 함께 규정해, 누적된 이력을 집계 형태로 정리할 수 있게 한다. 등록 흐름은 생성 작업만 호출하며 반환값이 없고 실패는 예외로 전파된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+              "line": 28,
+              "snippet": "public void logInsertTrsmrcvLog(TrsmrcvLog trsmrcvLog) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+              "line": 35,
+              "snippet": "public void logInsertTrsmrcvLogSummary() throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/log/tlg/InsertTrsmrcvLog.do:src/main/java/egovframework/com/sym/log/tlg/service/TrsmrcvLog.java",
+      "name": "송수신 로그 정보",
+      "summary": {
+        "text": "등록할 송수신 로그 한 건의 내용을 담는 구조로, 화면 입력값에 더해 요청자아이디가 설정된 뒤 서비스로 전달된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/TrsmrcvLog.java",
+            "line": 21,
+            "snippet": "public class TrsmrcvLog implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 150,
+            "snippet": "trsmrcvLog.setRqesterId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "등록 흐름에서 저장 대상 데이터를 담는 그릇 역할을 한다. 화면에서 입력된 송수신 항목을 담은 상태로 전달되고, 컨트롤러가 요청자아이디를 채운 뒤 서비스에 넘겨 이력으로 등록된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 150,
+              "snippet": "trsmrcvLog.setRqesterId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 151,
+              "snippet": "trsmrcvLogService.logInsertTrsmrcvLog(trsmrcvLog);"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "요청아이디, 발생일자, 송수신구분코드와 명칭, 연계ID, 제공기관·시스템·서비스ID, 요청기관·시스템ID, 요청·응답의 송신 및 수신 시각, 결과코드, 결과메시지, 최초등록시점, 요청자아이디를 보유한다. 요청자아이디는 인증 사용자가 없거나 고유아이디가 없으면 빈 문자열이 되는 것이 이 흐름의 불변식이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/TrsmrcvLog.java",
+              "line": 28,
+              "snippet": "private String requstId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 150,
+              "snippet": "trsmrcvLog.setRqesterId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/log/tlg/InsertTrsmrcvLog.do:src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+      "name": "송수신 로그 등록 처리",
+      "summary": {
+        "text": "인증 여부를 확인해 인증된 경우에만 요청자아이디를 채워 로그를 등록하고, 처리 후 목록 조회로 포워딩한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 143,
+            "snippet": "@RequestMapping(value = \"/sym/log/tlg/InsertTrsmrcvLog.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 154,
+            "snippet": "return \"forward:/sym/log/tlg/SelectTrsmrcvLogList.do\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "등록의 진입점 역할을 한다. 화면에서 입력된 로그 정보를 받아 인증 확인과 요청자 식별을 수행한 뒤 송수신 로그 서비스에 저장을 위임하고, 결과 확인을 위해 목록 조회 화면으로 포워딩한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 151,
+              "snippet": "trsmrcvLogService.logInsertTrsmrcvLog(trsmrcvLog);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 154,
+              "snippet": "return \"forward:/sym/log/tlg/SelectTrsmrcvLogList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "검색 조건 형식으로 로그 입력값을 화면 모델 속성으로 받고 세션 상태를 함께 전달받는다. 입력 항목에 대한 개별 검증은 없으나, 인증 여부를 확인해 미인증이면 저장을 수행하지 않고 목록으로 이동한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 144,
+              "snippet": "public String insertTrsmrcvLog(@ModelAttribute(\"searchVO\") TrsmrcvLog trsmrcvLog, SessionStatus status) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 148,
+              "snippet": "if (isAuthenticated) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/log/tlg/SelectTrsmrcvLogList.do:src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+      "name": "송수신 로그 서비스",
+      "summary": {
+        "text": "송수신 로그의 등록·요약·조회를 규정하는 업무 서비스로, 목록 조회 흐름에서는 로그 목록과 전체 건수를 함께 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+            "line": 21,
+            "snippet": "public interface EgovTrsmrcvLogService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+            "line": 52,
+            "snippet": "public Map<String, Object> selectTrsmrcvLogInf(TrsmrcvLog trsmrcvLog) throws Exception;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "목록 조회 흐름에서 로그 목록 조회를 담당한다. 검색 조건과 페이징 범위가 설정된 조회 조건을 받아 목록과 전체 건수를 한 묶음으로 반환하며, 컨트롤러는 이를 풀어 화면과 페이징 정보에 나눠 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+              "line": 52,
+              "snippet": "public Map<String, Object> selectTrsmrcvLogInf(TrsmrcvLog trsmrcvLog) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 85,
+              "snippet": "Map<String, Object> map = trsmrcvLogService.selectTrsmrcvLogInf(trsmrcvLog);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록 조회 결과는 조회된 로그 목록과 전체 건수를 함께 담아 반환하는 것이 규약이며, 컨트롤러는 전체 건수로 페이징을 구성한다. 목록의 범위 산정은 조회 조건에 설정된 시작·종료 위치를 따른다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/EgovTrsmrcvLogService.java",
+              "line": 52,
+              "snippet": "public Map<String, Object> selectTrsmrcvLogInf(TrsmrcvLog trsmrcvLog) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 86,
+              "snippet": "int totCnt = MapUtils.getIntValue(map, \"resultCnt\");"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/log/tlg/SelectTrsmrcvLogList.do:src/main/java/egovframework/com/sym/log/tlg/service/TrsmrcvLog.java",
+      "name": "송수신 로그 조회 조건",
+      "summary": {
+        "text": "목록 조회의 검색 조건과 페이징 범위를 담는 구조로, 페이지 단위·크기와 조회 시작·종료 위치가 설정되어 서비스에 전달된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/TrsmrcvLog.java",
+            "line": 21,
+            "snippet": "public class TrsmrcvLog implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 73,
+            "snippet": "trsmrcvLog.setPageUnit(propertyService.getInt(\"pageUnit\"));"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "목록 조회 흐름에서 검색 조건이자 페이징 조건을 담는 역할을 한다. 환경설정에서 읽은 페이지 단위와 페이지 크기가 설정되고, 페이징 계산 결과로 얻은 시작·종료 위치와 페이지당 건수가 채워진 뒤 서비스 조회에 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 81,
+              "snippet": "trsmrcvLog.setFirstIndex(paginationInfo.getFirstRecordIndex());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 82,
+              "snippet": "trsmrcvLog.setLastIndex(paginationInfo.getLastRecordIndex());"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "요청아이디, 발생일자, 송수신구분코드와 명칭 등 로그 항목에 더해 페이지 번호·페이지 단위·페이지 크기와 조회 시작·종료 위치 같은 페이징 항목을 함께 보유한다. 목록 조회에서는 페이징 항목이 반드시 설정된 상태여야 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/service/TrsmrcvLog.java",
+              "line": 21,
+              "snippet": "public class TrsmrcvLog implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 83,
+              "snippet": "trsmrcvLog.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/log/tlg/SelectTrsmrcvLogList.do:src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+      "name": "송수신 로그 목록 조회 처리",
+      "summary": {
+        "text": "송/수신로그관리 메뉴의 기본 화면 처리로, 페이징 조건을 구성해 로그 목록과 전체 건수를 조회한 뒤 목록 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 69,
+            "snippet": "@RequestMapping(value = \"/sym/log/tlg/SelectTrsmrcvLogList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+            "line": 94,
+            "snippet": "return \"egovframework/com/sym/log/tlg/EgovTrsmrcvLogList\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "목록 조회의 진입점이자 이 도메인의 대표 화면 역할을 한다. 환경설정에서 페이징 값을 읽어 조회 조건을 구성하고 송수신 로그 서비스에 목록 조회를 위임한 뒤, 목록·전체 건수·페이징 정보를 화면 모델에 담아 목록 화면을 표시한다. 상세 조회와 등록 처리도 완료 후 이 화면으로 되돌아온다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 88,
+              "snippet": "model.addAttribute(\"resultList\", map.get(\"resultList\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 92,
+              "snippet": "model.addAttribute(\"paginationInfo\", paginationInfo);"
+            }
+          ]
+        },
+        "request": {
+          "text": "검색 조건 객체를 화면 모델 속성으로 받고 화면 모델을 함께 전달받는다. 입력 검증이나 인증 확인은 수행하지 않으며, 페이지 단위와 페이지 크기는 요청값이 아니라 운영 환경설정에서 읽어 적용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 70,
+              "snippet": "public String selectTrsmrcvLogInf(@ModelAttribute(\"searchVO\") TrsmrcvLog trsmrcvLog, ModelMap model)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/tlg/web/EgovTrsmrcvLogController.java",
+              "line": 74,
+              "snippet": "trsmrcvLog.setPageSize(propertyService.getInt(\"pageSize\"));"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,751 @@
+{
+  "chunkId": "sym.ccm.cde-000",
+  "domainId": "domain:sym.ccm.cde",
+  "domainName": "",
+  "files": [
+    {
+      "className": "EgovMessageSource",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovMessageSource.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이문준          최초 생성\n *   2017.07.21  장동한 \t\t\targs, locale 설정\n *\n * </pre>\n */\n\npublic class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {\n\n\tprivate ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;\n\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @param reloadableResourceBundleMessageSource - resource MessageSource\n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic void setReloadableResourceBundleMessageSource(ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource) {\n\t\tthis.reloadableResourceBundleMessageSource = reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic ReloadableResourceBundleMessageSource getReloadableResourceBundleMessageSource() {\n\t\treturn reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, locale);\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @return String\n\t */\t\n\tpublic String getMessageArgs(String code, Object[] args) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, locale);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "LoginVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/LoginVO.java — java 파일",
+        "tags": []
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 21,
+        "text": " *   2009.03.03     박지욱     최초 생성\n *   2021.05.30     정진오     디지털원패스 사용자키/세션값 추가\n *</pre>\n *\n *  @author 공통서비스 개발팀 박지욱\n *  @since 2009.03.03\n *  @version 1.0\n *  @see\n *\n */\n@Getter\n@Setter\npublic class LoginVO implements Serializable{\n\n\t/**\n\t *\n\t */\n\tprivate static final long serialVersionUID = -8274004534207618049L;\n\n\t/** 아이디 */\n\t@EgovNullCheck\n\tprivate String id;\n\t/** 이름 */\n\t@EgovNullCheck\n\tprivate String name;\n\t/** 주민등록번호 */\n\tprivate String ihidNum;\n\t/** 이메일주소 */\n\t@EgovNullCheck\n\t@EgovEmailCheck\n\tprivate String email;\n\t/** 비밀번호 */\n\tprivate String password;\n\t/** 비밀번호 힌트 */\n\t@EgovNullCheck\n\tprivate String passwordHint;\n\t/** 비밀번호 정답 */\n\t@EgovNullCheck\n\tprivate String passwordCnsr;\n\t/** 사용자구분 */\n\tprivate String userSe;\n\t/** 조직(부서)ID */\n\tprivate String orgnztId;\n\t/** 조직(부서)명 */\n\tprivate String orgnztNm;\n\t/** 고유아이디 */\n\tprivate String uniqId;\n\t/** 로그인 후 이동할 페이지 */\n\tprivate String url;\n\t/** 사용자 IP정보 */\n\tprivate String ip;\n\t/** GPKI인증 DN */\n\tprivate String dn;\n\t/** 디지털원패스 사용자키 */\n\tprivate String onepassUserkey;\n\t/** 디지털원패스 사용자세션값 */\n\tprivate String onepassIntfToken;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "slice": {
+        "endLine": 27,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.service;\n\nimport java.util.List;\n\npublic interface EgovUserDetailsService {\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic Object getAuthenticatedUser();\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t * 예) [ROLE_ADMIN, ROLE_USER, ROLE_A, ROLE_B, ROLE_RESTRICTED, IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED_ANONYMOUSLY]\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic List<String> getAuthorities();\n\t\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\t\n\t */\n\tpublic Boolean isAuthenticated(); \n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovUserDetailsHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "slice": {
+        "endLine": 62,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n *   2009.03.10  sjyoon         최초 생성\n *   2011.07.01\t 서준식          interface 생성후 상세 로직의 분리\n * </pre>\n */\n\npublic class EgovUserDetailsHelper {\n\n\tstatic EgovUserDetailsService egovUserDetailsService;\n\n\tpublic EgovUserDetailsService getEgovUserDetailsService() {\n\t\treturn egovUserDetailsService;\n\t}\n\n\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {\n\t\tEgovUserDetailsHelper.egovUserDetailsService = egovUserDetailsService;\n\t}\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic static Object getAuthenticatedUser() {\n\t\treturn egovUserDetailsService.getAuthenticatedUser();\n\t}\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t *\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic static List<String> getAuthorities() {\n\t\treturn egovUserDetailsService.getAuthorities();\n\t}\n\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\n\t */\n\tpublic static Boolean isAuthenticated() {\n\t\treturn egovUserDetailsService.isAuthenticated();\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "CmmnCodeVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/cca/service/CmmnCodeVO.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cca/service/CmmnCodeVO.java",
+      "slice": {
+        "endLine": 59,
+        "startLine": 15,
+        "text": "*\n* <pre>\n* << 개정이력(Modification Information) >>\n*\n*   수정일      수정자           수정내용\n*  -------    --------    ---------------------------\n*   2009.04.01  이중호          최초 생성\n*\n* </pre>\n*/\n@Getter\n@Setter\npublic class CmmnCodeVO extends CmmnCode implements Serializable {\n\n\tprivate static final long serialVersionUID = -4184057693049713450L;\n\n\t/** 검색조건 */\n    private String searchCondition = \"\";\n\n    /** 검색Keyword */\n    private String searchKeyword = \"\";\n\n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n\n    /** 현재페이지 */\n    private int pageIndex = 1;\n\n    /** 페이지개수 */\n    private int pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private int pageSize = 10;\n\n    /** firstIndex */\n    private int firstIndex = 1;\n\n    /** lastIndex */\n    private int lastIndex = 1;\n\n    /** recordCountPerPage */\n    private int recordCountPerPage = 10;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCcmCmmnCodeManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/cca/service/EgovCcmCmmnCodeManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 23,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cca/service/EgovCcmCmmnCodeManageService.java",
+      "slice": {
+        "endLine": 73,
+        "startLine": 13,
+        "text": "* <pre>\n* << 개정이력(Modification Information) >>\n*\n*   수정일      수정자           수정내용\n*  -------    --------    ---------------------------\n*   2009.04.01  이중호          최초 생성\n*\n* </pre>\n*/\n\npublic interface EgovCcmCmmnCodeManageService {\n\n\t/**\n\t * 공통분류코드 총 개수를 조회한다.\n\t * \n\t * @param searchVO\n\t * @return int(공통분류코드 총 개수)\n\t * @throws Exception \n\t */\n\tint selectCmmnCodeListTotCnt(CmmnCodeVO searchVO) throws Exception;\n\t\n\t/**\n\t * 공통코드 목록을 조회한다.\n\t * \n\t * @param searchVO\n\t * @return List(공통분류코드 목록)\n\t * @throws Exception\n\t */\n\tList<CmmnCodeVO> selectCmmnCodeList(CmmnCodeVO searchVO) throws Exception;\n\n\t/**\n\t * 공통코드 상세항목을 조회한다.\n\t * @param cmmnCode\n\t * @return CmmnCode(공통코드)\n\t * @throws Exception\n\t */\n\tCmmnCodeVO selectCmmnCodeDetail(CmmnCodeVO cmmnCodeVO) throws Exception;\n\n\t/**\n\t * 공통코드를 수정한다.\n\t * @param cmmnCodeVO\n\t * @throws Exception\n\t */\n\tvoid updateCmmnCode(CmmnCodeVO cmmnCodeVO) throws Exception;\n\n\t/**\n\t * 공통코드를 등록한다.\n\t * @param cmmnCode\n\t * @throws Exception\n\t */\n\tvoid insertCmmnCode(CmmnCode cmmnCode) throws Exception;\n\n\t/**\n\t * 공통코드를 삭제한다.\n\t * @param cmmnCode\n\t * @throws Exception\n\t */\n\tvoid deleteCmmnCode(CmmnCode cmmnCode) throws Exception;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "CmmnClCodeVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+      "slice": {
+        "endLine": 59,
+        "startLine": 15,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\npublic class CmmnClCodeVO extends CmmnClCode implements Serializable {\n\n\tprivate static final long serialVersionUID = 442842373959722378L;\n\n\t/** 검색조건 */\n    private String searchCondition = \"\";\n\n    /** 검색Keyword */\n    private String searchKeyword = \"\";\n\n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n\n    /** 현재페이지 */\n    private int pageIndex = 1;\n\n    /** 페이지개수 */\n    private int pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private int pageSize = 10;\n\n    /** firstIndex */\n    private int firstIndex = 1;\n\n    /** lastIndex */\n    private int lastIndex = 1;\n\n    /** recordCountPerPage */\n    private int recordCountPerPage = 10;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCcmCmmnClCodeManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/ccc/service/EgovCcmCmmnClCodeManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 24,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/ccc/service/EgovCcmCmmnClCodeManageService.java",
+      "slice": {
+        "endLine": 72,
+        "startLine": 14,
+        "text": " * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호          최초 생성\n *\n * </pre>\n */\n\n\npublic interface EgovCcmCmmnClCodeManageService {\n\n\t/**\n\t * 공통분류코드 총 개수를 조회한다.\n\t * \n\t * @param searchVO\n\t * @return int(공통분류코드 총 개수)\n\t */\n\tint selectCmmnClCodeListTotCnt(CmmnClCodeVO searchVO) throws Exception;\n\n\t/**\n\t * 공통분류코드 목록을 조회한다.\n\t * @param searchVO\n\t * @return List(공통분류코드 목록)\n\t * @throws Exception\n\t */\n\tList<CmmnClCodeVO> selectCmmnClCodeList(CmmnClCodeVO searchVO) throws Exception;\n\n\t /**\n\t  *  공통분류코드 상세항목을 조회한다.\n\t  * @param cmmnClCode\n\t  * @return CmmnClCode(공통분류코드)\n\t  *  @throws Exception\n\t  */\n\tCmmnClCode selectCmmnClCodeDetail(CmmnClCodeVO cmmnClCodeVO) throws Exception;\n\n\t/**\n\t * 공통분류코드를 등록한다.\n\t * @param cmmnClCodeVO\n\t * @throws Exception\n\t */\n\tvoid insertCmmnClCode(CmmnClCodeVO cmmnClCodeVO) throws Exception;\n\t\n\t/**\n\t * 공통분류코드를 삭제한다.\n\t * @param cmmnClCodeVO\n\t * @throws Exception\n\t */\n\tvoid deleteCmmnClCode(CmmnClCodeVO cmmnClCodeVO) throws Exception;\n\t\n\t/**\n\t * 공통분류코드를 수정한다.\n\t * @param cmmnClCodeVO\n\t * @throws Exception\n\t */\n\tvoid updateCmmnClCode(CmmnClCodeVO cmmnClCodeVO) throws Exception;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "CmmnDetailCodeVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+      "slice": {
+        "endLine": 60,
+        "startLine": 16,
+        "text": "*\n* <pre>\n* << 개정이력(Modification Information) >>\n*\n*   수정일      수정자           수정내용\n*  -------    --------    ---------------------------\n*   2009.04.01  이중호          최초 생성\n*\n* </pre>\n*/\n@Getter\n@Setter\npublic class CmmnDetailCodeVO extends CmmnDetailCode implements Serializable {\n\n\tprivate static final long serialVersionUID = 9137280036724974467L;\n\n\t/** 검색조건 */\n    private String searchCondition = \"\";\n\n    /** 검색Keyword */\n    private String searchKeyword = \"\";\n\n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n\n    /** 현재페이지 */\n    private int pageIndex = 1;\n\n    /** 페이지개수 */\n    private int pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private int pageSize = 10;\n\n    /** firstIndex */\n    private int firstIndex = 1;\n\n    /** lastIndex */\n    private int lastIndex = 1;\n\n    /** recordCountPerPage */\n    private int recordCountPerPage = 10;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCcmCmmnDetailCodeManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+      "slice": {
+        "endLine": 71,
+        "startLine": 15,
+        "text": "* <pre>\n* << 개정이력(Modification Information) >>\n*\n*   수정일      수정자           수정내용\n*  -------    --------    ---------------------------\n*   2009.04.01  이중호          최초 생성\n*\n* </pre>\n*/\n\npublic interface EgovCcmCmmnDetailCodeManageService {\n\t/**\n\t * 공통상세코드 총 개수를 조회한다.\n\t * @param searchVO\n\t * @return int(공통상세코드 총 개수)\n\t */\n\tint selectCmmnDetailCodeListTotCnt(CmmnDetailCodeVO searchVO) throws Exception;\n\t\n\t/**\n\t * 공통상세코드 목록을 조회한다.\n\t * @param searchVO\n\t * @return List(공통상세코드 목록)\n\t * @throws Exception\n\t */\n\tList<CmmnDetailCodeVO> selectCmmnDetailCodeList(CmmnDetailCodeVO searchVO) throws Exception;\n\n\t/**\n\t * 공통상세코드 상세항목을 조회한다.\n\t * @param cmmnDetailCodeVO\n\t * @return CmmnDetailCode(공통상세코드)\n\t * @throws Exception\n\t */\n\tCmmnDetailCode selectCmmnDetailCodeDetail(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;\n\n\t/**\n\t * 공통상세코드를 삭제한다.\n\t * @param cmmnDetailCodeVO\n\t * @throws Exception\n\t */\n\tvoid deleteCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;\n\n\t/**\n\t * 공통상세코드를 등록한다.\n\t * @param cmmnDetailCodeVO\n\t * @throws Exception\n\t */\n\tvoid insertCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;\n\n\t/**\n\t * 공통상세코드를 수정한다.\n\t * @param cmmnDetailCodeVO\n\t * @throws Exception\n\t */\n\tvoid updateCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCcmCmmnDetailCodeManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 194,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "slice": {
+        "endLine": 263,
+        "startLine": 184,
+        "text": "\t/**\n\t * 공통상세코드를 등록한다.\n\t *\n\t * @param CmmnDetailCodeVO\n\t * @param CmmnDetailCodeVO\n\t * @param status\n\t * @param model\n\t * @return\n\t * @throws Exception\n\t */\n\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")\n\tpublic String insertCmmnDetailCode(@Valid @ModelAttribute(\"cmmnDetailCodeVO\") CmmnDetailCodeVO cmmnDetailCodeVO,\n\t\t\tBindingResult bindingResult, ModelMap model) throws Exception {\n\n\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();\n\n\t\tif (bindingResult.hasErrors()) {\n\n\t\t\taddCodeSelectLists(cmmnDetailCodeVO.getClCode(), model);\n\n\t\t\treturn \"egovframework/com/sym/ccm/cde/EgovCcmCmmnDetailCodeRegist\";\n\t\t}\n\n\t\tif (cmmnDetailCodeVO.getCodeId() != null) {\n\n\t\t\tCmmnDetailCode vo = cmmnDetailCodeManageService.selectCmmnDetailCodeDetail(cmmnDetailCodeVO);\n\t\t\tif (vo != null) {\n\t\t\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"comSymCcmCde.validate.codeCheck\"));\n\n\t\t\t\taddCodeSelectLists(cmmnDetailCodeVO.getClCode(), model);\n\n\t\t\t\treturn \"egovframework/com/sym/ccm/cde/EgovCcmCmmnDetailCodeRegist\";\n\t\t\t}\n\t\t}\n\n\t\tcmmnDetailCodeVO.setFrstRegisterId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());\n\t\tcmmnDetailCodeManageService.insertCmmnDetailCode(cmmnDetailCodeVO);\n\n\t\tmodel.addAttribute(\"searchCondition\", cmmnDetailCodeVO.getSearchCondition());\n\t\tmodel.addAttribute(\"searchKeyword\", cmmnDetailCodeVO.getSearchKeyword());\n\t\tmodel.addAttribute(\"pageIndex\", cmmnDetailCodeVO.getPageIndex());\n\n\t\treturn \"redirect:/sym/ccm/cde/SelectCcmCmmnDetailCodeList.do\";\n\t}\n\n\t/**\n\t * 공통상세코드 수정을 위한 수정페이지로 이동한다.\n\t *\n\t * @param cmmnDetailCodeVO\n\t * @param model\n\t * @return \"egovframework/com/sym/ccm/cde/EgovCcmCmmnDetailCodeUpdt\"\n\t * @throws Exception\n\t */\n\t@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do\")\n\tpublic String updateCmmnDetailCodeView(@ModelAttribute(\"loginVO\") LoginVO loginVO,\n\t\t\t@ModelAttribute(\"cmmnDetailCodeVO\") CmmnDetailCodeVO cmmnDetailCodeVO, ModelMap model) throws Exception {\n\n\t\tCmmnDetailCode result = cmmnDetailCodeManageService.selectCmmnDetailCodeDetail(cmmnDetailCodeVO);\n\t\tmodel.addAttribute(\"cmmnDetailCodeVO\", result);\n\n\t\treturn \"egovframework/com/sym/ccm/cde/EgovCcmCmmnDetailCodeUpdt\";\n\t}\n\n\t/**\n\t * 공통상세코드를 수정한다.\n\t *\n\t * @param cmmnDetailCodeVO\n\t * @param model\n\t * @return \"egovframework/com/sym/ccm/cde/EgovCcmCmmnDetailCodeUpdt\",\n\t *         \"/sym/ccm/cde/SelectCcmCmmnDetailCodeList.do\"\n\t * @throws Exception\n\t */\n\t@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCode.do\")\n\tpublic String updateCmmnDetailCode(@Valid @ModelAttribute(\"cmmnDetailCodeVO\") CmmnDetailCodeVO cmmnDetailCodeVO,\n\t\t\tModelMap model, BindingResult bindingResult) throws Exception {\n\n\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();\n\n\t\tif (bindingResult.hasErrors()) {\n\t\t\tCmmnDetailCode result = cmmnDetailCodeManageService.selectCmmnDetailCodeDetail(cmmnDetailCodeVO);",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovCcmCmmnDetailCodeManageController#insertCmmnDetailCode",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do",
+      "line": 194,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "line": 194,
+        "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+        "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+        "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmCmmnDetailCodeManageController#insertCmmnDetailCodeView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do",
+      "line": 155,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "line": 155,
+        "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCodeView.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/cca/service/CmmnCodeVO.java",
+        "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+        "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/ccc/service/EgovCcmCmmnClCodeManageService.java",
+        "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/cca/service/EgovCcmCmmnCodeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmCmmnDetailCodeManageController#deleteCmmnDetailCode",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/cde/RemoveCcmCmmnDetailCode.do",
+      "line": 135,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "line": 135,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/cde/RemoveCcmCmmnDetailCode.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/cde/RemoveCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "step:ANY /sym/ccm/cde/RemoveCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+        "step:ANY /sym/ccm/cde/RemoveCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmCmmnDetailCodeManageController#selectCmmnDetailCodeDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do",
+      "line": 117,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "line": 117,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "step:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmCmmnDetailCodeManageController#selectCmmnDetailCodeList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeList.do",
+      "line": 80,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "line": 80,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeList.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeList.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "step:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeList.do:src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+        "step:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeList.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmCmmnDetailCodeManageController#updateCmmnDetailCode",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do",
+      "line": 256,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "line": 256,
+        "snippet": "@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCode.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+        "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+        "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmCmmnDetailCodeManageController#updateCmmnDetailCodeView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do",
+      "line": 237,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "line": 237,
+        "snippet": "@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "header": {
+    "flowIndex": [
+      {
+        "entryPoint": "EgovCcmCmmnDetailCodeManageController#insertCmmnDetailCode",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "flowId": "flow:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do",
+        "line": 194,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+          "line": 194,
+          "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmCmmnDetailCodeManageController#insertCmmnDetailCodeView",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "flowId": "flow:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do",
+        "line": 155,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+          "line": 155,
+          "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCodeView.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmCmmnDetailCodeManageController#deleteCmmnDetailCode",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "flowId": "flow:ANY /sym/ccm/cde/RemoveCcmCmmnDetailCode.do",
+        "line": 135,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+          "line": 135,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/cde/RemoveCcmCmmnDetailCode.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmCmmnDetailCodeManageController#selectCmmnDetailCodeDetail",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "flowId": "flow:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do",
+        "line": 117,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+          "line": 117,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmCmmnDetailCodeManageController#selectCmmnDetailCodeList",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "flowId": "flow:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeList.do",
+        "line": 80,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+          "line": 80,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeList.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmCmmnDetailCodeManageController#updateCmmnDetailCode",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "flowId": "flow:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do",
+        "line": 256,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+          "line": 256,
+          "snippet": "@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCode.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmCmmnDetailCodeManageController#updateCmmnDetailCodeView",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "flowId": "flow:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do",
+        "line": 237,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+          "line": 237,
+          "snippet": "@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do\")"
+        }
+      }
+    ]
+  },
+  "isHeaderChunk": true,
+  "key": "sym.ccm.cde",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+        "line": 27,
+        "snippet": "public class CmmnClCodeVO extends CmmnClCode implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+        "line": 28,
+        "snippet": "public class CmmnDetailCodeVO extends CmmnDetailCode implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "line": 194,
+        "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cca/service/CmmnCodeVO.java",
+        "line": 27,
+        "snippet": "public class CmmnCodeVO extends CmmnCode implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cca/service/CmmnCodeVO.java",
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/cca/service/CmmnCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cca/service/EgovCcmCmmnCodeManageService.java",
+        "line": 23,
+        "snippet": "public interface EgovCcmCmmnCodeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cca/service/EgovCcmCmmnCodeManageService.java",
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/cca/service/EgovCcmCmmnCodeManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+        "line": 27,
+        "snippet": "public class CmmnClCodeVO extends CmmnClCode implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/EgovCcmCmmnClCodeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCcmCmmnClCodeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/ccc/service/EgovCcmCmmnClCodeManageService.java",
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/ccc/service/EgovCcmCmmnClCodeManageService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "line": 194,
+        "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+        "line": 28,
+        "snippet": "public class CmmnDetailCodeVO extends CmmnDetailCode implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+      "stepId": "step:ANY /sym/ccm/cde/RemoveCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+      "stepId": "step:ANY /sym/ccm/cde/RemoveCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "line": 194,
+        "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/cde/RemoveCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+      "stepId": "step:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "line": 194,
+        "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+        "line": 28,
+        "snippet": "public class CmmnDetailCodeVO extends CmmnDetailCode implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+      "stepId": "step:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeList.do:src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+      "stepId": "step:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeList.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "line": 194,
+        "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeList.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+        "line": 28,
+        "snippet": "public class CmmnDetailCodeVO extends CmmnDetailCode implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "line": 194,
+        "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+        "line": 194,
+        "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java"
+    }
+  ]
+}

@@ -1,0 +1,412 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "n_start",
+          "to": "n_list"
+        },
+        {
+          "from": "n_list",
+          "to": "n_detail"
+        },
+        {
+          "from": "n_detail",
+          "to": "n_view"
+        },
+        {
+          "from": "n_view",
+          "to": "n_end"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "n_start",
+          "kind": "start",
+          "label": "로그 조회 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+              "line": 58,
+              "snippet": "@RequestMapping(value = \"/sym/log/lgm/SelectSysLogList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/log/lgm/SelectSysLogList.do",
+          "id": "n_list",
+          "kind": "activity",
+          "label": "시스템 로그 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+              "line": 97,
+              "snippet": "@RequestMapping(value = \"/sym/log/lgm/SelectSysLogDetail.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/log/lgm/SelectSysLogDetail.do",
+          "id": "n_detail",
+          "kind": "activity",
+          "label": "요청 아이디로 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+              "line": 105,
+              "snippet": "return \"egovframework/com/sym/log/lgm/EgovSysLogDetail\";"
+            }
+          ],
+          "id": "n_view",
+          "kind": "activity",
+          "label": "상세 내용 화면 표시"
+        },
+        {
+          "id": "n_end",
+          "kind": "end",
+          "label": "조회 종료"
+        }
+      ],
+      "title": "시스템 로그 조회"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+          "line": 101,
+          "snippet": "sysLog.setRequstId(requstId.trim());"
+        }
+      ],
+      "text": "로그 상세 조회는 요청 아이디를 반드시 입력받으며, 앞뒤 공백을 제거한 값을 조회 기준으로 삼는다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+          "line": 97,
+          "snippet": "@RequestMapping(value = \"/sym/log/lgm/SelectSysLogDetail.do\")"
+        }
+      ],
+      "text": "로그 조회 업무는 목록 조회와 상세 조회로 나뉘며, 각각 별도의 업무 창구로 제공된다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java",
+          "line": 29,
+          "snippet": "public void logInsertSysLog(SysLog sysLog) throws Exception;"
+        }
+      ],
+      "text": "로그 생성 기능은 다른 업무 영역이 남긴 실행 이력을 받아 적재하는 창구 역할을 하므로, 시스템 전반의 업무 처리와 맞물려 동작한다."
+    }
+  ],
+  "domainId": "domain:sym.log.lgm",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java",
+          "line": 25,
+          "snippet": "public class SysLog implements Serializable{"
+        }
+      ],
+      "text": "시스템 로그: 오류 정보, 기관, 업무 구분, 처리 시간, 요청자 등 운영 이력 항목을 담는 핵심 업무 자료이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java",
+          "line": 90,
+          "snippet": "private String requstId = \"\";"
+        }
+      ],
+      "text": "요청 아이디: 개별 로그 한 건을 식별하는 열쇠 항목으로, 상세 조회의 기준값이 된다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /sym/log/lgm/SelectSysLogDetail.do",
+      "name": "시스템 로그 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(value = \"/sym/log/lgm/SelectSysLogDetail.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+            "line": 103,
+            "snippet": "SysLog vo = sysLogService.selectSysLog(sysLog);"
+          }
+        ],
+        "text": "담당자가 선택한 요청 아이디에 해당하는 시스템 로그 한 건을 찾아 상세 내용을 화면에 보여주는 업무 흐름이다. 입력받은 요청 아이디의 공백을 제거해 조회 기준으로 삼고, 조회 결과를 상세 화면으로 전달한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/log/lgm/SelectSysLogList.do",
+      "name": "시스템 로그 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+            "line": 58,
+            "snippet": "@RequestMapping(value = \"/sym/log/lgm/SelectSysLogList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java",
+            "line": 43,
+            "snippet": "public Map<String, Object> selectSysLogInf(SysLog sysLog) throws Exception;"
+          }
+        ],
+        "text": "담당자가 검색 조건에 맞는 시스템 로그 목록을 조회하는 업무 흐름이다. 조회 조건을 담은 자료를 서비스에 넘겨 목록과 전체 건수를 받아 화면 목록으로 제공한다."
+      }
+    }
+  ],
+  "name": "시스템 로그 관리",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java",
+              "line": 52,
+              "snippet": "public SysLog selectSysLog(SysLog sysLog) throws Exception;"
+            }
+          ],
+          "text": "상세 조회는 조회 조건 자료를 받아 시스템 로그 한 건을 반환한다. 처리 도중 오류가 나면 예외로 상위에 알리며, 별도의 계산 규칙 없이 조회 결과를 그대로 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java",
+              "line": 22,
+              "snippet": "public interface EgovSysLogService {"
+            }
+          ],
+          "text": "이 흐름에서 시스템 로그 서비스는 화면 창구로부터 조회 조건을 넘겨받아 로그 한 건을 찾아 돌려주는 업무 조율 역할을 맡는다. 로그 생성·요약·목록 조회·상세 조회를 한데 묶은 업무 계약을 정의한다."
+        }
+      },
+      "name": "시스템 로그 서비스 - 상세 조회 위임",
+      "stepId": "step:ANY /sym/log/lgm/SelectSysLogDetail.do:src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java",
+            "line": 22,
+            "snippet": "public interface EgovSysLogService {"
+          }
+        ],
+        "text": "시스템 로그 업무의 서비스 창구로서, 요청 아이디 기준의 로그 한 건 조회 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java",
+              "line": 90,
+              "snippet": "private String requstId = \"\";"
+            }
+          ],
+          "text": "요청 아이디를 식별 항목으로 두고, 오류 코드·오류 구분·기관 코드·업무 구분 코드·처리 시간 등 운영 이력 항목을 함께 보유한다. 문자 항목은 빈 값으로, 횟수 항목은 0으로 초기화되어 값이 없어도 비어 있지 않은 상태를 유지한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java",
+              "line": 25,
+              "snippet": "public class SysLog implements Serializable{"
+            }
+          ],
+          "text": "이 흐름에서 시스템 로그 자료는 화면에서 넘어온 요청 아이디를 실어 나르는 조회 조건 그릇이자, 조회된 로그 한 건의 내용을 담아 화면으로 되돌리는 전달 수단 역할을 한다."
+        }
+      },
+      "name": "시스템 로그 자료 - 상세 조회 기준",
+      "stepId": "step:ANY /sym/log/lgm/SelectSysLogDetail.do:src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java",
+            "line": 25,
+            "snippet": "public class SysLog implements Serializable{"
+          }
+        ],
+        "text": "상세 조회의 조회 조건이자 결과를 담는 업무 자료로, 요청 아이디를 비롯한 로그 항목을 보유한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+              "line": 98,
+              "snippet": "public String selectSysLog(@ModelAttribute(\"searchVO\") SysLog sysLog, @RequestParam(\"requstId\") String requstId,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+              "line": 101,
+              "snippet": "sysLog.setRequstId(requstId.trim());"
+            }
+          ],
+          "text": "검색 조건 자료와 함께 요청 아이디를 필수 요청 항목으로 받는다. 받은 요청 아이디는 앞뒤 공백을 제거해 조회 기준으로 설정하며, 별도의 인증·권한 검사 코드는 이 창구에 두지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+              "line": 103,
+              "snippet": "SysLog vo = sysLogService.selectSysLog(sysLog);"
+            }
+          ],
+          "text": "이 흐름에서 상세 조회 창구는 담당자의 상세 보기 요청을 받아 조회 조건을 정리하고 시스템 로그 서비스에 조회를 위임한다. 서비스가 돌려준 로그 한 건을 화면 자료로 담아 상세 화면으로 넘기는 역할까지 맡는다."
+        }
+      },
+      "name": "시스템 로그 상세 조회 창구",
+      "stepId": "step:ANY /sym/log/lgm/SelectSysLogDetail.do:src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(value = \"/sym/log/lgm/SelectSysLogDetail.do\")"
+          }
+        ],
+        "text": "상세 조회 요청을 받아 요청 아이디를 정리한 뒤 서비스에 조회를 맡기고, 결과를 상세 화면으로 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java",
+              "line": 43,
+              "snippet": "public Map<String, Object> selectSysLogInf(SysLog sysLog) throws Exception;"
+            }
+          ],
+          "text": "목록 조회는 조회 조건 자료를 받아 목록과 건수를 담은 결과 묶음을 반환한다. 처리 중 오류는 예외로 상위에 전달되며, 목록 산출 규칙 자체는 구현체와 매퍼 쪽에 위임되어 있다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java",
+              "line": 39,
+              "snippet": "* 시스템 로그정보 목록을 조회한다."
+            }
+          ],
+          "text": "이 흐름에서 시스템 로그 서비스는 화면 창구가 넘긴 검색·페이지 조건을 받아 로그 목록 조회 업무를 조율한다. 목록과 전체 건수를 한 묶음으로 돌려주어 화면이 목록과 쪽 나눔을 함께 구성할 수 있게 한다."
+        }
+      },
+      "name": "시스템 로그 서비스 - 목록 조회 위임",
+      "stepId": "step:ANY /sym/log/lgm/SelectSysLogList.do:src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java",
+            "line": 22,
+            "snippet": "public interface EgovSysLogService {"
+          }
+        ],
+        "text": "시스템 로그 업무의 서비스 창구로서, 검색 조건에 맞는 로그 목록과 건수를 제공하는 기능을 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java",
+              "line": 28,
+              "snippet": "private static final long serialVersionUID = 540569951549295059L;"
+            }
+          ],
+          "text": "오류 횟수·처리 횟수 같은 수치 항목은 0으로, 오류 코드·기관 코드·업무 구분 코드·발생 일자 등 문자 항목은 빈 값으로 초기화되어 있어 조회 조건이 지정되지 않아도 안전한 기본 상태를 유지한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java",
+              "line": 25,
+              "snippet": "public class SysLog implements Serializable{"
+            }
+          ],
+          "text": "이 흐름에서 시스템 로그 자료는 담당자가 입력한 검색 조건과 쪽 나눔 조건을 실어 서비스로 전달하는 조회 조건 그릇 역할을 한다. 조회된 목록 각 행의 항목 구성도 이 자료의 형태를 따른다."
+        }
+      },
+      "name": "시스템 로그 자료 - 목록 검색 조건",
+      "stepId": "step:ANY /sym/log/lgm/SelectSysLogList.do:src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java",
+            "line": 25,
+            "snippet": "public class SysLog implements Serializable{"
+          }
+        ],
+        "text": "목록 조회의 검색 조건과 쪽 나눔 조건을 담는 업무 자료이며, 조회 결과 항목의 형태도 함께 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+              "line": 97,
+              "snippet": "@RequestMapping(value = \"/sym/log/lgm/SelectSysLogDetail.do\")"
+            }
+          ],
+          "text": "검색 조건 자료를 화면 자료로 받아 처리하며, 요청 아이디 같은 필수 개별 항목은 요구하지 않는다. 이 창구 자체에는 별도의 인증·권한 검사 코드가 없고, 상세 조회 창구와 같은 컨트롤러에서 함께 제공된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+              "line": 58,
+              "snippet": "@RequestMapping(value = \"/sym/log/lgm/SelectSysLogList.do\")"
+            }
+          ],
+          "text": "이 흐름에서 목록 조회 창구는 담당자의 로그 목록 요청을 받아 검색 조건과 쪽 나눔 조건을 정리한 뒤 시스템 로그 서비스에 목록 조회를 위임한다. 받은 목록과 전체 건수를 화면 자료로 담아 목록 화면으로 넘긴다."
+        }
+      },
+      "name": "시스템 로그 목록 조회 창구",
+      "stepId": "step:ANY /sym/log/lgm/SelectSysLogList.do:src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+            "line": 58,
+            "snippet": "@RequestMapping(value = \"/sym/log/lgm/SelectSysLogList.do\")"
+          }
+        ],
+        "text": "목록 조회 요청을 받아 검색·쪽 나눔 조건을 구성하고 서비스에 조회를 맡긴 뒤 목록 화면으로 전달한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java",
+        "line": 22,
+        "snippet": "public interface EgovSysLogService {"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+        "line": 58,
+        "snippet": "@RequestMapping(value = \"/sym/log/lgm/SelectSysLogList.do\")"
+      }
+    ],
+    "text": "시스템 운영 중 발생한 로그 정보를 보관하고, 담당자가 로그 목록과 개별 로그의 상세 내용을 조회할 수 있게 하는 업무 영역이다. 로그 생성·요약·목록 조회·상세 조회의 네 가지 업무 기능을 하나의 서비스 창구로 제공한다."
+  }
+}

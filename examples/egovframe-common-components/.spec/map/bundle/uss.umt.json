@@ -1,0 +1,2377 @@
+{
+  "domainId": "domain:uss.umt",
+  "files": [
+    {
+      "className": "ComDefaultCodeVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "slice": {
+        "endLine": 58,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------       --------    ---------------------------\n *   2009.3.11   이삼섭          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class ComDefaultCodeVO implements Serializable {\n    /** 코드 ID */\n    private String codeId = \"\";\n\n    /** 상세코드 */\n    private String code = \"\";\n\n    /** 코드명 */\n    private String codeNm = \"\";\n\n    /** 코드설명 */\n    private String codeDc = \"\";\n\n    /** 특정테이블명 */\n    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용\n\n    /** 상세 조건 여부 */\n    private String haveDetailCondition = \"N\";\n\n    /** 상세 조건 */\n    private String detailCondition = \"\";\n\n    /**\n     * toString 메소드를 대치한다.\n     */\n    public String toString() {\n    \treturn ToStringBuilder.reflectionToString(this);\n    }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovMessageSource",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovMessageSource.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이문준          최초 생성\n *   2017.07.21  장동한 \t\t\targs, locale 설정\n *\n * </pre>\n */\n\npublic class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {\n\n\tprivate ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;\n\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @param reloadableResourceBundleMessageSource - resource MessageSource\n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic void setReloadableResourceBundleMessageSource(ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource) {\n\t\tthis.reloadableResourceBundleMessageSource = reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic ReloadableResourceBundleMessageSource getReloadableResourceBundleMessageSource() {\n\t\treturn reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, locale);\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @return String\n\t */\t\n\tpublic String getMessageArgs(String code, Object[] args) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, locale);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovWebUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovWebUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "slice": {
+        "endLine": 94,
+        "startLine": 15,
+        "text": " *\t2017-02-07   이정은      시큐어코딩(ES) - 시큐어코딩 경로 조작 및 자원 삽입[CWE-22, CWE-23, CWE-95, CWE-99]\n *  2018.08.17   신용호      filePathBlackList 수정\n *  2018.10.10   신용호      . => \\\\.으로 수정\n *  2022.05.10   정진오      clearXSS() 메소드 추가\n *  2022.06.09   김장하      NSR 보안조치 (removeOSCmdRisk 함수에 윈도우 다중 명령 실행 키워드 추가)\n *  2023.08.10   신용호      removeLDAPInjectionRisk() 오류 수정\n *  2024.12.04   신용호      filePathBlackList() basePath 추가\n * </pre>\n */\n\npublic class EgovWebUtil {\n\tpublic static String clearXSSMinimum(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\"\", \"&#34;\");\n\t\treturnValue = returnValue.replaceAll(\"\\'\", \"&#39;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSSMaximum(String value) {\n\t\tString returnValue = value;\n\t\treturnValue = clearXSSMinimum(returnValue);\n\n\t\treturnValue = returnValue.replace(\"%00\", \"\");\n\n\t\treturnValue = returnValue.replaceAll(\"%\", \"&#37;\");\n\n\t\t// \\\\. => .\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\\\\\\\\\", \"\"); // ..\\\n\t\treturnValue = returnValue.replaceAll(\"\\\\./\", \"\"); // ./\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSS(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3C\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3E\", \"&gt;\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String filePathBlackList(String value) {\n\t\tString returnValue = value;\n\t\tif (returnValue == null || returnValue.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\t/**\n\t * 파일경로 보안취약점 조치\n\t * # 주의사항\n\t * 1. basePath는 반드시 지정해야 한다.\n\t * 2. basePath는 ROOT Path \"/\" 사용 금지 한다.",
+        "truncated": true
+      }
+    },
+    {
+      "className": "LoginVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/LoginVO.java — java 파일",
+        "tags": []
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 21,
+        "text": " *   2009.03.03     박지욱     최초 생성\n *   2021.05.30     정진오     디지털원패스 사용자키/세션값 추가\n *</pre>\n *\n *  @author 공통서비스 개발팀 박지욱\n *  @since 2009.03.03\n *  @version 1.0\n *  @see\n *\n */\n@Getter\n@Setter\npublic class LoginVO implements Serializable{\n\n\t/**\n\t *\n\t */\n\tprivate static final long serialVersionUID = -8274004534207618049L;\n\n\t/** 아이디 */\n\t@EgovNullCheck\n\tprivate String id;\n\t/** 이름 */\n\t@EgovNullCheck\n\tprivate String name;\n\t/** 주민등록번호 */\n\tprivate String ihidNum;\n\t/** 이메일주소 */\n\t@EgovNullCheck\n\t@EgovEmailCheck\n\tprivate String email;\n\t/** 비밀번호 */\n\tprivate String password;\n\t/** 비밀번호 힌트 */\n\t@EgovNullCheck\n\tprivate String passwordHint;\n\t/** 비밀번호 정답 */\n\t@EgovNullCheck\n\tprivate String passwordCnsr;\n\t/** 사용자구분 */\n\tprivate String userSe;\n\t/** 조직(부서)ID */\n\tprivate String orgnztId;\n\t/** 조직(부서)명 */\n\tprivate String orgnztNm;\n\t/** 고유아이디 */\n\tprivate String uniqId;\n\t/** 로그인 후 이동할 페이지 */\n\tprivate String url;\n\t/** 사용자 IP정보 */\n\tprivate String ip;\n\t/** GPKI인증 DN */\n\tprivate String dn;\n\t/** 디지털원패스 사용자키 */\n\tprivate String onepassUserkey;\n\t/** 디지털원패스 사용자세션값 */\n\tprivate String onepassIntfToken;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCmmUseService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "slice": {
+        "endLine": 60,
+        "startLine": 16,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이삼섭          최초 생성\n *   2025.07.16  이백행          2025년 컨트리뷰션 `throws Exception` 제거\n *\n *      </pre>\n */\npublic interface EgovCmmUseService {\n\n\t/**\n\t * 공통코드를 조회한다.\n\t *\n\t * @param comDefaultCodeVO\n\t * @return List(코드)\n\t */\n\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * ComDefaultCodeVO의 리스트를 받아서 여러개의 코드 리스트를 맵에 담아서 리턴한다.\n\t *\n\t * @param comDefaultCodeVOs\n\t * @return Map(코드)\n\t */\n\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);\n\n\t/**\n\t * 조직정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 조직정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * 그룹정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 그룹정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "slice": {
+        "endLine": 27,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.service;\n\nimport java.util.List;\n\npublic interface EgovUserDetailsService {\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic Object getAuthenticatedUser();\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t * 예) [ROLE_ADMIN, ROLE_USER, ROLE_A, ROLE_B, ROLE_RESTRICTED, IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED_ANONYMOUSLY]\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic List<String> getAuthorities();\n\t\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\t\n\t */\n\tpublic Boolean isAuthenticated(); \n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovUmtAuthorizationHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 11,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+      "slice": {
+        "endLine": 38,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.util;\n\nimport java.util.List;\n\nimport egovframework.com.cmm.LoginVO;\nimport egovframework.com.utl.fcc.service.EgovStringUtil;\n\n/**\n * 사용자관리(UMT) 수정 권한 Helper\n */\npublic final class EgovUmtAuthorizationHelper {\n\n\tprivate EgovUmtAuthorizationHelper() {\n\t}\n\n\tpublic static String getLoginUniqId() {\n\t\tLoginVO loginUser = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();\n\t\treturn loginUser == null ? \"\" : EgovStringUtil.isNullToString(loginUser.getUniqId());\n\t}\n\n\tpublic static boolean isAdmin() {\n\t\tList<String> authorities = EgovUserDetailsHelper.getAuthorities();\n\t\treturn authorities != null && authorities.contains(\"ROLE_ADMIN\");\n\t}\n\n\tpublic static boolean isSelfTarget(String targetUniqId) {\n\t\tString loginUniqId = getLoginUniqId();\n\t\treturn !loginUniqId.isEmpty()\n\t\t\t\t&& targetUniqId != null\n\t\t\t\t&& loginUniqId.equals(targetUniqId);\n\t}\n\n\t/** 관리자이거나 수정 대상이 본인인 경우 true */\n\tpublic static boolean canModifyUser(String targetUniqId) {\n\t\treturn isAdmin() || isSelfTarget(targetUniqId);\n\t}\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovUserDetailsHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "slice": {
+        "endLine": 62,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n *   2009.03.10  sjyoon         최초 생성\n *   2011.07.01\t 서준식          interface 생성후 상세 로직의 분리\n * </pre>\n */\n\npublic class EgovUserDetailsHelper {\n\n\tstatic EgovUserDetailsService egovUserDetailsService;\n\n\tpublic EgovUserDetailsService getEgovUserDetailsService() {\n\t\treturn egovUserDetailsService;\n\t}\n\n\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {\n\t\tEgovUserDetailsHelper.egovUserDetailsService = egovUserDetailsService;\n\t}\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic static Object getAuthenticatedUser() {\n\t\treturn egovUserDetailsService.getAuthenticatedUser();\n\t}\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t *\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic static List<String> getAuthorities() {\n\t\treturn egovUserDetailsService.getAuthorities();\n\t}\n\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\n\t */\n\tpublic static Boolean isAuthenticated() {\n\t\treturn egovUserDetailsService.isAuthenticated();\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovComUtlController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java — java 파일",
+        "tags": []
+      },
+      "line": 40,
+      "relPath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+      "slice": {
+        "endLine": 109,
+        "startLine": 30,
+        "text": " *   2022.11.11  김혜준      시큐어코딩 처리\n *   2023.05.23  신용호      moveToPage() 추가 보완 조치\n *   2024.07.08  신용호      decryptId(), encryptId() 추가\n *\n *  @author 공통서비스 개발팀 조재영\n *  @since 2009.03.02\n *  @version 1.0\n *  @see\n *\n */\n@Controller\npublic class EgovComUtlController {\n\n    //@Resource(name = \"egovUserManageService\")\n    //private EgovUserManageService egovUserManageService;\n\tprivate static final Logger LOGGER = LoggerFactory.getLogger(EgovComUtlController.class);\n\tprivate static final String ERROR_VIEW = \"egovframework/com/cmm/error/egovError\";\n\n\t/** 암호화서비스 */\n\tprivate static EgovEnvCryptoService cryptoService;\n\n\n\t@Resource(name = \"egovPageLinkWhitelist\")\n    protected List<String> egovWhitelist;\n\n    /** EgovPropertyService */\n    @Resource(name = \"propertiesService\")\n    protected EgovPropertyService propertiesService;\n\n\t@Resource(name = \"egovEnvCryptoService\")\n\tpublic void setEgovEnvCryptoService(EgovEnvCryptoService cryptoService) {\n\t\tthis.cryptoService = cryptoService;\n\t}\n\n\n    /**\n\t * JSP 호출작업만 처리하는 공통 함수\n\t */\n\t@RequestMapping(value = \"/EgovPageLink.do\")\n\tpublic String moveToPage(@RequestParam(value = \"linkIndex\",required=true,defaultValue=\"0\") Integer linkIndex){\n\n\t\tString link = \"\";\n\t\t// 화이트 리스트가 비었는지 확인\n\t\tif (egovWhitelist == null || egovWhitelist.isEmpty()) {\n\t\t\tlink=ERROR_VIEW;\n\t\t\treturn link;\n\t\t}\n\n\t\tif (linkIndex == null || linkIndex < 0 || egovWhitelist.size() <= linkIndex) {\n\t\t\tlink=ERROR_VIEW;\n\t\t\treturn link;\n\t\t}\n\n\t\tlink = egovWhitelist.get(linkIndex);\n\n\t\tlink = link.replace(\";\", \"\");\n\t\tlink = link.replace(\"%\", \"\");\n\t\tlink = link.replace(\".\", \"\");\n\n\t\t// 안전한 경로 문자열로 조치\n\t\tlink = EgovWebUtil.filePathBlackList(link);\n\n\t\treturn link;\n\t}\n\n    /**\n\t * 모달조회\n\t * @return String\n\t * @exception Exception\n\t */\n    @RequestMapping(value = \"/EgovModal.do\")\n    public String selectUtlJsonInquire()  throws Exception {\n        return \"egovframework/com/cmm/EgovModal\";\n    }\n\n    /**\n\t * validato rule dynamic Javascript\n\t */\n\t@RequestMapping(\"/validator.do\")\n\tpublic String validate(){",
+        "truncated": true
+      }
+    },
+    {
+      "className": "DeptManageVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/DeptManageVO.java — java 파일",
+        "tags": []
+      },
+      "line": 7,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/DeptManageVO.java",
+      "slice": {
+        "endLine": 17,
+        "startLine": 1,
+        "text": "package egovframework.com.uss.umt.service;\n\nimport egovframework.com.cmm.ComDefaultVO;\nimport lombok.Getter;\nimport lombok.Setter;\n\n@Getter\n@Setter\npublic class DeptManageVO extends ComDefaultVO {\n\n\tprivate static final long serialVersionUID = 1L;\n\tprivate String orgnztId;\n\tprivate String orgnztNm;\n\tprivate String orgnztDc;\n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovDeptManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java",
+      "slice": {
+        "endLine": 58,
+        "startLine": 1,
+        "text": "package egovframework.com.uss.umt.service;\n\nimport java.util.List;\n\npublic interface EgovDeptManageService {\n\n\t/**\n\t * 부서를 관리하기 위해 등록된 부서목록을 조회한다.\n\t * @param deptManageVO - 부서 Vo\n\t * @return List - 부서 목록\n\t * \n\t * @param deptManageVO\n\t */\n\tpublic List<DeptManageVO> selectDeptManageList(DeptManageVO deptManageVO) throws Exception;\n\n\t/**\n\t * 부서목록 총 개수를 조회한다.\n\t * @param deptManageVO - 부서 Vo\n\t * @return int - 부서 카운트 수\n\t * \n\t * @param deptManageVO\n\t */\n\tpublic int selectDeptManageListTotCnt(DeptManageVO deptManageVO) throws Exception;\n\t\n\t/**\n\t * 등록된 부서의 상세정보를 조회한다.\n\t * @param deptManageVO - 부서 Vo\n\t * @return deptManageVO - 부서 Vo\n\t * \n\t * @param deptManageVO\n\t */\n\tpublic DeptManageVO selectDeptManage(DeptManageVO deptManageVO) throws Exception;\n\n\t/**\n\t * 부서정보를 신규로 등록한다.\n\t * @param deptManageVO - 부서 model\n\t * \n\t * @param deptManageVO\n\t */\n\tpublic void insertDeptManage(DeptManageVO deptManageVO) throws Exception;\n\n\t/**\n\t * 기 등록된 부서정보를 수정한다.\n\t * @param deptManageVO - 부서 model\n\t * \n\t * @param deptManageVO\n\t */\n\tpublic void updateDeptManage(DeptManageVO deptManageVO) throws Exception;\n\n\t/**\n\t * 기 등록된 부서정보를 삭제한다.\n\t * @param deptManageVO - 부서 model\n\t * \n\t * @param deptManageVO\n\t */\n\tpublic void deleteDeptManage(DeptManageVO deptManageVO) throws Exception;\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovEmplyrManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 23,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "slice": {
+        "endLine": 92,
+        "startLine": 13,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.10  조재영          최초 생성\n *   2017.07.21  장동한 \t\t\t로그인인증제한 작업\n *\n * </pre>\n */\npublic interface EgovEmplyrManageService  {\n\n\t/**\n\t * 입력한 사용자아이디의 중복여부를 체크하여 사용가능여부를 확인\n\t * @param checkId 중복여부 확인대상 아이디\n\t * @return 사용가능여부(아이디 사용회수 int)\n\t * @throws Exception\n\t */\n\tpublic int checkIdDplct(String checkId) throws Exception;\n\n\t/**\n\t * 화면에 조회된 사용자의 정보를 데이터베이스에서 삭제\n\t * @param checkedIdForDel 삭제대상 업무사용자아이디\n\t * @throws Exception\n\t */\n\tpublic void deleteEmplyr(String checkedIdForDel) throws Exception;\n\n\t/**\n\t * @param userManageVO 업무사용자 등록정보\n\t * @return result 등록결과\n\t * @throws Exception\n\t */\n\tpublic String insertEmplyr(EmplyrManageVO emplyrManageVO) throws Exception;\n\n\t/**\n\t * 기 등록된 사용자 중 검색조건에 맞는 사용자의 정보를 데이터베이스에서 읽어와 화면에 출력\n\t * @param emplyrId 상세조회대상 업무사용자 아이디\n\t * @return userManageVO 업무사용자 상세정보\n\t * @throws Exception\n\t */\n\tpublic EmplyrManageVO selectEmplyr(String emplyrId) throws Exception;\n\n\t/**\n\t * 기 등록된 특정 사용자의 정보를 데이터베이스에서 읽어와 화면에 출력\n\t * @param userSearchVO 검색조건\n\t * @return List<UserManageVO> 업무사용자 목록정보\n\t * @throws Exception\n\t */\n\tpublic List<EgovMap> selectEmplyrList(UserDefaultVO userSearchVO) throws Exception;\n\n\t/**\n\t * 기 등록된 특정 사용자목록의 전체수를 확인\n\t * @param userSearchVO 검색조건\n\t * @return 총사용자개수(int)\n\t * @throws Exception\n\t */\n\tpublic int selectEmplyrListTotCnt(UserDefaultVO userSearchVO) throws Exception;\n\n\t/**\n\t * 화면에 조회된 사용자의 기본정보를 수정하여 항목의 정합성을 체크하고 수정된 데이터를 데이터베이스에 반영\n\t * @param userManageVO 업무사용자 수정정보\n\t * @throws Exception\n\t */\n\tpublic void updateEmplyr(EmplyrManageVO emplyrManageVO) throws Exception;\n\n\t/**\n\t * 사용자정보 수정시 히스토리 정보를 추가\n\t * @param userManageVO 업무사용자 수정정보\n\t * @return result 등록결과\n\t * @throws Exception\n\t */\n\tpublic String insertEmplyrHistory(EmplyrManageVO emplyrManageVO) throws Exception;\n\n\t/**\n\t * 업무사용자 암호 수정\n\t * @param emplyrPasswordManageVO 업무사용자 비밀번호 수정정보\n\t * @throws Exception\n\t */\n\tpublic void updatePassword(EmplyrPasswordManageVO emplyrPasswordManageVO) throws Exception;\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovEntrprsManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 22,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "slice": {
+        "endLine": 91,
+        "startLine": 12,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.10  조재영          최초 생성\n *   2017.07.21  장동한 \t\t\t로그인인증제한 작업\n *\n * </pre>\n */\npublic interface EgovEntrprsManageService {\n\n\t/**\n\t * 기업회원의 기본정보를 화면에서 입력하여 항목의 정합성을 체크하고 데이터베이스에 저장\n\t * @param entrprsManageVO 기업회원등록정보\n\t * @return result 등록결과\n\t * @throws Exception\n\t */\n\tpublic String insertEntrprsmber(EntrprsManageVO entrprsManageVO) throws Exception;\n\n\t/**\n\t * 기 등록된 사용자 중 검색조건에 맞는기업회원의 정보를 데이터베이스에서 읽어와 화면에 출력\n\t * @param entrprsmberId 조회대상 기업회원아이디\n\t * @return entrprsManageVO 기업회원정보\n\t * @throws Exception\n\t */\n\tpublic EntrprsManageVO selectEntrprsmber(String entrprsmberId) throws Exception;\n\n\t/**\n\t * 화면에 조회된 기업회원의 기본정보를 수정하여 항목의 정합성을 체크하고 수정된 데이터를 데이터베이스에 반영\n\t * @param entrprsManageVO 기업회원수정정보\n\t * @throws Exception\n\t */\n\tpublic void updateEntrprsmber(EntrprsManageVO entrprsManageVO) throws Exception;\n\n\t/**\n\t * 화면에 조회된 기업회원의 정보를 데이터베이스에서 삭제\n\t * @param checkedIdForDel 삭제대상기업회원아이디\n\t * @throws Exception\n\t */\n\tpublic void deleteEntrprsmber(String checkedIdForDel) throws Exception;\n\n\t/**\n\t * 기업회원용 약관정보 조회\n\t * @param stplatId 기업회원약관아이디\n\t * @return stplatList 기업회원약관정보\n\t * @throws Exception\n\t */\n\tpublic List<StplatVO> selectStplat(String stplatId) throws Exception;\n\n\t/**\n\t * 기업회원암호수정\n\t * @param entrprsManageVO 기업회원수정정보(비밀번호)\n\t * @throws Exception\n\t */\n\tpublic void updatePassword(EntrprsPasswordManageVO entrprsPasswordManageVO) throws Exception;\n\n\t/**\n\t * 기업회원이 비밀번호를 기억하지 못할 때 비밀번호를 찾을 수 있도록 함\n\t * @param passVO 기업회원암호 조회조건정보\n\t * @return entrprsManageVO 기업회원암호정보\n\t * @throws Exception\n\t */\n\tpublic EntrprsPasswordManageVO selectPassword(EntrprsPasswordManageVO passVO) throws Exception;\n\n\t/**\n\t * 기 등록된기업 회원 중 검색조건에 맞는 회원들의 정보를 데이터베이스에서 읽어와 화면에 출력\n\t * @param userSearchVO 검색조건\n\t * @return List<EntrprsManageVO> 기업회원목록정보\n\t * @throws Exception\n\t */\n\tpublic List<EntrprsManageVO> selectEntrprsMberList(UserDefaultVO userSearchVO) throws Exception;\n\n    /**\n     * 기업회원 총 개수를 조회한다.\n     * @param userSearchVO 검색조건\n     * @return 사용자 총 개수(int)\n     * @throws Exception\n     */\n    public int selectEntrprsMberListTotCnt(UserDefaultVO userSearchVO) throws Exception;",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovMberManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 22,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "slice": {
+        "endLine": 91,
+        "startLine": 12,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.10  조재영          최초 생성\n *   2017.07.21  장동한 \t\t\t로그인인증제한 작업\n *\n * </pre>\n */\npublic interface EgovMberManageService {\n\n\t/**\n\t * 사용자의 기본정보를 화면에서 입력하여 항목의 정합성을 체크하고 데이터베이스에 저장\n\t * @param mberManageVO 일반회원 등록정보\n\t * @return 등록결과\n\t * @throws Exception\n\t */\n\tpublic String insertMber(MberManageVO mberManageVO) throws Exception;\n\n\t/**\n\t * 기 등록된 사용자 중 검색조건에 맞는 일반회원의 정보를 데이터베이스에서 읽어와 화면에 출력\n\t * @param mberId 상세조회대상 일반회원아이디\n\t * @return mberManageVO 일반회원상세정보\n\t * @throws Exception\n\t */\n\tpublic MberManageVO selectMber(String mberId) throws Exception;\n\n\t/**\n\t * 기 등록된 회원 중 검색조건에 맞는 회원들의 정보를 데이터베이스에서 읽어와 화면에 출력\n\t * @param userSearchVO 검색조건\n\t * @return List<MberManageVO> 일반회원목록정보\n\t * @throws Exception\n\t */\n\tpublic List<MberManageVO> selectMberList(UserDefaultVO userSearchVO) throws Exception;\n\n    /**\n     * 일반회원 총 개수를 조회한다.\n     * @param userSearchVO 검색조건\n     * @return 일반회원총개수(int)\n     * @throws Exception\n     */\n    public int selectMberListTotCnt(UserDefaultVO userSearchVO) throws Exception;\n\n\t/**\n\t * 화면에 조회된 일반회원의 기본정보를 수정하여 항목의 정합성을 체크하고 수정된 데이터를 데이터베이스에 반영\n\t * @param mberManageVO 일반회원수정정보\n\t * @throws Exception\n\t */\n\tpublic void updateMber(MberManageVO mberManageVO) throws Exception;\n\n\t/**\n\t * 화면에 조회된 사용자의 정보를 데이터베이스에서 삭제\n\t * @param checkedIdForDel 삭제대상 일반회원아이디\n\t * @throws Exception\n\t */\n\tpublic void deleteMber(String checkedIdForDel) throws Exception;\n\n\t/**\n\t * 일반회원 약관확인\n\t * @param stplatId 일반회원약관아이디\n\t * @return 일반회원약관정보(List)\n\t * @throws Exception\n\t */\n\tpublic List<StplatVO> selectStplat(String stplatId)  throws Exception;\n\n\t/**\n\t * 일반회원암호수정\n\t * @param mberPasswordManageVO 일반회원 비밀번호 수정정보\n\t * @throws Exception\n\t */\n\tpublic void updatePassword(MberPasswordManageVO mberPasswordManageVO) throws Exception;\n\n\t/**\n\t * 일반회원이 비밀번호를 기억하지 못할 때 비밀번호를 찾을 수 있도록 함\n\t * @param mberPasswordManageVO 일반회원 암호 조회조건정보\n\t * @return mberPasswordManageVO 일반회원 암호정보\n\t * @throws Exception\n\t */\n\tpublic MberPasswordManageVO selectPassword(MberPasswordManageVO mberPasswordManageVO) throws Exception;",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EmplyrManageInsertVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/EmplyrManageInsertVO.java — java 파일",
+        "tags": []
+      },
+      "line": 17,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EmplyrManageInsertVO.java",
+      "slice": {
+        "endLine": 31,
+        "startLine": 7,
+        "text": "\n/**\n * 일반회원 등록용 VO 클래스\n * EmplyrManageVO를 상속받아 비밀번호 검증 필드를 추가\n *\n * @author 공통서비스\n * @since 2025.12.16\n * @version 1.0\n * @see EmplyrManageVO\n */\n@Getter\n@Setter\npublic class EmplyrManageInsertVO extends EmplyrManageVO {\n\n\tprivate static final long serialVersionUID = 1L;\n\n\t/**\n\t * 새 비밀번호 확인 (등록 시 확인)\n\t */\n\t@EgovNullCheck\n\t@EgovPwdCheck\n\tprivate String password2;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EmplyrManageVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/EmplyrManageVO.java — java 파일",
+        "tags": []
+      },
+      "line": 28,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EmplyrManageVO.java",
+      "slice": {
+        "endLine": 97,
+        "startLine": 18,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.10  조재영          최초 생성\n *   2017.07.21  장동한 \t\t\t로그인인증제한 작업\n *\n * </pre>\n */\n@Getter\n@Setter\npublic class EmplyrManageVO extends UserDefaultVO{\n\n\tprivate static final long serialVersionUID = 3640820362821490939L;\n\n    /**\n\t * 가입일\n\t */\n\tprivate String sbscrbDe;\n\t/**\n\t * 사용자고유아이디\n\t */\n\tprivate String uniqId=\"\";\n\t/**\n\t * 사용자 유형\n\t */\n\tprivate String userTy;\n\t/**\n\t * 지역번호\n\t */\n\t@EgovNullCheck\n\t@Size(max=4)\n\t@Pattern(regexp=\"^[0-9]*$\", message=\"{validation.pattern.integer}\")\n\tprivate String areaNo;\n\t/**\n\t * 생일\n\t */\n\tprivate String brth;\n\t/**\n\t * 상세주소\n\t */\n\tprivate String detailAdres;\n\t/**\n\t * 이메일주소\n\t */\n\t@EgovNullCheck\n\t@Size(max=50)\n\t@EgovEmailCheck\n\tprivate String emailAdres;\n\t/**\n\t * 사원번호\n\t */\n\tprivate String emplNo;\n\t/**\n\t * 사용자 ID\n\t */\n\t@EgovNullCheck\n\t@Size(max=20)\n\tprivate String emplyrId;\n\t/**\n\t * 사용자 명\n\t */\n\t@EgovNullCheck\n\t@Size(max=50)\n\tprivate String emplyrNm;\n\t/**\n\t * 사용자 상태\n\t */\n\t@EgovNullCheck\n\tprivate String emplyrSttusCode;\n\t/**\n\t * 팩스번호\n\t */\n\t@Size(max=15)\n\tprivate String fxnum;\n\t/**\n\t * 그룹 ID\n\t */\n\t@EgovNullCheck",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EmplyrPasswordManageVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java",
+      "slice": {
+        "endLine": 43,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.10  조재영          최초 생성\n *   2017.07.21  장동한 \t\t\t로그인인증제한 작업\n *   2025.12.16  공통서비스      PasswordManageVO 상속으로 변경\n *\n * </pre>\n */\n@Getter\n@Setter\npublic class EmplyrPasswordManageVO extends PasswordManageVO {\n\n\tprivate static final long serialVersionUID = 1L;\n\n\t/**\n\t * 일반회원 ID\n\t */\n\tprivate String emplyrId;\n\n\t/**\n\t * 일반회원 PW\n\t */\n\tprivate String emplyrPassword;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EntrprsManageInsertVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java — java 파일",
+        "tags": []
+      },
+      "line": 17,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+      "slice": {
+        "endLine": 31,
+        "startLine": 7,
+        "text": "\n/**\n * 기업회원 등록용 VO 클래스\n * EntrprsManageVO를 상속받아 비밀번호 검증 필드를 추가\n *\n * @author 공통서비스\n * @since 2025.12.16\n * @version 1.0\n * @see EntrprsManageVO\n */\n@Getter\n@Setter\npublic class EntrprsManageInsertVO extends EntrprsManageVO {\n\n\tprivate static final long serialVersionUID = 1L;\n\n\t/**\n\t * 새 비밀번호 확인 (등록 시 확인)\n\t */\n\t@EgovNullCheck\n\t@EgovPwdCheck\n\tprivate String password2;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EntrprsManageVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageVO.java — java 파일",
+        "tags": []
+      },
+      "line": 28,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageVO.java",
+      "slice": {
+        "endLine": 97,
+        "startLine": 18,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.10  조재영          최초 생성\n *   2017.07.21  장동한 \t\t\t로그인인증제한 작업\n *\n * </pre>\n */\n@Getter\n@Setter\npublic class EntrprsManageVO  extends UserDefaultVO{\n\n\tprivate static final long serialVersionUID = -6532736688851136256L;\n\n    /**\n\t * 사용자고유아이디\n\t */\n\tprivate String uniqId=\"\";\n\t/**\n\t * 사용자 유형\n\t */\n\tprivate String userTy;\n\t/**\n\t * 주소\n\t */\n\t@EgovNullCheck\n\t@Size(max=100)\n\tprivate String adres;\n\t/**\n\t * 상세주소\n\t */\n\tprivate String detailAdres;\n\t/**\n\t * 신청자 주민등록번호\n\t */\n\tprivate String applcntIhidnum;\n\t/**\n\t * 신청자 명\n\t */\n\t@EgovNullCheck\n\tprivate String applcntNm;\n\t/**\n\t * 사업자번호\n\t */\n\t@EgovNullCheck\n\tprivate String bizrno;\n\t/**\n\t * 회사명\n\t */\n\t@EgovNullCheck\n\t@Size(max=50)\n\tprivate String cmpnyNm;\n\t/**\n\t * 대표이사\n\t */\n\tprivate String cxfc;\n\t/**\n\t * 기업 회원 ID\n\t */\n\t@EgovNullCheck\n\t@Size(max=20)\n\tprivate String entrprsmberId;\n\t/**\n\t * 기업 회원 비밀번호\n\t */\n\t@EgovNullCheck\n\t@EgovPwdCheck\n\tprivate String entrprsMberPassword;\n\t/**\n\t * 기업 회원 비밀번호 정답\n\t */\n\t@EgovNullCheck\n\t@Size(max=100)\n\tprivate String entrprsMberPasswordCnsr;\n\t/**\n\t * 기업 회원 비밀번호 힌트\n\t */\n\t@EgovNullCheck",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EntrprsPasswordManageVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/EntrprsPasswordManageVO.java — java 파일",
+        "tags": []
+      },
+      "line": 6,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EntrprsPasswordManageVO.java",
+      "slice": {
+        "endLine": 23,
+        "startLine": 1,
+        "text": "package egovframework.com.uss.umt.service;\n\nimport lombok.Getter;\nimport lombok.Setter;\n\n@Getter\n@Setter\npublic class EntrprsPasswordManageVO extends PasswordManageVO {\n\n\tprivate static final long serialVersionUID = 1L;\n\n\t/**\n\t * 기업 회원 ID\n\t */\n\tprivate String entrprsmberId;\n\n\t/**\n\t * 기업 회원 PW\n\t */\n\tprivate String entrprsMberPassword;\n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "MberManageInsertVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java — java 파일",
+        "tags": []
+      },
+      "line": 17,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java",
+      "slice": {
+        "endLine": 31,
+        "startLine": 7,
+        "text": "\n/**\n * 일반회원 등록용 VO 클래스\n * MberManageVO를 상속받아 비밀번호 검증 필드를 추가\n *\n * @author 공통서비스\n * @since 2025.12.16\n * @version 1.0\n * @see MberManageVO\n */\n@Getter\n@Setter\npublic class MberManageInsertVO extends MberManageVO {\n\n\tprivate static final long serialVersionUID = 1L;\n\n\t/**\n\t * 새 비밀번호 확인 (등록 시 확인)\n\t */\n\t@EgovNullCheck\n\t@EgovPwdCheck\n\tprivate String password2;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "MberManageVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/MberManageVO.java — java 파일",
+        "tags": []
+      },
+      "line": 28,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/MberManageVO.java",
+      "slice": {
+        "endLine": 97,
+        "startLine": 18,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.10  조재영          최초 생성\n *   2017.07.21  장동한 \t\t\t로그인인증제한 작업\n *\n * </pre>\n */\n@Getter\n@Setter\npublic class MberManageVO extends UserDefaultVO{\n\n\tprivate static final long serialVersionUID = -4255594107023139972L;\n\n    /**\n\t * 사용자고유아이디\n\t */\n\tprivate String uniqId=\"\";\n\t/**\n\t * 사용자 유형\n\t */\n\tprivate String userTy;\n\t/**\n\t * 주소\n\t */\n\t@EgovNullCheck\n\t@Size(max=100)\n\tprivate String adres;\n\t/**\n\t * 상세주소\n\t */\n\tprivate String detailAdres;\n\t/**\n\t * 끝전화번호\n\t */\n\t@EgovNullCheck\n\t@Size(max=4)\n\t@Pattern(regexp=\"^[0-9]*$\", message=\"{validation.pattern.integer}\")\n\tprivate String endTelno;\n\t/**\n\t * 팩스번호\n\t */\n\t@Size(max=15)\n\tprivate String mberFxnum;\n\t/**\n\t * 그룹 ID\n\t */\n\tprivate String groupId;\n\t/**\n\t * 주민등록번호\n\t */\n\tprivate String ihidnum;\n\t/**\n\t * 성별코드\n\t */\n\tprivate String sexdstnCode;\n\t/**\n\t * 회원 ID\n\t */\n\t@EgovNullCheck\n\t@Size(max=20)\n\tprivate String mberId;\n\t/**\n\t * 회원명\n\t */\n\t@EgovNullCheck\n\t@Size(max=50)\n\tprivate String mberNm;\n\t/**\n\t * 회원상태\n\t */\n\t@EgovNullCheck\n\tprivate String mberSttus;\n\t/**\n\t * 지역번호\n\t */\n\t@EgovNullCheck\n\t@Size(max=4)",
+        "truncated": true
+      }
+    },
+    {
+      "className": "MberPasswordManageVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/MberPasswordManageVO.java — java 파일",
+        "tags": []
+      },
+      "line": 15,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/MberPasswordManageVO.java",
+      "slice": {
+        "endLine": 32,
+        "startLine": 5,
+        "text": "\n/**\n * 일반회원 비밀번호 관리 VO 클래스\n * PasswordManageVO를 상속받아 일반회원 관련 필드를 추가\n *\n * @author 공통서비스\n * @since 2025.12.16\n * @version 1.0\n * @see PasswordManageVO\n */\n@Getter\n@Setter\npublic class MberPasswordManageVO extends PasswordManageVO {\n\n\tprivate static final long serialVersionUID = 1L;\n\n\t/**\n\t * 일반회원 ID\n\t */\n\tprivate String mberId;\n\n\t/**\n\t * 일반회원 PW\n\t */\n\tprivate String mberPassword;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "PasswordManageVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java — java 파일",
+        "tags": []
+      },
+      "line": 8,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java",
+      "slice": {
+        "endLine": 39,
+        "startLine": 1,
+        "text": "package egovframework.com.uss.umt.service;\n\nimport org.egovframe.rte.ptl.reactive.validation.EgovNullCheck;\nimport org.egovframe.rte.ptl.reactive.validation.EgovPwdCheck;\nimport lombok.Getter;\nimport lombok.Setter;\n\n@Getter\n@Setter\npublic class PasswordManageVO {\n\n\tprivate static final long serialVersionUID = -4255594107023139972L;\n\n\t/** 이전비밀번호 - 비밀번호 변경시 사용*/\n\t@EgovNullCheck\n\tprivate String oldPassword = \"\";\n\n\t/** 새 비밀번호 - 비밀번호 변경시 사용*/\n\t@EgovNullCheck\n\t@EgovPwdCheck\n\tprivate String password = \"\";\n\n\t/** 새 비밀번호 확인- 비밀번호 변경시 사용*/\n\t@EgovNullCheck\n\t@EgovPwdCheck\n\tprivate String password2 = \"\";\n\n\t/**\n\t * 사용자고유아이디\n\t */\n\tprivate String uniqId = \"\";\n\n\t/**\n\t * 사용자 유형\n\t */\n\tprivate String userTy = \"\";\n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "UserDefaultVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/UserDefaultVO.java — java 파일",
+        "tags": []
+      },
+      "line": 23,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/UserDefaultVO.java",
+      "slice": {
+        "endLine": 60,
+        "startLine": 13,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.10  조재영          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\npublic class UserDefaultVO implements Serializable {\n\n\tprivate static final long serialVersionUID = 4829684178121022508L;\n\n\t/** 검색조건-회원상태     (0, A, D, P)*/\n\tprivate String sbscrbSttus = \"0\";\n\n\t/** 검색조건 */\n\tprivate String searchCondition = \"\";\n\n\t/** 검색Keyword */\n\tprivate String searchKeyword = \"\";\n\n\t/** 검색사용여부 */\n\tprivate String searchUseYn = \"\";\n\n\t/** 현재페이지 */\n\tprivate int pageIndex = 1;\n\n\t/** 페이지개수 */\n\tprivate int pageUnit = 10;\n\n\t/** 페이지사이즈 */\n\tprivate int pageSize = 10;\n\n\t/** firstIndex */\n\tprivate int firstIndex = 1;\n\n\t/** lastIndex */\n\tprivate int lastIndex = 1;\n\n\t/** recordCountPerPage */\n\tprivate int recordCountPerPage = 10;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovDeptManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 132,
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "slice": {
+        "endLine": 201,
+        "startLine": 122,
+        "text": "\n\t\tmodel.addAttribute(\"deptManage\", deptManageVO);\n\t\treturn \"egovframework/com/uss/umt/EgovDeptManageInsert\";\n\t}\n\n\t/**\n\t * 부서정보를 신규로 등록한다.\n\t * @param banner - 부서 model\n\t * @return String - 리턴 Url\n\t */\n\t@RequestMapping(value = \"/uss/umt/dpt/addDeptManage.do\")\n\tpublic String insertDeptManage(\n\t\t@Valid @ModelAttribute(\"deptManageVO\") DeptManageVO deptManageVO,\n\t\tBindingResult bindingResult,  ModelMap model) throws Exception {\n\n\t\tdeptManageVO.setOrgnztId(egovDeptManageIdGnrService.getNextStringId());\n\n\t\tif (bindingResult.hasErrors()) {\n\t\t\treturn \"egovframework/com/uss/umt/EgovDeptManageInsert\";\n\t\t} else {\n\t\t\tegovDeptManageService.insertDeptManage(deptManageVO);\n\t\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));\n\t\t\treturn \"forward:/uss/umt/dpt/selectDeptManageList.do\";\n\t\t}\n\t}\n\n\t/**\n\t * 기 등록된 부서정보를 수정한다.\n\t * @param banner - 부서 model\n\t * @return String - 리턴 Url\n\t */\n\t@RequestMapping(value = \"/uss/umt/dpt/updtDeptManage.do\")\n\tpublic String updateDeptManage(\n\t\t@Valid @ModelAttribute(\"deptManageVO\") DeptManageVO deptManageVO,\n\t\tBindingResult bindingResult, ModelMap model) throws Exception {\n\n\t\tif (bindingResult.hasErrors()) {\n\t\t\treturn \"egovframework/com/uss/umt/EgovDeptManageUpdt\";\n\t\t} else {\n\t\t\tegovDeptManageService.updateDeptManage(deptManageVO);\n\t\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));\n\t\t\treturn \"forward:/uss/umt/dpt/selectDeptManageList.do\";\n\t\t}\n\t}\n\n\t/**\n\t * 기 등록된 부서정보를 삭제한다.\n\t * @param banner Banner\n\t * @return String\n\t * @exception Exception\n\t */\n\t@RequestMapping(value = \"/uss/umt/dpt/removeDeptManage.do\")\n\tpublic String deleteDeptManage(@ModelAttribute(\"deptManageVO\") DeptManageVO deptManageVO, Model model) throws Exception {\n\n\t\tegovDeptManageService.deleteDeptManage(deptManageVO);\n\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.delete\"));\n\t\treturn \"forward:/uss/umt/dpt/selectDeptManageList.do\";\n\t}\n\n\t/**\n\t * 기 등록된 부서정보목록을 일괄 삭제한다.\n\t * @param banners String\n\t * @param banner Banner\n\t * @return String\n\t * @exception Exception\n\t */\n\t@RequestMapping(value = \"/uss/umt/dpt/removeDeptManageList.do\")\n\tpublic String deleteDeptManageList(@RequestParam(\"deptManages\") String deptManages, @ModelAttribute(\"deptManageVO\") DeptManageVO deptManageVO, ModelMap model) throws Exception {\n\n\t\t// 2026.03.23 kisa 보안점검 대응 조치\n\t\tif (ObjectUtils.isEmpty(deptManages)) {\n\t\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.insert\"));\n\t\t\treturn \"forward:/uss/umt/dpt/selectDeptManageList.do\";\n\t\t}\n\n\t\tString[] strDeptManages = deptManages.split(\";\");\n\t\tfor (String strDeptManage : strDeptManages) {\n\t\t\tdeptManageVO.setOrgnztId(strDeptManage);\n\t\t\tegovDeptManageService.deleteDeptManage(deptManageVO);\n\t\t}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovEmplyrManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 92,
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "slice": {
+        "endLine": 161,
+        "startLine": 82,
+        "text": "\n\t/**\n\t * 사용자목록을 조회한다. (pageing)\n\t * \n\t * @param userSearchVO 검색조건정보\n\t * @param model        화면모델\n\t * @return cmm/uss/umt/EgovUserManage\n\t * @throws Exception\n\t */\n\t@IncludedInfo(name = \"업무사용자관리\", order = 460, gid = 50)\n\t@RequestMapping(value = \"/uss/umt/EgovEmplyrManage.do\")\n\tpublic String selectEmplyrList(@ModelAttribute(\"userSearchVO\") UserDefaultVO userSearchVO, ModelMap model)\n\t\t\tthrows Exception {\n\n\t\t// 미인증 사용자에 대한 보안처리\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\t\tif (!isAuthenticated) {\n\t\t\treturn \"index\";\n\t\t}\n\n\t\t/** EgovPropertyService */\n\t\tuserSearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));\n\t\tuserSearchVO.setPageSize(propertiesService.getInt(\"pageSize\"));\n\n\t\t/** pageing */\n\t\tPaginationInfo paginationInfo = new PaginationInfo();\n\t\tpaginationInfo.setCurrentPageNo(userSearchVO.getPageIndex());\n\t\tpaginationInfo.setRecordCountPerPage(userSearchVO.getPageUnit());\n\t\tpaginationInfo.setPageSize(userSearchVO.getPageSize());\n\n\t\tuserSearchVO.setFirstIndex(paginationInfo.getFirstRecordIndex());\n\t\tuserSearchVO.setLastIndex(paginationInfo.getLastRecordIndex());\n\t\tuserSearchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());\n\n\t\tList<EgovMap> emplyrList = emplyrManageService.selectEmplyrList(userSearchVO);\n\t\tmodel.addAttribute(\"resultList\", emplyrList);\n\n\t\tint totCnt = emplyrManageService.selectEmplyrListTotCnt(userSearchVO);\n\t\tpaginationInfo.setTotalRecordCount(totCnt);\n\t\tmodel.addAttribute(\"paginationInfo\", paginationInfo);\n\n\t\t// 사용자상태코드를 코드정보로부터 조회\n\t\tComDefaultCodeVO comDefaultCodeVO = new ComDefaultCodeVO();\n\t\tcomDefaultCodeVO.setCodeId(\"COM013\");\n\t\tList<CmmnDetailCode> emplyrSttusCodeResult = cmmUseService.selectCmmCodeDetail(comDefaultCodeVO);\n\t\tmodel.addAttribute(\"emplyrSttusCode_result\", emplyrSttusCodeResult);// 사용자상태코드목록\n\n\t\treturn \"egovframework/com/uss/umt/EgovEmplyrManage\";\n\t}\n\n\t/**\n\t * 사용자등록화면으로 이동한다.\n\t * \n\t * @param userSearchVO         검색조건정보\n\t * @param emplyrManageInsertVO 사용자초기화정보\n\t * @param model                화면모델\n\t * @return cmm/uss/umt/EgovUserInsert\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/uss/umt/EgovEmplyrInsertView.do\", method = RequestMethod.POST)\n\t@RequireAdmin\n\tpublic String insertUserView(@ModelAttribute(\"userSearchVO\") UserDefaultVO userSearchVO,\n\t\t\t@ModelAttribute(\"emplyrManageVO\") EmplyrManageInsertVO emplyrManageInsertVO, Model model) throws Exception {\n\n\t\t// 미인증 사용자에 대한 보안처리\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\t\tif (!isAuthenticated) {\n\t\t\treturn \"index\";\n\t\t}\n\n\t\tComDefaultCodeVO comDefaultCodeVO = new ComDefaultCodeVO();\n\n\t\t// 패스워드힌트목록을 코드정보로부터 조회\n\t\tcomDefaultCodeVO.setCodeId(\"COM022\");\n\t\tList<CmmnDetailCode> passwordHintResult = cmmUseService.selectCmmCodeDetail(comDefaultCodeVO);\n\t\t// 성별구분코드를 코드정보로부터 조회\n\t\tcomDefaultCodeVO.setCodeId(\"COM014\");\n\t\tList<CmmnDetailCode> sexdstnCodeResult = cmmUseService.selectCmmCodeDetail(comDefaultCodeVO);\n\t\t// 사용자상태코드를 코드정보로부터 조회\n\t\tcomDefaultCodeVO.setCodeId(\"COM013\");",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovEntrprsManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 90,
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "slice": {
+        "endLine": 159,
+        "startLine": 80,
+        "text": "\n\t/**\n\t * 기업회원목록을 조회한다. (pageing)\n\t *\n\t * @param userSearchVO 검색조건정보\n\t * @param model        화면모델\n\t * @return uss/umt/EgovEntrprsManage\n\t * @throws Exception\n\t */\n\t@IncludedInfo(name = \"기업회원관리\", order = 450, gid = 50)\n\t@RequestMapping(value = \"/uss/umt/EgovEntrprsManage.do\")\n\tpublic String selectEntrprsMberList(@ModelAttribute(\"userSearchVO\") UserDefaultVO userSearchVO, ModelMap model)\n\t\t\tthrows Exception {\n\n\t\t// 미인증 사용자에 대한 보안처리\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\t\tif (!isAuthenticated) {\n\t\t\treturn \"index\";\n\t\t}\n\n\t\t/** EgovPropertyService */\n\t\tuserSearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));\n\t\tuserSearchVO.setPageSize(propertiesService.getInt(\"pageSize\"));\n\n\t\t/** pageing */\n\t\tPaginationInfo paginationInfo = new PaginationInfo();\n\t\tpaginationInfo.setCurrentPageNo(userSearchVO.getPageIndex());\n\t\tpaginationInfo.setRecordCountPerPage(userSearchVO.getPageUnit());\n\t\tpaginationInfo.setPageSize(userSearchVO.getPageSize());\n\n\t\tuserSearchVO.setFirstIndex(paginationInfo.getFirstRecordIndex());\n\t\tuserSearchVO.setLastIndex(paginationInfo.getLastRecordIndex());\n\t\tuserSearchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());\n\n\t\tList<EntrprsManageVO> resultList = entrprsManageService.selectEntrprsMberList(userSearchVO);\n\t\tmodel.addAttribute(\"resultList\", resultList);\n\n\t\tint totCnt = entrprsManageService.selectEntrprsMberListTotCnt(userSearchVO);\n\t\tpaginationInfo.setTotalRecordCount(totCnt);\n\t\tmodel.addAttribute(\"paginationInfo\", paginationInfo);\n\n\t\t// 기업회원 상태코드를 코드정보로부터 조회\n\t\tComDefaultCodeVO comDefaultCodeVO = new ComDefaultCodeVO();\n\t\tcomDefaultCodeVO.setCodeId(\"COM013\");\n\t\tList<CmmnDetailCode> entrprsMberSttusResult = cmmUseService.selectCmmCodeDetail(comDefaultCodeVO);\n\t\tmodel.addAttribute(\"entrprsMberSttus_result\", entrprsMberSttusResult);\n\n\t\treturn \"egovframework/com/uss/umt/EgovEntrprsManage\";\n\t}\n\n\t/**\n\t * 기업회원 등록화면으로 이동한다.\n\t *\n\t * @param userSearchVO          검색조건정보\n\t * @param entrprsManageInsertVO 기업회원 초기화정보\n\t * @param model                 화면모델\n\t * @return uss/umt/EgovEntrprsInsert\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/uss/umt/EgovEntrprsInsertView.do\", method = RequestMethod.POST)\n\t@RequireAdmin\n\tpublic String insertEntrprsMberView(@ModelAttribute(\"userSearchVO\") UserDefaultVO userSearchVO,\n\t\t\t@ModelAttribute(\"entrprsManageVO\") EntrprsManageInsertVO entrprsManageInsertVO, Model model) throws Exception {\n\n\t\t// 미인증 사용자에 대한 보안처리\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\t\tif (!isAuthenticated) {\n\t\t\treturn \"index\";\n\t\t}\n\n\t\taddEntrprsCodeListToModel(model);\n\n\t\treturn \"egovframework/com/uss/umt/EgovEntrprsInsert\";\n\t}\n\n\t/**\n\t * 기업회원등록처리후 목록화면으로 이동한다.\n\t *\n\t * @param entrprsManageInsertVO 신규기업회원정보 (비밀번호 검증 포함)\n\t * @param bindingResult         입력값검증용 bindingResult",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovMberManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 90,
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "slice": {
+        "endLine": 159,
+        "startLine": 80,
+        "text": "\n\t/**\n\t * 일반회원목록을 조회한다. (pageing)\n\t *\n\t * @param userSearchVO 검색조건정보\n\t * @param model        화면모델\n\t * @return uss/umt/EgovMberManage\n\t * @throws Exception\n\t */\n\t@IncludedInfo(name = \"일반회원관리\", order = 470, gid = 50)\n\t@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")\n\tpublic String selectMberList(@ModelAttribute(\"userSearchVO\") UserDefaultVO userSearchVO, ModelMap model)\n\t\t\tthrows Exception {\n\n\t\t// 미인증 사용자에 대한 보안처리\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\t\tif (!isAuthenticated) {\n\t\t\treturn \"index\";\n\t\t}\n\n\t\t/** EgovPropertyService */\n\t\tuserSearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));\n\t\tuserSearchVO.setPageSize(propertiesService.getInt(\"pageSize\"));\n\n\t\t/** pageing */\n\t\tPaginationInfo paginationInfo = new PaginationInfo();\n\t\tpaginationInfo.setCurrentPageNo(userSearchVO.getPageIndex());\n\t\tpaginationInfo.setRecordCountPerPage(userSearchVO.getPageUnit());\n\t\tpaginationInfo.setPageSize(userSearchVO.getPageSize());\n\n\t\tuserSearchVO.setFirstIndex(paginationInfo.getFirstRecordIndex());\n\t\tuserSearchVO.setLastIndex(paginationInfo.getLastRecordIndex());\n\t\tuserSearchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());\n\n\t\tList<MberManageVO> resultList = mberManageService.selectMberList(userSearchVO);\n\t\tmodel.addAttribute(\"resultList\", resultList);\n\n\t\tint totCnt = mberManageService.selectMberListTotCnt(userSearchVO);\n\t\tpaginationInfo.setTotalRecordCount(totCnt);\n\t\tmodel.addAttribute(\"paginationInfo\", paginationInfo);\n\n\t\t// 일반회원 상태코드를 코드정보로부터 조회\n\t\tComDefaultCodeVO comDefaultCodeVO = new ComDefaultCodeVO();\n\t\tcomDefaultCodeVO.setCodeId(\"COM013\");\n\t\tList<CmmnDetailCode> mberSttusResult = cmmUseService.selectCmmCodeDetail(comDefaultCodeVO);\n\t\tmodel.addAttribute(\"entrprsMberSttus_result\", mberSttusResult);// 기업회원상태코드목록\n\n\t\treturn \"egovframework/com/uss/umt/EgovMberManage\";\n\t}\n\n\t/**\n\t * 일반회원등록화면으로 이동한다.\n\t *\n\t * @param userSearchVO        검색조건정보\n\t * @param mberManageInsertVO  일반회원초기화정보\n\t * @param model               화면모델\n\t * @return uss/umt/EgovMberInsert\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/uss/umt/EgovMberInsertView.do\", method = RequestMethod.POST)\n\t@RequireAdmin\n\tpublic String insertMberView(@ModelAttribute(\"userSearchVO\") UserDefaultVO userSearchVO,\n\t\t\t@ModelAttribute(\"mberManageVO\") MberManageInsertVO mberManageInsertVO, Model model) throws Exception {\n\n\t\t// 미인증 사용자에 대한 보안처리\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\t\tif (!isAuthenticated) {\n\t\t\treturn \"index\";\n\t\t}\n\n\t\tComDefaultCodeVO comDefaultCodeVO = new ComDefaultCodeVO();\n\n\t\t// 패스워드힌트목록을 코드정보로부터 조회\n\t\tcomDefaultCodeVO.setCodeId(\"COM022\");\n\t\tList<CmmnDetailCode> passwordHintResult = cmmUseService.selectCmmCodeDetail(comDefaultCodeVO);\n\t\t// 성별구분코드를 코드정보로부터 조회\n\t\tcomDefaultCodeVO.setCodeId(\"COM014\");\n\t\tList<CmmnDetailCode> sexdstnCodeResult = cmmUseService.selectCmmCodeDetail(comDefaultCodeVO);\n\t\t// 사용자상태코드를 코드정보로부터 조회\n\t\tcomDefaultCodeVO.setCodeId(\"COM013\");",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovStringUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 43,
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "slice": {
+        "endLine": 112,
+        "startLine": 33,
+        "text": " * See the License for the specific language governing permissions and\n * limitations under the License.\n */\nimport java.io.UnsupportedEncodingException;\nimport java.math.BigDecimal;\nimport java.security.SecureRandom;\nimport java.sql.Timestamp;\nimport java.text.SimpleDateFormat;\nimport java.util.Locale;\n\npublic class EgovStringUtil {\n\t/**\n\t * 빈 문자열 <code>\"\"</code>.\n\t */\n\tpublic static final String EMPTY = \"\";\n\n\t// 221116\t김혜준\t2022 시큐어코딩 조치\n\tprivate static SecureRandom rnd = new SecureRandom();\n\n\t/**\n\t * <p>Padding을 할 수 있는 최대 수치</p>\n\t */\n\t// private static final int PAD_LIMIT = 8192;\n\n\t/**\n\t * <p>An array of <code>String</code>s used for padding.</p>\n\t * <p>Used for efficient space padding. The length of each String expands as needed.</p>\n\t */\n\t/*\n\tprivate static final String[] PADDING = new String[Character.MAX_VALUE];\n\n\tstatic {\n\t\t// space padding is most common, start with 64 chars\n\t\tPADDING[32] = \"                                                                \";\n\t}\n\t */\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 지정한길이에다가 해당 문자열을 붙여주는 메서드.\n\t * @param source 원본 문자열 배열\n\t * @param output 더할문자열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, String output, int slength) {\n\t\tString returnVal = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\treturnVal = source.substring(0, slength) + output;\n\t\t\t} else {\n\t\t\t\treturnVal = source;\n\t\t\t}\n\t\t}\n\t\treturn returnVal;\n\t}\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 해당 문자열을 삭제하는 메서드\n\t * @param source 원본 문자열 배열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, int slength) {\n\t\tString result = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\tresult = source.substring(0, slength);\n\t\t\t} else {\n\t\t\t\tresult = source;\n\t\t\t}\n\t\t}\n\t\treturn result;\n\t}\n\n\t/**\n\t * <p>\n\t * String이 비었거나(\"\") 혹은 null 인지 검증한다.\n\t * </p>\n\t *\n\t * <pre>",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovFileScrty",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/sim/service/EgovFileScrty.java — java 파일",
+        "tags": []
+      },
+      "line": 49,
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovFileScrty.java",
+      "slice": {
+        "endLine": 118,
+        "startLine": 39,
+        "text": " *\n *    수정일                 수정자              수정내용\n *    ----------    -------     -------------------\n *    2019.11.29\t신용호\t\tencryptPassword(String data) 삭제 : KISA 보안약점 조치 (비밀번호 해시함수 적용 시 솔트를 사용하여야 함)\n *    2022.11.16\t신용호        소스코드 보안 조치\n *\n * @author 공통컴포넌트개발팀 한성곤\n * @since 2009.08.26\n * @version 1.0\n */\npublic class EgovFileScrty {\n\n\tprivate static final String STORE_FILE_PATH = EgovProperties.getProperty(\"Globals.fileStorePath\");\n    // 파일구분자\n    static final char FILE_SEPARATOR = File.separatorChar;\n\n    static final int BUFFER_SIZE = 1024;\n\n    /**\n     * 파일을 암호화하는 기능\n     *\n     * @param String source 암호화할 파일\n     * @param String target 암호화된 파일\n     * @return boolean result 암호화여부 True/False\n     * @exception Exception\n     */\n    public static boolean encryptFile(String source, String target) throws Exception {\n\n\t\t// 암호화 여부\n\t\tboolean result = false;\n\n\t\tFile srcFile = new File(EgovWebUtil.filePathBlackList(STORE_FILE_PATH + FilenameUtils.getName(source)));\n\n\t\tBufferedInputStream input = null;\n\t\tBufferedOutputStream output = null;\n\n\t\tbyte[] buffer = new byte[BUFFER_SIZE];\n\n\t\ttry {\n\t\t    if (srcFile.exists() && srcFile.isFile()) {\n\n\t\t\t\tinput = new BufferedInputStream(new FileInputStream(srcFile));\n\t\t\t\toutput = new BufferedOutputStream(new FileOutputStream(EgovWebUtil.filePathBlackList(STORE_FILE_PATH + FilenameUtils.getName(target))));\n\n\t\t\t\tint length = 0;\n\t\t\t\twhile ((length = input.read(buffer)) >= 0) {\n\t\t\t\t\tbyte[] data = new byte[length];\n\t\t\t\t\tSystem.arraycopy(buffer, 0, data, 0, length);\n\t\t\t\t\toutput.write(encodeBinary(data).getBytes());\n\t\t\t\t\toutput.write(System.getProperty(\"line.separator\").getBytes());\n\t\t\t\t}\n\t\t\t\tresult = true;\n\t\t\t}\n\t\t} finally {\n\t\t\tEgovResourceCloseHelper.close(input, output);\n\t\t}\n\n\t\treturn result;\n    }\n\n    /**\n     * 파일을 복호화하는 기능\n     *\n     * @param String source 복호화할 파일\n     * @param String target 복호화된 파일\n     * @return boolean result 복호화여부 True/False\n     * @exception Exception\n     */\n    public static boolean decryptFile(String source, String target) throws Exception {\n\n\t\t// 복호화 여부\n\t\tboolean result = false;\n\n\t\tFile srcFile = new File(EgovWebUtil.filePathBlackList(STORE_FILE_PATH + FilenameUtils.getName(source)));\n\n\t\tBufferedReader input = null;\n\t\tBufferedOutputStream output = null;\n\n\t\t//byte[] buffer = new byte[BUFFER_SIZE];\n\t\tString line = null;",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovEmplyrManageController#selectEmplyrList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "flowId": "flow:ANY /uss/umt/EgovEmplyrManage.do",
+      "line": 92,
+      "stepIds": [
+        "step:ANY /uss/umt/EgovEmplyrManage.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:ANY /uss/umt/EgovEmplyrManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/umt/EgovEmplyrManage.do:src/main/java/egovframework/com/uss/umt/service/UserDefaultVO.java",
+        "step:ANY /uss/umt/EgovEmplyrManage.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "step:ANY /uss/umt/EgovEmplyrManage.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/umt/EgovEmplyrManage.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /uss/umt/EgovEmplyrManage.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEntrprsManageController#selectEntrprsMberList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "flowId": "flow:ANY /uss/umt/EgovEntrprsManage.do",
+      "line": 90,
+      "stepIds": [
+        "step:ANY /uss/umt/EgovEntrprsManage.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:ANY /uss/umt/EgovEntrprsManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/umt/EgovEntrprsManage.do:src/main/java/egovframework/com/uss/umt/service/UserDefaultVO.java",
+        "step:ANY /uss/umt/EgovEntrprsManage.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+        "step:ANY /uss/umt/EgovEntrprsManage.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/umt/EgovEntrprsManage.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /uss/umt/EgovEntrprsManage.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#selectMberList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:ANY /uss/umt/EgovMberManage.do",
+      "line": 90,
+      "stepIds": [
+        "step:ANY /uss/umt/EgovMberManage.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:ANY /uss/umt/EgovMberManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/umt/EgovMberManage.do:src/main/java/egovframework/com/uss/umt/service/UserDefaultVO.java",
+        "step:ANY /uss/umt/EgovMberManage.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+        "step:ANY /uss/umt/EgovMberManage.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/umt/EgovMberManage.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /uss/umt/EgovMberManage.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovDeptManageController#insertDeptManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "flowId": "flow:ANY /uss/umt/dpt/addDeptManage.do",
+      "line": 132,
+      "stepIds": [
+        "step:ANY /uss/umt/dpt/addDeptManage.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+        "step:ANY /uss/umt/dpt/addDeptManage.do:src/main/java/egovframework/com/uss/umt/service/DeptManageVO.java",
+        "step:ANY /uss/umt/dpt/addDeptManage.do:src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java",
+        "step:ANY /uss/umt/dpt/addDeptManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovDeptManageController#insertViewDeptManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "flowId": "flow:ANY /uss/umt/dpt/addViewDeptManage.do",
+      "line": 120,
+      "stepIds": [
+        "step:ANY /uss/umt/dpt/addViewDeptManage.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovDeptManageController#selectDeptManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "flowId": "flow:ANY /uss/umt/dpt/getDeptManage.do",
+      "line": 105,
+      "stepIds": [
+        "step:ANY /uss/umt/dpt/getDeptManage.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+        "step:ANY /uss/umt/dpt/getDeptManage.do:src/main/java/egovframework/com/uss/umt/service/DeptManageVO.java",
+        "step:ANY /uss/umt/dpt/getDeptManage.do:src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java",
+        "step:ANY /uss/umt/dpt/getDeptManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovDeptManageController#deleteDeptManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "flowId": "flow:ANY /uss/umt/dpt/removeDeptManage.do",
+      "line": 173,
+      "stepIds": [
+        "step:ANY /uss/umt/dpt/removeDeptManage.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+        "step:ANY /uss/umt/dpt/removeDeptManage.do:src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java",
+        "step:ANY /uss/umt/dpt/removeDeptManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovDeptManageController#deleteDeptManageList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "flowId": "flow:ANY /uss/umt/dpt/removeDeptManageList.do",
+      "line": 188,
+      "stepIds": [
+        "step:ANY /uss/umt/dpt/removeDeptManageList.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+        "step:ANY /uss/umt/dpt/removeDeptManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uss/umt/dpt/removeDeptManageList.do:src/main/java/egovframework/com/uss/umt/service/DeptManageVO.java",
+        "step:ANY /uss/umt/dpt/removeDeptManageList.do:src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovDeptManageController#selectDeptManageList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "flowId": "flow:ANY /uss/umt/dpt/selectDeptManageList.do",
+      "line": 77,
+      "stepIds": [
+        "step:ANY /uss/umt/dpt/selectDeptManageList.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+        "step:ANY /uss/umt/dpt/selectDeptManageList.do:src/main/java/egovframework/com/uss/umt/service/DeptManageVO.java",
+        "step:ANY /uss/umt/dpt/selectDeptManageList.do:src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java",
+        "step:ANY /uss/umt/dpt/selectDeptManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovDeptManageController#selectDeptManageListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "flowId": "flow:ANY /uss/umt/dpt/selectDeptManageListView.do",
+      "line": 58,
+      "stepIds": [
+        "step:ANY /uss/umt/dpt/selectDeptManageListView.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+        "step:ANY /uss/umt/dpt/selectDeptManageListView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/umt/dpt/selectDeptManageListView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovDeptManageController#updateDeptManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "flowId": "flow:ANY /uss/umt/dpt/updtDeptManage.do",
+      "line": 153,
+      "stepIds": [
+        "step:ANY /uss/umt/dpt/updtDeptManage.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+        "step:ANY /uss/umt/dpt/updtDeptManage.do:src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java",
+        "step:ANY /uss/umt/dpt/updtDeptManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEmplyrManageController#deleteUser",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEmplyrDelete.do",
+      "line": 374,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEmplyrManageController#insertUser",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEmplyrInsert.do",
+      "line": 192,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/uss/umt/service/EmplyrManageInsertVO.java",
+        "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEmplyrManageController#insertUserView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEmplyrInsertView.do",
+      "line": 141,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEmplyrManageController#updateLockIncorrect",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEmplyrLockIncorrect.do",
+      "line": 293,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEmplyrManageController#updatePassword",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEmplyrPasswordUpdt.do",
+      "line": 483,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/utl/sim/service/EgovFileScrty.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEmplyrManageController#updatePasswordView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEmplyrPasswordUpdtView.do",
+      "line": 542,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEmplyrManageController#updateUser",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEmplyrSelectUpdt.do",
+      "line": 316,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EmplyrManageVO.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEmplyrManageController#updateUserView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEmplyrSelectUpdtView.do",
+      "line": 229,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEntrprsManageController#deleteEntrprsMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEntrprsDelete.do",
+      "line": 316,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+        "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEntrprsManageController#insertEntrprsMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEntrprsInsert.do",
+      "line": 164,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+        "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+        "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEntrprsManageController#insertEntrprsMberView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEntrprsInsertView.do",
+      "line": 139,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEntrprsManageController#updateLockIncorrect",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEntrprsLockIncorrect.do",
+      "line": 249,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+        "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEntrprsManageController#updatePassword",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEntrprsPasswordUpdt.do",
+      "line": 457,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEntrprsPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovEntrprsPasswordUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEntrprsPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+        "step:POST /uss/umt/EgovEntrprsPasswordUpdt.do:src/main/java/egovframework/com/utl/sim/service/EgovFileScrty.java",
+        "step:POST /uss/umt/EgovEntrprsPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/EntrprsPasswordManageVO.java",
+        "step:POST /uss/umt/EgovEntrprsPasswordUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEntrprsPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEntrprsManageController#updatePasswordView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEntrprsPasswordUpdtView.do",
+      "line": 515,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEntrprsPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovEntrprsPasswordUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEntrprsPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EntrprsPasswordManageVO.java",
+        "step:POST /uss/umt/EgovEntrprsPasswordUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEntrprsPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEntrprsManageController#sbscrbEntrprsMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEntrprsSbscrb.do",
+      "line": 412,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEntrprsSbscrb.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovEntrprsSbscrb.do:src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+        "step:POST /uss/umt/EgovEntrprsSbscrb.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEntrprsManageController#sbscrbEntrprsMberView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEntrprsSbscrbView.do",
+      "line": 371,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEntrprsSbscrbView.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovEntrprsSbscrbView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/umt/EgovEntrprsSbscrbView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /uss/umt/EgovEntrprsSbscrbView.do:src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEntrprsManageController#updateEntrprsMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEntrprsSelectUpdt.do",
+      "line": 272,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EntrprsManageVO.java",
+        "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+        "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+        "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEntrprsManageController#updateEntrprsMberView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEntrprsSelectUpdtView.do",
+      "line": 199,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+        "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+        "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+        "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEntrprsManageController#withdrawEntrprsMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovEntrprsWithdraw.do",
+      "line": 344,
+      "stepIds": [
+        "step:POST /uss/umt/EgovEntrprsWithdraw.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovEntrprsWithdraw.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEntrprsWithdraw.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+        "step:POST /uss/umt/EgovEntrprsWithdraw.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/umt/EgovEntrprsWithdraw.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /uss/umt/EgovEntrprsWithdraw.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEmplyrManageController#checkIdDplct",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovIdDplctCnfirm.do",
+      "line": 424,
+      "stepIds": [
+        "step:POST /uss/umt/EgovIdDplctCnfirm.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovIdDplctCnfirm.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovIdDplctCnfirm.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "step:POST /uss/umt/EgovIdDplctCnfirm.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEmplyrManageController#checkIdDplctAjax",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovIdDplctCnfirmAjax.do",
+      "line": 456,
+      "stepIds": [
+        "step:POST /uss/umt/EgovIdDplctCnfirmAjax.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovIdDplctCnfirmAjax.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEmplyrManageController#checkIdDplct",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovIdDplctCnfirmView.do",
+      "line": 402,
+      "stepIds": [
+        "step:POST /uss/umt/EgovIdDplctCnfirmView.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovIdDplctCnfirmView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovIdDplctCnfirmView.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "step:POST /uss/umt/EgovIdDplctCnfirmView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#deleteMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovMberDelete.do",
+      "line": 375,
+      "stepIds": [
+        "step:POST /uss/umt/EgovMberDelete.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovMberDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovMberDelete.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/umt/EgovMberDelete.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+        "step:POST /uss/umt/EgovMberDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#insertMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovMberInsert.do",
+      "line": 182,
+      "stepIds": [
+        "step:POST /uss/umt/EgovMberInsert.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovMberInsert.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovMberInsert.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/umt/EgovMberInsert.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /uss/umt/EgovMberInsert.do:src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java",
+        "step:POST /uss/umt/EgovMberInsert.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+        "step:POST /uss/umt/EgovMberInsert.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#insertMberView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovMberInsertView.do",
+      "line": 139,
+      "stepIds": [
+        "step:POST /uss/umt/EgovMberInsertView.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovMberInsertView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovMberInsertView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/umt/EgovMberInsertView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /uss/umt/EgovMberInsertView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#updateLockIncorrect",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovMberLockIncorrect.do",
+      "line": 308,
+      "stepIds": [
+        "step:POST /uss/umt/EgovMberLockIncorrect.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovMberLockIncorrect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovMberLockIncorrect.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+        "step:POST /uss/umt/EgovMberLockIncorrect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#updatePassword",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovMberPasswordUpdt.do",
+      "line": 527,
+      "stepIds": [
+        "step:POST /uss/umt/EgovMberPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovMberPasswordUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovMberPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+        "step:POST /uss/umt/EgovMberPasswordUpdt.do:src/main/java/egovframework/com/utl/sim/service/EgovFileScrty.java",
+        "step:POST /uss/umt/EgovMberPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/MberPasswordManageVO.java",
+        "step:POST /uss/umt/EgovMberPasswordUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovMberPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#updatePasswordView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovMberPasswordUpdtView.do",
+      "line": 586,
+      "stepIds": [
+        "step:POST /uss/umt/EgovMberPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovMberPasswordUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovMberPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/MberPasswordManageVO.java",
+        "step:POST /uss/umt/EgovMberPasswordUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovMberPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#sbscrbMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovMberSbscrb.do",
+      "line": 470,
+      "stepIds": [
+        "step:POST /uss/umt/EgovMberSbscrb.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovMberSbscrb.do:src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java",
+        "step:POST /uss/umt/EgovMberSbscrb.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#sbscrbMberView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovMberSbscrbView.do",
+      "line": 433,
+      "stepIds": [
+        "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#updateMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovMberSelectUpdt.do",
+      "line": 331,
+      "stepIds": [
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/MberManageVO.java",
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#updateMberView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovMberSelectUpdtView.do",
+      "line": 237,
+      "stepIds": [
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#withdrawMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovMberWithdraw.do",
+      "line": 404,
+      "stepIds": [
+        "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+        "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEmplyrManageController#rlnmCnfirm",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovRlnmCnfirm.do",
+      "line": 569,
+      "stepIds": [
+        "step:POST /uss/umt/EgovRlnmCnfirm.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovRlnmCnfirm.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEntrprsManageController#sbscrbEntrprsMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovStplatCnfirmEntrprs.do",
+      "line": 433,
+      "stepIds": [
+        "step:POST /uss/umt/EgovStplatCnfirmEntrprs.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovStplatCnfirmEntrprs.do:src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+        "step:POST /uss/umt/EgovStplatCnfirmEntrprs.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#sbscrbEntrprsMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovStplatCnfirmMber.do",
+      "line": 495,
+      "stepIds": [
+        "step:POST /uss/umt/EgovStplatCnfirmMber.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovStplatCnfirmMber.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "uss.umt",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /uss/umt/EgovEmplyrManage.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /uss/umt/EgovEmplyrManage.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /uss/umt/EgovEmplyrManage.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/umt/EgovEmplyrManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "stepId": "step:ANY /uss/umt/EgovEmplyrManage.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/UserDefaultVO.java",
+      "stepId": "step:ANY /uss/umt/EgovEmplyrManage.do:src/main/java/egovframework/com/uss/umt/service/UserDefaultVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepId": "step:ANY /uss/umt/EgovEmplyrManage.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /uss/umt/EgovEntrprsManage.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /uss/umt/EgovEntrprsManage.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /uss/umt/EgovEntrprsManage.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/umt/EgovEntrprsManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "stepId": "step:ANY /uss/umt/EgovEntrprsManage.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/UserDefaultVO.java",
+      "stepId": "step:ANY /uss/umt/EgovEntrprsManage.do:src/main/java/egovframework/com/uss/umt/service/UserDefaultVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepId": "step:ANY /uss/umt/EgovEntrprsManage.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /uss/umt/EgovMberManage.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /uss/umt/EgovMberManage.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /uss/umt/EgovMberManage.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/umt/EgovMberManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "stepId": "step:ANY /uss/umt/EgovMberManage.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/UserDefaultVO.java",
+      "stepId": "step:ANY /uss/umt/EgovMberManage.do:src/main/java/egovframework/com/uss/umt/service/UserDefaultVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:ANY /uss/umt/EgovMberManage.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/umt/dpt/addDeptManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/DeptManageVO.java",
+      "stepId": "step:ANY /uss/umt/dpt/addDeptManage.do:src/main/java/egovframework/com/uss/umt/service/DeptManageVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java",
+      "stepId": "step:ANY /uss/umt/dpt/addDeptManage.do:src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "stepId": "step:ANY /uss/umt/dpt/addDeptManage.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "stepId": "step:ANY /uss/umt/dpt/addViewDeptManage.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/umt/dpt/getDeptManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/DeptManageVO.java",
+      "stepId": "step:ANY /uss/umt/dpt/getDeptManage.do:src/main/java/egovframework/com/uss/umt/service/DeptManageVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java",
+      "stepId": "step:ANY /uss/umt/dpt/getDeptManage.do:src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "stepId": "step:ANY /uss/umt/dpt/getDeptManage.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/umt/dpt/removeDeptManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java",
+      "stepId": "step:ANY /uss/umt/dpt/removeDeptManage.do:src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "stepId": "step:ANY /uss/umt/dpt/removeDeptManage.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/umt/dpt/removeDeptManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/DeptManageVO.java",
+      "stepId": "step:ANY /uss/umt/dpt/removeDeptManageList.do:src/main/java/egovframework/com/uss/umt/service/DeptManageVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java",
+      "stepId": "step:ANY /uss/umt/dpt/removeDeptManageList.do:src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "stepId": "step:ANY /uss/umt/dpt/removeDeptManageList.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/umt/dpt/selectDeptManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/DeptManageVO.java",
+      "stepId": "step:ANY /uss/umt/dpt/selectDeptManageList.do:src/main/java/egovframework/com/uss/umt/service/DeptManageVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java",
+      "stepId": "step:ANY /uss/umt/dpt/selectDeptManageList.do:src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "stepId": "step:ANY /uss/umt/dpt/selectDeptManageList.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /uss/umt/dpt/selectDeptManageListView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/umt/dpt/selectDeptManageListView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "stepId": "step:ANY /uss/umt/dpt/selectDeptManageListView.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/umt/dpt/updtDeptManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java",
+      "stepId": "step:ANY /uss/umt/dpt/updtDeptManage.do:src/main/java/egovframework/com/uss/umt/service/EgovDeptManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java",
+      "stepId": "step:ANY /uss/umt/dpt/updtDeptManage.do:src/main/java/egovframework/com/uss/umt/web/EgovDeptManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EmplyrManageInsertVO.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/uss/umt/service/EmplyrManageInsertVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovFileScrty.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/utl/sim/service/EgovFileScrty.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EmplyrManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EmplyrManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsPasswordUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsPasswordUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EntrprsPasswordManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/EntrprsPasswordManageVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovFileScrty.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsPasswordUpdt.do:src/main/java/egovframework/com/utl/sim/service/EgovFileScrty.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsPasswordUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsPasswordUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EntrprsPasswordManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EntrprsPasswordManageVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSbscrb.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSbscrb.do:src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSbscrb.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSbscrbView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSbscrbView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSbscrbView.do:src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSbscrbView.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EntrprsManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdt.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsWithdraw.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsWithdraw.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsWithdraw.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsWithdraw.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsWithdraw.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:POST /uss/umt/EgovEntrprsWithdraw.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovIdDplctCnfirm.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovIdDplctCnfirm.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "stepId": "step:POST /uss/umt/EgovIdDplctCnfirm.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepId": "step:POST /uss/umt/EgovIdDplctCnfirm.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "stepId": "step:POST /uss/umt/EgovIdDplctCnfirmAjax.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepId": "step:POST /uss/umt/EgovIdDplctCnfirmAjax.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovIdDplctCnfirmView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovIdDplctCnfirmView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "stepId": "step:POST /uss/umt/EgovIdDplctCnfirmView.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepId": "step:POST /uss/umt/EgovIdDplctCnfirmView.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberDelete.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovMberDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "stepId": "step:POST /uss/umt/EgovMberDelete.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovMberDelete.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberInsert.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:POST /uss/umt/EgovMberInsert.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovMberInsert.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberInsert.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "stepId": "step:POST /uss/umt/EgovMberInsert.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberInsert.do:src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovMberInsert.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberInsertView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:POST /uss/umt/EgovMberInsertView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovMberInsertView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberInsertView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovMberInsertView.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovMberLockIncorrect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberLockIncorrect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "stepId": "step:POST /uss/umt/EgovMberLockIncorrect.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovMberLockIncorrect.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovMberPasswordUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberPasswordUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "stepId": "step:POST /uss/umt/EgovMberPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/MberPasswordManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/MberPasswordManageVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovMberPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovFileScrty.java",
+      "stepId": "step:POST /uss/umt/EgovMberPasswordUpdt.do:src/main/java/egovframework/com/utl/sim/service/EgovFileScrty.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovMberPasswordUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberPasswordUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/MberPasswordManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/MberPasswordManageVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovMberPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "stepId": "step:POST /uss/umt/EgovMberSbscrb.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberSbscrb.do:src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovMberSbscrb.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/MberManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/MberManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "stepId": "step:POST /uss/umt/EgovRlnmCnfirm.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepId": "step:POST /uss/umt/EgovRlnmCnfirm.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "stepId": "step:POST /uss/umt/EgovStplatCnfirmEntrprs.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+      "stepId": "step:POST /uss/umt/EgovStplatCnfirmEntrprs.do:src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepId": "step:POST /uss/umt/EgovStplatCnfirmEntrprs.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "stepId": "step:POST /uss/umt/EgovStplatCnfirmMber.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovStplatCnfirmMber.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    }
+  ]
+}

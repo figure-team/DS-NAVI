@@ -1,0 +1,878 @@
+{
+  "chunkId": "cop.ems-000",
+  "domainId": "domain:cop.ems",
+  "domainName": "",
+  "files": [
+    {
+      "className": "ComDefaultVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/ComDefaultVO.java — java 파일",
+        "tags": []
+      },
+      "line": 22,
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "slice": {
+        "endLine": 91,
+        "startLine": 12,
+        "text": " * @  수정일         수정자                   수정내용\n * @ -------    --------    ---------------------------\n * @ 2009.02.01    조재영         최초 생성\n *\n *  @author 공통서비스 개발팀 조재영\n *  @since 2009.02.01\n *  @version 1.0\n *  @see \n *  \n */\n@SuppressWarnings(\"serial\")\npublic class ComDefaultVO implements Serializable {\n\t\n\t/** 검색조건 */\n    private String searchCondition = \"\";\n    \n    /** 검색Keyword */\n    private String searchKeyword = \"\";\n    \n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n    \n    /** 현재페이지 */\n    private Integer pageIndex = 1;\n    \n    /** 페이지개수 */\n    private Integer pageUnit = 10;\n    \n    /** 페이지사이즈 */\n    private Integer pageSize = 10;\n\n    /** firstIndex */\n    private Integer firstIndex = 1;\n\n    /** lastIndex */\n    private Integer lastIndex = 1;\n\n    /** recordCountPerPage */\n    private Integer recordCountPerPage = 10;\n    \n    /** 검색KeywordFrom */\n    private String searchKeywordFrom = \"\";    \n\n\t/** 검색KeywordTo */\n    private String searchKeywordTo = \"\";  \n    \n\tpublic Integer getFirstIndex() {\n\t\treturn firstIndex == null ? 1 : firstIndex;\n\t}\n\n\tpublic void setFirstIndex(Integer firstIndex) {\n\t\tthis.firstIndex = firstIndex == null ? 1 : firstIndex;\n\t}\n\n\tpublic Integer getLastIndex() {\n\t\treturn lastIndex == null ? 1 : lastIndex;\n\t}\n\n\tpublic void setLastIndex(Integer lastIndex) {\n\t\tthis.lastIndex = lastIndex == null ? 1 : lastIndex;\n\t}\n\n\tpublic Integer getRecordCountPerPage() {\n\t\treturn recordCountPerPage == null ? 10 : recordCountPerPage;\n\t}\n\n\tpublic void setRecordCountPerPage(Integer recordCountPerPage) {\n\t\tthis.recordCountPerPage = recordCountPerPage == null ? 10 : recordCountPerPage;\n\t}\n\n\tpublic String getSearchCondition() {\n        return searchCondition;\n    }\n\n    public void setSearchCondition(String searchCondition) {\n        this.searchCondition = searchCondition;\n    }\n\n    public String getSearchKeyword() {\n        return searchKeyword;",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovMessageSource",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovMessageSource.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이문준          최초 생성\n *   2017.07.21  장동한 \t\t\targs, locale 설정\n *\n * </pre>\n */\n\npublic class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {\n\n\tprivate ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;\n\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @param reloadableResourceBundleMessageSource - resource MessageSource\n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic void setReloadableResourceBundleMessageSource(ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource) {\n\t\tthis.reloadableResourceBundleMessageSource = reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic ReloadableResourceBundleMessageSource getReloadableResourceBundleMessageSource() {\n\t\treturn reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, locale);\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @return String\n\t */\t\n\tpublic String getMessageArgs(String code, Object[] args) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, locale);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovWebUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovWebUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "slice": {
+        "endLine": 94,
+        "startLine": 15,
+        "text": " *\t2017-02-07   이정은      시큐어코딩(ES) - 시큐어코딩 경로 조작 및 자원 삽입[CWE-22, CWE-23, CWE-95, CWE-99]\n *  2018.08.17   신용호      filePathBlackList 수정\n *  2018.10.10   신용호      . => \\\\.으로 수정\n *  2022.05.10   정진오      clearXSS() 메소드 추가\n *  2022.06.09   김장하      NSR 보안조치 (removeOSCmdRisk 함수에 윈도우 다중 명령 실행 키워드 추가)\n *  2023.08.10   신용호      removeLDAPInjectionRisk() 오류 수정\n *  2024.12.04   신용호      filePathBlackList() basePath 추가\n * </pre>\n */\n\npublic class EgovWebUtil {\n\tpublic static String clearXSSMinimum(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\"\", \"&#34;\");\n\t\treturnValue = returnValue.replaceAll(\"\\'\", \"&#39;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSSMaximum(String value) {\n\t\tString returnValue = value;\n\t\treturnValue = clearXSSMinimum(returnValue);\n\n\t\treturnValue = returnValue.replace(\"%00\", \"\");\n\n\t\treturnValue = returnValue.replaceAll(\"%\", \"&#37;\");\n\n\t\t// \\\\. => .\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\\\\\\\\\", \"\"); // ..\\\n\t\treturnValue = returnValue.replaceAll(\"\\\\./\", \"\"); // ./\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSS(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3C\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3E\", \"&gt;\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String filePathBlackList(String value) {\n\t\tString returnValue = value;\n\t\tif (returnValue == null || returnValue.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\t/**\n\t * 파일경로 보안취약점 조치\n\t * # 주의사항\n\t * 1. basePath는 반드시 지정해야 한다.\n\t * 2. basePath는 ROOT Path \"/\" 사용 금지 한다.",
+        "truncated": true
+      }
+    },
+    {
+      "className": "LoginVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/LoginVO.java — java 파일",
+        "tags": []
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 21,
+        "text": " *   2009.03.03     박지욱     최초 생성\n *   2021.05.30     정진오     디지털원패스 사용자키/세션값 추가\n *</pre>\n *\n *  @author 공통서비스 개발팀 박지욱\n *  @since 2009.03.03\n *  @version 1.0\n *  @see\n *\n */\n@Getter\n@Setter\npublic class LoginVO implements Serializable{\n\n\t/**\n\t *\n\t */\n\tprivate static final long serialVersionUID = -8274004534207618049L;\n\n\t/** 아이디 */\n\t@EgovNullCheck\n\tprivate String id;\n\t/** 이름 */\n\t@EgovNullCheck\n\tprivate String name;\n\t/** 주민등록번호 */\n\tprivate String ihidNum;\n\t/** 이메일주소 */\n\t@EgovNullCheck\n\t@EgovEmailCheck\n\tprivate String email;\n\t/** 비밀번호 */\n\tprivate String password;\n\t/** 비밀번호 힌트 */\n\t@EgovNullCheck\n\tprivate String passwordHint;\n\t/** 비밀번호 정답 */\n\t@EgovNullCheck\n\tprivate String passwordCnsr;\n\t/** 사용자구분 */\n\tprivate String userSe;\n\t/** 조직(부서)ID */\n\tprivate String orgnztId;\n\t/** 조직(부서)명 */\n\tprivate String orgnztNm;\n\t/** 고유아이디 */\n\tprivate String uniqId;\n\t/** 로그인 후 이동할 페이지 */\n\tprivate String url;\n\t/** 사용자 IP정보 */\n\tprivate String ip;\n\t/** GPKI인증 DN */\n\tprivate String dn;\n\t/** 디지털원패스 사용자키 */\n\tprivate String onepassUserkey;\n\t/** 디지털원패스 사용자세션값 */\n\tprivate String onepassIntfToken;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovFileMngService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java — java 파일",
+        "tags": []
+      },
+      "line": 21,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "slice": {
+        "endLine": 90,
+        "startLine": 11,
+        "text": " *    수정일       수정자         수정내용\n *    -------        -------     -------------------\n *    2009. 3. 25.     이삼섭    최초생성\n *\n * @author 공통 서비스 개발팀 이삼섭\n * @since 2009. 3. 25.\n * @version\n * @see\n *\n */\npublic interface EgovFileMngService {\n\n    /**\n     * 파일에 대한 목록을 조회한다.\n     *\n     * @param fvo\n     * @return\n     * @throws Exception\n     */\n    public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;\n\n    /**\n     * 하나의 파일에 대한 정보(속성 및 상세)를 등록한다.\n     *\n     * @param fvo\n     * @throws Exception\n     */\n    public String insertFileInf(FileVO fvo) throws Exception;\n\n    /**\n     * 여러 개의 파일에 대한 정보(속성 및 상세)를 등록한다.\n     *\n     * @param fvoList\n     * @throws Exception\n     */\n    public String insertFileInfs(List<FileVO> fvoList) throws Exception;\n\n    /**\n     * 여러 개의 파일에 대한 정보(속성 및 상세)를 수정한다.\n     *\n     * @param fvoList\n     * @throws Exception\n     */\n    public void updateFileInfs(List<FileVO> fvoList) throws Exception;\n\n    /**\n     * 여러 개의 파일을 삭제한다.\n     *\n     * @param fvoList\n     * @throws Exception\n     */\n    public void deleteFileInfs(List<FileVO> fvoList) throws Exception;\n\n    /**\n     * 하나의 파일을 삭제한다.\n     *\n     * @param fvo\n     * @throws Exception\n     */\n    public void deleteFileInf(FileVO fvo) throws Exception;\n\n    /**\n     * 파일에 대한 상세정보를 조회한다.\n     *\n     * @param fvo\n     * @return\n     * @throws Exception\n     */\n    public FileVO selectFileInf(FileVO fvo) throws Exception;\n\n    /**\n     * 파일 구분자에 대한 최대값을 구한다.\n     *\n     * @param fvo\n     * @return\n     * @throws Exception\n     */\n    public int getMaxFileSN(FileVO fvo) throws Exception;\n\n    /**",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovFileMngUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 60,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "slice": {
+        "endLine": 129,
+        "startLine": 50,
+        "text": " *   2009.02.13  이삼섭          최초 생성\n *   2011.08.09  서준식          utl.fcc패키지와 Dependency제거를 위해 getTimeStamp()메서드 추가\n *   2017.03.03  조성원          시큐어코딩(ES)-부적절한 예외 처리[CWE-253, CWE-440, CWE-754]\n *   2020.10.26  신용호          parseFileInf(List<MultipartFile> files ...) 추가\n *   2022.11.11  김혜준          시큐어코딩 처리\n *   2024.12.04  신용호          downFile() KISA 시큐어코딩 처리\n *   2025.05.26  이백행          PMD로 소프트웨어 보안약점 진단하고 제거하기-FormalParameterNamingConventions(공식 매개변수 명명 규칙), CloseResource(리소스 닫기), LocalVariableNamingConventions(지역 변수 명명 규칙), AssignmentInOperand(피연산자의 할당)\n * \n *      </pre>\n */\n@Component(\"EgovFileMngUtil\")\npublic class EgovFileMngUtil {\n\n\tprivate static final Logger LOGGER = LoggerFactory.getLogger(EgovFileMngUtil.class);\n\tprivate static final String FILE_STORE_PATH = EgovProperties.getProperty(\"Globals.fileStorePath\");\n\n\t@Resource(name = \"egovFileIdGnrService\")\n\tprivate EgovIdGnrService idgenService;\n\n\t/**\n\t * 첨부파일에 대한 목록 정보를 취득한다.\n\t *\n\t * @param files\n\t * @return\n\t * @throws Exception\n\t */\n\tpublic List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,\n\t\t\tString atchFileId, String storePath) throws Exception {\n\t\tint fileKey = fileKeyParam;\n\n\t\tString storePathString = \"\";\n\t\tString atchFileIdString = \"\";\n\n\t\tif (storePath == null || \"\".equals(storePath)) {\n\t\t\tstorePathString = EgovProperties.getProperty(\"Globals.fileStorePath\");\n\t\t} else {\n\t\t\tstorePathString = EgovProperties.getProperty(storePath);\n\t\t}\n\n\t\tif (atchFileId == null || \"\".equals(atchFileId)) {\n\t\t\tatchFileIdString = idgenService.getNextStringId();\n\t\t} else {\n\t\t\tatchFileIdString = atchFileId;\n\t\t}\n\n\t\tFile saveFolder = new File(EgovWebUtil.filePathBlackList(storePathString));\n\n\t\tif (!saveFolder.exists() || saveFolder.isFile()) {\n\t\t\t// 2017.03.03 조성원 시큐어코딩(ES)-부적절한 예외 처리[CWE-253, CWE-440, CWE-754]\n\t\t\tif (saveFolder.mkdirs()) {\n\t\t\t\tLOGGER.debug(\"[file.mkdirs] saveFolder : Creation Success \");\n\t\t\t} else {\n\t\t\t\tLOGGER.error(\"[file.mkdirs] saveFolder : Creation Fail \");\n\t\t\t}\n\t\t}\n\n\t\tIterator<Entry<String, MultipartFile>> itr = files.entrySet().iterator();\n\t\tMultipartFile file;\n\t\tList<FileVO> result = new ArrayList<FileVO>();\n\t\tFileVO fvo;\n\n\t\twhile (itr.hasNext()) {\n\t\t\tEntry<String, MultipartFile> entry = itr.next();\n\t\t\tfile = entry.getValue();\n\t\t\tString orginFileName = file.getOriginalFilename();\n\t\t\tif (StringUtils.isEmpty(orginFileName)) {\n\t\t\t\tcontinue;\n\t\t\t}\n\n\t\t\t// 2022.11.11 시큐어코딩 처리\n\t\t\tString fileExt = FilenameUtils.getExtension(orginFileName).toUpperCase();\n\t\t\tString newName = keyStr + getTimeStamp() + fileKey;\n\t\t\tlong size = file.getSize();\n\t\t\tString filePath = storePathString + File.separator + newName;\n\t\t\tfile.transferTo(new File(EgovWebUtil.filePathBlackList(filePath)));\n\n\t\t\tfvo = new FileVO();\n\t\t\tfvo.setFileExtsn(fileExt);\n\t\t\tfvo.setFileStreCours(storePathString);\n\t\t\tfvo.setFileMg(Long.toString(size));",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovProperties",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovProperties.java — java 파일",
+        "tags": []
+      },
+      "line": 49,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "slice": {
+        "endLine": 118,
+        "startLine": 39,
+        "text": " *   수정일              수정자          수정내용\n *   ----------  --------  ---------------------------\n *   2009.01.19  박지욱          최초 생성\n *   2011.07.20    서준식     Globals파일의 상대경로를 읽은 메서드 추가\n *   2014.10.13    이기하     Globals.properties 값이 null일 경우 오류처리\n *   2019.04.26    신용호     RELATIVE_PATH_PREFIX Path 적용 방식 개선\n *   2022.01.21    윤주호     Try-catch-resource 조치 및 Method Refactoring\n *</pre>\n */\n\npublic class EgovProperties {\n\n\tprivate static final Logger LOGGER = LoggerFactory.getLogger(EgovProperties.class);\n\n\t//파일구분자\n\tfinal static String FILE_SEPARATOR = System.getProperty(\"file.separator\");\n\n\t//프로퍼티 파일의 물리적 위치\n\t//public static final String GLOBALS_PROPERTIES_FILE = System.getProperty(\"user.home\") + FILE_SEPARATOR + \"egovProps\" +FILE_SEPARATOR + \"globals.properties\";\n\n\tpublic static final String RELATIVE_PATH_PREFIX = EgovProperties.class.getResource(\"\") == null ? \"\"\n\t\t: EgovProperties.class.getResource(\"\").getPath().substring(0,\n\t\t\tEgovProperties.class.getResource(\"\").getPath().lastIndexOf(\"com\"));\n\t//public static final String RELATIVE_PATH_PREFIX = EgovProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath().substring(0,EgovProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath().indexOf(\"WEB-INF/classes/\")+\"WEB-INF/classes/\".length())+\"egovframework/\";\n\n\tpublic static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR\n\t\t+ \"globals.properties\";\n\n\t/**\n\t * 인자로 주어진 문자열을 Key값으로 하는 프로퍼티 값을 반환한다(Globals.java 전용)\n\t * @param keyName String\n\t * @return String\n\t */\n\tpublic static String getProperty(String keyName) {\n\t\t// 221116\t김혜준\t2022 시큐어코딩 조치\n\t\tLOGGER.debug(\"===>>> getProperty\" + EgovStringUtil.isNullToString(EgovProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath()));\n\t\tLOGGER.debug(\"getProperty : {} = {}\", GLOBALS_PROPERTIES_FILE, keyName);\n\n\t\treturn getPropertyValueByKey(keyName);\n\t}\n\n\t/**\n\t * 인자로 주어진 문자열을 Key값으로 하는 상대경로 프로퍼티 값을 절대경로로 반환한다(Globals.java 전용)\n\t * @param keyName String\n\t * @return String\n\t */\n\tpublic static String getPathProperty(String keyName) {\n\t\tLOGGER.debug(\"getPathProperty : {} = {}\", GLOBALS_PROPERTIES_FILE, keyName);\n\n\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(keyName);\n\t}\n\n\t/**\n\t * 주어진 파일에서 인자로 주어진 문자열을 Key값으로 하는 프로퍼티 값을 반환한다\n\t * @param fileName String\n\t * @param key String\n\t * @return String\n\t */\n\tpublic static String getProperty(String fileName, String keyName) {\n\t\treturn getPropertyValueByKey(fileName, keyName);\n\t}\n\n\t/**\n\t * 주어진 파일에서 인자로 주어진 문자열을 Key값으로 하는 프로퍼티 상대 경로값을 절대 경로값으로 반환한다\n\t * @param fileName String\n\t * @param key String\n\t * @return String\n\t */\n\tpublic static String getPathProperty(String fileName, String keyName) {\n\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(fileName, keyName);\n\t}\n\n\t/**\n\t * 주어진 프로파일의 내용을 파싱하여 (key-value) 형태의 구조체 배열을 반환한다.\n\t * @param property String\n\t * @return ArrayList\n\t */\n\tpublic static ArrayList<Map<String, String>> loadPropertyFile(String propertyPath) {\n\n\t\t// key - value 형태로 된 배열 결과",
+        "truncated": true
+      }
+    },
+    {
+      "className": "FileVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/FileVO.java — java 파일",
+        "tags": []
+      },
+      "line": 20,
+      "relPath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "slice": {
+        "endLine": 89,
+        "startLine": 10,
+        "text": " *    수정일       수정자         수정내용\n *    -------        -------     -------------------\n *    2009. 3. 25.     이삼섭\n *\n * @author 공통 서비스 개발팀 이삼섭\n * @since 2009. 3. 25.\n * @version\n * @see\n *\n */\n@SuppressWarnings(\"serial\")\npublic class FileVO extends ComDefaultVO {\n\n    /**\n     * 첨부파일 아이디\n     */\n    public String atchFileId = \"\";\n    /**\n     * 생성일자\n     */\n    public String creatDt = \"\";\n    /**\n     * 파일내용\n     */\n    public String fileCn = \"\";\n    /**\n     * 파일확장자\n     */\n    public String fileExtsn = \"\";\n    /**\n     * 파일크기\n     */\n    public String fileMg = \"\";\n    /**\n     * 파일연번\n     */\n    public String fileSn = \"\";\n    /**\n     * 파일저장경로\n     */\n    public String fileStreCours = \"\";\n    /**\n     * 원파일명\n     */\n    public String orignlFileNm = \"\";\n    /**\n     * 저장파일명\n     */\n    public String streFileNm = \"\";\n\n    /**\n     * atchFileId attribute를 리턴한다.\n     * \n     * @return the atchFileId\n     */\n    public String getAtchFileId() {\n\treturn atchFileId;\n    }\n\n    /**\n     * atchFileId attribute 값을 설정한다.\n     * \n     * @param atchFileId\n     *            the atchFileId to set\n     */\n    public void setAtchFileId(String atchFileId) {\n\tthis.atchFileId = atchFileId;\n    }\n\n    /**\n     * creatDt attribute를 리턴한다.\n     * \n     * @return the creatDt\n     */\n    public String getCreatDt() {\n\treturn creatDt;\n    }\n\n    /**\n     * creatDt attribute 값을 설정한다.",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "slice": {
+        "endLine": 62,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n *   2009.03.10  sjyoon         최초 생성\n *   2011.07.01\t 서준식          interface 생성후 상세 로직의 분리\n * </pre>\n */\n\npublic class EgovUserDetailsHelper {\n\n\tstatic EgovUserDetailsService egovUserDetailsService;\n\n\tpublic EgovUserDetailsService getEgovUserDetailsService() {\n\t\treturn egovUserDetailsService;\n\t}\n\n\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {\n\t\tEgovUserDetailsHelper.egovUserDetailsService = egovUserDetailsService;\n\t}\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic static Object getAuthenticatedUser() {\n\t\treturn egovUserDetailsService.getAuthenticatedUser();\n\t}\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t *\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic static List<String> getAuthorities() {\n\t\treturn egovUserDetailsService.getAuthorities();\n\t}\n\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\n\t */\n\tpublic static Boolean isAuthenticated() {\n\t\treturn egovUserDetailsService.isAuthenticated();\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovSndngMailDetailService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDetailService.java — java 파일",
+        "tags": []
+      },
+      "line": 19,
+      "relPath": "src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDetailService.java",
+      "slice": {
+        "endLine": 43,
+        "startLine": 9,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자          수정내용\n *  -------    --------    ---------------------------\n *  2009.03.12  박지욱          최초 생성\n *\n *  </pre>\n */\npublic interface EgovSndngMailDetailService {\n\n\t/**\n\t * 발송메일을 상세 조회한다.\n\t * @param vo SndngMailVO\n\t * @return SndngMailVO\n\t * @exception Exception\n\t */\n\tSndngMailVO selectSndngMail(SndngMailVO vo) throws Exception;\n\n\t/**\n\t * 발송메일을 삭제한다.\n\t * @param vo SndngMailVO\n\t * @exception\n\t */\n\tvoid deleteSndngMail(SndngMailVO vo) throws Exception;\n\n\t/**\n\t * 첨부파일을 삭제한다.\n\t * @param vo SndngMailVO\n\t * @exception\n\t */\n\tvoid deleteAtchmnFile(SndngMailVO vo) throws Exception;\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovSndngMailDtlsService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDtlsService.java — java 파일",
+        "tags": []
+      },
+      "line": 23,
+      "relPath": "src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDtlsService.java",
+      "slice": {
+        "endLine": 48,
+        "startLine": 13,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자          수정내용\n *  -------    --------    ---------------------------\n *  2009.03.12  박지욱          최초 생성\n *\n *  </pre>\n */\npublic interface EgovSndngMailDtlsService {\n\n\t/**\n\t * 발송메일 목록을 조회한다.\n\t * @param vo ComDefaultVO\n\t * @return List\n\t * @exception Exception\n\t */\n\tList<SndngMailVO> selectSndngMailList(ComDefaultVO vo) throws Exception;\n\n\t/**\n\t * 발송메일 총건수를 조회한다.\n\t * @param vo ComDefaultVO\n\t * @return int\n\t * @exception\n\t */\n\tint selectSndngMailListTotCnt(ComDefaultVO vo) throws Exception;\n\n\t/**\n\t * 발송메일을 삭제한다.\n\t * @param vo SndngMailVO\n\t * @exception\n\t */\n\tvoid deleteSndngMailList(SndngMailVO vo) throws Exception;\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "SndngMailVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+      "slice": {
+        "endLine": 61,
+        "startLine": 16,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자          수정내용\n *  -------    --------    ---------------------------\n *  2009.03.12  박지욱          최초 생성\n *  2011.12.06  이기하          첨부파일경로(fileStreCours), 첨부파일이름(orignlFileNm) 추가\n *\n *  </pre>\n */\n@Getter\n@Setter\npublic class SndngMailVO {\n\n\t/** 메세지ID */\n\tprivate String mssageId;\n\t/** 발신자 */\n\tprivate String dsptchPerson;\n\t/** 수신자 */\n\t@EgovNullCheck\n\t@Email\n\tprivate String recptnPerson;\n\t/** 제목 */\n\t@EgovNullCheck\n\tprivate String sj;\n\t/** 발송결과코드 */\n\tprivate String sndngResultCode;\n\t/** 메일내용 */\n\t@EgovNullCheck\n\tprivate String emailCn;\n\t/** 첨부파일ID */\n\tprivate String atchFileId;\n\t/** 첨부파일경로 */\n\tprivate String fileStreCours;\n\t/** 첨부파일이름 */\n\tprivate String orignlFileNm;\n\t/** 발신일자 */\n\tprivate String sndngDe;\n\t/** 첨부파일ID 리스트 */\n\tprivate String atchFileIdList;\n\t/** 발송요청XML내용 */\n\tprivate String xmlContent;\n\t/** 팝업링크여부(Y/N) */\n\tprivate String link;\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovSndngMailDetailController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java — java 파일",
+        "tags": []
+      },
+      "line": 115,
+      "relPath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+      "slice": {
+        "endLine": 179,
+        "startLine": 105,
+        "text": "\t\treturn \"redirect:/cop/ems/selectSndngMailList.do\";\n\t}\n\n\t/**\n\t * 발송메일 내용조회로 돌아간다.\n\t * \n\t * @param sndngMailVO SndngMailVO\n\t * @return String\n\t * @exception Exception\n\t */\n\t@RequestMapping(value = \"/cop/ems/backSndngMailDetail.do\")\n\tpublic String backSndngMailDtls(@ModelAttribute(\"sndngMailVO\") SndngMailVO sndngMailVO, ModelMap model)\n\t\t\tthrows Exception {\n\n\t\treturn \"redirect:/cop/ems/selectSndngMailList.do\";\n\t}\n\n\t/**\n\t * XML형태의 발송요청메일을 조회한다.\n\t * \n\t * @param sndngMailVO SndngMailVO\n\t * @exception Exception\n\t */\n\t@RequestMapping(value = \"/cop/ems/selectSndngMailXml.do\")\n\tpublic void selectSndngMailXml(@ModelAttribute(\"sndngMailVO\") SndngMailVO sndngMailVO, HttpServletResponse response,\n\t\t\tModelMap model) throws Exception {\n\n\t\t// 메일 등록 시 기본 생성 경로로 변경 처리 : 23.08.09\n\t\t// String xmlFile = Globals.MAIL_REQUEST_PATH + sndngMailVO.getMssageId() +\n\t\t// \".xml\";\n\n\t\tString storePathString = EgovProperties.getProperty(\"Globals.fileStorePath\");\n\t\tString xmlFile = storePathString + sndngMailVO.getMssageId() + \".xml\";\n\n\t\tFile uFile = new File(EgovWebUtil.filePathBlackList(xmlFile));\n\t\tint fSize = (int) uFile.length();\n\n\t\tif (fSize > 0) {\n\t\t\tString mimetype = \"application/x-msdownload;charset=UTF-8\";\n\n\t\t\tresponse.setContentType(mimetype);\n\t\t\tresponse.setHeader(\"Content-Disposition\",\n\t\t\t\t\t\"attachment; filename=\\\"\" + EgovWebUtil.removeCRLF(uFile.getName()) + \"\\\"\");\n\t\t\tresponse.setContentLength(fSize);\n\n\t\t\tBufferedInputStream in = null;\n\t\t\ttry {\n\t\t\t\tin = new BufferedInputStream(new FileInputStream(uFile));\n\t\t\t\tFileCopyUtils.copy(in, response.getOutputStream());\n\t\t\t} finally {\n\t\t\t\tif (in != null) {\n\t\t\t\t\ttry {\n\t\t\t\t\t\tin.close();\n\t\t\t\t\t\t// 2017.03.03 조성원 시큐어코딩(ES)-부적절한 예외 처리[CWE-253, CWE-440, CWE-754]\n\t\t\t\t\t} catch (IOException ignore) {\n\t\t\t\t\t\tLOGGER.error(\"[\" + ignore.getClass() + \"] : Connection Close\");\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t\tresponse.getOutputStream().flush();\n\t\t\tresponse.getOutputStream().close();\n\t\t} else {\n\t\t\tresponse.setContentType(\"application/x-msdownload\");\n\t\t\tPrintWriter printwriter = response.getWriter(); // NOPMD - CloseResource\n\t\t\tprintwriter.println(\"<html>\");\n\t\t\tprintwriter.println(\n\t\t\t\t\t\"<br><br><br><h2>Could not get file name:<br>\" + EgovWebUtil.clearXSSMinimum(xmlFile) + \"</h2>\");\n\t\t\tprintwriter.println(\"<br><br><br><center><h3><a href='javascript: history.go(-1)'>Back</a></h3></center>\");\n\t\t\tprintwriter.println(\"<br><br><br>&copy; webAccess\");\n\t\t\tprintwriter.println(\"</html>\");\n\t\t\tprintwriter.flush();\n\t\t\tprintwriter.close();\n\t\t}\n\t}\n}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovSndngMailDtlsController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java — java 파일",
+        "tags": []
+      },
+      "line": 92,
+      "relPath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java",
+      "slice": {
+        "endLine": 105,
+        "startLine": 82,
+        "text": "\n\t\treturn \"egovframework/com/cop/ems/EgovMailDtls\";\n\t}\n\n\t/**\n\t * 발송메일을 삭제한다.\n\t * @param sndngMailVO SndngMailVO\n\t * @return String\n\t * @exception\n\t */\n\t@RequestMapping(value = \"/cop/ems/deleteSndngMailList.do\")\n\tpublic String deleteSndngMailList(@ModelAttribute(\"sndngMailVO\") SndngMailVO sndngMailVO, ModelMap model) throws Exception {\n\n\t\tif (sndngMailVO == null || sndngMailVO.getMssageId() == null || sndngMailVO.getMssageId().equals(\"\")) {\n\t\t\treturn \"egovframework/com/cmm/egovError\";\n\t\t}\n\n\t\t// 1. 발송메일을 삭제한다.\n\t\tsndngMailDtlsService.deleteSndngMailList(sndngMailVO);\n\n\t\t// 2. 발송메일 목록 페이지 이동\n\t\treturn \"redirect:/cop/ems/selectSndngMailList.do\";\n\t}\n}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovSndngMailRegistController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java — java 파일",
+        "tags": []
+      },
+      "line": 158,
+      "relPath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+      "slice": {
+        "endLine": 164,
+        "startLine": 148,
+        "text": "\t\t}\n\t}\n\n\t/**\n\t * 발송메일 내용조회로 돌아간다.\n\t * \n\t * @param sndngMailVO SndngMailVO\n\t * @return String\n\t * @exception Exception\n\t */\n\t@RequestMapping(value = \"/cop/ems/backSndngMailRegist.do\")\n\tpublic String backSndngMailRegist(@ModelAttribute(\"sndngMailVO\") SndngMailVO sndngMailVO, ModelMap model)\n\t\t\tthrows Exception {\n\n\t\treturn \"redirect:/cop/ems/selectSndngMailList.do\";\n\t}\n}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovStringUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 43,
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "slice": {
+        "endLine": 112,
+        "startLine": 33,
+        "text": " * See the License for the specific language governing permissions and\n * limitations under the License.\n */\nimport java.io.UnsupportedEncodingException;\nimport java.math.BigDecimal;\nimport java.security.SecureRandom;\nimport java.sql.Timestamp;\nimport java.text.SimpleDateFormat;\nimport java.util.Locale;\n\npublic class EgovStringUtil {\n\t/**\n\t * 빈 문자열 <code>\"\"</code>.\n\t */\n\tpublic static final String EMPTY = \"\";\n\n\t// 221116\t김혜준\t2022 시큐어코딩 조치\n\tprivate static SecureRandom rnd = new SecureRandom();\n\n\t/**\n\t * <p>Padding을 할 수 있는 최대 수치</p>\n\t */\n\t// private static final int PAD_LIMIT = 8192;\n\n\t/**\n\t * <p>An array of <code>String</code>s used for padding.</p>\n\t * <p>Used for efficient space padding. The length of each String expands as needed.</p>\n\t */\n\t/*\n\tprivate static final String[] PADDING = new String[Character.MAX_VALUE];\n\n\tstatic {\n\t\t// space padding is most common, start with 64 chars\n\t\tPADDING[32] = \"                                                                \";\n\t}\n\t */\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 지정한길이에다가 해당 문자열을 붙여주는 메서드.\n\t * @param source 원본 문자열 배열\n\t * @param output 더할문자열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, String output, int slength) {\n\t\tString returnVal = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\treturnVal = source.substring(0, slength) + output;\n\t\t\t} else {\n\t\t\t\treturnVal = source;\n\t\t\t}\n\t\t}\n\t\treturn returnVal;\n\t}\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 해당 문자열을 삭제하는 메서드\n\t * @param source 원본 문자열 배열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, int slength) {\n\t\tString result = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\tresult = source.substring(0, slength);\n\t\t\t} else {\n\t\t\t\tresult = source;\n\t\t\t}\n\t\t}\n\t\treturn result;\n\t}\n\n\t/**\n\t * <p>\n\t * String이 비었거나(\"\") 혹은 null 인지 검증한다.\n\t * </p>\n\t *\n\t * <pre>",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovSndngMailDetailController#backSndngMailDtls",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+      "flowId": "flow:ANY /cop/ems/backSndngMailDetail.do",
+      "line": 115,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+        "line": 115,
+        "snippet": "@RequestMapping(value = \"/cop/ems/backSndngMailDetail.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/ems/backSndngMailDetail.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovSndngMailRegistController#backSndngMailRegist",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+      "flowId": "flow:ANY /cop/ems/backSndngMailRegist.do",
+      "line": 158,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+        "line": 158,
+        "snippet": "@RequestMapping(value = \"/cop/ems/backSndngMailRegist.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/ems/backSndngMailRegist.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovSndngMailDetailController#deleteSndngMail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+      "flowId": "flow:ANY /cop/ems/deleteSndngMail.do",
+      "line": 90,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+        "line": 90,
+        "snippet": "@RequestMapping(value = \"/cop/ems/deleteSndngMail.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/ems/deleteSndngMail.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+        "step:ANY /cop/ems/deleteSndngMail.do:src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+        "step:ANY /cop/ems/deleteSndngMail.do:src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDetailService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovSndngMailDtlsController#deleteSndngMailList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java",
+      "flowId": "flow:ANY /cop/ems/deleteSndngMailList.do",
+      "line": 92,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java",
+        "line": 92,
+        "snippet": "@RequestMapping(value = \"/cop/ems/deleteSndngMailList.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/ems/deleteSndngMailList.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java",
+        "step:ANY /cop/ems/deleteSndngMailList.do:src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+        "step:ANY /cop/ems/deleteSndngMailList.do:src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDtlsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovSndngMailRegistController#insertSndngMail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+      "flowId": "flow:ANY /cop/ems/insertSndngMail.do",
+      "line": 91,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+        "line": 91,
+        "snippet": "@RequestMapping(value = \"/cop/ems/insertSndngMail.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+        "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+        "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+        "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+        "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+        "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovSndngMailRegistController#insertSndngMailView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+      "flowId": "flow:ANY /cop/ems/insertSndngMailView.do",
+      "line": 75,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+        "line": 75,
+        "snippet": "@RequestMapping(value = \"/cop/ems/insertSndngMailView.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/ems/insertSndngMailView.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovSndngMailDetailController#selectSndngMail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+      "flowId": "flow:ANY /cop/ems/selectSndngMailDetail.do",
+      "line": 61,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+        "line": 61,
+        "snippet": "@RequestMapping(value = \"/cop/ems/selectSndngMailDetail.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/ems/selectSndngMailDetail.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+        "step:ANY /cop/ems/selectSndngMailDetail.do:src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+        "step:ANY /cop/ems/selectSndngMailDetail.do:src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDetailService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovSndngMailDtlsController#selectSndngMailList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java",
+      "flowId": "flow:ANY /cop/ems/selectSndngMailList.do",
+      "line": 57,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java",
+        "line": 57,
+        "snippet": "@RequestMapping(value = \"/cop/ems/selectSndngMailList.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/ems/selectSndngMailList.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java",
+        "step:ANY /cop/ems/selectSndngMailList.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "step:ANY /cop/ems/selectSndngMailList.do:src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDtlsService.java",
+        "step:ANY /cop/ems/selectSndngMailList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovSndngMailDetailController#selectSndngMailXml",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+      "flowId": "flow:ANY /cop/ems/selectSndngMailXml.do",
+      "line": 128,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+        "line": 128,
+        "snippet": "@RequestMapping(value = \"/cop/ems/selectSndngMailXml.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/ems/selectSndngMailXml.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+        "step:ANY /cop/ems/selectSndngMailXml.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:ANY /cop/ems/selectSndngMailXml.do:src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+        "step:ANY /cop/ems/selectSndngMailXml.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "step:ANY /cop/ems/selectSndngMailXml.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "header": {
+    "flowIndex": [
+      {
+        "entryPoint": "EgovSndngMailDetailController#backSndngMailDtls",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+        "flowId": "flow:ANY /cop/ems/backSndngMailDetail.do",
+        "line": 115,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+          "line": 115,
+          "snippet": "@RequestMapping(value = \"/cop/ems/backSndngMailDetail.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovSndngMailRegistController#backSndngMailRegist",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+        "flowId": "flow:ANY /cop/ems/backSndngMailRegist.do",
+        "line": 158,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+          "line": 158,
+          "snippet": "@RequestMapping(value = \"/cop/ems/backSndngMailRegist.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovSndngMailDetailController#deleteSndngMail",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+        "flowId": "flow:ANY /cop/ems/deleteSndngMail.do",
+        "line": 90,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+          "line": 90,
+          "snippet": "@RequestMapping(value = \"/cop/ems/deleteSndngMail.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovSndngMailDtlsController#deleteSndngMailList",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java",
+        "flowId": "flow:ANY /cop/ems/deleteSndngMailList.do",
+        "line": 92,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java",
+          "line": 92,
+          "snippet": "@RequestMapping(value = \"/cop/ems/deleteSndngMailList.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovSndngMailRegistController#insertSndngMail",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+        "flowId": "flow:ANY /cop/ems/insertSndngMail.do",
+        "line": 91,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+          "line": 91,
+          "snippet": "@RequestMapping(value = \"/cop/ems/insertSndngMail.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovSndngMailRegistController#insertSndngMailView",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+        "flowId": "flow:ANY /cop/ems/insertSndngMailView.do",
+        "line": 75,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+          "line": 75,
+          "snippet": "@RequestMapping(value = \"/cop/ems/insertSndngMailView.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovSndngMailDetailController#selectSndngMail",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+        "flowId": "flow:ANY /cop/ems/selectSndngMailDetail.do",
+        "line": 61,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+          "line": 61,
+          "snippet": "@RequestMapping(value = \"/cop/ems/selectSndngMailDetail.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovSndngMailDtlsController#selectSndngMailList",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java",
+        "flowId": "flow:ANY /cop/ems/selectSndngMailList.do",
+        "line": 57,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java",
+          "line": 57,
+          "snippet": "@RequestMapping(value = \"/cop/ems/selectSndngMailList.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovSndngMailDetailController#selectSndngMailXml",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+        "flowId": "flow:ANY /cop/ems/selectSndngMailXml.do",
+        "line": 128,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+          "line": 128,
+          "snippet": "@RequestMapping(value = \"/cop/ems/selectSndngMailXml.do\")"
+        }
+      }
+    ]
+  },
+  "isHeaderChunk": true,
+  "key": "cop.ems",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+        "line": 115,
+        "snippet": "@RequestMapping(value = \"/cop/ems/backSndngMailDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+      "stepId": "step:ANY /cop/ems/backSndngMailDetail.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+        "line": 158,
+        "snippet": "@RequestMapping(value = \"/cop/ems/backSndngMailRegist.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+      "stepId": "step:ANY /cop/ems/backSndngMailRegist.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDetailService.java",
+        "line": 19,
+        "snippet": "public interface EgovSndngMailDetailService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDetailService.java",
+      "stepId": "step:ANY /cop/ems/deleteSndngMail.do:src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDetailService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+        "line": 28,
+        "snippet": "public class SndngMailVO {"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+      "stepId": "step:ANY /cop/ems/deleteSndngMail.do:src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+        "line": 115,
+        "snippet": "@RequestMapping(value = \"/cop/ems/backSndngMailDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+      "stepId": "step:ANY /cop/ems/deleteSndngMail.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDtlsService.java",
+        "line": 23,
+        "snippet": "public interface EgovSndngMailDtlsService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDtlsService.java",
+      "stepId": "step:ANY /cop/ems/deleteSndngMailList.do:src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDtlsService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+        "line": 28,
+        "snippet": "public class SndngMailVO {"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+      "stepId": "step:ANY /cop/ems/deleteSndngMailList.do:src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java",
+        "line": 92,
+        "snippet": "@RequestMapping(value = \"/cop/ems/deleteSndngMailList.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java",
+      "stepId": "step:ANY /cop/ems/deleteSndngMailList.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+        "line": 21,
+        "snippet": "public interface EgovFileMngService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "stepId": "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+        "line": 60,
+        "snippet": "@Component(\"EgovFileMngUtil\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "stepId": "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+        "line": 20,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "stepId": "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/cmm/service/FileVO.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+        "line": 28,
+        "snippet": "public class SndngMailVO {"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+      "stepId": "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+        "line": 158,
+        "snippet": "@RequestMapping(value = \"/cop/ems/backSndngMailRegist.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+      "stepId": "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      },
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /cop/ems/insertSndngMail.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+        "line": 158,
+        "snippet": "@RequestMapping(value = \"/cop/ems/backSndngMailRegist.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java",
+      "stepId": "step:ANY /cop/ems/insertSndngMailView.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailRegistController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDetailService.java",
+        "line": 19,
+        "snippet": "public interface EgovSndngMailDetailService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDetailService.java",
+      "stepId": "step:ANY /cop/ems/selectSndngMailDetail.do:src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDetailService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+        "line": 28,
+        "snippet": "public class SndngMailVO {"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+      "stepId": "step:ANY /cop/ems/selectSndngMailDetail.do:src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+        "line": 115,
+        "snippet": "@RequestMapping(value = \"/cop/ems/backSndngMailDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+      "stepId": "step:ANY /cop/ems/selectSndngMailDetail.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "line": 22,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "stepId": "step:ANY /cop/ems/selectSndngMailList.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /cop/ems/selectSndngMailList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDtlsService.java",
+        "line": 23,
+        "snippet": "public interface EgovSndngMailDtlsService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDtlsService.java",
+      "stepId": "step:ANY /cop/ems/selectSndngMailList.do:src/main/java/egovframework/com/cop/ems/service/EgovSndngMailDtlsService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java",
+        "line": 92,
+        "snippet": "@RequestMapping(value = \"/cop/ems/deleteSndngMailList.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java",
+      "stepId": "step:ANY /cop/ems/selectSndngMailList.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDtlsController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "stepId": "step:ANY /cop/ems/selectSndngMailXml.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "stepId": "step:ANY /cop/ems/selectSndngMailXml.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+        "line": 28,
+        "snippet": "public class SndngMailVO {"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java",
+      "stepId": "step:ANY /cop/ems/selectSndngMailXml.do:src/main/java/egovframework/com/cop/ems/service/SndngMailVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+        "line": 115,
+        "snippet": "@RequestMapping(value = \"/cop/ems/backSndngMailDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java",
+      "stepId": "step:ANY /cop/ems/selectSndngMailXml.do:src/main/java/egovframework/com/cop/ems/web/EgovSndngMailDetailController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      },
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /cop/ems/selectSndngMailXml.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    }
+  ]
+}

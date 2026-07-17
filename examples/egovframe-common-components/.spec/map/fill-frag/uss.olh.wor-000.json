@@ -1,0 +1,1795 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "uss.olh.wor-000",
+  "domainId": "domain:uss.olh.wor",
+  "header": {
+    "name": "용어사전",
+    "summary": {
+      "text": "업무에서 쓰는 용어의 뜻과 영문명, 동의어를 등록·수정·삭제하고 목록과 상세로 열람할 수 있게 하는 온라인 도움말 성격의 용어사전 관리 업무이다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+          "line": 7,
+          "snippet": "public interface EgovWordDicaryService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+          "line": 67,
+          "snippet": "@RequestMapping(value = \"/uss/olh/wor/selectWordDicaryList.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+          "line": 32,
+          "snippet": "public class WordDicaryVO extends WordDicaryDefaultVO {"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "용어사전 정보: 용어ID로 식별되며 용어명, 영문명, 용어설명, 동의어를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 37,
+            "snippet": "\tprivate String wordId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 42,
+            "snippet": "\tprivate String wordNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 48,
+            "snippet": "\tprivate String engNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 53,
+            "snippet": "\tprivate String wordDc;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 57,
+            "snippet": "\tprivate String synonm;"
+          }
+        ]
+      },
+      {
+        "text": "등록·수정 이력: 각 용어는 등록자명과 최초등록시점·최초등록자, 최종수정시점·최종수정자를 함께 보관한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 60,
+            "snippet": "\tprivate String emplyrNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 32,
+            "snippet": "public class WordDicaryVO extends WordDicaryDefaultVO {"
+          }
+        ]
+      },
+      {
+        "text": "접속 사용자 정보: 용어를 등록·수정하는 처리자를 확인하기 위해 아이디·이름·소속 조직 정보를 담은 사용자 정보를 참조한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 42,
+            "snippet": "\tprivate String id;"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "용어명, 영문명, 용어설명은 반드시 입력해야 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 40,
+            "snippet": "\t@EgovNullCheck"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 45,
+            "snippet": "\t@EgovNullCheck"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 51,
+            "snippet": "\t@EgovNullCheck"
+          }
+        ]
+      },
+      {
+        "text": "용어명은 250자, 영문명은 60자, 용어설명은 2500자, 동의어는 100자를 넘을 수 없다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 41,
+            "snippet": "\t@Size(max=250)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 46,
+            "snippet": "\t@Size(max=60)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 52,
+            "snippet": "\t@Size(max=2500)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 56,
+            "snippet": "\t@Size(max=100)"
+          }
+        ]
+      },
+      {
+        "text": "영문명은 영문자·숫자·밑줄만 사용할 수 있다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 47,
+            "snippet": "\t@Pattern(regexp=\"^[a-zA-Z0-9_]*$\", message=\"{validation.pattern.english}\")"
+          }
+        ]
+      },
+      {
+        "text": "용어 등록 시 용어ID 채번에 실패하면 업무 예외로 알린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 15,
+            "snippet": "\tvoid insertWordDicary(WordDicaryVO wordDicaryVO) throws FdlException;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 5,
+            "snippet": "import org.egovframe.rte.fdl.cmmn.exception.FdlException;"
+          }
+        ]
+      },
+      {
+        "text": "용어 삭제·등록·수정 처리를 마치면 항상 용어 목록 화면으로 되돌아간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 216,
+            "snippet": "\t\tegovWordDicaryService.deleteWordDicary(wordDicaryVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 218,
+            "snippet": "\t\treturn \"forward:/uss/olh/wor/selectWordDicaryList.do\";"
+          }
+        ]
+      },
+      {
+        "text": "목록 조회는 검색 조건에 맞는 용어 목록과 총 건수를 함께 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 9,
+            "snippet": "\tList<WordDicaryVO> selectWordDicaryList(WordDicaryVO searchVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 11,
+            "snippet": "\tint selectWordDicaryListCnt(WordDicaryVO searchVO);"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "사용자 인증 공통 업무를 통해 현재 접속 사용자와 권한, 인증 여부를 확인한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 58,
+            "snippet": "\tpublic static Boolean isAuthenticated() {"
+          }
+        ]
+      },
+      {
+        "text": "공통 문자열 처리 지원을 이용해 입력 문자열의 빈 값 확인과 길이 제한 처리를 수행한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 77,
+            "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "용어사전 관리",
+        "nodes": [
+          {
+            "id": "s",
+            "kind": "start",
+            "label": "용어사전 메뉴 진입"
+          },
+          {
+            "id": "list",
+            "kind": "activity",
+            "label": "용어 목록 조회",
+            "flowRef": "flow:ANY /uss/olh/wor/selectWordDicaryList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+                "line": 67,
+                "snippet": "@RequestMapping(value = \"/uss/olh/wor/selectWordDicaryList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "detail",
+            "kind": "activity",
+            "label": "용어 상세 조회",
+            "flowRef": "flow:ANY /uss/olh/wor/selectWordDicaryDetail.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+                "line": 102,
+                "snippet": "@RequestMapping(\"/uss/olh/wor/selectWordDicaryDetail.do\")"
+              }
+            ]
+          },
+          {
+            "id": "insView",
+            "kind": "activity",
+            "label": "등록 화면 호출",
+            "flowRef": "flow:ANY /uss/olh/wor/insertWordDicaryView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+                "line": 119,
+                "snippet": "@RequestMapping(\"/uss/olh/wor/insertWordDicaryView.do\")"
+              }
+            ]
+          },
+          {
+            "id": "ins",
+            "kind": "activity",
+            "label": "용어 등록",
+            "flowRef": "flow:ANY /uss/olh/wor/insertWordDicary.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+                "line": 136,
+                "snippet": "@RequestMapping(\"/uss/olh/wor/insertWordDicary.do\")"
+              }
+            ]
+          },
+          {
+            "id": "updView",
+            "kind": "activity",
+            "label": "수정 화면 호출",
+            "flowRef": "flow:ANY /uss/olh/wor/updateWordDicaryView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+                "line": 166,
+                "snippet": "@RequestMapping(\"/uss/olh/wor/updateWordDicaryView.do\")"
+              }
+            ]
+          },
+          {
+            "id": "upd",
+            "kind": "activity",
+            "label": "용어 수정",
+            "flowRef": "flow:ANY /uss/olh/wor/updateWordDicary.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+                "line": 186,
+                "snippet": "@RequestMapping(\"/uss/olh/wor/updateWordDicary.do\")"
+              }
+            ]
+          },
+          {
+            "id": "del",
+            "kind": "activity",
+            "label": "용어 삭제",
+            "flowRef": "flow:ANY /uss/olh/wor/deleteWordDicary.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+                "line": 213,
+                "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+              }
+            ]
+          },
+          {
+            "id": "e",
+            "kind": "end",
+            "label": "목록 화면 복귀"
+          }
+        ],
+        "edges": [
+          {
+            "from": "s",
+            "to": "list"
+          },
+          {
+            "from": "list",
+            "to": "detail"
+          },
+          {
+            "from": "list",
+            "to": "insView"
+          },
+          {
+            "from": "insView",
+            "to": "ins"
+          },
+          {
+            "from": "list",
+            "to": "updView"
+          },
+          {
+            "from": "updView",
+            "to": "upd"
+          },
+          {
+            "from": "list",
+            "to": "del"
+          },
+          {
+            "from": "detail",
+            "to": "e"
+          },
+          {
+            "from": "ins",
+            "to": "e"
+          },
+          {
+            "from": "upd",
+            "to": "e"
+          },
+          {
+            "from": "del",
+            "to": "e"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/olh/wor/deleteWordDicary.do",
+      "name": "용어사전 삭제",
+      "summary": {
+        "text": "선택한 용어를 삭제한 뒤 목록 화면으로 되돌리는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 213,
+            "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 216,
+            "snippet": "\t\tegovWordDicaryService.deleteWordDicary(wordDicaryVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 19,
+            "snippet": "\tvoid deleteWordDicary(WordDicaryVO wordDicaryVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/wor/insertWordDicary.do",
+      "name": "용어사전 등록",
+      "summary": {
+        "text": "입력된 용어명·영문명·용어설명을 검증한 뒤 새 용어를 등록하고 목록 화면으로 되돌리는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 136,
+            "snippet": "@RequestMapping(\"/uss/olh/wor/insertWordDicary.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 15,
+            "snippet": "\tvoid insertWordDicary(WordDicaryVO wordDicaryVO) throws FdlException;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/wor/insertWordDicaryView.do",
+      "name": "용어사전 등록 화면 호출",
+      "summary": {
+        "text": "용어를 새로 등록하기 위한 입력 화면을 여는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 119,
+            "snippet": "@RequestMapping(\"/uss/olh/wor/insertWordDicaryView.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/wor/selectWordDicaryDetail.do",
+      "name": "용어사전 상세 조회",
+      "summary": {
+        "text": "선택한 용어의 상세 정보를 조회해 상세 화면에 표시하는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 102,
+            "snippet": "@RequestMapping(\"/uss/olh/wor/selectWordDicaryDetail.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 13,
+            "snippet": "\tWordDicaryVO selectWordDicaryDetail(WordDicaryVO wordDicaryVO) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/wor/selectWordDicaryList.do",
+      "name": "용어사전 목록 조회",
+      "summary": {
+        "text": "검색 조건을 받아 용어사전 목록과 총 건수를 조회해 목록 화면에 표시하는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 67,
+            "snippet": "@RequestMapping(value = \"/uss/olh/wor/selectWordDicaryList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 9,
+            "snippet": "\tList<WordDicaryVO> selectWordDicaryList(WordDicaryVO searchVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 11,
+            "snippet": "\tint selectWordDicaryListCnt(WordDicaryVO searchVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/wor/updateWordDicary.do",
+      "name": "용어사전 수정",
+      "summary": {
+        "text": "수정 입력값을 검증한 뒤 기존 용어 정보를 갱신하고 목록 화면으로 되돌리는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 186,
+            "snippet": "@RequestMapping(\"/uss/olh/wor/updateWordDicary.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 17,
+            "snippet": "\tvoid updateWordDicary(WordDicaryVO wordDicaryVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/wor/updateWordDicaryView.do",
+      "name": "용어사전 수정 화면 호출",
+      "summary": {
+        "text": "수정 대상 용어의 기존 정보를 조회해 수정 입력 화면에 채워 주는 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 166,
+            "snippet": "@RequestMapping(\"/uss/olh/wor/updateWordDicaryView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 13,
+            "snippet": "\tWordDicaryVO selectWordDicaryDetail(WordDicaryVO wordDicaryVO) throws Exception;"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /uss/olh/wor/deleteWordDicary.do:src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+      "name": "용어사전 업무 서비스",
+      "summary": {
+        "text": "용어사전의 조회·등록·수정·삭제 업무를 정의하고 용어사전 삭제 처리를 수행한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 7,
+            "snippet": "public interface EgovWordDicaryService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 도메인의 업무 창구로서 목록 조회, 건수 조회, 상세 조회, 등록, 수정, 삭제 작업을 한데 모아 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 7,
+              "snippet": "public interface EgovWordDicaryService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 9,
+              "snippet": "\tList<WordDicaryVO> selectWordDicaryList(WordDicaryVO searchVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록 작업은 용어ID 채번 실패를 업무 예외로 알리도록 정의되어 있고, 수정과 삭제는 전달된 용어 정보를 기준으로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 15,
+              "snippet": "\tvoid insertWordDicary(WordDicaryVO wordDicaryVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 17,
+              "snippet": "\tvoid updateWordDicary(WordDicaryVO wordDicaryVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 19,
+              "snippet": "\tvoid deleteWordDicary(WordDicaryVO wordDicaryVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/deleteWordDicary.do:src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+      "name": "용어사전 삭제 요청 접수",
+      "summary": {
+        "text": "용어사전 삭제 요청을 받아 파라미터를 담고 용어사전 서비스로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 213,
+            "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 화면에서 들어온 요청을 받아 용어사전 서비스에 처리를 위임하고, 처리 후에는 목록 화면으로 되돌리는 진입 지점 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 213,
+              "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 218,
+              "snippet": "\t\treturn \"forward:/uss/olh/wor/selectWordDicaryList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "용어 정보와 검색 조건을 요청 파라미터로 받아 화면 모델에 담아 처리하며, 처리 결과에 따라 목록 화면으로 이동한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 214,
+              "snippet": "\tpublic String deleteWordDicary(WordDicaryVO wordDicaryVO, @ModelAttribute(\"searchVO\") WordDicaryVO searchVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 216,
+              "snippet": "\t\tegovWordDicaryService.deleteWordDicary(wordDicaryVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/insertWordDicary.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "접속 사용자 정보 항목",
+      "summary": {
+        "text": "용어사전 등록 처리 시 등록자·수정자를 남기기 위해 참조하는 접속 사용자 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "로그인한 사용자의 신원과 소속, 접속 정보를 담아 용어 등록·수정 시 처리자를 기록하는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디와 이름, 이메일은 반드시 채워야 하며 이메일은 형식 검증을 거치고, 사용자구분·조직ID·고유아이디 등 소속 정보를 함께 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "\tprivate String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 50,
+              "snippet": "\t@EgovEmailCheck"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/insertWordDicary.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "사용자 인증 정보 서비스",
+      "summary": {
+        "text": "용어사전 등록 처리 시 인증된 사용자와 권한 정보를 제공하는 공통 인증 업무이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 제공하는 공통 업무로, 용어사전 처리에서 처리자 확인에 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "사용자 권한 정보는 관리자·일반 사용자 등 권한 이름 목록으로 제공되며, 인증 여부는 참/거짓으로 판정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/insertWordDicary.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "접속 사용자 정보 조회 지원",
+      "summary": {
+        "text": "용어사전 등록 처리 시 현재 접속한 사용자 정보와 권한, 인증 여부를 가져오는 데 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어 등록·수정 처리에서 현재 접속 사용자를 확인하는 창구로, 사용자 정보 조회 요청을 사용자 인증 서비스로 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 정보, 사용자 권한 목록, 인증 여부 세 가지를 제공하며 사용자 인증 서비스를 하나만 두고 공유한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/insertWordDicary.do:src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+      "name": "용어사전 업무 서비스",
+      "summary": {
+        "text": "용어사전의 조회·등록·수정·삭제 업무를 정의하고 용어사전 등록 처리를 수행한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 7,
+            "snippet": "public interface EgovWordDicaryService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 도메인의 업무 창구로서 목록 조회, 건수 조회, 상세 조회, 등록, 수정, 삭제 작업을 한데 모아 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 7,
+              "snippet": "public interface EgovWordDicaryService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 9,
+              "snippet": "\tList<WordDicaryVO> selectWordDicaryList(WordDicaryVO searchVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록 작업은 용어ID 채번 실패를 업무 예외로 알리도록 정의되어 있고, 수정과 삭제는 전달된 용어 정보를 기준으로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 15,
+              "snippet": "\tvoid insertWordDicary(WordDicaryVO wordDicaryVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 17,
+              "snippet": "\tvoid updateWordDicary(WordDicaryVO wordDicaryVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 19,
+              "snippet": "\tvoid deleteWordDicary(WordDicaryVO wordDicaryVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/insertWordDicary.do:src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+      "name": "용어사전 정보 항목",
+      "summary": {
+        "text": "용어ID·용어명·영문명·용어설명·동의어와 등록·수정 이력을 담아 용어사전 등록 처리에 전달되는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 32,
+            "snippet": "public class WordDicaryVO extends WordDicaryDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 화면과 업무 서비스 사이에서 용어 한 건의 내용과 검색 조건을 실어 나르는 정보 묶음 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 32,
+              "snippet": "public class WordDicaryVO extends WordDicaryDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 37,
+              "snippet": "\tprivate String wordId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "용어명은 250자, 영문명은 60자이며 영문·숫자·밑줄만 허용되고, 용어설명은 2500자, 동의어는 100자까지 담을 수 있으며 용어명·영문명·용어설명은 반드시 채워야 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 41,
+              "snippet": "\t@Size(max=250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 47,
+              "snippet": "\t@Pattern(regexp=\"^[a-zA-Z0-9_]*$\", message=\"{validation.pattern.english}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 52,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 56,
+              "snippet": "\t@Size(max=100)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 51,
+              "snippet": "\t@EgovNullCheck"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/insertWordDicary.do:src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+      "name": "용어사전 등록 요청 접수",
+      "summary": {
+        "text": "용어사전 등록 요청을 받아 파라미터를 담고 용어사전 서비스로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 213,
+            "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 화면에서 들어온 요청을 받아 용어사전 서비스에 처리를 위임하고, 처리 후에는 목록 화면으로 되돌리는 진입 지점 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 213,
+              "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 218,
+              "snippet": "\t\treturn \"forward:/uss/olh/wor/selectWordDicaryList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "용어 정보와 검색 조건을 요청 파라미터로 받아 화면 모델에 담아 처리하며, 처리 결과에 따라 목록 화면으로 이동한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 214,
+              "snippet": "\tpublic String deleteWordDicary(WordDicaryVO wordDicaryVO, @ModelAttribute(\"searchVO\") WordDicaryVO searchVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 216,
+              "snippet": "\t\tegovWordDicaryService.deleteWordDicary(wordDicaryVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/insertWordDicary.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 지원",
+      "summary": {
+        "text": "용어사전 등록 처리 시 입력 문자열의 빈 값 확인과 길이 자르기 등 문자열 가공에 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어 등록·수정 처리에서 입력 문자열이 비었는지 확인하거나 지정 길이로 잘라내는 등 공통 문자열 가공을 지원한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열을 기준 값으로 두고, 원본이 지정 길이를 넘으면 잘라내고 넘지 않으면 원본을 그대로 돌려주는 규칙을 지킨다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 81,
+              "snippet": "\t\t\t\treturnVal = source.substring(0, slength) + output;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/insertWordDicaryView.do:src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+      "name": "용어사전 등록 화면 호출 요청 접수",
+      "summary": {
+        "text": "용어사전 등록 화면 호출 요청을 받아 파라미터를 담고 용어사전 서비스로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 213,
+            "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 화면에서 들어온 요청을 받아 용어사전 서비스에 처리를 위임하고, 처리 후에는 목록 화면으로 되돌리는 진입 지점 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 213,
+              "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 218,
+              "snippet": "\t\treturn \"forward:/uss/olh/wor/selectWordDicaryList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "용어 정보와 검색 조건을 요청 파라미터로 받아 화면 모델에 담아 처리하며, 처리 결과에 따라 목록 화면으로 이동한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 214,
+              "snippet": "\tpublic String deleteWordDicary(WordDicaryVO wordDicaryVO, @ModelAttribute(\"searchVO\") WordDicaryVO searchVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 216,
+              "snippet": "\t\tegovWordDicaryService.deleteWordDicary(wordDicaryVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/selectWordDicaryDetail.do:src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+      "name": "용어사전 업무 서비스",
+      "summary": {
+        "text": "용어사전의 조회·등록·수정·삭제 업무를 정의하고 용어사전 상세 조회 처리를 수행한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 7,
+            "snippet": "public interface EgovWordDicaryService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 도메인의 업무 창구로서 목록 조회, 건수 조회, 상세 조회, 등록, 수정, 삭제 작업을 한데 모아 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 7,
+              "snippet": "public interface EgovWordDicaryService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 9,
+              "snippet": "\tList<WordDicaryVO> selectWordDicaryList(WordDicaryVO searchVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록 작업은 용어ID 채번 실패를 업무 예외로 알리도록 정의되어 있고, 수정과 삭제는 전달된 용어 정보를 기준으로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 15,
+              "snippet": "\tvoid insertWordDicary(WordDicaryVO wordDicaryVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 17,
+              "snippet": "\tvoid updateWordDicary(WordDicaryVO wordDicaryVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 19,
+              "snippet": "\tvoid deleteWordDicary(WordDicaryVO wordDicaryVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/selectWordDicaryDetail.do:src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+      "name": "용어사전 상세 조회 요청 접수",
+      "summary": {
+        "text": "용어사전 상세 조회 요청을 받아 파라미터를 담고 용어사전 서비스로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 213,
+            "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 화면에서 들어온 요청을 받아 용어사전 서비스에 처리를 위임하고, 처리 후에는 목록 화면으로 되돌리는 진입 지점 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 213,
+              "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 218,
+              "snippet": "\t\treturn \"forward:/uss/olh/wor/selectWordDicaryList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "용어 정보와 검색 조건을 요청 파라미터로 받아 화면 모델에 담아 처리하며, 처리 결과에 따라 목록 화면으로 이동한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 214,
+              "snippet": "\tpublic String deleteWordDicary(WordDicaryVO wordDicaryVO, @ModelAttribute(\"searchVO\") WordDicaryVO searchVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 216,
+              "snippet": "\t\tegovWordDicaryService.deleteWordDicary(wordDicaryVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/selectWordDicaryList.do:src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+      "name": "용어사전 업무 서비스",
+      "summary": {
+        "text": "용어사전의 조회·등록·수정·삭제 업무를 정의하고 용어사전 목록 조회 처리를 수행한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 7,
+            "snippet": "public interface EgovWordDicaryService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 도메인의 업무 창구로서 목록 조회, 건수 조회, 상세 조회, 등록, 수정, 삭제 작업을 한데 모아 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 7,
+              "snippet": "public interface EgovWordDicaryService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 9,
+              "snippet": "\tList<WordDicaryVO> selectWordDicaryList(WordDicaryVO searchVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록 작업은 용어ID 채번 실패를 업무 예외로 알리도록 정의되어 있고, 수정과 삭제는 전달된 용어 정보를 기준으로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 15,
+              "snippet": "\tvoid insertWordDicary(WordDicaryVO wordDicaryVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 17,
+              "snippet": "\tvoid updateWordDicary(WordDicaryVO wordDicaryVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 19,
+              "snippet": "\tvoid deleteWordDicary(WordDicaryVO wordDicaryVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/selectWordDicaryList.do:src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+      "name": "용어사전 정보 항목",
+      "summary": {
+        "text": "용어ID·용어명·영문명·용어설명·동의어와 등록·수정 이력을 담아 용어사전 목록 조회 처리에 전달되는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 32,
+            "snippet": "public class WordDicaryVO extends WordDicaryDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 화면과 업무 서비스 사이에서 용어 한 건의 내용과 검색 조건을 실어 나르는 정보 묶음 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 32,
+              "snippet": "public class WordDicaryVO extends WordDicaryDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 37,
+              "snippet": "\tprivate String wordId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "용어명은 250자, 영문명은 60자이며 영문·숫자·밑줄만 허용되고, 용어설명은 2500자, 동의어는 100자까지 담을 수 있으며 용어명·영문명·용어설명은 반드시 채워야 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 41,
+              "snippet": "\t@Size(max=250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 47,
+              "snippet": "\t@Pattern(regexp=\"^[a-zA-Z0-9_]*$\", message=\"{validation.pattern.english}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 52,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 56,
+              "snippet": "\t@Size(max=100)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 51,
+              "snippet": "\t@EgovNullCheck"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/selectWordDicaryList.do:src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+      "name": "용어사전 목록 조회 요청 접수",
+      "summary": {
+        "text": "용어사전 목록 조회 요청을 받아 파라미터를 담고 용어사전 서비스로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 213,
+            "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 화면에서 들어온 요청을 받아 용어사전 서비스에 처리를 위임하고, 처리 후에는 목록 화면으로 되돌리는 진입 지점 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 213,
+              "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 218,
+              "snippet": "\t\treturn \"forward:/uss/olh/wor/selectWordDicaryList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "용어 정보와 검색 조건을 요청 파라미터로 받아 화면 모델에 담아 처리하며, 처리 결과에 따라 목록 화면으로 이동한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 214,
+              "snippet": "\tpublic String deleteWordDicary(WordDicaryVO wordDicaryVO, @ModelAttribute(\"searchVO\") WordDicaryVO searchVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 216,
+              "snippet": "\t\tegovWordDicaryService.deleteWordDicary(wordDicaryVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/updateWordDicary.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "접속 사용자 정보 항목",
+      "summary": {
+        "text": "용어사전 수정 처리 시 등록자·수정자를 남기기 위해 참조하는 접속 사용자 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "로그인한 사용자의 신원과 소속, 접속 정보를 담아 용어 등록·수정 시 처리자를 기록하는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디와 이름, 이메일은 반드시 채워야 하며 이메일은 형식 검증을 거치고, 사용자구분·조직ID·고유아이디 등 소속 정보를 함께 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "\tprivate String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 50,
+              "snippet": "\t@EgovEmailCheck"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/updateWordDicary.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "사용자 인증 정보 서비스",
+      "summary": {
+        "text": "용어사전 수정 처리 시 인증된 사용자와 권한 정보를 제공하는 공통 인증 업무이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 제공하는 공통 업무로, 용어사전 처리에서 처리자 확인에 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "사용자 권한 정보는 관리자·일반 사용자 등 권한 이름 목록으로 제공되며, 인증 여부는 참/거짓으로 판정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/updateWordDicary.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "접속 사용자 정보 조회 지원",
+      "summary": {
+        "text": "용어사전 수정 처리 시 현재 접속한 사용자 정보와 권한, 인증 여부를 가져오는 데 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어 등록·수정 처리에서 현재 접속 사용자를 확인하는 창구로, 사용자 정보 조회 요청을 사용자 인증 서비스로 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 정보, 사용자 권한 목록, 인증 여부 세 가지를 제공하며 사용자 인증 서비스를 하나만 두고 공유한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/updateWordDicary.do:src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+      "name": "용어사전 업무 서비스",
+      "summary": {
+        "text": "용어사전의 조회·등록·수정·삭제 업무를 정의하고 용어사전 수정 처리를 수행한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 7,
+            "snippet": "public interface EgovWordDicaryService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 도메인의 업무 창구로서 목록 조회, 건수 조회, 상세 조회, 등록, 수정, 삭제 작업을 한데 모아 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 7,
+              "snippet": "public interface EgovWordDicaryService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 9,
+              "snippet": "\tList<WordDicaryVO> selectWordDicaryList(WordDicaryVO searchVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록 작업은 용어ID 채번 실패를 업무 예외로 알리도록 정의되어 있고, 수정과 삭제는 전달된 용어 정보를 기준으로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 15,
+              "snippet": "\tvoid insertWordDicary(WordDicaryVO wordDicaryVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 17,
+              "snippet": "\tvoid updateWordDicary(WordDicaryVO wordDicaryVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 19,
+              "snippet": "\tvoid deleteWordDicary(WordDicaryVO wordDicaryVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/updateWordDicary.do:src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+      "name": "용어사전 정보 항목",
+      "summary": {
+        "text": "용어ID·용어명·영문명·용어설명·동의어와 등록·수정 이력을 담아 용어사전 수정 처리에 전달되는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 32,
+            "snippet": "public class WordDicaryVO extends WordDicaryDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 화면과 업무 서비스 사이에서 용어 한 건의 내용과 검색 조건을 실어 나르는 정보 묶음 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 32,
+              "snippet": "public class WordDicaryVO extends WordDicaryDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 37,
+              "snippet": "\tprivate String wordId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "용어명은 250자, 영문명은 60자이며 영문·숫자·밑줄만 허용되고, 용어설명은 2500자, 동의어는 100자까지 담을 수 있으며 용어명·영문명·용어설명은 반드시 채워야 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 41,
+              "snippet": "\t@Size(max=250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 47,
+              "snippet": "\t@Pattern(regexp=\"^[a-zA-Z0-9_]*$\", message=\"{validation.pattern.english}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 52,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 56,
+              "snippet": "\t@Size(max=100)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 51,
+              "snippet": "\t@EgovNullCheck"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/updateWordDicary.do:src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+      "name": "용어사전 수정 요청 접수",
+      "summary": {
+        "text": "용어사전 수정 요청을 받아 파라미터를 담고 용어사전 서비스로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 213,
+            "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 화면에서 들어온 요청을 받아 용어사전 서비스에 처리를 위임하고, 처리 후에는 목록 화면으로 되돌리는 진입 지점 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 213,
+              "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 218,
+              "snippet": "\t\treturn \"forward:/uss/olh/wor/selectWordDicaryList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "용어 정보와 검색 조건을 요청 파라미터로 받아 화면 모델에 담아 처리하며, 처리 결과에 따라 목록 화면으로 이동한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 214,
+              "snippet": "\tpublic String deleteWordDicary(WordDicaryVO wordDicaryVO, @ModelAttribute(\"searchVO\") WordDicaryVO searchVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 216,
+              "snippet": "\t\tegovWordDicaryService.deleteWordDicary(wordDicaryVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/updateWordDicary.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 지원",
+      "summary": {
+        "text": "용어사전 수정 처리 시 입력 문자열의 빈 값 확인과 길이 자르기 등 문자열 가공에 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어 등록·수정 처리에서 입력 문자열이 비었는지 확인하거나 지정 길이로 잘라내는 등 공통 문자열 가공을 지원한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열을 기준 값으로 두고, 원본이 지정 길이를 넘으면 잘라내고 넘지 않으면 원본을 그대로 돌려주는 규칙을 지킨다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 81,
+              "snippet": "\t\t\t\treturnVal = source.substring(0, slength) + output;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/updateWordDicaryView.do:src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+      "name": "용어사전 업무 서비스",
+      "summary": {
+        "text": "용어사전의 조회·등록·수정·삭제 업무를 정의하고 용어사전 수정 화면 호출 처리를 수행한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+            "line": 7,
+            "snippet": "public interface EgovWordDicaryService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 도메인의 업무 창구로서 목록 조회, 건수 조회, 상세 조회, 등록, 수정, 삭제 작업을 한데 모아 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 7,
+              "snippet": "public interface EgovWordDicaryService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 9,
+              "snippet": "\tList<WordDicaryVO> selectWordDicaryList(WordDicaryVO searchVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록 작업은 용어ID 채번 실패를 업무 예외로 알리도록 정의되어 있고, 수정과 삭제는 전달된 용어 정보를 기준으로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 15,
+              "snippet": "\tvoid insertWordDicary(WordDicaryVO wordDicaryVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 17,
+              "snippet": "\tvoid updateWordDicary(WordDicaryVO wordDicaryVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/EgovWordDicaryService.java",
+              "line": 19,
+              "snippet": "\tvoid deleteWordDicary(WordDicaryVO wordDicaryVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/updateWordDicaryView.do:src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+      "name": "용어사전 정보 항목",
+      "summary": {
+        "text": "용어ID·용어명·영문명·용어설명·동의어와 등록·수정 이력을 담아 용어사전 수정 화면 호출 처리에 전달되는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+            "line": 32,
+            "snippet": "public class WordDicaryVO extends WordDicaryDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 화면과 업무 서비스 사이에서 용어 한 건의 내용과 검색 조건을 실어 나르는 정보 묶음 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 32,
+              "snippet": "public class WordDicaryVO extends WordDicaryDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 37,
+              "snippet": "\tprivate String wordId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "용어명은 250자, 영문명은 60자이며 영문·숫자·밑줄만 허용되고, 용어설명은 2500자, 동의어는 100자까지 담을 수 있으며 용어명·영문명·용어설명은 반드시 채워야 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 41,
+              "snippet": "\t@Size(max=250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 47,
+              "snippet": "\t@Pattern(regexp=\"^[a-zA-Z0-9_]*$\", message=\"{validation.pattern.english}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 52,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 56,
+              "snippet": "\t@Size(max=100)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/service/WordDicaryVO.java",
+              "line": 51,
+              "snippet": "\t@EgovNullCheck"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/olh/wor/updateWordDicaryView.do:src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+      "name": "용어사전 수정 화면 호출 요청 접수",
+      "summary": {
+        "text": "용어사전 수정 화면 호출 요청을 받아 파라미터를 담고 용어사전 서비스로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+            "line": 213,
+            "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "용어사전 화면에서 들어온 요청을 받아 용어사전 서비스에 처리를 위임하고, 처리 후에는 목록 화면으로 되돌리는 진입 지점 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 213,
+              "snippet": "@RequestMapping(\"/uss/olh/wor/deleteWordDicary.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 218,
+              "snippet": "\t\treturn \"forward:/uss/olh/wor/selectWordDicaryList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "용어 정보와 검색 조건을 요청 파라미터로 받아 화면 모델에 담아 처리하며, 처리 결과에 따라 목록 화면으로 이동한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 214,
+              "snippet": "\tpublic String deleteWordDicary(WordDicaryVO wordDicaryVO, @ModelAttribute(\"searchVO\") WordDicaryVO searchVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/wor/web/EgovWordDicaryController.java",
+              "line": 216,
+              "snippet": "\t\tegovWordDicaryService.deleteWordDicary(wordDicaryVO);"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "domainId": "domain:utl.jso",
+  "files": [
+    {
+      "className": "EgovUtlJsonController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java — java 파일",
+        "tags": []
+      },
+      "line": 59,
+      "relPath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "slice": {
+        "endLine": 125,
+        "startLine": 49,
+        "text": "    @Resource(name = \"propertiesService\")\n    protected EgovPropertyService propertiesService;\n\n    private static final Logger LOGGER = LoggerFactory.getLogger(EgovUtlJsonController.class);\n\n    /**\n\t * json 단건조회\n\t * @return String\n\t * @exception Exception\n\t */\n    @RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.GET)\n    public String selectUtlJsonInquire()  throws Exception {\n        return \"egovframework/com/utl/jso/EgovUtlJsonInquire\";\n    }\n\n    @RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.POST)\n    public ModelAndView selectUtlJsonInquirePost(@RequestParam Map<?, ?> commandMap)  throws Exception {\n    \tModelAndView modelAndView = new ModelAndView();\n    \tmodelAndView.setViewName(\"jsonView\");\n    \tLOGGER.debug(\"EgovUtlJsonController EgovUtlJsonInquire START=========\");\n\n    \tLOGGER.debug(\"commandMap>\"+commandMap);\n\n    \tmodelAndView.addObject(\"fruits1\", \"apple\");\n    \tmodelAndView.addObject(\"fruits2\", \"orange\");\n    \tmodelAndView.addObject(\"fruits3\", \"lemon\");\n    \tmodelAndView.addObject(\"fruits4\", \"lime\");\n    \tmodelAndView.addObject(\"fruits5\", \"mango\");\n\n    \tLOGGER.debug(\"EgovUtlJsonController EgovUtlJsonInquire END=========\");\n\n    \treturn modelAndView;\n    }\n    /**\n\t * json 다건조회\n\t * @return String\n\t * @exception Exception\n\t */\n    @RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.GET)\n    public String selectUtlJsonMultiInquire(@RequestParam Map<?, ?> commandMap)  throws Exception {\n        return \"egovframework/com/utl/jso/EgovUtlJsonMultiInquire\";\n    }\n    @RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.POST)\n    public ModelAndView selectUtlJsonMultiInquirePost(@RequestParam Map<?, ?> commandMap)  throws Exception {\n    \tModelAndView modelAndView = new ModelAndView();\n    \tmodelAndView.setViewName(\"jsonView\");\n    \tLOGGER.debug(\"EgovUtlJsonController selectUtlJsonMultiInquire START=========\");\n\n    \tLOGGER.debug(\"commandMap>\"+commandMap);\n\n    \tmodelAndView.addObject(\"fruits1\", \"apple\");\n    \tmodelAndView.addObject(\"fruits2\", \"orange\");\n    \tmodelAndView.addObject(\"fruits3\", \"lemon\");\n    \tmodelAndView.addObject(\"fruits4\", \"lime\");\n    \tmodelAndView.addObject(\"fruits5\", \"mango\");\n\n    \tMap<String, String> mp = new HashMap<>();\n    \tmp.put(\"fruits1\", \"apple\");\n    \tmp.put(\"fruits2\", \"orange\");\n    \tmp.put(\"fruits3\", \"lemon\");\n    \tmp.put(\"fruits4\", \"lime\");\n    \tmp.put(\"fruits5\", \"mango\");\n\n    \tList<Map<String, String>> list = new ArrayList<>();\n    \tlist.add(mp);\n    \tlist.add(mp);\n    \tlist.add(mp);\n    \tlist.add(mp);\n    \tlist.add(mp);\n\n    \tmodelAndView.addObject(\"list\", list);\n    \tLOGGER.debug(\"EgovUtlJsonController selectUtlJsonMultiInquire END=========\");\n\n    \treturn modelAndView;\n    }\n\n}",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovUtlJsonController#selectUtlJsonInquire",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "flowId": "flow:GET /utl/jso/EgovUtlJsonInquire.do",
+      "line": 59,
+      "stepIds": [
+        "step:GET /utl/jso/EgovUtlJsonInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovUtlJsonController#selectUtlJsonMultiInquire",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "flowId": "flow:GET /utl/jso/EgovUtlJsonMultiInquire.do",
+      "line": 87,
+      "stepIds": [
+        "step:GET /utl/jso/EgovUtlJsonMultiInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovUtlJsonController#selectUtlJsonInquirePost",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "flowId": "flow:POST /utl/jso/EgovUtlJsonInquire.do",
+      "line": 64,
+      "stepIds": [
+        "step:POST /utl/jso/EgovUtlJsonInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovUtlJsonController#selectUtlJsonMultiInquirePost",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "flowId": "flow:POST /utl/jso/EgovUtlJsonMultiInquire.do",
+      "line": 91,
+      "stepIds": [
+        "step:POST /utl/jso/EgovUtlJsonMultiInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "utl.jso",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "stepId": "step:GET /utl/jso/EgovUtlJsonInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "stepId": "step:GET /utl/jso/EgovUtlJsonMultiInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "stepId": "step:POST /utl/jso/EgovUtlJsonInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "stepId": "step:POST /utl/jso/EgovUtlJsonMultiInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java"
+    }
+  ]
+}

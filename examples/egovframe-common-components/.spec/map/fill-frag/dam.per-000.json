@@ -1,0 +1,1846 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "dam.per-000",
+  "domainId": "domain:dam.per",
+  "header": {
+    "name": "개인지식 관리",
+    "summary": {
+      "text": "조직 구성원이 자신의 개인지식을 등록하고, 목록·상세로 조회하며, 수정·삭제하는 업무 영역이다. 지식에는 소속조직과 지식유형이 부여되고 첨부파일을 함께 관리한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+          "line": 103,
+          "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonalList.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+          "line": 203,
+          "snippet": "@PostMapping(value = \"/dam/per/EgovComDamPersonalRegist.do\")"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "개인지식 — 소속조직, 지식유형, 지식명, 수집일자, 지식내용, 개인지식공개여부, 첨부파일ID로 구성되는 이 영역의 핵심 업무 정보이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonal.java",
+            "line": 16,
+            "snippet": "public class KnoPersonal {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonal.java",
+            "line": 25,
+            "snippet": "\tprivate String knoId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonal.java",
+            "line": 83,
+            "snippet": "\tprivate String atchFileId;"
+          }
+        ]
+      },
+      {
+        "text": "개인지식 조회조건 — 목록 화면의 검색조건·검색 키워드와 페이지 정보를 담아 목록조회에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonalVO.java",
+            "line": 18,
+            "snippet": "public class KnoPersonalVO extends KnoPersonal {"
+          }
+        ]
+      },
+      {
+        "text": "첨부파일 — 첨부파일 아이디, 파일연번, 원파일명, 저장파일명, 파일저장경로, 파일크기로 개인지식에 딸린 파일을 표현한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 26,
+            "snippet": "    public String atchFileId = \"\";"
+          }
+        ]
+      },
+      {
+        "text": "조직별 지식맵 — 등록 화면에서 소속조직을 고를 수 있도록 조직 기준 지식맵 목록을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapTeamService {"
+          }
+        ]
+      },
+      {
+        "text": "지식유형 지식맵 — 등록 화면에서 지식유형을 고를 수 있도록 유형 기준 지식맵 목록을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapMaterialService {"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "목록조회·등록·수정은 로그인한 사용자만 수행할 수 있으며, 미인증 사용자는 로그인 안내 메시지와 함께 로그인 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 208,
+            "snippet": "\t\tif (!isAuthenticated) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 111,
+            "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+          }
+        ]
+      },
+      {
+        "text": "등록·수정 요청은 입력값 검증을 통과해야 하며, 검증 오류가 있으면 저장하지 않고 다시 입력 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 218,
+            "snippet": "\t\tif (bindingResult.hasErrors()) {"
+          }
+        ]
+      },
+      {
+        "text": "소속조직ID, 지식유형코드, 지식명, 지식내용, 수집일자는 필수 입력이며 지식내용은 2500자를 넘을 수 없다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonal.java",
+            "line": 59,
+            "snippet": "\tprivate String knoNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonal.java",
+            "line": 64,
+            "snippet": "\t@Size(max=2500)"
+          }
+        ]
+      },
+      {
+        "text": "등록 화면을 열 때는 선택 항목으로 쓰일 조직별 지식맵 목록과 지식유형 지식맵 목록을 전체 건수 기준으로 함께 조회해 내려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 167,
+            "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonalRegistView.do\")"
+          }
+        ]
+      },
+      {
+        "text": "첨부파일은 저장 경로가 지정되지 않으면 전역 파일 저장 경로에 저장하고, 첨부파일 아이디가 없으면 새로 채번한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "지식맵 영역(조직별·지식유형)의 목록을 등록 화면 선택 항목으로 받아 쓴다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapTeamService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapMaterialService {"
+          }
+        ]
+      },
+      {
+        "text": "공통 인증 영역에 로그인 여부와 로그인 사용자 정보를 의존하며, 미인증 시 로그인 화면으로 넘긴다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      {
+        "text": "공통 첨부파일 영역에 파일 저장과 파일 정보 등록·수정을 위임한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          }
+        ]
+      },
+      {
+        "text": "공통 메시지 영역에서 로그인 실패 등 사용자 안내 문구를 코드로 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "개인지식 관리",
+        "nodes": [
+          {
+            "id": "n_start",
+            "kind": "start",
+            "label": "개인지식 화면 진입"
+          },
+          {
+            "id": "n_auth",
+            "kind": "decision",
+            "label": "로그인 사용자인가",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+                "line": 208,
+                "snippet": "\t\tif (!isAuthenticated) {"
+              }
+            ]
+          },
+          {
+            "id": "n_login",
+            "kind": "activity",
+            "label": "로그인 화면으로 이동",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+                "line": 111,
+                "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+              }
+            ]
+          },
+          {
+            "id": "n_list",
+            "kind": "activity",
+            "label": "개인지식 목록조회",
+            "flowRef": "flow:ANY /dam/per/EgovComDamPersonalList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+                "line": 103,
+                "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonalList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n_detail",
+            "kind": "activity",
+            "label": "개인지식 상세조회",
+            "flowRef": "flow:ANY /dam/per/EgovComDamPersonal.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+                "line": 151,
+                "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n_registview",
+            "kind": "activity",
+            "label": "등록화면 열기",
+            "flowRef": "flow:ANY /dam/per/EgovComDamPersonalRegistView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+                "line": 167,
+                "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonalRegistView.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n_regist",
+            "kind": "activity",
+            "label": "개인지식 등록",
+            "flowRef": "flow:POST /dam/per/EgovComDamPersonalRegist.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+                "line": 203,
+                "snippet": "@PostMapping(value = \"/dam/per/EgovComDamPersonalRegist.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n_modifyview",
+            "kind": "activity",
+            "label": "수정화면 열기",
+            "flowRef": "flow:POST /dam/per/EgovComDamPersonalModifyView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+                "line": 254,
+                "snippet": "@PostMapping(value = \"/dam/per/EgovComDamPersonalModifyView.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n_modify",
+            "kind": "activity",
+            "label": "개인지식 수정",
+            "flowRef": "flow:POST /dam/per/EgovComDamPersonalModify.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+                "line": 281,
+                "snippet": "@PostMapping(value = \"/dam/per/EgovComDamPersonalModify.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n_remove",
+            "kind": "activity",
+            "label": "개인지식 삭제",
+            "flowRef": "flow:POST /dam/per/EgovComDamPersonalRemove.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+                "line": 354,
+                "snippet": "@PostMapping(value = \"/dam/per/EgovComDamPersonalRemove.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n_valid",
+            "kind": "decision",
+            "label": "입력값 검증 통과",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+                "line": 218,
+                "snippet": "\t\tif (bindingResult.hasErrors()) {"
+              }
+            ]
+          },
+          {
+            "id": "n_reinput",
+            "kind": "activity",
+            "label": "입력화면 재표시",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+                "line": 218,
+                "snippet": "\t\tif (bindingResult.hasErrors()) {"
+              }
+            ]
+          },
+          {
+            "id": "n_end",
+            "kind": "end",
+            "label": "처리 완료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "n_start",
+            "to": "n_auth"
+          },
+          {
+            "from": "n_auth",
+            "to": "n_login",
+            "label": "NO"
+          },
+          {
+            "from": "n_auth",
+            "to": "n_list",
+            "label": "YES"
+          },
+          {
+            "from": "n_login",
+            "to": "n_end"
+          },
+          {
+            "from": "n_list",
+            "to": "n_detail"
+          },
+          {
+            "from": "n_list",
+            "to": "n_registview"
+          },
+          {
+            "from": "n_registview",
+            "to": "n_regist"
+          },
+          {
+            "from": "n_detail",
+            "to": "n_modifyview"
+          },
+          {
+            "from": "n_detail",
+            "to": "n_remove"
+          },
+          {
+            "from": "n_modifyview",
+            "to": "n_modify"
+          },
+          {
+            "from": "n_regist",
+            "to": "n_valid"
+          },
+          {
+            "from": "n_modify",
+            "to": "n_valid"
+          },
+          {
+            "from": "n_valid",
+            "to": "n_reinput",
+            "label": "NO"
+          },
+          {
+            "from": "n_valid",
+            "to": "n_end",
+            "label": "YES"
+          },
+          {
+            "from": "n_reinput",
+            "to": "n_end"
+          },
+          {
+            "from": "n_remove",
+            "to": "n_end"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /dam/per/EgovComDamPersonal.do",
+      "name": "개인지식 상세조회",
+      "summary": {
+        "text": "목록에서 선택한 개인지식 한 건의 상세 정보를 조회해 상세 화면에 보여준다. 소속조직, 지식유형, 지식명, 수집일자, 지식내용과 첨부파일 정보를 함께 확인할 수 있다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /dam/per/EgovComDamPersonalList.do",
+      "name": "개인지식 목록조회",
+      "summary": {
+        "text": "로그인한 사용자가 등록된 개인지식 목록을 검색조건과 검색어로 조회한다. 로그인하지 않은 경우 로그인 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 103,
+            "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonalList.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /dam/per/EgovComDamPersonalRegistView.do",
+      "name": "개인지식 등록화면",
+      "summary": {
+        "text": "개인지식 등록 화면을 연다. 선택 항목으로 쓰일 조직별 지식맵 목록과 지식유형 지식맵 목록을 함께 조회해 화면에 내려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 167,
+            "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonalRegistView.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /dam/per/EgovComDamPersonalModify.do",
+      "name": "개인지식 수정",
+      "summary": {
+        "text": "기 등록된 개인지식 정보를 수정한다. 로그인 여부와 입력값 검증을 거친 뒤 본문 내용과 첨부파일을 갱신한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 281,
+            "snippet": "@PostMapping(value = \"/dam/per/EgovComDamPersonalModify.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /dam/per/EgovComDamPersonalModifyView.do",
+      "name": "개인지식 수정화면",
+      "summary": {
+        "text": "수정할 개인지식 한 건을 조회해 수정 화면에 기존 값을 채워 보여준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 254,
+            "snippet": "@PostMapping(value = \"/dam/per/EgovComDamPersonalModifyView.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /dam/per/EgovComDamPersonalRegist.do",
+      "name": "개인지식 등록",
+      "summary": {
+        "text": "작성한 개인지식을 신규로 등록한다. 로그인 여부와 입력값 검증을 거쳐 첨부파일을 저장하고 지식 본문을 등록한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 203,
+            "snippet": "@PostMapping(value = \"/dam/per/EgovComDamPersonalRegist.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /dam/per/EgovComDamPersonalRemove.do",
+      "name": "개인지식 삭제",
+      "summary": {
+        "text": "등록된 개인지식 한 건을 삭제한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 354,
+            "snippet": "@PostMapping(value = \"/dam/per/EgovComDamPersonalRemove.do\")"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /dam/per/EgovComDamPersonal.do:src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+      "name": "개인지식 상세조회 - 개인지식 업무 서비스",
+      "summary": {
+        "text": "개인지식 상세조회 흐름에서 개인지식 업무 서비스 단계가 맡는 처리이다. 개인지식 정보의 등록, 수정, 삭제, 조회 업무를 제공하는 업무 서비스이다. 조회 기능은 목록조회와 상세조회로 나뉘며 화면 요청을 실제 업무 처리로 연결한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+            "line": 17,
+            "snippet": "public interface EgovKnoPersonalService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "개인지식 정보의 등록, 수정, 삭제, 조회 업무를 제공하는 업무 서비스이다. 조회 기능은 목록조회와 상세조회로 나뉘며 화면 요청을 실제 업무 처리로 연결한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+              "line": 17,
+              "snippet": "public interface EgovKnoPersonalService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록된 개인지식 목록 조회, 목록 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제 업무를 각각 제공한다. 목록 조회는 조회조건 정보를 받아 페이지 단위 목록을 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+              "line": 17,
+              "snippet": "public interface EgovKnoPersonalService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /dam/per/EgovComDamPersonal.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "name": "개인지식 상세조회 - 개인지식 화면 처리",
+      "summary": {
+        "text": "개인지식 상세조회 흐름에서 개인지식 화면 처리 단계가 맡는 처리이다. 개인지식 관련 화면 요청을 받아 업무 서비스로 위임하고, 조회 결과를 화면 모델에 담아 되돌려 주는 창구 역할을 한다. 목록·상세·등록·수정·삭제 요청의 진입점이며 이동할 화면 경로를 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "개인지식 관련 화면 요청을 받아 업무 서비스로 위임하고, 조회 결과를 화면 모델에 담아 되돌려 주는 창구 역할을 한다. 목록·상세·등록·수정·삭제 요청의 진입점이며 이동할 화면 경로를 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 화면과 조회조건은 개인지식 조회조건 정보로 받아 처리하며, 등록·수정 요청은 로그인 여부를 먼저 확인하고 미인증이면 로그인 화면으로 되돌린다. 입력값 검증에 실패하면 저장하지 않고 다시 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 208,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 218,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /dam/per/EgovComDamPersonalList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "개인지식 목록조회 - 안내 메시지 조회",
+      "summary": {
+        "text": "개인지식 목록조회 흐름에서 안내 메시지 조회 단계가 맡는 처리이다. 업무 처리 결과와 오류 상황에서 사용자에게 보여줄 안내 메시지를 코드로 조회해 주는 공통 기능이다. 개인지식 등록·수정 시 로그인 실패 안내 문구를 가져오는 데 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "업무 처리 결과와 오류 상황에서 사용자에게 보여줄 안내 메시지를 코드로 조회해 주는 공통 기능이다. 개인지식 등록·수정 시 로그인 실패 안내 문구를 가져오는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드로 정의된 메시지를 조회하며, 필요에 따라 로케일과 매개변수를 함께 적용해 사용자 언어에 맞는 문구를 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /dam/per/EgovComDamPersonalList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "개인지식 목록조회 - 로그인 사용자 정보",
+      "summary": {
+        "text": "개인지식 목록조회 흐름에서 로그인 사용자 정보 단계가 맡는 처리이다. 인증된 사용자의 신원 정보를 담아 흐름 전반에 전달하는 정보 객체이다. 개인지식 등록·수정 시 등록자와 소속조직을 채우는 근거가 된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증된 사용자의 신원 정보를 담아 흐름 전반에 전달하는 정보 객체이다. 개인지식 등록·수정 시 등록자와 소속조직을 채우는 근거가 된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디, 이름, 이메일주소, 사용자구분, 조직(부서) 아이디와 명, 고유아이디, 사용자 IP정보 등을 보관한다. 아이디·이름·이메일은 비어 있을 수 없는 항목으로 지정되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /dam/per/EgovComDamPersonalList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "개인지식 목록조회 - 인증 사용자 조회 서비스",
+      "summary": {
+        "text": "개인지식 목록조회 흐름에서 인증 사용자 조회 서비스 단계가 맡는 처리이다. 현재 인증된 사용자 정보와 권한 목록을 제공하고, 인증 여부를 판정해 주는 공통 인증 서비스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "현재 인증된 사용자 정보와 권한 목록을 제공하고, 인증 여부를 판정해 주는 공통 인증 서비스이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 객체 조회, 사용자 권한 정보 목록 조회, 인증된 사용자 여부 확인의 세 가지 판정 기능을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /dam/per/EgovComDamPersonalList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "개인지식 목록조회 - 인증 사용자 확인 도우미",
+      "summary": {
+        "text": "개인지식 목록조회 흐름에서 인증 사용자 확인 도우미 단계가 맡는 처리이다. 화면 처리 단계에서 인증 사용자 조회 서비스를 손쉽게 호출하도록 감싼 도우미이다. 개인지식 흐름에서 로그인 여부 확인과 로그인 사용자 정보 취득에 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면 처리 단계에서 인증 사용자 조회 서비스를 손쉽게 호출하도록 감싼 도우미이다. 개인지식 흐름에서 로그인 여부 확인과 로그인 사용자 정보 취득에 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 서비스 하나를 보유하며, 인증된 사용자 객체·권한 목록·인증 여부를 그대로 위임해 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /dam/per/EgovComDamPersonalList.do:src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+      "name": "개인지식 목록조회 - 개인지식 업무 서비스",
+      "summary": {
+        "text": "개인지식 목록조회 흐름에서 개인지식 업무 서비스 단계가 맡는 처리이다. 개인지식 정보의 등록, 수정, 삭제, 조회 업무를 제공하는 업무 서비스이다. 조회 기능은 목록조회와 상세조회로 나뉘며 화면 요청을 실제 업무 처리로 연결한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+            "line": 17,
+            "snippet": "public interface EgovKnoPersonalService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "개인지식 정보의 등록, 수정, 삭제, 조회 업무를 제공하는 업무 서비스이다. 조회 기능은 목록조회와 상세조회로 나뉘며 화면 요청을 실제 업무 처리로 연결한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+              "line": 17,
+              "snippet": "public interface EgovKnoPersonalService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록된 개인지식 목록 조회, 목록 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제 업무를 각각 제공한다. 목록 조회는 조회조건 정보를 받아 페이지 단위 목록을 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+              "line": 17,
+              "snippet": "public interface EgovKnoPersonalService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /dam/per/EgovComDamPersonalList.do:src/main/java/egovframework/com/dam/per/service/KnoPersonalVO.java",
+      "name": "개인지식 목록조회 - 개인지식 조회조건 정보",
+      "summary": {
+        "text": "개인지식 목록조회 흐름에서 개인지식 조회조건 정보 단계가 맡는 처리이다. 개인지식 목록 화면의 조회조건과 페이지 정보를 담는 정보 객체이다. 화면에서 받은 검색 입력을 업무 서비스로 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonalVO.java",
+            "line": 18,
+            "snippet": "public class KnoPersonalVO extends KnoPersonal {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "개인지식 목록 화면의 조회조건과 페이지 정보를 담는 정보 객체이다. 화면에서 받은 검색 입력을 업무 서비스로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonalVO.java",
+              "line": 18,
+              "snippet": "public class KnoPersonalVO extends KnoPersonal {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "개인지식 정보를 확장하며 검색조건, 검색 키워드, 페이지개수·페이지사이즈·현재페이지 등 목록 페이지 항목을 관리한다. 현재페이지는 1, 한 페이지 표시 건수는 10이 기본값이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonalVO.java",
+              "line": 18,
+              "snippet": "public class KnoPersonalVO extends KnoPersonal {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /dam/per/EgovComDamPersonalList.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "name": "개인지식 목록조회 - 개인지식 화면 처리",
+      "summary": {
+        "text": "개인지식 목록조회 흐름에서 개인지식 화면 처리 단계가 맡는 처리이다. 개인지식 관련 화면 요청을 받아 업무 서비스로 위임하고, 조회 결과를 화면 모델에 담아 되돌려 주는 창구 역할을 한다. 목록·상세·등록·수정·삭제 요청의 진입점이며 이동할 화면 경로를 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "개인지식 관련 화면 요청을 받아 업무 서비스로 위임하고, 조회 결과를 화면 모델에 담아 되돌려 주는 창구 역할을 한다. 목록·상세·등록·수정·삭제 요청의 진입점이며 이동할 화면 경로를 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 화면과 조회조건은 개인지식 조회조건 정보로 받아 처리하며, 등록·수정 요청은 로그인 여부를 먼저 확인하고 미인증이면 로그인 화면으로 되돌린다. 입력값 검증에 실패하면 저장하지 않고 다시 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 208,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 218,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /dam/per/EgovComDamPersonalRegistView.do:src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+      "name": "개인지식 등록화면 - 지식유형 지식맵 서비스",
+      "summary": {
+        "text": "개인지식 등록화면 흐름에서 지식유형 지식맵 서비스 단계가 맡는 처리이다. 지식유형 기준 지식맵 정보를 제공하는 업무 서비스이다. 개인지식 등록 화면에서 선택 가능한 지식유형 목록을 내려주는 데 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapMaterialService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "지식유형 기준 지식맵 정보를 제공하는 업무 서비스이다. 개인지식 등록 화면에서 선택 가능한 지식유형 목록을 내려주는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapMaterialService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "지식맵(지식유형)에 대한 등록, 수정, 삭제, 조회를 제공하며 조회는 목록조회와 상세조회로 구분된다. 등록 시 지식유형코드 중복 여부도 확인한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/EgovMapMaterialService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapMaterialService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /dam/per/EgovComDamPersonalRegistView.do:src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+      "name": "개인지식 등록화면 - 지식유형 조회조건 정보",
+      "summary": {
+        "text": "개인지식 등록화면 흐름에서 지식유형 조회조건 정보 단계가 맡는 처리이다. 지식유형 지식맵 목록을 조회할 때 쓰는 조회조건·페이지 정보 객체이다. 등록 화면에서는 전체 목록을 받기 위해 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+            "line": 18,
+            "snippet": "public class MapMaterialVO extends MapMaterial {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "지식유형 지식맵 목록을 조회할 때 쓰는 조회조건·페이지 정보 객체이다. 등록 화면에서는 전체 목록을 받기 위해 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "지식맵(지식유형) 정보를 확장하며 검색조건, 검색 키워드, 페이지개수·페이지사이즈·현재페이지 등 목록 항목을 관리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/mat/service/MapMaterialVO.java",
+              "line": 18,
+              "snippet": "public class MapMaterialVO extends MapMaterial {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /dam/per/EgovComDamPersonalRegistView.do:src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+      "name": "개인지식 등록화면 - 조직별 지식맵 서비스",
+      "summary": {
+        "text": "개인지식 등록화면 흐름에서 조직별 지식맵 서비스 단계가 맡는 처리이다. 조직별 지식맵 정보를 제공하는 업무 서비스이다. 개인지식 등록 화면에서 선택 가능한 소속조직 목록을 내려주는 데 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+            "line": 16,
+            "snippet": "public interface EgovMapTeamService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "조직별 지식맵 정보를 제공하는 업무 서비스이다. 개인지식 등록 화면에서 선택 가능한 소속조직 목록을 내려주는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "지식맵(조직별)에 대한 등록, 수정, 삭제, 조회를 제공하며 조회는 목록조회와 상세조회로 구분된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/EgovMapTeamService.java",
+              "line": 16,
+              "snippet": "public interface EgovMapTeamService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /dam/per/EgovComDamPersonalRegistView.do:src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+      "name": "개인지식 등록화면 - 조직별 조회조건 정보",
+      "summary": {
+        "text": "개인지식 등록화면 흐름에서 조직별 조회조건 정보 단계가 맡는 처리이다. 조직별 지식맵 목록을 조회할 때 쓰는 조회조건·페이지 정보 객체이다. 등록 화면에서는 전체 목록을 받기 위해 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+            "line": 18,
+            "snippet": "public class MapTeamVO extends MapTeam {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "조직별 지식맵 목록을 조회할 때 쓰는 조회조건·페이지 정보 객체이다. 등록 화면에서는 전체 목록을 받기 위해 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "지식맵(조직별) 정보를 확장하며 검색조건, 검색 키워드, 페이지개수·페이지사이즈·현재페이지 등 목록 항목을 관리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/map/tea/service/MapTeamVO.java",
+              "line": 18,
+              "snippet": "public class MapTeamVO extends MapTeam {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /dam/per/EgovComDamPersonalRegistView.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "name": "개인지식 등록화면 - 개인지식 화면 처리",
+      "summary": {
+        "text": "개인지식 등록화면 흐름에서 개인지식 화면 처리 단계가 맡는 처리이다. 개인지식 관련 화면 요청을 받아 업무 서비스로 위임하고, 조회 결과를 화면 모델에 담아 되돌려 주는 창구 역할을 한다. 목록·상세·등록·수정·삭제 요청의 진입점이며 이동할 화면 경로를 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "개인지식 관련 화면 요청을 받아 업무 서비스로 위임하고, 조회 결과를 화면 모델에 담아 되돌려 주는 창구 역할을 한다. 목록·상세·등록·수정·삭제 요청의 진입점이며 이동할 화면 경로를 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 화면과 조회조건은 개인지식 조회조건 정보로 받아 처리하며, 등록·수정 요청은 로그인 여부를 먼저 확인하고 미인증이면 로그인 화면으로 되돌린다. 입력값 검증에 실패하면 저장하지 않고 다시 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 208,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 218,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalModify.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "개인지식 수정 - 안내 메시지 조회",
+      "summary": {
+        "text": "개인지식 수정 흐름에서 안내 메시지 조회 단계가 맡는 처리이다. 업무 처리 결과와 오류 상황에서 사용자에게 보여줄 안내 메시지를 코드로 조회해 주는 공통 기능이다. 개인지식 등록·수정 시 로그인 실패 안내 문구를 가져오는 데 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "업무 처리 결과와 오류 상황에서 사용자에게 보여줄 안내 메시지를 코드로 조회해 주는 공통 기능이다. 개인지식 등록·수정 시 로그인 실패 안내 문구를 가져오는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드로 정의된 메시지를 조회하며, 필요에 따라 로케일과 매개변수를 함께 적용해 사용자 언어에 맞는 문구를 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalModify.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "개인지식 수정 - 로그인 사용자 정보",
+      "summary": {
+        "text": "개인지식 수정 흐름에서 로그인 사용자 정보 단계가 맡는 처리이다. 인증된 사용자의 신원 정보를 담아 흐름 전반에 전달하는 정보 객체이다. 개인지식 등록·수정 시 등록자와 소속조직을 채우는 근거가 된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증된 사용자의 신원 정보를 담아 흐름 전반에 전달하는 정보 객체이다. 개인지식 등록·수정 시 등록자와 소속조직을 채우는 근거가 된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디, 이름, 이메일주소, 사용자구분, 조직(부서) 아이디와 명, 고유아이디, 사용자 IP정보 등을 보관한다. 아이디·이름·이메일은 비어 있을 수 없는 항목으로 지정되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalModify.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "개인지식 수정 - 첨부파일 정보 관리 서비스",
+      "summary": {
+        "text": "개인지식 수정 흐름에서 첨부파일 정보 관리 서비스 단계가 맡는 처리이다. 첨부파일의 속성과 상세 정보를 등록·수정·삭제·조회하는 공통 업무 서비스이다. 개인지식 등록·수정 시 첨부파일 정보를 남기는 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일의 속성과 상세 정보를 등록·수정·삭제·조회하는 공통 업무 서비스이다. 개인지식 등록·수정 시 첨부파일 정보를 남기는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "파일 목록 조회, 한 건 또는 여러 건 등록, 여러 건 수정, 한 건 또는 여러 건 삭제, 상세 조회, 파일 구분자 최대값 취득 업무를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalModify.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "name": "개인지식 수정 - 첨부파일 저장 처리",
+      "summary": {
+        "text": "개인지식 수정 흐름에서 첨부파일 저장 처리 단계가 맡는 처리이다. 화면에서 올라온 첨부파일을 실제 저장소에 저장하고, 저장 결과를 첨부파일 정보 목록으로 만들어 주는 공통 처리이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면에서 올라온 첨부파일을 실제 저장소에 저장하고, 저장 결과를 첨부파일 정보 목록으로 만들어 주는 공통 처리이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 60,
+              "snippet": "@Component(\"EgovFileMngUtil\")"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "저장 경로가 지정되지 않으면 전역 파일 저장 경로를 쓰고, 첨부파일 아이디가 없으면 새 아이디를 채번한다. 저장 폴더가 없으면 만들고, 파일마다 확장자·저장경로·파일크기를 기록한 뒤 시각을 붙인 새 이름으로 저장한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 60,
+              "snippet": "@Component(\"EgovFileMngUtil\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalModify.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "name": "개인지식 수정 - 첨부파일 정보",
+      "summary": {
+        "text": "개인지식 수정 흐름에서 첨부파일 정보 단계가 맡는 처리이다. 첨부파일 한 건의 속성을 담는 정보 객체이다. 개인지식에 붙는 첨부파일을 등록·수정할 때 오간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일 한 건의 속성을 담는 정보 객체이다. 개인지식에 붙는 첨부파일을 등록·수정할 때 오간다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "첨부파일 아이디, 생성일자, 파일내용, 파일확장자, 파일크기, 파일연번, 파일저장경로, 원파일명, 저장파일명을 관리한다. 첨부파일 아이디와 파일연번이 파일 한 건을 식별하는 기준이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 26,
+              "snippet": "    public String atchFileId = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalModify.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "개인지식 수정 - 인증 사용자 확인 도우미",
+      "summary": {
+        "text": "개인지식 수정 흐름에서 인증 사용자 확인 도우미 단계가 맡는 처리이다. 화면 처리 단계에서 인증 사용자 조회 서비스를 손쉽게 호출하도록 감싼 도우미이다. 개인지식 흐름에서 로그인 여부 확인과 로그인 사용자 정보 취득에 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면 처리 단계에서 인증 사용자 조회 서비스를 손쉽게 호출하도록 감싼 도우미이다. 개인지식 흐름에서 로그인 여부 확인과 로그인 사용자 정보 취득에 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 서비스 하나를 보유하며, 인증된 사용자 객체·권한 목록·인증 여부를 그대로 위임해 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalModify.do:src/main/java/egovframework/com/dam/per/service/KnoPersonal.java",
+      "name": "개인지식 수정 - 개인지식 정보",
+      "summary": {
+        "text": "개인지식 수정 흐름에서 개인지식 정보 단계가 맡는 처리이다. 개인지식 한 건의 실제 내용을 담는 업무 정보이다. 등록·수정·삭제·조회 모든 흐름에서 오가는 핵심 정보이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonal.java",
+            "line": 16,
+            "snippet": "public class KnoPersonal {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "개인지식 한 건의 실제 내용을 담는 업무 정보이다. 등록·수정·삭제·조회 모든 흐름에서 오가는 핵심 정보이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonal.java",
+              "line": 16,
+              "snippet": "public class KnoPersonal {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "지식ID, 소속조직ID와 명, 사용자ID와 명, 지식유형코드와 명, 지식명, 지식내용, 개인지식공개여부, 수집일자, 첨부파일ID를 관리한다. 소속조직ID·지식유형코드·지식명·지식내용·수집일자는 필수이며 지식내용은 2500자까지 허용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonal.java",
+              "line": 16,
+              "snippet": "public class KnoPersonal {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonal.java",
+              "line": 59,
+              "snippet": "\tprivate String knoNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonal.java",
+              "line": 64,
+              "snippet": "\t@Size(max=2500)"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalModify.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "name": "개인지식 수정 - 개인지식 화면 처리",
+      "summary": {
+        "text": "개인지식 수정 흐름에서 개인지식 화면 처리 단계가 맡는 처리이다. 개인지식 관련 화면 요청을 받아 업무 서비스로 위임하고, 조회 결과를 화면 모델에 담아 되돌려 주는 창구 역할을 한다. 목록·상세·등록·수정·삭제 요청의 진입점이며 이동할 화면 경로를 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "개인지식 관련 화면 요청을 받아 업무 서비스로 위임하고, 조회 결과를 화면 모델에 담아 되돌려 주는 창구 역할을 한다. 목록·상세·등록·수정·삭제 요청의 진입점이며 이동할 화면 경로를 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 화면과 조회조건은 개인지식 조회조건 정보로 받아 처리하며, 등록·수정 요청은 로그인 여부를 먼저 확인하고 미인증이면 로그인 화면으로 되돌린다. 입력값 검증에 실패하면 저장하지 않고 다시 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 208,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 218,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalModifyView.do:src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+      "name": "개인지식 수정화면 - 개인지식 업무 서비스",
+      "summary": {
+        "text": "개인지식 수정화면 흐름에서 개인지식 업무 서비스 단계가 맡는 처리이다. 개인지식 정보의 등록, 수정, 삭제, 조회 업무를 제공하는 업무 서비스이다. 조회 기능은 목록조회와 상세조회로 나뉘며 화면 요청을 실제 업무 처리로 연결한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+            "line": 17,
+            "snippet": "public interface EgovKnoPersonalService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "개인지식 정보의 등록, 수정, 삭제, 조회 업무를 제공하는 업무 서비스이다. 조회 기능은 목록조회와 상세조회로 나뉘며 화면 요청을 실제 업무 처리로 연결한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+              "line": 17,
+              "snippet": "public interface EgovKnoPersonalService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록된 개인지식 목록 조회, 목록 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제 업무를 각각 제공한다. 목록 조회는 조회조건 정보를 받아 페이지 단위 목록을 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+              "line": 17,
+              "snippet": "public interface EgovKnoPersonalService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalModifyView.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "name": "개인지식 수정화면 - 개인지식 화면 처리",
+      "summary": {
+        "text": "개인지식 수정화면 흐름에서 개인지식 화면 처리 단계가 맡는 처리이다. 개인지식 관련 화면 요청을 받아 업무 서비스로 위임하고, 조회 결과를 화면 모델에 담아 되돌려 주는 창구 역할을 한다. 목록·상세·등록·수정·삭제 요청의 진입점이며 이동할 화면 경로를 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "개인지식 관련 화면 요청을 받아 업무 서비스로 위임하고, 조회 결과를 화면 모델에 담아 되돌려 주는 창구 역할을 한다. 목록·상세·등록·수정·삭제 요청의 진입점이며 이동할 화면 경로를 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 화면과 조회조건은 개인지식 조회조건 정보로 받아 처리하며, 등록·수정 요청은 로그인 여부를 먼저 확인하고 미인증이면 로그인 화면으로 되돌린다. 입력값 검증에 실패하면 저장하지 않고 다시 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 208,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 218,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "개인지식 등록 - 안내 메시지 조회",
+      "summary": {
+        "text": "개인지식 등록 흐름에서 안내 메시지 조회 단계가 맡는 처리이다. 업무 처리 결과와 오류 상황에서 사용자에게 보여줄 안내 메시지를 코드로 조회해 주는 공통 기능이다. 개인지식 등록·수정 시 로그인 실패 안내 문구를 가져오는 데 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "업무 처리 결과와 오류 상황에서 사용자에게 보여줄 안내 메시지를 코드로 조회해 주는 공통 기능이다. 개인지식 등록·수정 시 로그인 실패 안내 문구를 가져오는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드로 정의된 메시지를 조회하며, 필요에 따라 로케일과 매개변수를 함께 적용해 사용자 언어에 맞는 문구를 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "개인지식 등록 - 로그인 사용자 정보",
+      "summary": {
+        "text": "개인지식 등록 흐름에서 로그인 사용자 정보 단계가 맡는 처리이다. 인증된 사용자의 신원 정보를 담아 흐름 전반에 전달하는 정보 객체이다. 개인지식 등록·수정 시 등록자와 소속조직을 채우는 근거가 된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증된 사용자의 신원 정보를 담아 흐름 전반에 전달하는 정보 객체이다. 개인지식 등록·수정 시 등록자와 소속조직을 채우는 근거가 된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디, 이름, 이메일주소, 사용자구분, 조직(부서) 아이디와 명, 고유아이디, 사용자 IP정보 등을 보관한다. 아이디·이름·이메일은 비어 있을 수 없는 항목으로 지정되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "개인지식 등록 - 첨부파일 정보 관리 서비스",
+      "summary": {
+        "text": "개인지식 등록 흐름에서 첨부파일 정보 관리 서비스 단계가 맡는 처리이다. 첨부파일의 속성과 상세 정보를 등록·수정·삭제·조회하는 공통 업무 서비스이다. 개인지식 등록·수정 시 첨부파일 정보를 남기는 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "첨부파일의 속성과 상세 정보를 등록·수정·삭제·조회하는 공통 업무 서비스이다. 개인지식 등록·수정 시 첨부파일 정보를 남기는 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "파일 목록 조회, 한 건 또는 여러 건 등록, 여러 건 수정, 한 건 또는 여러 건 삭제, 상세 조회, 파일 구분자 최대값 취득 업무를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "name": "개인지식 등록 - 첨부파일 저장 처리",
+      "summary": {
+        "text": "개인지식 등록 흐름에서 첨부파일 저장 처리 단계가 맡는 처리이다. 화면에서 올라온 첨부파일을 실제 저장소에 저장하고, 저장 결과를 첨부파일 정보 목록으로 만들어 주는 공통 처리이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면에서 올라온 첨부파일을 실제 저장소에 저장하고, 저장 결과를 첨부파일 정보 목록으로 만들어 주는 공통 처리이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 60,
+              "snippet": "@Component(\"EgovFileMngUtil\")"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "저장 경로가 지정되지 않으면 전역 파일 저장 경로를 쓰고, 첨부파일 아이디가 없으면 새 아이디를 채번한다. 저장 폴더가 없으면 만들고, 파일마다 확장자·저장경로·파일크기를 기록한 뒤 시각을 붙인 새 이름으로 저장한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 60,
+              "snippet": "@Component(\"EgovFileMngUtil\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "개인지식 등록 - 인증 사용자 확인 도우미",
+      "summary": {
+        "text": "개인지식 등록 흐름에서 인증 사용자 확인 도우미 단계가 맡는 처리이다. 화면 처리 단계에서 인증 사용자 조회 서비스를 손쉽게 호출하도록 감싼 도우미이다. 개인지식 흐름에서 로그인 여부 확인과 로그인 사용자 정보 취득에 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면 처리 단계에서 인증 사용자 조회 서비스를 손쉽게 호출하도록 감싼 도우미이다. 개인지식 흐름에서 로그인 여부 확인과 로그인 사용자 정보 취득에 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 서비스 하나를 보유하며, 인증된 사용자 객체·권한 목록·인증 여부를 그대로 위임해 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+      "name": "개인지식 등록 - 개인지식 업무 서비스",
+      "summary": {
+        "text": "개인지식 등록 흐름에서 개인지식 업무 서비스 단계가 맡는 처리이다. 개인지식 정보의 등록, 수정, 삭제, 조회 업무를 제공하는 업무 서비스이다. 조회 기능은 목록조회와 상세조회로 나뉘며 화면 요청을 실제 업무 처리로 연결한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+            "line": 17,
+            "snippet": "public interface EgovKnoPersonalService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "개인지식 정보의 등록, 수정, 삭제, 조회 업무를 제공하는 업무 서비스이다. 조회 기능은 목록조회와 상세조회로 나뉘며 화면 요청을 실제 업무 처리로 연결한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+              "line": 17,
+              "snippet": "public interface EgovKnoPersonalService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록된 개인지식 목록 조회, 목록 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제 업무를 각각 제공한다. 목록 조회는 조회조건 정보를 받아 페이지 단위 목록을 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+              "line": 17,
+              "snippet": "public interface EgovKnoPersonalService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/dam/per/service/KnoPersonalVO.java",
+      "name": "개인지식 등록 - 개인지식 조회조건 정보",
+      "summary": {
+        "text": "개인지식 등록 흐름에서 개인지식 조회조건 정보 단계가 맡는 처리이다. 개인지식 목록 화면의 조회조건과 페이지 정보를 담는 정보 객체이다. 화면에서 받은 검색 입력을 업무 서비스로 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonalVO.java",
+            "line": 18,
+            "snippet": "public class KnoPersonalVO extends KnoPersonal {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "개인지식 목록 화면의 조회조건과 페이지 정보를 담는 정보 객체이다. 화면에서 받은 검색 입력을 업무 서비스로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonalVO.java",
+              "line": 18,
+              "snippet": "public class KnoPersonalVO extends KnoPersonal {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "개인지식 정보를 확장하며 검색조건, 검색 키워드, 페이지개수·페이지사이즈·현재페이지 등 목록 페이지 항목을 관리한다. 현재페이지는 1, 한 페이지 표시 건수는 10이 기본값이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonalVO.java",
+              "line": 18,
+              "snippet": "public class KnoPersonalVO extends KnoPersonal {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "name": "개인지식 등록 - 개인지식 화면 처리",
+      "summary": {
+        "text": "개인지식 등록 흐름에서 개인지식 화면 처리 단계가 맡는 처리이다. 개인지식 관련 화면 요청을 받아 업무 서비스로 위임하고, 조회 결과를 화면 모델에 담아 되돌려 주는 창구 역할을 한다. 목록·상세·등록·수정·삭제 요청의 진입점이며 이동할 화면 경로를 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "개인지식 관련 화면 요청을 받아 업무 서비스로 위임하고, 조회 결과를 화면 모델에 담아 되돌려 주는 창구 역할을 한다. 목록·상세·등록·수정·삭제 요청의 진입점이며 이동할 화면 경로를 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 화면과 조회조건은 개인지식 조회조건 정보로 받아 처리하며, 등록·수정 요청은 로그인 여부를 먼저 확인하고 미인증이면 로그인 화면으로 되돌린다. 입력값 검증에 실패하면 저장하지 않고 다시 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 208,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 218,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRemove.do:src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+      "name": "개인지식 삭제 - 개인지식 업무 서비스",
+      "summary": {
+        "text": "개인지식 삭제 흐름에서 개인지식 업무 서비스 단계가 맡는 처리이다. 개인지식 정보의 등록, 수정, 삭제, 조회 업무를 제공하는 업무 서비스이다. 조회 기능은 목록조회와 상세조회로 나뉘며 화면 요청을 실제 업무 처리로 연결한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+            "line": 17,
+            "snippet": "public interface EgovKnoPersonalService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "개인지식 정보의 등록, 수정, 삭제, 조회 업무를 제공하는 업무 서비스이다. 조회 기능은 목록조회와 상세조회로 나뉘며 화면 요청을 실제 업무 처리로 연결한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+              "line": 17,
+              "snippet": "public interface EgovKnoPersonalService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록된 개인지식 목록 조회, 목록 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제 업무를 각각 제공한다. 목록 조회는 조회조건 정보를 받아 페이지 단위 목록을 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+              "line": 17,
+              "snippet": "public interface EgovKnoPersonalService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRemove.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "name": "개인지식 삭제 - 개인지식 화면 처리",
+      "summary": {
+        "text": "개인지식 삭제 흐름에서 개인지식 화면 처리 단계가 맡는 처리이다. 개인지식 관련 화면 요청을 받아 업무 서비스로 위임하고, 조회 결과를 화면 모델에 담아 되돌려 주는 창구 역할을 한다. 목록·상세·등록·수정·삭제 요청의 진입점이며 이동할 화면 경로를 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "개인지식 관련 화면 요청을 받아 업무 서비스로 위임하고, 조회 결과를 화면 모델에 담아 되돌려 주는 창구 역할을 한다. 목록·상세·등록·수정·삭제 요청의 진입점이며 이동할 화면 경로를 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 화면과 조회조건은 개인지식 조회조건 정보로 받아 처리하며, 등록·수정 요청은 로그인 여부를 먼저 확인하고 미인증이면 로그인 화면으로 되돌린다. 입력값 검증에 실패하면 저장하지 않고 다시 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 208,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+              "line": 218,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

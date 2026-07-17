@@ -1,0 +1,4406 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "v0",
+          "to": "v1"
+        },
+        {
+          "from": "v0",
+          "to": "v2"
+        },
+        {
+          "from": "v1",
+          "to": "v3"
+        },
+        {
+          "from": "v2",
+          "to": "v3"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "v0",
+          "kind": "start",
+          "label": "조직도 화면 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 280,
+              "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageTreeView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 284,
+              "snippet": "        return \"egovframework/com/ext/ldapumt/EgovDeptManageTree\";"
+            }
+          ],
+          "flowRef": "flow:ANY /ext/ldapumt/dpt/selectDeptManageTreeView.do",
+          "id": "v1",
+          "kind": "activity",
+          "label": "부서 트리 화면 이동"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 293,
+              "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 296,
+              "snippet": "    \treturn \"egovframework/com/ext/ldapumt/EgovDeptManageOrgChart\";"
+            }
+          ],
+          "flowRef": "flow:ANY /ext/ldapumt/dpt/selectDeptManageOrgChartView.do",
+          "id": "v2",
+          "kind": "activity",
+          "label": "조직도 그래프 화면 이동"
+        },
+        {
+          "id": "v3",
+          "kind": "end",
+          "label": "조직도 화면 표시"
+        }
+      ],
+      "title": "LDAP 조직도 화면 조회"
+    },
+    {
+      "edges": [
+        {
+          "from": "q0",
+          "to": "q1"
+        },
+        {
+          "from": "q1",
+          "to": "q2"
+        },
+        {
+          "from": "q1",
+          "to": "q3"
+        },
+        {
+          "from": "q2",
+          "to": "q4"
+        },
+        {
+          "from": "q3",
+          "to": "q4"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "q0",
+          "kind": "start",
+          "label": "조직 정보 조회 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 60,
+              "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/getDeptManageSublist.do\", method = RequestMethod.POST)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 52,
+              "snippet": "\tpublic Map<Object, Object> selectDeptManageSubList(String dn) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:POST /ext/ldapumt/dpt/getDeptManageSublist.do",
+          "id": "q1",
+          "kind": "activity",
+          "label": "하위 부서 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 77,
+              "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/getDeptManage.do\", method = RequestMethod.POST)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 68,
+              "snippet": "\tpublic UcorgVO selectDeptManage(UcorgVO vo) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:POST /ext/ldapumt/dpt/getDeptManage.do",
+          "id": "q2",
+          "kind": "activity",
+          "label": "부서 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 94,
+              "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/getUserManage.do\", method = RequestMethod.POST)"
+            }
+          ],
+          "flowRef": "flow:POST /ext/ldapumt/dpt/getUserManage.do",
+          "id": "q3",
+          "kind": "activity",
+          "label": "사용자 상세 조회"
+        },
+        {
+          "id": "q4",
+          "kind": "end",
+          "label": "조회 결과 표시"
+        }
+      ],
+      "title": "LDAP 조직 정보 조회"
+    },
+    {
+      "edges": [
+        {
+          "from": "d0",
+          "to": "d1"
+        },
+        {
+          "from": "d1",
+          "label": "유효",
+          "to": "d2"
+        },
+        {
+          "from": "d1",
+          "label": "유효",
+          "to": "d3"
+        },
+        {
+          "from": "d1",
+          "label": "유효",
+          "to": "d4"
+        },
+        {
+          "from": "d1",
+          "label": "유효",
+          "to": "d5"
+        },
+        {
+          "from": "d1",
+          "label": "무효",
+          "to": "d8"
+        },
+        {
+          "from": "d2",
+          "to": "d6"
+        },
+        {
+          "from": "d3",
+          "to": "d6"
+        },
+        {
+          "from": "d4",
+          "to": "d6"
+        },
+        {
+          "from": "d5",
+          "to": "d6"
+        },
+        {
+          "from": "d6",
+          "to": "d7"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "d0",
+          "kind": "start",
+          "label": "부서 관리 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 300,
+              "snippet": "\t\tif (dn == null || dn.isBlank() || !LDAP_DN_PATTERN.matcher(dn).matches()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 308,
+              "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+            }
+          ],
+          "id": "d1",
+          "kind": "decision",
+          "label": "부서 식별자 유효성 확인"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 112,
+              "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/createNode.do\", method = RequestMethod.POST)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 83,
+              "snippet": "\tpublic Map<Object, Object> insertDeptManage(String parentDn, String ou) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:POST /ext/ldapumt/dpt/createNode.do",
+          "id": "d2",
+          "kind": "activity",
+          "label": "신규 부서 등록"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 177,
+              "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/renameNode.do\", method = RequestMethod.POST)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 105,
+              "snippet": "\tpublic void renameDeptManage(String dn, String name);"
+            }
+          ],
+          "flowRef": "flow:POST /ext/ldapumt/dpt/renameNode.do",
+          "id": "d3",
+          "kind": "activity",
+          "label": "부서 이름 변경"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 242,
+              "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/modifyDeptManage.do\", method = RequestMethod.POST)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 74,
+              "snippet": "\tpublic void updateDeptManage(UcorgVO vo) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:POST /ext/ldapumt/dpt/modifyDeptManage.do",
+          "id": "d4",
+          "kind": "activity",
+          "label": "부서 정보 수정"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 156,
+              "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/deleteNode.do\", method = RequestMethod.POST)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 98,
+              "snippet": "\tpublic void deleteDeptManage(String dn);"
+            }
+          ],
+          "flowRef": "flow:POST /ext/ldapumt/dpt/deleteNode.do",
+          "id": "d5",
+          "kind": "activity",
+          "label": "부서 삭제"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "id": "d6",
+          "kind": "activity",
+          "label": "결과 메시지 조회"
+        },
+        {
+          "id": "d7",
+          "kind": "end",
+          "label": "부서 관리 완료"
+        },
+        {
+          "id": "d8",
+          "kind": "end",
+          "label": "요청 거부"
+        }
+      ],
+      "title": "LDAP 부서 관리"
+    },
+    {
+      "edges": [
+        {
+          "from": "u0",
+          "to": "u1"
+        },
+        {
+          "from": "u1",
+          "label": "유효",
+          "to": "u2"
+        },
+        {
+          "from": "u1",
+          "label": "유효",
+          "to": "u3"
+        },
+        {
+          "from": "u1",
+          "label": "유효",
+          "to": "u4"
+        },
+        {
+          "from": "u1",
+          "label": "무효",
+          "to": "u6"
+        },
+        {
+          "from": "u2",
+          "to": "u5"
+        },
+        {
+          "from": "u3",
+          "to": "u5"
+        },
+        {
+          "from": "u4",
+          "to": "u5"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "u0",
+          "kind": "start",
+          "label": "사용자 관리 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 315,
+              "snippet": "\t\tif (rdnValue == null || rdnValue.isBlank() || !LDAP_RDN_VALUE_PATTERN.matcher(rdnValue).matches()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 316,
+              "snippet": "\t\t\tthrow new IllegalArgumentException(\"Invalid LDAP RDN value\");"
+            }
+          ],
+          "id": "u1",
+          "kind": "decision",
+          "label": "사용자 이름 값 유효성 확인"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 134,
+              "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/createUserNode.do\", method = RequestMethod.POST)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 92,
+              "snippet": "\tpublic Map<Object, Object> insertUserManage(String parentDn, String cn) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:POST /ext/ldapumt/dpt/createUserNode.do",
+          "id": "u2",
+          "kind": "activity",
+          "label": "신규 사용자 등록"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 199,
+              "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/renameUserNode.do\", method = RequestMethod.POST)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 112,
+              "snippet": "\tpublic void renameUserManage(String dn, String name);"
+            }
+          ],
+          "flowRef": "flow:POST /ext/ldapumt/dpt/renameUserNode.do",
+          "id": "u3",
+          "kind": "activity",
+          "label": "사용자 이름 변경"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 262,
+              "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/modifyUserManage.do\", method = RequestMethod.POST)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "flowRef": "flow:POST /ext/ldapumt/dpt/modifyUserManage.do",
+          "id": "u4",
+          "kind": "activity",
+          "label": "사용자 정보 수정"
+        },
+        {
+          "id": "u5",
+          "kind": "end",
+          "label": "사용자 관리 완료"
+        },
+        {
+          "id": "u6",
+          "kind": "end",
+          "label": "요청 거부"
+        }
+      ],
+      "title": "LDAP 사용자 관리"
+    },
+    {
+      "edges": [
+        {
+          "from": "m0",
+          "to": "m1"
+        },
+        {
+          "from": "m1",
+          "label": "범위 내",
+          "to": "m2"
+        },
+        {
+          "from": "m1",
+          "label": "범위 밖",
+          "to": "m5"
+        },
+        {
+          "from": "m2",
+          "to": "m3"
+        },
+        {
+          "from": "m3",
+          "to": "m4"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "m0",
+          "kind": "start",
+          "label": "노드 이동 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 304,
+              "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 308,
+              "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+            }
+          ],
+          "id": "m1",
+          "kind": "decision",
+          "label": "조직 최상위 범위 확인"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 221,
+              "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/moveOrgNode.do\", method = RequestMethod.POST)"
+            }
+          ],
+          "flowRef": "flow:POST /ext/ldapumt/dpt/moveOrgNode.do",
+          "id": "m2",
+          "kind": "activity",
+          "label": "조직 노드 이동 처리"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "id": "m3",
+          "kind": "activity",
+          "label": "이동 결과 메시지 조회"
+        },
+        {
+          "id": "m4",
+          "kind": "end",
+          "label": "조직도 갱신 완료"
+        },
+        {
+          "id": "m5",
+          "kind": "end",
+          "label": "이동 거부"
+        }
+      ],
+      "title": "LDAP 조직 노드 이동"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+          "line": 300,
+          "snippet": "\t\tif (dn == null || dn.isBlank() || !LDAP_DN_PATTERN.matcher(dn).matches()) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+          "line": 301,
+          "snippet": "\t\t\tthrow new IllegalArgumentException(\"Invalid LDAP DN\");"
+        }
+      ],
+      "text": "조직 식별자는 정해진 형식에 맞아야 하며, 값이 없거나 형식에 맞지 않으면 요청을 거부한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+          "line": 304,
+          "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+          "line": 308,
+          "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+          "line": 309,
+          "snippet": "\t\t\t\tthrow new IllegalArgumentException(\"DN is out of LDAP root scope\");"
+        }
+      ],
+      "text": "조직 식별자는 설정에 정의된 조직 최상위 범위 안에 있어야 하며, 범위를 벗어나면 요청을 거부한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+          "line": 315,
+          "snippet": "\t\tif (rdnValue == null || rdnValue.isBlank() || !LDAP_RDN_VALUE_PATTERN.matcher(rdnValue).matches()) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+          "line": 316,
+          "snippet": "\t\t\tthrow new IllegalArgumentException(\"Invalid LDAP RDN value\");"
+        }
+      ],
+      "text": "부서·사용자의 이름 값은 허용된 형식이어야 하며, 비어 있거나 형식에 맞지 않으면 요청을 거부한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+          "line": 78,
+          "snippet": "\t * @param parentDn 등록할 부서의 상위부서 "
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+          "line": 83,
+          "snippet": "\tpublic Map<Object, Object> insertDeptManage(String parentDn, String ou) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+          "line": 87,
+          "snippet": "\t * @param parentDn 사용자의 부서"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+          "line": 92,
+          "snippet": "\tpublic Map<Object, Object> insertUserManage(String parentDn, String cn) throws Exception;"
+        }
+      ],
+      "text": "신규 부서와 신규 사용자는 반드시 상위 부서를 지정해 그 아래에 등록한다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+          "line": 304,
+          "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+          "line": 72,
+          "snippet": "\tpublic static String getProperty(String keyName) {"
+        }
+      ],
+      "text": "공통 설정 관리와 연계해 조직 최상위 범위 등 LDAP 연동 설정 값을 읽어 온다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 52,
+          "snippet": "\tpublic String getMessage(String code) {"
+        }
+      ],
+      "text": "공통 메시지 관리와 연계해 조직 관리 처리 결과를 사용자 안내 문구로 변환한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 25,
+          "snippet": "public class EgovWebUtil {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 62,
+          "snippet": "\tpublic static String clearXSS(String value) {"
+        }
+      ],
+      "text": "공통 보안 처리와 연계해 화면에서 넘어온 조직 관리 입력값의 위험 문자를 제거한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 43,
+          "snippet": "public class EgovStringUtil {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 77,
+          "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+        }
+      ],
+      "text": "공통 문자열 처리와 연계해 부서명·사용자명 등 문자열의 빈 값과 길이 제한을 일관되게 다룬다."
+    }
+  ],
+  "domainId": "domain:ext.ldapumt",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+          "line": 68,
+          "snippet": "\tpublic UcorgVO selectDeptManage(UcorgVO vo) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+          "line": 83,
+          "snippet": "\tpublic Map<Object, Object> insertDeptManage(String parentDn, String ou) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+          "line": 98,
+          "snippet": "\tpublic void deleteDeptManage(String dn);"
+        }
+      ],
+      "text": "부서: 조직도를 이루는 기본 단위로, 상위 부서 아래에 등록되며 상세 정보 조회·수정·삭제와 이름 변경 대상이 된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+          "line": 92,
+          "snippet": "\tpublic Map<Object, Object> insertUserManage(String parentDn, String cn) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+          "line": 112,
+          "snippet": "\tpublic void renameUserManage(String dn, String name);"
+        }
+      ],
+      "text": "사용자: 특정 부서에 소속되어 등록되는 구성원으로, 부서 식별자를 상위로 두고 등록되며 이름 변경 대상이 된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+          "line": 52,
+          "snippet": "\tpublic Map<Object, Object> selectDeptManageSubList(String dn) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+          "line": 60,
+          "snippet": "\tpublic List<Object> selectDeptManageSubListByOuCode(String ouCode) throws Exception;"
+        }
+      ],
+      "text": "하위 부서 목록: 특정 부서를 기준으로 조회되는 자식 부서들의 묶음으로, 조직도 트리를 단계적으로 펼치는 근거가 된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+          "line": 48,
+          "snippet": "\t * @param dn 조회할 부서의 dn"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+          "line": 299,
+          "snippet": "\tprivate void validateDn(String dn) {"
+        }
+      ],
+      "text": "조직 식별자: 조직도에서 부서와 사용자를 가리키는 고유 값으로, 모든 조회·등록·변경 요청의 기준 키로 쓰인다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /ext/ldapumt/dpt/selectDeptManageOrgChartView.do",
+      "name": "LDAP 조직도 그래프 화면 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ],
+        "text": "관리자가 조직도 그래프 화면을 요청하면 별도 데이터 조회 없이 조직도 그래프 화면으로 이동시킨다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /ext/ldapumt/dpt/selectDeptManageTreeView.do",
+      "name": "LDAP 조직도 트리 화면 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 280,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageTreeView.do\")"
+          }
+        ],
+        "text": "관리자가 조직도 트리 화면을 요청하면 부서 트리 화면으로 이동시켜 조직도를 펼쳐 볼 수 있게 한다."
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/createNode.do",
+      "name": "LDAP 부서 노드 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 112,
+            "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/createNode.do\", method = RequestMethod.POST)"
+          }
+        ],
+        "text": "상위 부서 아래에 신규 부서 노드를 등록하고 등록 결과를 화면에 돌려준다."
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/createUserNode.do",
+      "name": "LDAP 사용자 노드 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 134,
+            "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/createUserNode.do\", method = RequestMethod.POST)"
+          }
+        ],
+        "text": "지정한 부서 아래에 신규 사용자 노드를 등록하고 등록 결과를 화면에 돌려준다."
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/deleteNode.do",
+      "name": "LDAP 부서 노드 삭제",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 156,
+            "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/deleteNode.do\", method = RequestMethod.POST)"
+          }
+        ],
+        "text": "선택한 부서 노드를 조직도에서 삭제하고 처리 결과 메시지를 화면에 돌려준다."
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/getDeptManage.do",
+      "name": "LDAP 부서 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 77,
+            "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/getDeptManage.do\", method = RequestMethod.POST)"
+          }
+        ],
+        "text": "선택한 부서의 상세 정보를 조회해 부서 상세 화면에 표시한다."
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/getDeptManageSublist.do",
+      "name": "LDAP 하위 부서 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 60,
+            "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/getDeptManageSublist.do\", method = RequestMethod.POST)"
+          }
+        ],
+        "text": "지정한 부서의 하위 부서 목록을 조회해 조직도 트리를 단계적으로 펼친다."
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/getUserManage.do",
+      "name": "LDAP 사용자 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 94,
+            "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/getUserManage.do\", method = RequestMethod.POST)"
+          }
+        ],
+        "text": "선택한 사용자의 상세 정보를 조회해 사용자 상세 화면에 표시한다."
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/modifyDeptManage.do",
+      "name": "LDAP 부서 정보 수정",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 242,
+            "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/modifyDeptManage.do\", method = RequestMethod.POST)"
+          }
+        ],
+        "text": "입력된 부서 정보를 반영해 기 등록된 부서의 상세 정보를 수정한다."
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/modifyUserManage.do",
+      "name": "LDAP 사용자 정보 수정",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 262,
+            "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/modifyUserManage.do\", method = RequestMethod.POST)"
+          }
+        ],
+        "text": "입력된 사용자 정보를 반영해 기 등록된 사용자의 상세 정보를 수정한다."
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/moveOrgNode.do",
+      "name": "LDAP 조직 노드 이동",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 221,
+            "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/moveOrgNode.do\", method = RequestMethod.POST)"
+          }
+        ],
+        "text": "조직도에서 선택한 노드를 다른 상위 부서 아래로 옮기고 결과 메시지를 돌려준다."
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/renameNode.do",
+      "name": "LDAP 부서 이름 변경",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 177,
+            "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/renameNode.do\", method = RequestMethod.POST)"
+          }
+        ],
+        "text": "선택한 부서 노드의 이름을 변경하고 결과 메시지를 화면에 돌려준다."
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/renameUserNode.do",
+      "name": "LDAP 사용자 이름 변경",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 199,
+            "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/renameUserNode.do\", method = RequestMethod.POST)"
+          }
+        ],
+        "text": "선택한 사용자 노드의 이름을 변경하고 결과 메시지를 화면에 돌려준다."
+      }
+    }
+  ],
+  "name": "LDAP 조직·사용자 관리",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 300,
+              "snippet": "\t\tif (dn == null || dn.isBlank() || !LDAP_DN_PATTERN.matcher(dn).matches()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 304,
+              "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 308,
+              "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 315,
+              "snippet": "\t\tif (rdnValue == null || rdnValue.isBlank() || !LDAP_RDN_VALUE_PATTERN.matcher(rdnValue).matches()) {"
+            }
+          ],
+          "text": "요청으로 받은 조직 식별자는 정해진 형식에 맞는지 확인하고, 설정된 조직 최상위 범위를 벗어나면 처리를 거부한다. 노드 이름 값도 허용된 형식인지 별도로 확인한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 293,
+              "snippet": "    @RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 294,
+              "snippet": "    public String selectDeptManageOrgChartView() throws Exception {"
+            }
+          ],
+          "text": "LDAP 조직도 화면에서 올라온 요청을 받는 진입점으로, 요청 값을 확인해 조직 관리 서비스에 처리를 위임하고 결과 화면 또는 처리 결과를 되돌려 준다."
+        }
+      },
+      "name": "LDAP 조직도 그래프 화면 조회 — 조직 관리 요청 접수",
+      "stepId": "step:ANY /ext/ldapumt/dpt/selectDeptManageOrgChartView.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ],
+        "text": "LDAP 조직 관리 화면의 요청을 받아 유효성을 확인한 뒤 조직 관리 서비스로 위임하고 결과를 화면에 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "\t\tif (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 34,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 54,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ],
+          "text": "입력이 없거나 공백뿐이면 빈 문자열로 통일하고, 값이 있으면 화면에 위험한 특수 문자를 안전한 표기로 바꾼다. 강한 수준에서는 상위 경로 이동 표기도 함께 제거한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ],
+          "text": "화면에서 넘어온 조직 관리 입력값을 그대로 쓰지 않도록 위험 문자를 걸러 주는 공통 보안 도구로, 부서명·사용자명 같은 사용자 입력이 화면과 조직 저장소로 전달되기 전 정리 단계를 맡는다."
+        }
+      },
+      "name": "LDAP 조직도 트리 화면 조회 — 입력값 보안 처리",
+      "stepId": "step:ANY /ext/ldapumt/dpt/selectDeptManageTreeView.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ],
+        "text": "화면에서 넘어온 조직 관리 입력값에서 위험 문자를 제거해 안전한 값으로 정리한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "\tpublic static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 77,
+              "snippet": "\t\treturn getPropertyValueByKey(keyName);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 88,
+              "snippet": "\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(keyName);"
+            }
+          ],
+          "text": "설정은 키와 값의 짝으로 관리되며, 설정 파일의 위치는 상대 경로 기준으로 결정된다. 키 이름을 주면 해당 값을, 경로 성격의 값은 절대 경로로 변환해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "\tpublic static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "조직 관리에 필요한 환경설정 값을 공통 설정 파일에서 읽어 제공하는 협력 객체로, 조직 최상위 범위 확인처럼 설정에 따라 달라지는 판단의 근거 값을 공급한다."
+        }
+      },
+      "name": "LDAP 조직도 트리 화면 조회 — LDAP 환경설정 조회",
+      "stepId": "step:ANY /ext/ldapumt/dpt/selectDeptManageTreeView.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "조직 최상위 범위 등 LDAP 연동에 필요한 환경설정 값을 설정 파일에서 읽어 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 300,
+              "snippet": "\t\tif (dn == null || dn.isBlank() || !LDAP_DN_PATTERN.matcher(dn).matches()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 304,
+              "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 308,
+              "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 315,
+              "snippet": "\t\tif (rdnValue == null || rdnValue.isBlank() || !LDAP_RDN_VALUE_PATTERN.matcher(rdnValue).matches()) {"
+            }
+          ],
+          "text": "요청으로 받은 조직 식별자는 정해진 형식에 맞는지 확인하고, 설정된 조직 최상위 범위를 벗어나면 처리를 거부한다. 노드 이름 값도 허용된 형식인지 별도로 확인한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 293,
+              "snippet": "    @RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 294,
+              "snippet": "    public String selectDeptManageOrgChartView() throws Exception {"
+            }
+          ],
+          "text": "LDAP 조직도 화면에서 올라온 요청을 받는 진입점으로, 요청 값을 확인해 조직 관리 서비스에 처리를 위임하고 결과 화면 또는 처리 결과를 되돌려 준다."
+        }
+      },
+      "name": "LDAP 조직도 트리 화면 조회 — 조직 관리 요청 접수",
+      "stepId": "step:ANY /ext/ldapumt/dpt/selectDeptManageTreeView.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ],
+        "text": "LDAP 조직 관리 화면의 요청을 받아 유효성을 확인한 뒤 조직 관리 서비스로 위임하고 결과를 화면에 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 81,
+              "snippet": "\t\t\t\treturnVal = source.substring(0, slength) + output;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 83,
+              "snippet": "\t\t\t\treturnVal = source;"
+            }
+          ],
+          "text": "빈 문자열을 기준 값으로 두고, 원본 문자열이 지정한 길이를 넘으면 그 길이로 잘라 내며 넘지 않으면 원본을 그대로 유지한다는 규칙을 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "조직 관리에서 다루는 부서명·사용자명·식별자 같은 문자열을 다룰 때 쓰는 공통 도구로, 빈 값 처리와 길이 제한 같은 반복되는 가공을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 조직도 트리 화면 조회 — 문자열 가공 처리",
+      "stepId": "step:ANY /ext/ldapumt/dpt/selectDeptManageTreeView.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "조직 관리에서 다루는 이름과 식별자 문자열의 빈 값 처리와 길이 제한 등 공통 가공을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "\t\tif (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 34,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 54,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ],
+          "text": "입력이 없거나 공백뿐이면 빈 문자열로 통일하고, 값이 있으면 화면에 위험한 특수 문자를 안전한 표기로 바꾼다. 강한 수준에서는 상위 경로 이동 표기도 함께 제거한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ],
+          "text": "화면에서 넘어온 조직 관리 입력값을 그대로 쓰지 않도록 위험 문자를 걸러 주는 공통 보안 도구로, 부서명·사용자명 같은 사용자 입력이 화면과 조직 저장소로 전달되기 전 정리 단계를 맡는다."
+        }
+      },
+      "name": "LDAP 부서 노드 등록 — 입력값 보안 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/createNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ],
+        "text": "화면에서 넘어온 조직 관리 입력값에서 위험 문자를 제거해 안전한 값으로 정리한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "\tpublic static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 77,
+              "snippet": "\t\treturn getPropertyValueByKey(keyName);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 88,
+              "snippet": "\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(keyName);"
+            }
+          ],
+          "text": "설정은 키와 값의 짝으로 관리되며, 설정 파일의 위치는 상대 경로 기준으로 결정된다. 키 이름을 주면 해당 값을, 경로 성격의 값은 절대 경로로 변환해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "\tpublic static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "조직 관리에 필요한 환경설정 값을 공통 설정 파일에서 읽어 제공하는 협력 객체로, 조직 최상위 범위 확인처럼 설정에 따라 달라지는 판단의 근거 값을 공급한다."
+        }
+      },
+      "name": "LDAP 부서 노드 등록 — LDAP 환경설정 조회",
+      "stepId": "step:POST /ext/ldapumt/dpt/createNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "조직 최상위 범위 등 LDAP 연동에 필요한 환경설정 값을 설정 파일에서 읽어 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 68,
+              "snippet": "\tpublic UcorgVO selectDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 74,
+              "snippet": "\tpublic void updateDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 83,
+              "snippet": "\tpublic Map<Object, Object> insertDeptManage(String parentDn, String ou) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 92,
+              "snippet": "\tpublic Map<Object, Object> insertUserManage(String parentDn, String cn) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 98,
+              "snippet": "\tpublic void deleteDeptManage(String dn);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 105,
+              "snippet": "\tpublic void renameDeptManage(String dn, String name);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 112,
+              "snippet": "\tpublic void renameUserManage(String dn, String name);"
+            }
+          ],
+          "text": "부서 상세 조회와 정보 수정, 상위 부서 아래 신규 부서 등록, 부서 아래 신규 사용자 등록, 부서 삭제, 부서와 사용자 이름 변경을 각각 별도 작업으로 나누어 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 44,
+              "snippet": "public interface EgovOrgManageLdapService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 52,
+              "snippet": "\tpublic Map<Object, Object> selectDeptManageSubList(String dn) throws Exception;"
+            }
+          ],
+          "text": "LDAP 조직 관리의 업무 규약을 정의하는 서비스로, 하위 부서 목록 조회부터 부서·사용자 등록, 삭제, 이름 변경까지 조직도에서 필요한 작업을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 부서 노드 등록 — 조직 관리 업무 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/createNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+            "line": 44,
+            "snippet": "public interface EgovOrgManageLdapService {"
+          }
+        ],
+        "text": "부서와 사용자의 조회·등록·수정·삭제·이름 변경 등 조직 관리 업무를 정의하고 조직 저장소에 반영한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 300,
+              "snippet": "\t\tif (dn == null || dn.isBlank() || !LDAP_DN_PATTERN.matcher(dn).matches()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 304,
+              "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 308,
+              "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 315,
+              "snippet": "\t\tif (rdnValue == null || rdnValue.isBlank() || !LDAP_RDN_VALUE_PATTERN.matcher(rdnValue).matches()) {"
+            }
+          ],
+          "text": "요청으로 받은 조직 식별자는 정해진 형식에 맞는지 확인하고, 설정된 조직 최상위 범위를 벗어나면 처리를 거부한다. 노드 이름 값도 허용된 형식인지 별도로 확인한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 293,
+              "snippet": "    @RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 294,
+              "snippet": "    public String selectDeptManageOrgChartView() throws Exception {"
+            }
+          ],
+          "text": "LDAP 조직도 화면에서 올라온 요청을 받는 진입점으로, 요청 값을 확인해 조직 관리 서비스에 처리를 위임하고 결과 화면 또는 처리 결과를 되돌려 준다."
+        }
+      },
+      "name": "LDAP 부서 노드 등록 — 조직 관리 요청 접수",
+      "stepId": "step:POST /ext/ldapumt/dpt/createNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ],
+        "text": "LDAP 조직 관리 화면의 요청을 받아 유효성을 확인한 뒤 조직 관리 서비스로 위임하고 결과를 화면에 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 81,
+              "snippet": "\t\t\t\treturnVal = source.substring(0, slength) + output;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 83,
+              "snippet": "\t\t\t\treturnVal = source;"
+            }
+          ],
+          "text": "빈 문자열을 기준 값으로 두고, 원본 문자열이 지정한 길이를 넘으면 그 길이로 잘라 내며 넘지 않으면 원본을 그대로 유지한다는 규칙을 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "조직 관리에서 다루는 부서명·사용자명·식별자 같은 문자열을 다룰 때 쓰는 공통 도구로, 빈 값 처리와 길이 제한 같은 반복되는 가공을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 부서 노드 등록 — 문자열 가공 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/createNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "조직 관리에서 다루는 이름과 식별자 문자열의 빈 값 처리와 길이 제한 등 공통 가공을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "\t\tif (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 34,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 54,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ],
+          "text": "입력이 없거나 공백뿐이면 빈 문자열로 통일하고, 값이 있으면 화면에 위험한 특수 문자를 안전한 표기로 바꾼다. 강한 수준에서는 상위 경로 이동 표기도 함께 제거한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ],
+          "text": "화면에서 넘어온 조직 관리 입력값을 그대로 쓰지 않도록 위험 문자를 걸러 주는 공통 보안 도구로, 부서명·사용자명 같은 사용자 입력이 화면과 조직 저장소로 전달되기 전 정리 단계를 맡는다."
+        }
+      },
+      "name": "LDAP 사용자 노드 등록 — 입력값 보안 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/createUserNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ],
+        "text": "화면에서 넘어온 조직 관리 입력값에서 위험 문자를 제거해 안전한 값으로 정리한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "\tpublic static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 77,
+              "snippet": "\t\treturn getPropertyValueByKey(keyName);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 88,
+              "snippet": "\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(keyName);"
+            }
+          ],
+          "text": "설정은 키와 값의 짝으로 관리되며, 설정 파일의 위치는 상대 경로 기준으로 결정된다. 키 이름을 주면 해당 값을, 경로 성격의 값은 절대 경로로 변환해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "\tpublic static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "조직 관리에 필요한 환경설정 값을 공통 설정 파일에서 읽어 제공하는 협력 객체로, 조직 최상위 범위 확인처럼 설정에 따라 달라지는 판단의 근거 값을 공급한다."
+        }
+      },
+      "name": "LDAP 사용자 노드 등록 — LDAP 환경설정 조회",
+      "stepId": "step:POST /ext/ldapumt/dpt/createUserNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "조직 최상위 범위 등 LDAP 연동에 필요한 환경설정 값을 설정 파일에서 읽어 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 68,
+              "snippet": "\tpublic UcorgVO selectDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 74,
+              "snippet": "\tpublic void updateDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 83,
+              "snippet": "\tpublic Map<Object, Object> insertDeptManage(String parentDn, String ou) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 92,
+              "snippet": "\tpublic Map<Object, Object> insertUserManage(String parentDn, String cn) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 98,
+              "snippet": "\tpublic void deleteDeptManage(String dn);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 105,
+              "snippet": "\tpublic void renameDeptManage(String dn, String name);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 112,
+              "snippet": "\tpublic void renameUserManage(String dn, String name);"
+            }
+          ],
+          "text": "부서 상세 조회와 정보 수정, 상위 부서 아래 신규 부서 등록, 부서 아래 신규 사용자 등록, 부서 삭제, 부서와 사용자 이름 변경을 각각 별도 작업으로 나누어 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 44,
+              "snippet": "public interface EgovOrgManageLdapService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 52,
+              "snippet": "\tpublic Map<Object, Object> selectDeptManageSubList(String dn) throws Exception;"
+            }
+          ],
+          "text": "LDAP 조직 관리의 업무 규약을 정의하는 서비스로, 하위 부서 목록 조회부터 부서·사용자 등록, 삭제, 이름 변경까지 조직도에서 필요한 작업을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 사용자 노드 등록 — 조직 관리 업무 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/createUserNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+            "line": 44,
+            "snippet": "public interface EgovOrgManageLdapService {"
+          }
+        ],
+        "text": "부서와 사용자의 조회·등록·수정·삭제·이름 변경 등 조직 관리 업무를 정의하고 조직 저장소에 반영한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 300,
+              "snippet": "\t\tif (dn == null || dn.isBlank() || !LDAP_DN_PATTERN.matcher(dn).matches()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 304,
+              "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 308,
+              "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 315,
+              "snippet": "\t\tif (rdnValue == null || rdnValue.isBlank() || !LDAP_RDN_VALUE_PATTERN.matcher(rdnValue).matches()) {"
+            }
+          ],
+          "text": "요청으로 받은 조직 식별자는 정해진 형식에 맞는지 확인하고, 설정된 조직 최상위 범위를 벗어나면 처리를 거부한다. 노드 이름 값도 허용된 형식인지 별도로 확인한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 293,
+              "snippet": "    @RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 294,
+              "snippet": "    public String selectDeptManageOrgChartView() throws Exception {"
+            }
+          ],
+          "text": "LDAP 조직도 화면에서 올라온 요청을 받는 진입점으로, 요청 값을 확인해 조직 관리 서비스에 처리를 위임하고 결과 화면 또는 처리 결과를 되돌려 준다."
+        }
+      },
+      "name": "LDAP 사용자 노드 등록 — 조직 관리 요청 접수",
+      "stepId": "step:POST /ext/ldapumt/dpt/createUserNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ],
+        "text": "LDAP 조직 관리 화면의 요청을 받아 유효성을 확인한 뒤 조직 관리 서비스로 위임하고 결과를 화면에 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 81,
+              "snippet": "\t\t\t\treturnVal = source.substring(0, slength) + output;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 83,
+              "snippet": "\t\t\t\treturnVal = source;"
+            }
+          ],
+          "text": "빈 문자열을 기준 값으로 두고, 원본 문자열이 지정한 길이를 넘으면 그 길이로 잘라 내며 넘지 않으면 원본을 그대로 유지한다는 규칙을 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "조직 관리에서 다루는 부서명·사용자명·식별자 같은 문자열을 다룰 때 쓰는 공통 도구로, 빈 값 처리와 길이 제한 같은 반복되는 가공을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 사용자 노드 등록 — 문자열 가공 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/createUserNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "조직 관리에서 다루는 이름과 식별자 문자열의 빈 값 처리와 길이 제한 등 공통 가공을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드와 필요 시 매개변수·로케일을 함께 받아 해당 로케일의 안내 문구를 돌려준다. 로케일을 주지 않으면 시스템 기본 로케일을 적용한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "조직 관리 처리 결과를 화면에 알릴 때 필요한 안내 문구를 메시지 자원에서 가져오는 역할을 맡으며, 문구를 코드로 관리해 다국어와 문구 변경을 코드 수정 없이 처리한다."
+        }
+      },
+      "name": "LDAP 부서 노드 삭제 — 처리 결과 메시지 조회",
+      "stepId": "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "조직 관리 처리 결과를 사용자에게 알릴 때 쓰이는 안내 메시지를 메시지 코드로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "\t\tif (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 34,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 54,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ],
+          "text": "입력이 없거나 공백뿐이면 빈 문자열로 통일하고, 값이 있으면 화면에 위험한 특수 문자를 안전한 표기로 바꾼다. 강한 수준에서는 상위 경로 이동 표기도 함께 제거한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ],
+          "text": "화면에서 넘어온 조직 관리 입력값을 그대로 쓰지 않도록 위험 문자를 걸러 주는 공통 보안 도구로, 부서명·사용자명 같은 사용자 입력이 화면과 조직 저장소로 전달되기 전 정리 단계를 맡는다."
+        }
+      },
+      "name": "LDAP 부서 노드 삭제 — 입력값 보안 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ],
+        "text": "화면에서 넘어온 조직 관리 입력값에서 위험 문자를 제거해 안전한 값으로 정리한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "\tpublic static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 77,
+              "snippet": "\t\treturn getPropertyValueByKey(keyName);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 88,
+              "snippet": "\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(keyName);"
+            }
+          ],
+          "text": "설정은 키와 값의 짝으로 관리되며, 설정 파일의 위치는 상대 경로 기준으로 결정된다. 키 이름을 주면 해당 값을, 경로 성격의 값은 절대 경로로 변환해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "\tpublic static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "조직 관리에 필요한 환경설정 값을 공통 설정 파일에서 읽어 제공하는 협력 객체로, 조직 최상위 범위 확인처럼 설정에 따라 달라지는 판단의 근거 값을 공급한다."
+        }
+      },
+      "name": "LDAP 부서 노드 삭제 — LDAP 환경설정 조회",
+      "stepId": "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "조직 최상위 범위 등 LDAP 연동에 필요한 환경설정 값을 설정 파일에서 읽어 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 68,
+              "snippet": "\tpublic UcorgVO selectDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 74,
+              "snippet": "\tpublic void updateDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 83,
+              "snippet": "\tpublic Map<Object, Object> insertDeptManage(String parentDn, String ou) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 92,
+              "snippet": "\tpublic Map<Object, Object> insertUserManage(String parentDn, String cn) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 98,
+              "snippet": "\tpublic void deleteDeptManage(String dn);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 105,
+              "snippet": "\tpublic void renameDeptManage(String dn, String name);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 112,
+              "snippet": "\tpublic void renameUserManage(String dn, String name);"
+            }
+          ],
+          "text": "부서 상세 조회와 정보 수정, 상위 부서 아래 신규 부서 등록, 부서 아래 신규 사용자 등록, 부서 삭제, 부서와 사용자 이름 변경을 각각 별도 작업으로 나누어 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 44,
+              "snippet": "public interface EgovOrgManageLdapService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 52,
+              "snippet": "\tpublic Map<Object, Object> selectDeptManageSubList(String dn) throws Exception;"
+            }
+          ],
+          "text": "LDAP 조직 관리의 업무 규약을 정의하는 서비스로, 하위 부서 목록 조회부터 부서·사용자 등록, 삭제, 이름 변경까지 조직도에서 필요한 작업을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 부서 노드 삭제 — 조직 관리 업무 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+            "line": 44,
+            "snippet": "public interface EgovOrgManageLdapService {"
+          }
+        ],
+        "text": "부서와 사용자의 조회·등록·수정·삭제·이름 변경 등 조직 관리 업무를 정의하고 조직 저장소에 반영한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 300,
+              "snippet": "\t\tif (dn == null || dn.isBlank() || !LDAP_DN_PATTERN.matcher(dn).matches()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 304,
+              "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 308,
+              "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 315,
+              "snippet": "\t\tif (rdnValue == null || rdnValue.isBlank() || !LDAP_RDN_VALUE_PATTERN.matcher(rdnValue).matches()) {"
+            }
+          ],
+          "text": "요청으로 받은 조직 식별자는 정해진 형식에 맞는지 확인하고, 설정된 조직 최상위 범위를 벗어나면 처리를 거부한다. 노드 이름 값도 허용된 형식인지 별도로 확인한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 293,
+              "snippet": "    @RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 294,
+              "snippet": "    public String selectDeptManageOrgChartView() throws Exception {"
+            }
+          ],
+          "text": "LDAP 조직도 화면에서 올라온 요청을 받는 진입점으로, 요청 값을 확인해 조직 관리 서비스에 처리를 위임하고 결과 화면 또는 처리 결과를 되돌려 준다."
+        }
+      },
+      "name": "LDAP 부서 노드 삭제 — 조직 관리 요청 접수",
+      "stepId": "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ],
+        "text": "LDAP 조직 관리 화면의 요청을 받아 유효성을 확인한 뒤 조직 관리 서비스로 위임하고 결과를 화면에 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 81,
+              "snippet": "\t\t\t\treturnVal = source.substring(0, slength) + output;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 83,
+              "snippet": "\t\t\t\treturnVal = source;"
+            }
+          ],
+          "text": "빈 문자열을 기준 값으로 두고, 원본 문자열이 지정한 길이를 넘으면 그 길이로 잘라 내며 넘지 않으면 원본을 그대로 유지한다는 규칙을 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "조직 관리에서 다루는 부서명·사용자명·식별자 같은 문자열을 다룰 때 쓰는 공통 도구로, 빈 값 처리와 길이 제한 같은 반복되는 가공을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 부서 노드 삭제 — 문자열 가공 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "조직 관리에서 다루는 이름과 식별자 문자열의 빈 값 처리와 길이 제한 등 공통 가공을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "\t\tif (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 34,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 54,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ],
+          "text": "입력이 없거나 공백뿐이면 빈 문자열로 통일하고, 값이 있으면 화면에 위험한 특수 문자를 안전한 표기로 바꾼다. 강한 수준에서는 상위 경로 이동 표기도 함께 제거한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ],
+          "text": "화면에서 넘어온 조직 관리 입력값을 그대로 쓰지 않도록 위험 문자를 걸러 주는 공통 보안 도구로, 부서명·사용자명 같은 사용자 입력이 화면과 조직 저장소로 전달되기 전 정리 단계를 맡는다."
+        }
+      },
+      "name": "LDAP 부서 상세 조회 — 입력값 보안 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ],
+        "text": "화면에서 넘어온 조직 관리 입력값에서 위험 문자를 제거해 안전한 값으로 정리한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "\tpublic static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 77,
+              "snippet": "\t\treturn getPropertyValueByKey(keyName);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 88,
+              "snippet": "\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(keyName);"
+            }
+          ],
+          "text": "설정은 키와 값의 짝으로 관리되며, 설정 파일의 위치는 상대 경로 기준으로 결정된다. 키 이름을 주면 해당 값을, 경로 성격의 값은 절대 경로로 변환해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "\tpublic static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "조직 관리에 필요한 환경설정 값을 공통 설정 파일에서 읽어 제공하는 협력 객체로, 조직 최상위 범위 확인처럼 설정에 따라 달라지는 판단의 근거 값을 공급한다."
+        }
+      },
+      "name": "LDAP 부서 상세 조회 — LDAP 환경설정 조회",
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManage.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "조직 최상위 범위 등 LDAP 연동에 필요한 환경설정 값을 설정 파일에서 읽어 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 68,
+              "snippet": "\tpublic UcorgVO selectDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 74,
+              "snippet": "\tpublic void updateDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 83,
+              "snippet": "\tpublic Map<Object, Object> insertDeptManage(String parentDn, String ou) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 92,
+              "snippet": "\tpublic Map<Object, Object> insertUserManage(String parentDn, String cn) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 98,
+              "snippet": "\tpublic void deleteDeptManage(String dn);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 105,
+              "snippet": "\tpublic void renameDeptManage(String dn, String name);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 112,
+              "snippet": "\tpublic void renameUserManage(String dn, String name);"
+            }
+          ],
+          "text": "부서 상세 조회와 정보 수정, 상위 부서 아래 신규 부서 등록, 부서 아래 신규 사용자 등록, 부서 삭제, 부서와 사용자 이름 변경을 각각 별도 작업으로 나누어 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 44,
+              "snippet": "public interface EgovOrgManageLdapService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 52,
+              "snippet": "\tpublic Map<Object, Object> selectDeptManageSubList(String dn) throws Exception;"
+            }
+          ],
+          "text": "LDAP 조직 관리의 업무 규약을 정의하는 서비스로, 하위 부서 목록 조회부터 부서·사용자 등록, 삭제, 이름 변경까지 조직도에서 필요한 작업을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 부서 상세 조회 — 조직 관리 업무 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManage.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+            "line": 44,
+            "snippet": "public interface EgovOrgManageLdapService {"
+          }
+        ],
+        "text": "부서와 사용자의 조회·등록·수정·삭제·이름 변경 등 조직 관리 업무를 정의하고 조직 저장소에 반영한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 300,
+              "snippet": "\t\tif (dn == null || dn.isBlank() || !LDAP_DN_PATTERN.matcher(dn).matches()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 304,
+              "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 308,
+              "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 315,
+              "snippet": "\t\tif (rdnValue == null || rdnValue.isBlank() || !LDAP_RDN_VALUE_PATTERN.matcher(rdnValue).matches()) {"
+            }
+          ],
+          "text": "요청으로 받은 조직 식별자는 정해진 형식에 맞는지 확인하고, 설정된 조직 최상위 범위를 벗어나면 처리를 거부한다. 노드 이름 값도 허용된 형식인지 별도로 확인한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 293,
+              "snippet": "    @RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 294,
+              "snippet": "    public String selectDeptManageOrgChartView() throws Exception {"
+            }
+          ],
+          "text": "LDAP 조직도 화면에서 올라온 요청을 받는 진입점으로, 요청 값을 확인해 조직 관리 서비스에 처리를 위임하고 결과 화면 또는 처리 결과를 되돌려 준다."
+        }
+      },
+      "name": "LDAP 부서 상세 조회 — 조직 관리 요청 접수",
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManage.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ],
+        "text": "LDAP 조직 관리 화면의 요청을 받아 유효성을 확인한 뒤 조직 관리 서비스로 위임하고 결과를 화면에 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 81,
+              "snippet": "\t\t\t\treturnVal = source.substring(0, slength) + output;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 83,
+              "snippet": "\t\t\t\treturnVal = source;"
+            }
+          ],
+          "text": "빈 문자열을 기준 값으로 두고, 원본 문자열이 지정한 길이를 넘으면 그 길이로 잘라 내며 넘지 않으면 원본을 그대로 유지한다는 규칙을 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "조직 관리에서 다루는 부서명·사용자명·식별자 같은 문자열을 다룰 때 쓰는 공통 도구로, 빈 값 처리와 길이 제한 같은 반복되는 가공을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 부서 상세 조회 — 문자열 가공 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "조직 관리에서 다루는 이름과 식별자 문자열의 빈 값 처리와 길이 제한 등 공통 가공을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "\t\tif (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 34,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 54,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ],
+          "text": "입력이 없거나 공백뿐이면 빈 문자열로 통일하고, 값이 있으면 화면에 위험한 특수 문자를 안전한 표기로 바꾼다. 강한 수준에서는 상위 경로 이동 표기도 함께 제거한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ],
+          "text": "화면에서 넘어온 조직 관리 입력값을 그대로 쓰지 않도록 위험 문자를 걸러 주는 공통 보안 도구로, 부서명·사용자명 같은 사용자 입력이 화면과 조직 저장소로 전달되기 전 정리 단계를 맡는다."
+        }
+      },
+      "name": "LDAP 하위 부서 목록 조회 — 입력값 보안 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManageSublist.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ],
+        "text": "화면에서 넘어온 조직 관리 입력값에서 위험 문자를 제거해 안전한 값으로 정리한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "\tpublic static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 77,
+              "snippet": "\t\treturn getPropertyValueByKey(keyName);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 88,
+              "snippet": "\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(keyName);"
+            }
+          ],
+          "text": "설정은 키와 값의 짝으로 관리되며, 설정 파일의 위치는 상대 경로 기준으로 결정된다. 키 이름을 주면 해당 값을, 경로 성격의 값은 절대 경로로 변환해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "\tpublic static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "조직 관리에 필요한 환경설정 값을 공통 설정 파일에서 읽어 제공하는 협력 객체로, 조직 최상위 범위 확인처럼 설정에 따라 달라지는 판단의 근거 값을 공급한다."
+        }
+      },
+      "name": "LDAP 하위 부서 목록 조회 — LDAP 환경설정 조회",
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManageSublist.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "조직 최상위 범위 등 LDAP 연동에 필요한 환경설정 값을 설정 파일에서 읽어 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 68,
+              "snippet": "\tpublic UcorgVO selectDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 74,
+              "snippet": "\tpublic void updateDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 83,
+              "snippet": "\tpublic Map<Object, Object> insertDeptManage(String parentDn, String ou) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 92,
+              "snippet": "\tpublic Map<Object, Object> insertUserManage(String parentDn, String cn) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 98,
+              "snippet": "\tpublic void deleteDeptManage(String dn);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 105,
+              "snippet": "\tpublic void renameDeptManage(String dn, String name);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 112,
+              "snippet": "\tpublic void renameUserManage(String dn, String name);"
+            }
+          ],
+          "text": "부서 상세 조회와 정보 수정, 상위 부서 아래 신규 부서 등록, 부서 아래 신규 사용자 등록, 부서 삭제, 부서와 사용자 이름 변경을 각각 별도 작업으로 나누어 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 44,
+              "snippet": "public interface EgovOrgManageLdapService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 52,
+              "snippet": "\tpublic Map<Object, Object> selectDeptManageSubList(String dn) throws Exception;"
+            }
+          ],
+          "text": "LDAP 조직 관리의 업무 규약을 정의하는 서비스로, 하위 부서 목록 조회부터 부서·사용자 등록, 삭제, 이름 변경까지 조직도에서 필요한 작업을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 하위 부서 목록 조회 — 조직 관리 업무 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManageSublist.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+            "line": 44,
+            "snippet": "public interface EgovOrgManageLdapService {"
+          }
+        ],
+        "text": "부서와 사용자의 조회·등록·수정·삭제·이름 변경 등 조직 관리 업무를 정의하고 조직 저장소에 반영한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 300,
+              "snippet": "\t\tif (dn == null || dn.isBlank() || !LDAP_DN_PATTERN.matcher(dn).matches()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 304,
+              "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 308,
+              "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 315,
+              "snippet": "\t\tif (rdnValue == null || rdnValue.isBlank() || !LDAP_RDN_VALUE_PATTERN.matcher(rdnValue).matches()) {"
+            }
+          ],
+          "text": "요청으로 받은 조직 식별자는 정해진 형식에 맞는지 확인하고, 설정된 조직 최상위 범위를 벗어나면 처리를 거부한다. 노드 이름 값도 허용된 형식인지 별도로 확인한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 293,
+              "snippet": "    @RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 294,
+              "snippet": "    public String selectDeptManageOrgChartView() throws Exception {"
+            }
+          ],
+          "text": "LDAP 조직도 화면에서 올라온 요청을 받는 진입점으로, 요청 값을 확인해 조직 관리 서비스에 처리를 위임하고 결과 화면 또는 처리 결과를 되돌려 준다."
+        }
+      },
+      "name": "LDAP 하위 부서 목록 조회 — 조직 관리 요청 접수",
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManageSublist.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ],
+        "text": "LDAP 조직 관리 화면의 요청을 받아 유효성을 확인한 뒤 조직 관리 서비스로 위임하고 결과를 화면에 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 81,
+              "snippet": "\t\t\t\treturnVal = source.substring(0, slength) + output;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 83,
+              "snippet": "\t\t\t\treturnVal = source;"
+            }
+          ],
+          "text": "빈 문자열을 기준 값으로 두고, 원본 문자열이 지정한 길이를 넘으면 그 길이로 잘라 내며 넘지 않으면 원본을 그대로 유지한다는 규칙을 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "조직 관리에서 다루는 부서명·사용자명·식별자 같은 문자열을 다룰 때 쓰는 공통 도구로, 빈 값 처리와 길이 제한 같은 반복되는 가공을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 하위 부서 목록 조회 — 문자열 가공 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManageSublist.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "조직 관리에서 다루는 이름과 식별자 문자열의 빈 값 처리와 길이 제한 등 공통 가공을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "\t\tif (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 34,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 54,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ],
+          "text": "입력이 없거나 공백뿐이면 빈 문자열로 통일하고, 값이 있으면 화면에 위험한 특수 문자를 안전한 표기로 바꾼다. 강한 수준에서는 상위 경로 이동 표기도 함께 제거한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ],
+          "text": "화면에서 넘어온 조직 관리 입력값을 그대로 쓰지 않도록 위험 문자를 걸러 주는 공통 보안 도구로, 부서명·사용자명 같은 사용자 입력이 화면과 조직 저장소로 전달되기 전 정리 단계를 맡는다."
+        }
+      },
+      "name": "LDAP 사용자 상세 조회 — 입력값 보안 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/getUserManage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ],
+        "text": "화면에서 넘어온 조직 관리 입력값에서 위험 문자를 제거해 안전한 값으로 정리한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "\tpublic static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 77,
+              "snippet": "\t\treturn getPropertyValueByKey(keyName);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 88,
+              "snippet": "\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(keyName);"
+            }
+          ],
+          "text": "설정은 키와 값의 짝으로 관리되며, 설정 파일의 위치는 상대 경로 기준으로 결정된다. 키 이름을 주면 해당 값을, 경로 성격의 값은 절대 경로로 변환해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "\tpublic static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "조직 관리에 필요한 환경설정 값을 공통 설정 파일에서 읽어 제공하는 협력 객체로, 조직 최상위 범위 확인처럼 설정에 따라 달라지는 판단의 근거 값을 공급한다."
+        }
+      },
+      "name": "LDAP 사용자 상세 조회 — LDAP 환경설정 조회",
+      "stepId": "step:POST /ext/ldapumt/dpt/getUserManage.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "조직 최상위 범위 등 LDAP 연동에 필요한 환경설정 값을 설정 파일에서 읽어 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 68,
+              "snippet": "\tpublic UcorgVO selectDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 74,
+              "snippet": "\tpublic void updateDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 83,
+              "snippet": "\tpublic Map<Object, Object> insertDeptManage(String parentDn, String ou) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 92,
+              "snippet": "\tpublic Map<Object, Object> insertUserManage(String parentDn, String cn) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 98,
+              "snippet": "\tpublic void deleteDeptManage(String dn);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 105,
+              "snippet": "\tpublic void renameDeptManage(String dn, String name);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 112,
+              "snippet": "\tpublic void renameUserManage(String dn, String name);"
+            }
+          ],
+          "text": "부서 상세 조회와 정보 수정, 상위 부서 아래 신규 부서 등록, 부서 아래 신규 사용자 등록, 부서 삭제, 부서와 사용자 이름 변경을 각각 별도 작업으로 나누어 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 44,
+              "snippet": "public interface EgovOrgManageLdapService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 52,
+              "snippet": "\tpublic Map<Object, Object> selectDeptManageSubList(String dn) throws Exception;"
+            }
+          ],
+          "text": "LDAP 조직 관리의 업무 규약을 정의하는 서비스로, 하위 부서 목록 조회부터 부서·사용자 등록, 삭제, 이름 변경까지 조직도에서 필요한 작업을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 사용자 상세 조회 — 조직 관리 업무 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/getUserManage.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+            "line": 44,
+            "snippet": "public interface EgovOrgManageLdapService {"
+          }
+        ],
+        "text": "부서와 사용자의 조회·등록·수정·삭제·이름 변경 등 조직 관리 업무를 정의하고 조직 저장소에 반영한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 300,
+              "snippet": "\t\tif (dn == null || dn.isBlank() || !LDAP_DN_PATTERN.matcher(dn).matches()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 304,
+              "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 308,
+              "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 315,
+              "snippet": "\t\tif (rdnValue == null || rdnValue.isBlank() || !LDAP_RDN_VALUE_PATTERN.matcher(rdnValue).matches()) {"
+            }
+          ],
+          "text": "요청으로 받은 조직 식별자는 정해진 형식에 맞는지 확인하고, 설정된 조직 최상위 범위를 벗어나면 처리를 거부한다. 노드 이름 값도 허용된 형식인지 별도로 확인한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 293,
+              "snippet": "    @RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 294,
+              "snippet": "    public String selectDeptManageOrgChartView() throws Exception {"
+            }
+          ],
+          "text": "LDAP 조직도 화면에서 올라온 요청을 받는 진입점으로, 요청 값을 확인해 조직 관리 서비스에 처리를 위임하고 결과 화면 또는 처리 결과를 되돌려 준다."
+        }
+      },
+      "name": "LDAP 사용자 상세 조회 — 조직 관리 요청 접수",
+      "stepId": "step:POST /ext/ldapumt/dpt/getUserManage.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ],
+        "text": "LDAP 조직 관리 화면의 요청을 받아 유효성을 확인한 뒤 조직 관리 서비스로 위임하고 결과를 화면에 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 81,
+              "snippet": "\t\t\t\treturnVal = source.substring(0, slength) + output;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 83,
+              "snippet": "\t\t\t\treturnVal = source;"
+            }
+          ],
+          "text": "빈 문자열을 기준 값으로 두고, 원본 문자열이 지정한 길이를 넘으면 그 길이로 잘라 내며 넘지 않으면 원본을 그대로 유지한다는 규칙을 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "조직 관리에서 다루는 부서명·사용자명·식별자 같은 문자열을 다룰 때 쓰는 공통 도구로, 빈 값 처리와 길이 제한 같은 반복되는 가공을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 사용자 상세 조회 — 문자열 가공 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/getUserManage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "조직 관리에서 다루는 이름과 식별자 문자열의 빈 값 처리와 길이 제한 등 공통 가공을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드와 필요 시 매개변수·로케일을 함께 받아 해당 로케일의 안내 문구를 돌려준다. 로케일을 주지 않으면 시스템 기본 로케일을 적용한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "조직 관리 처리 결과를 화면에 알릴 때 필요한 안내 문구를 메시지 자원에서 가져오는 역할을 맡으며, 문구를 코드로 관리해 다국어와 문구 변경을 코드 수정 없이 처리한다."
+        }
+      },
+      "name": "LDAP 부서 정보 수정 — 처리 결과 메시지 조회",
+      "stepId": "step:POST /ext/ldapumt/dpt/modifyDeptManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "조직 관리 처리 결과를 사용자에게 알릴 때 쓰이는 안내 메시지를 메시지 코드로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 68,
+              "snippet": "\tpublic UcorgVO selectDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 74,
+              "snippet": "\tpublic void updateDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 83,
+              "snippet": "\tpublic Map<Object, Object> insertDeptManage(String parentDn, String ou) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 92,
+              "snippet": "\tpublic Map<Object, Object> insertUserManage(String parentDn, String cn) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 98,
+              "snippet": "\tpublic void deleteDeptManage(String dn);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 105,
+              "snippet": "\tpublic void renameDeptManage(String dn, String name);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 112,
+              "snippet": "\tpublic void renameUserManage(String dn, String name);"
+            }
+          ],
+          "text": "부서 상세 조회와 정보 수정, 상위 부서 아래 신규 부서 등록, 부서 아래 신규 사용자 등록, 부서 삭제, 부서와 사용자 이름 변경을 각각 별도 작업으로 나누어 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 44,
+              "snippet": "public interface EgovOrgManageLdapService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 52,
+              "snippet": "\tpublic Map<Object, Object> selectDeptManageSubList(String dn) throws Exception;"
+            }
+          ],
+          "text": "LDAP 조직 관리의 업무 규약을 정의하는 서비스로, 하위 부서 목록 조회부터 부서·사용자 등록, 삭제, 이름 변경까지 조직도에서 필요한 작업을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 부서 정보 수정 — 조직 관리 업무 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/modifyDeptManage.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+            "line": 44,
+            "snippet": "public interface EgovOrgManageLdapService {"
+          }
+        ],
+        "text": "부서와 사용자의 조회·등록·수정·삭제·이름 변경 등 조직 관리 업무를 정의하고 조직 저장소에 반영한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 300,
+              "snippet": "\t\tif (dn == null || dn.isBlank() || !LDAP_DN_PATTERN.matcher(dn).matches()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 304,
+              "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 308,
+              "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 315,
+              "snippet": "\t\tif (rdnValue == null || rdnValue.isBlank() || !LDAP_RDN_VALUE_PATTERN.matcher(rdnValue).matches()) {"
+            }
+          ],
+          "text": "요청으로 받은 조직 식별자는 정해진 형식에 맞는지 확인하고, 설정된 조직 최상위 범위를 벗어나면 처리를 거부한다. 노드 이름 값도 허용된 형식인지 별도로 확인한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 293,
+              "snippet": "    @RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 294,
+              "snippet": "    public String selectDeptManageOrgChartView() throws Exception {"
+            }
+          ],
+          "text": "LDAP 조직도 화면에서 올라온 요청을 받는 진입점으로, 요청 값을 확인해 조직 관리 서비스에 처리를 위임하고 결과 화면 또는 처리 결과를 되돌려 준다."
+        }
+      },
+      "name": "LDAP 부서 정보 수정 — 조직 관리 요청 접수",
+      "stepId": "step:POST /ext/ldapumt/dpt/modifyDeptManage.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ],
+        "text": "LDAP 조직 관리 화면의 요청을 받아 유효성을 확인한 뒤 조직 관리 서비스로 위임하고 결과를 화면에 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드와 필요 시 매개변수·로케일을 함께 받아 해당 로케일의 안내 문구를 돌려준다. 로케일을 주지 않으면 시스템 기본 로케일을 적용한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "조직 관리 처리 결과를 화면에 알릴 때 필요한 안내 문구를 메시지 자원에서 가져오는 역할을 맡으며, 문구를 코드로 관리해 다국어와 문구 변경을 코드 수정 없이 처리한다."
+        }
+      },
+      "name": "LDAP 사용자 정보 수정 — 처리 결과 메시지 조회",
+      "stepId": "step:POST /ext/ldapumt/dpt/modifyUserManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "조직 관리 처리 결과를 사용자에게 알릴 때 쓰이는 안내 메시지를 메시지 코드로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 68,
+              "snippet": "\tpublic UcorgVO selectDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 74,
+              "snippet": "\tpublic void updateDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 83,
+              "snippet": "\tpublic Map<Object, Object> insertDeptManage(String parentDn, String ou) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 92,
+              "snippet": "\tpublic Map<Object, Object> insertUserManage(String parentDn, String cn) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 98,
+              "snippet": "\tpublic void deleteDeptManage(String dn);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 105,
+              "snippet": "\tpublic void renameDeptManage(String dn, String name);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 112,
+              "snippet": "\tpublic void renameUserManage(String dn, String name);"
+            }
+          ],
+          "text": "부서 상세 조회와 정보 수정, 상위 부서 아래 신규 부서 등록, 부서 아래 신규 사용자 등록, 부서 삭제, 부서와 사용자 이름 변경을 각각 별도 작업으로 나누어 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 44,
+              "snippet": "public interface EgovOrgManageLdapService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 52,
+              "snippet": "\tpublic Map<Object, Object> selectDeptManageSubList(String dn) throws Exception;"
+            }
+          ],
+          "text": "LDAP 조직 관리의 업무 규약을 정의하는 서비스로, 하위 부서 목록 조회부터 부서·사용자 등록, 삭제, 이름 변경까지 조직도에서 필요한 작업을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 사용자 정보 수정 — 조직 관리 업무 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/modifyUserManage.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+            "line": 44,
+            "snippet": "public interface EgovOrgManageLdapService {"
+          }
+        ],
+        "text": "부서와 사용자의 조회·등록·수정·삭제·이름 변경 등 조직 관리 업무를 정의하고 조직 저장소에 반영한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 300,
+              "snippet": "\t\tif (dn == null || dn.isBlank() || !LDAP_DN_PATTERN.matcher(dn).matches()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 304,
+              "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 308,
+              "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 315,
+              "snippet": "\t\tif (rdnValue == null || rdnValue.isBlank() || !LDAP_RDN_VALUE_PATTERN.matcher(rdnValue).matches()) {"
+            }
+          ],
+          "text": "요청으로 받은 조직 식별자는 정해진 형식에 맞는지 확인하고, 설정된 조직 최상위 범위를 벗어나면 처리를 거부한다. 노드 이름 값도 허용된 형식인지 별도로 확인한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 293,
+              "snippet": "    @RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 294,
+              "snippet": "    public String selectDeptManageOrgChartView() throws Exception {"
+            }
+          ],
+          "text": "LDAP 조직도 화면에서 올라온 요청을 받는 진입점으로, 요청 값을 확인해 조직 관리 서비스에 처리를 위임하고 결과 화면 또는 처리 결과를 되돌려 준다."
+        }
+      },
+      "name": "LDAP 사용자 정보 수정 — 조직 관리 요청 접수",
+      "stepId": "step:POST /ext/ldapumt/dpt/modifyUserManage.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ],
+        "text": "LDAP 조직 관리 화면의 요청을 받아 유효성을 확인한 뒤 조직 관리 서비스로 위임하고 결과를 화면에 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드와 필요 시 매개변수·로케일을 함께 받아 해당 로케일의 안내 문구를 돌려준다. 로케일을 주지 않으면 시스템 기본 로케일을 적용한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "조직 관리 처리 결과를 화면에 알릴 때 필요한 안내 문구를 메시지 자원에서 가져오는 역할을 맡으며, 문구를 코드로 관리해 다국어와 문구 변경을 코드 수정 없이 처리한다."
+        }
+      },
+      "name": "LDAP 조직 노드 이동 — 처리 결과 메시지 조회",
+      "stepId": "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "조직 관리 처리 결과를 사용자에게 알릴 때 쓰이는 안내 메시지를 메시지 코드로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "\t\tif (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 34,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 54,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ],
+          "text": "입력이 없거나 공백뿐이면 빈 문자열로 통일하고, 값이 있으면 화면에 위험한 특수 문자를 안전한 표기로 바꾼다. 강한 수준에서는 상위 경로 이동 표기도 함께 제거한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ],
+          "text": "화면에서 넘어온 조직 관리 입력값을 그대로 쓰지 않도록 위험 문자를 걸러 주는 공통 보안 도구로, 부서명·사용자명 같은 사용자 입력이 화면과 조직 저장소로 전달되기 전 정리 단계를 맡는다."
+        }
+      },
+      "name": "LDAP 조직 노드 이동 — 입력값 보안 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ],
+        "text": "화면에서 넘어온 조직 관리 입력값에서 위험 문자를 제거해 안전한 값으로 정리한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "\tpublic static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 77,
+              "snippet": "\t\treturn getPropertyValueByKey(keyName);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 88,
+              "snippet": "\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(keyName);"
+            }
+          ],
+          "text": "설정은 키와 값의 짝으로 관리되며, 설정 파일의 위치는 상대 경로 기준으로 결정된다. 키 이름을 주면 해당 값을, 경로 성격의 값은 절대 경로로 변환해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "\tpublic static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "조직 관리에 필요한 환경설정 값을 공통 설정 파일에서 읽어 제공하는 협력 객체로, 조직 최상위 범위 확인처럼 설정에 따라 달라지는 판단의 근거 값을 공급한다."
+        }
+      },
+      "name": "LDAP 조직 노드 이동 — LDAP 환경설정 조회",
+      "stepId": "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "조직 최상위 범위 등 LDAP 연동에 필요한 환경설정 값을 설정 파일에서 읽어 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 68,
+              "snippet": "\tpublic UcorgVO selectDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 74,
+              "snippet": "\tpublic void updateDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 83,
+              "snippet": "\tpublic Map<Object, Object> insertDeptManage(String parentDn, String ou) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 92,
+              "snippet": "\tpublic Map<Object, Object> insertUserManage(String parentDn, String cn) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 98,
+              "snippet": "\tpublic void deleteDeptManage(String dn);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 105,
+              "snippet": "\tpublic void renameDeptManage(String dn, String name);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 112,
+              "snippet": "\tpublic void renameUserManage(String dn, String name);"
+            }
+          ],
+          "text": "부서 상세 조회와 정보 수정, 상위 부서 아래 신규 부서 등록, 부서 아래 신규 사용자 등록, 부서 삭제, 부서와 사용자 이름 변경을 각각 별도 작업으로 나누어 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 44,
+              "snippet": "public interface EgovOrgManageLdapService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 52,
+              "snippet": "\tpublic Map<Object, Object> selectDeptManageSubList(String dn) throws Exception;"
+            }
+          ],
+          "text": "LDAP 조직 관리의 업무 규약을 정의하는 서비스로, 하위 부서 목록 조회부터 부서·사용자 등록, 삭제, 이름 변경까지 조직도에서 필요한 작업을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 조직 노드 이동 — 조직 관리 업무 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+            "line": 44,
+            "snippet": "public interface EgovOrgManageLdapService {"
+          }
+        ],
+        "text": "부서와 사용자의 조회·등록·수정·삭제·이름 변경 등 조직 관리 업무를 정의하고 조직 저장소에 반영한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 300,
+              "snippet": "\t\tif (dn == null || dn.isBlank() || !LDAP_DN_PATTERN.matcher(dn).matches()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 304,
+              "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 308,
+              "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 315,
+              "snippet": "\t\tif (rdnValue == null || rdnValue.isBlank() || !LDAP_RDN_VALUE_PATTERN.matcher(rdnValue).matches()) {"
+            }
+          ],
+          "text": "요청으로 받은 조직 식별자는 정해진 형식에 맞는지 확인하고, 설정된 조직 최상위 범위를 벗어나면 처리를 거부한다. 노드 이름 값도 허용된 형식인지 별도로 확인한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 293,
+              "snippet": "    @RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 294,
+              "snippet": "    public String selectDeptManageOrgChartView() throws Exception {"
+            }
+          ],
+          "text": "LDAP 조직도 화면에서 올라온 요청을 받는 진입점으로, 요청 값을 확인해 조직 관리 서비스에 처리를 위임하고 결과 화면 또는 처리 결과를 되돌려 준다."
+        }
+      },
+      "name": "LDAP 조직 노드 이동 — 조직 관리 요청 접수",
+      "stepId": "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ],
+        "text": "LDAP 조직 관리 화면의 요청을 받아 유효성을 확인한 뒤 조직 관리 서비스로 위임하고 결과를 화면에 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 81,
+              "snippet": "\t\t\t\treturnVal = source.substring(0, slength) + output;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 83,
+              "snippet": "\t\t\t\treturnVal = source;"
+            }
+          ],
+          "text": "빈 문자열을 기준 값으로 두고, 원본 문자열이 지정한 길이를 넘으면 그 길이로 잘라 내며 넘지 않으면 원본을 그대로 유지한다는 규칙을 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "조직 관리에서 다루는 부서명·사용자명·식별자 같은 문자열을 다룰 때 쓰는 공통 도구로, 빈 값 처리와 길이 제한 같은 반복되는 가공을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 조직 노드 이동 — 문자열 가공 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "조직 관리에서 다루는 이름과 식별자 문자열의 빈 값 처리와 길이 제한 등 공통 가공을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드와 필요 시 매개변수·로케일을 함께 받아 해당 로케일의 안내 문구를 돌려준다. 로케일을 주지 않으면 시스템 기본 로케일을 적용한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "조직 관리 처리 결과를 화면에 알릴 때 필요한 안내 문구를 메시지 자원에서 가져오는 역할을 맡으며, 문구를 코드로 관리해 다국어와 문구 변경을 코드 수정 없이 처리한다."
+        }
+      },
+      "name": "LDAP 부서 이름 변경 — 처리 결과 메시지 조회",
+      "stepId": "step:POST /ext/ldapumt/dpt/renameNode.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "조직 관리 처리 결과를 사용자에게 알릴 때 쓰이는 안내 메시지를 메시지 코드로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "\t\tif (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 34,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 54,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ],
+          "text": "입력이 없거나 공백뿐이면 빈 문자열로 통일하고, 값이 있으면 화면에 위험한 특수 문자를 안전한 표기로 바꾼다. 강한 수준에서는 상위 경로 이동 표기도 함께 제거한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ],
+          "text": "화면에서 넘어온 조직 관리 입력값을 그대로 쓰지 않도록 위험 문자를 걸러 주는 공통 보안 도구로, 부서명·사용자명 같은 사용자 입력이 화면과 조직 저장소로 전달되기 전 정리 단계를 맡는다."
+        }
+      },
+      "name": "LDAP 부서 이름 변경 — 입력값 보안 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/renameNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ],
+        "text": "화면에서 넘어온 조직 관리 입력값에서 위험 문자를 제거해 안전한 값으로 정리한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "\tpublic static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 77,
+              "snippet": "\t\treturn getPropertyValueByKey(keyName);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 88,
+              "snippet": "\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(keyName);"
+            }
+          ],
+          "text": "설정은 키와 값의 짝으로 관리되며, 설정 파일의 위치는 상대 경로 기준으로 결정된다. 키 이름을 주면 해당 값을, 경로 성격의 값은 절대 경로로 변환해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "\tpublic static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "조직 관리에 필요한 환경설정 값을 공통 설정 파일에서 읽어 제공하는 협력 객체로, 조직 최상위 범위 확인처럼 설정에 따라 달라지는 판단의 근거 값을 공급한다."
+        }
+      },
+      "name": "LDAP 부서 이름 변경 — LDAP 환경설정 조회",
+      "stepId": "step:POST /ext/ldapumt/dpt/renameNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "조직 최상위 범위 등 LDAP 연동에 필요한 환경설정 값을 설정 파일에서 읽어 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 68,
+              "snippet": "\tpublic UcorgVO selectDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 74,
+              "snippet": "\tpublic void updateDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 83,
+              "snippet": "\tpublic Map<Object, Object> insertDeptManage(String parentDn, String ou) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 92,
+              "snippet": "\tpublic Map<Object, Object> insertUserManage(String parentDn, String cn) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 98,
+              "snippet": "\tpublic void deleteDeptManage(String dn);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 105,
+              "snippet": "\tpublic void renameDeptManage(String dn, String name);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 112,
+              "snippet": "\tpublic void renameUserManage(String dn, String name);"
+            }
+          ],
+          "text": "부서 상세 조회와 정보 수정, 상위 부서 아래 신규 부서 등록, 부서 아래 신규 사용자 등록, 부서 삭제, 부서와 사용자 이름 변경을 각각 별도 작업으로 나누어 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 44,
+              "snippet": "public interface EgovOrgManageLdapService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 52,
+              "snippet": "\tpublic Map<Object, Object> selectDeptManageSubList(String dn) throws Exception;"
+            }
+          ],
+          "text": "LDAP 조직 관리의 업무 규약을 정의하는 서비스로, 하위 부서 목록 조회부터 부서·사용자 등록, 삭제, 이름 변경까지 조직도에서 필요한 작업을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 부서 이름 변경 — 조직 관리 업무 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/renameNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+            "line": 44,
+            "snippet": "public interface EgovOrgManageLdapService {"
+          }
+        ],
+        "text": "부서와 사용자의 조회·등록·수정·삭제·이름 변경 등 조직 관리 업무를 정의하고 조직 저장소에 반영한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 300,
+              "snippet": "\t\tif (dn == null || dn.isBlank() || !LDAP_DN_PATTERN.matcher(dn).matches()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 304,
+              "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 308,
+              "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 315,
+              "snippet": "\t\tif (rdnValue == null || rdnValue.isBlank() || !LDAP_RDN_VALUE_PATTERN.matcher(rdnValue).matches()) {"
+            }
+          ],
+          "text": "요청으로 받은 조직 식별자는 정해진 형식에 맞는지 확인하고, 설정된 조직 최상위 범위를 벗어나면 처리를 거부한다. 노드 이름 값도 허용된 형식인지 별도로 확인한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 293,
+              "snippet": "    @RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 294,
+              "snippet": "    public String selectDeptManageOrgChartView() throws Exception {"
+            }
+          ],
+          "text": "LDAP 조직도 화면에서 올라온 요청을 받는 진입점으로, 요청 값을 확인해 조직 관리 서비스에 처리를 위임하고 결과 화면 또는 처리 결과를 되돌려 준다."
+        }
+      },
+      "name": "LDAP 부서 이름 변경 — 조직 관리 요청 접수",
+      "stepId": "step:POST /ext/ldapumt/dpt/renameNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ],
+        "text": "LDAP 조직 관리 화면의 요청을 받아 유효성을 확인한 뒤 조직 관리 서비스로 위임하고 결과를 화면에 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 81,
+              "snippet": "\t\t\t\treturnVal = source.substring(0, slength) + output;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 83,
+              "snippet": "\t\t\t\treturnVal = source;"
+            }
+          ],
+          "text": "빈 문자열을 기준 값으로 두고, 원본 문자열이 지정한 길이를 넘으면 그 길이로 잘라 내며 넘지 않으면 원본을 그대로 유지한다는 규칙을 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "조직 관리에서 다루는 부서명·사용자명·식별자 같은 문자열을 다룰 때 쓰는 공통 도구로, 빈 값 처리와 길이 제한 같은 반복되는 가공을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 부서 이름 변경 — 문자열 가공 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/renameNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "조직 관리에서 다루는 이름과 식별자 문자열의 빈 값 처리와 길이 제한 등 공통 가공을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드와 필요 시 매개변수·로케일을 함께 받아 해당 로케일의 안내 문구를 돌려준다. 로케일을 주지 않으면 시스템 기본 로케일을 적용한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "조직 관리 처리 결과를 화면에 알릴 때 필요한 안내 문구를 메시지 자원에서 가져오는 역할을 맡으며, 문구를 코드로 관리해 다국어와 문구 변경을 코드 수정 없이 처리한다."
+        }
+      },
+      "name": "LDAP 사용자 이름 변경 — 처리 결과 메시지 조회",
+      "stepId": "step:POST /ext/ldapumt/dpt/renameUserNode.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "조직 관리 처리 결과를 사용자에게 알릴 때 쓰이는 안내 메시지를 메시지 코드로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "\t\tif (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 34,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 54,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ],
+          "text": "입력이 없거나 공백뿐이면 빈 문자열로 통일하고, 값이 있으면 화면에 위험한 특수 문자를 안전한 표기로 바꾼다. 강한 수준에서는 상위 경로 이동 표기도 함께 제거한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ],
+          "text": "화면에서 넘어온 조직 관리 입력값을 그대로 쓰지 않도록 위험 문자를 걸러 주는 공통 보안 도구로, 부서명·사용자명 같은 사용자 입력이 화면과 조직 저장소로 전달되기 전 정리 단계를 맡는다."
+        }
+      },
+      "name": "LDAP 사용자 이름 변경 — 입력값 보안 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/renameUserNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ],
+        "text": "화면에서 넘어온 조직 관리 입력값에서 위험 문자를 제거해 안전한 값으로 정리한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "\tpublic static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 77,
+              "snippet": "\t\treturn getPropertyValueByKey(keyName);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 88,
+              "snippet": "\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(keyName);"
+            }
+          ],
+          "text": "설정은 키와 값의 짝으로 관리되며, 설정 파일의 위치는 상대 경로 기준으로 결정된다. 키 이름을 주면 해당 값을, 경로 성격의 값은 절대 경로로 변환해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "\tpublic static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "조직 관리에 필요한 환경설정 값을 공통 설정 파일에서 읽어 제공하는 협력 객체로, 조직 최상위 범위 확인처럼 설정에 따라 달라지는 판단의 근거 값을 공급한다."
+        }
+      },
+      "name": "LDAP 사용자 이름 변경 — LDAP 환경설정 조회",
+      "stepId": "step:POST /ext/ldapumt/dpt/renameUserNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "조직 최상위 범위 등 LDAP 연동에 필요한 환경설정 값을 설정 파일에서 읽어 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 68,
+              "snippet": "\tpublic UcorgVO selectDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 74,
+              "snippet": "\tpublic void updateDeptManage(UcorgVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 83,
+              "snippet": "\tpublic Map<Object, Object> insertDeptManage(String parentDn, String ou) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 92,
+              "snippet": "\tpublic Map<Object, Object> insertUserManage(String parentDn, String cn) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 98,
+              "snippet": "\tpublic void deleteDeptManage(String dn);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 105,
+              "snippet": "\tpublic void renameDeptManage(String dn, String name);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 112,
+              "snippet": "\tpublic void renameUserManage(String dn, String name);"
+            }
+          ],
+          "text": "부서 상세 조회와 정보 수정, 상위 부서 아래 신규 부서 등록, 부서 아래 신규 사용자 등록, 부서 삭제, 부서와 사용자 이름 변경을 각각 별도 작업으로 나누어 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 44,
+              "snippet": "public interface EgovOrgManageLdapService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+              "line": 52,
+              "snippet": "\tpublic Map<Object, Object> selectDeptManageSubList(String dn) throws Exception;"
+            }
+          ],
+          "text": "LDAP 조직 관리의 업무 규약을 정의하는 서비스로, 하위 부서 목록 조회부터 부서·사용자 등록, 삭제, 이름 변경까지 조직도에서 필요한 작업을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 사용자 이름 변경 — 조직 관리 업무 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/renameUserNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+            "line": 44,
+            "snippet": "public interface EgovOrgManageLdapService {"
+          }
+        ],
+        "text": "부서와 사용자의 조회·등록·수정·삭제·이름 변경 등 조직 관리 업무를 정의하고 조직 저장소에 반영한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 300,
+              "snippet": "\t\tif (dn == null || dn.isBlank() || !LDAP_DN_PATTERN.matcher(dn).matches()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 304,
+              "snippet": "\t\tString rootDn = EgovProperties.getProperty(\"ldap.rootDn\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 308,
+              "snippet": "\t\t\tif (!normalizedDn.endsWith(normalizedRootDn)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 315,
+              "snippet": "\t\tif (rdnValue == null || rdnValue.isBlank() || !LDAP_RDN_VALUE_PATTERN.matcher(rdnValue).matches()) {"
+            }
+          ],
+          "text": "요청으로 받은 조직 식별자는 정해진 형식에 맞는지 확인하고, 설정된 조직 최상위 범위를 벗어나면 처리를 거부한다. 노드 이름 값도 허용된 형식인지 별도로 확인한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 293,
+              "snippet": "    @RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 294,
+              "snippet": "    public String selectDeptManageOrgChartView() throws Exception {"
+            }
+          ],
+          "text": "LDAP 조직도 화면에서 올라온 요청을 받는 진입점으로, 요청 값을 확인해 조직 관리 서비스에 처리를 위임하고 결과 화면 또는 처리 결과를 되돌려 준다."
+        }
+      },
+      "name": "LDAP 사용자 이름 변경 — 조직 관리 요청 접수",
+      "stepId": "step:POST /ext/ldapumt/dpt/renameUserNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ],
+        "text": "LDAP 조직 관리 화면의 요청을 받아 유효성을 확인한 뒤 조직 관리 서비스로 위임하고 결과를 화면에 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 81,
+              "snippet": "\t\t\t\treturnVal = source.substring(0, slength) + output;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 83,
+              "snippet": "\t\t\t\treturnVal = source;"
+            }
+          ],
+          "text": "빈 문자열을 기준 값으로 두고, 원본 문자열이 지정한 길이를 넘으면 그 길이로 잘라 내며 넘지 않으면 원본을 그대로 유지한다는 규칙을 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "조직 관리에서 다루는 부서명·사용자명·식별자 같은 문자열을 다룰 때 쓰는 공통 도구로, 빈 값 처리와 길이 제한 같은 반복되는 가공을 한 곳에서 제공한다."
+        }
+      },
+      "name": "LDAP 사용자 이름 변경 — 문자열 가공 처리",
+      "stepId": "step:POST /ext/ldapumt/dpt/renameUserNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "조직 관리에서 다루는 이름과 식별자 문자열의 빈 값 처리와 길이 제한 등 공통 가공을 담당한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 293,
+        "snippet": "    @RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "line": 44,
+        "snippet": "public interface EgovOrgManageLdapService {"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 284,
+        "snippet": "        return \"egovframework/com/ext/ldapumt/EgovDeptManageTree\";"
+      }
+    ],
+    "text": "LDAP 디렉터리에 보관된 조직도를 관리하는 업무 영역이다. 관리자는 부서 트리와 조직도 그래프 화면에서 부서와 사용자를 조회하고, 신규 부서·사용자를 등록하거나 이름을 바꾸고, 부서를 삭제하거나 노드를 다른 상위 부서 아래로 옮긴다."
+  }
+}

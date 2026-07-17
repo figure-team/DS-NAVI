@@ -1,0 +1,1296 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "uss.umt-002",
+  "domainId": "domain:uss.umt",
+  "header": null,
+  "flows": [
+    {
+      "flowId": "flow:POST /uss/umt/EgovMberSbscrbView.do",
+      "name": "일반회원 가입 화면 조회",
+      "summary": {
+        "text": "일반회원 가입 신청 화면을 여는 진입점으로, 가입 입력 폼에 필요한 공통코드 목록과 빈 회원 등록 정보를 준비해 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+            "line": 433,
+            "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberSbscrbView.do\", method = RequestMethod.POST)"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovMberSelectUpdt.do",
+      "name": "일반회원 정보 수정 처리",
+      "summary": {
+        "text": "화면에서 입력한 일반회원 수정 정보를 받아 수정 권한과 입력값 정합성을 확인한 뒤 회원 정보를 반영한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+            "line": 331,
+            "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberSelectUpdt.do\", method = RequestMethod.POST)"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovMberSelectUpdtView.do",
+      "name": "일반회원 수정 화면 조회",
+      "summary": {
+        "text": "수정 대상 일반회원의 기존 정보와 선택용 공통코드 목록을 조회해 수정 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+            "line": 237,
+            "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberSelectUpdtView.do\", method = RequestMethod.POST)"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovMberWithdraw.do",
+      "name": "일반회원 탈퇴 처리",
+      "summary": {
+        "text": "로그인한 일반회원의 탈퇴 요청을 받아 본인 여부를 확인한 뒤 회원 정보를 삭제 처리한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+            "line": 404,
+            "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberWithdraw.do\", method = RequestMethod.POST)"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovRlnmCnfirm.do",
+      "name": "업무사용자 실명 확인",
+      "summary": {
+        "text": "업무사용자 등록 과정에서 입력된 실명 확인 정보를 검증하고 그 결과를 화면에 돌려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+            "line": 569,
+            "snippet": "@RequestMapping(value = \"/uss/umt/EgovRlnmCnfirm.do\", method = RequestMethod.POST)"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovStplatCnfirmEntrprs.do",
+      "name": "기업회원 약관 동의 확인",
+      "summary": {
+        "text": "기업회원 가입 절차에서 약관 동의 여부를 확인하고 동의 시 기업회원 가입 입력 화면으로 이어준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+            "line": 433,
+            "snippet": "@RequestMapping(value = \"/uss/umt/EgovStplatCnfirmEntrprs.do\", method = RequestMethod.POST)"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovStplatCnfirmMber.do",
+      "name": "일반회원 약관 동의 확인",
+      "summary": {
+        "text": "일반회원 가입 절차에서 약관 동의 여부를 확인하고 동의 시 일반회원 가입 입력 화면으로 이어준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+            "line": 495,
+            "snippet": "@RequestMapping(value = \"/uss/umt/EgovStplatCnfirmMber.do\", method = RequestMethod.POST)"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "일반회원 가입 화면 조회 — 공통코드 조회 조건 정보",
+      "summary": {
+        "text": "일반회원 가입 화면 조회 흐름에서 공통코드 조회 조건 정보 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 가입 화면 조회 에서 공통코드 조회 조건 정보 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "일반회원 가입 화면 조회 — 공통코드 조회 서비스",
+      "summary": {
+        "text": "일반회원 가입 화면 조회 흐름에서 공통코드 조회 서비스 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 가입 화면 조회 과정에서 필요한 업무 처리를 정의하는 서비스 계약이다. 화면 처리 지점의 요청을 받아 조회·등록·수정·삭제 등 업무 작업을 수행한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "서비스는 입력 항목의 정합성을 확인한 뒤 데이터베이스에 반영하는 업무 규칙을 담당하며, 처리 결과를 화면 처리 지점에 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java",
+      "name": "일반회원 가입 화면 조회 — 일반회원 등록 정보",
+      "summary": {
+        "text": "일반회원 가입 화면 조회 흐름에서 일반회원 등록 정보 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java",
+            "line": 19,
+            "snippet": "public class MberManageInsertVO extends MberManageVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 가입 화면 조회 에서 일반회원 등록 정보 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java",
+              "line": 19,
+              "snippet": "public class MberManageInsertVO extends MberManageVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java",
+              "line": 28,
+              "snippet": "\tprivate String password2;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "name": "일반회원 가입 화면 조회 — 일반회원 관리 화면 처리",
+      "summary": {
+        "text": "일반회원 가입 화면 조회 흐름에서 일반회원 관리 화면 처리 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+            "line": 90,
+            "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 가입 화면 조회 요청을 받는 화면 처리 지점이다. 요청을 수신해 권한·입력값 확인을 거친 뒤 회원 관리 서비스에 실제 처리를 위임하고, 그 결과를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+              "line": 90,
+              "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 처리 시 먼저 인증된 사용자인지 확인하고, 미인증이면 초기 화면으로 되돌린다. 화면 입력값은 전용 정보 객체로 바인딩되어 검증 규칙에 따라 확인된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+              "line": 95,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "일반회원 정보 수정 처리 — 로그인 사용자 정보",
+      "summary": {
+        "text": "일반회원 정보 수정 처리 흐름에서 로그인 사용자 정보 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 정보 수정 처리 에서 로그인 사용자 정보 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "일반회원 정보 수정 처리 — 인증 사용자 정보 서비스",
+      "summary": {
+        "text": "일반회원 정보 수정 처리 흐름에서 인증 사용자 정보 서비스 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 정보 수정 처리 과정에서 필요한 업무 처리를 정의하는 서비스 계약이다. 화면 처리 지점의 요청을 받아 조회·등록·수정·삭제 등 업무 작업을 수행한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "서비스는 입력 항목의 정합성을 확인한 뒤 데이터베이스에 반영하는 업무 규칙을 담당하며, 처리 결과를 화면 처리 지점에 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+      "name": "일반회원 정보 수정 처리 — 사용자관리 수정 권한 판정",
+      "summary": {
+        "text": "일반회원 정보 수정 처리 흐름에서 사용자관리 수정 권한 판정 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+            "line": 11,
+            "snippet": "public final class EgovUmtAuthorizationHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 정보 수정 처리 에서 사용자관리 수정 권한 판정 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+              "line": 11,
+              "snippet": "public final class EgovUmtAuthorizationHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+              "line": 34,
+              "snippet": "\tpublic static boolean canModifyUser(String targetUniqId) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "일반회원 정보 수정 처리 — 인증 사용자 정보 조회 도구",
+      "summary": {
+        "text": "일반회원 정보 수정 처리 흐름에서 인증 사용자 정보 조회 도구 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 정보 수정 처리 에서 인증 사용자 정보 조회 도구 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "name": "일반회원 정보 수정 처리 — 일반회원 관리 서비스",
+      "summary": {
+        "text": "일반회원 정보 수정 처리 흐름에서 일반회원 관리 서비스 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovMberManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 정보 수정 처리 과정에서 필요한 업무 처리를 정의하는 서비스 계약이다. 화면 처리 지점의 요청을 받아 조회·등록·수정·삭제 등 업무 작업을 수행한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovMberManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "서비스는 입력 항목의 정합성을 확인한 뒤 데이터베이스에 반영하는 업무 규칙을 담당하며, 처리 결과를 화면 처리 지점에 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+              "line": 30,
+              "snippet": "\tpublic String insertMber(MberManageVO mberManageVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/MberManageVO.java",
+      "name": "일반회원 정보 수정 처리 — 일반회원 정보",
+      "summary": {
+        "text": "일반회원 정보 수정 처리 흐름에서 일반회원 정보 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/service/MberManageVO.java",
+            "line": 30,
+            "snippet": "public class MberManageVO extends UserDefaultVO{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 정보 수정 처리 에서 일반회원 정보 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/MberManageVO.java",
+              "line": 30,
+              "snippet": "public class MberManageVO extends UserDefaultVO{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/MberManageVO.java",
+              "line": 37,
+              "snippet": "\tprivate String uniqId=\"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "name": "일반회원 정보 수정 처리 — 일반회원 관리 화면 처리",
+      "summary": {
+        "text": "일반회원 정보 수정 처리 흐름에서 일반회원 관리 화면 처리 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+            "line": 90,
+            "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 정보 수정 처리 요청을 받는 화면 처리 지점이다. 요청을 수신해 권한·입력값 확인을 거친 뒤 회원 관리 서비스에 실제 처리를 위임하고, 그 결과를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+              "line": 90,
+              "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 처리 시 먼저 인증된 사용자인지 확인하고, 미인증이면 초기 화면으로 되돌린다. 화면 입력값은 전용 정보 객체로 바인딩되어 검증 규칙에 따라 확인된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+              "line": 95,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "일반회원 정보 수정 처리 — 문자열 처리 도구",
+      "summary": {
+        "text": "일반회원 정보 수정 처리 흐름에서 문자열 처리 도구 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 정보 수정 처리 에서 문자열 처리 도구 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "일반회원 수정 화면 조회 — 공통코드 조회 조건 정보",
+      "summary": {
+        "text": "일반회원 수정 화면 조회 흐름에서 공통코드 조회 조건 정보 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 수정 화면 조회 에서 공통코드 조회 조건 정보 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "일반회원 수정 화면 조회 — 로그인 사용자 정보",
+      "summary": {
+        "text": "일반회원 수정 화면 조회 흐름에서 로그인 사용자 정보 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 수정 화면 조회 에서 로그인 사용자 정보 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "일반회원 수정 화면 조회 — 공통코드 조회 서비스",
+      "summary": {
+        "text": "일반회원 수정 화면 조회 흐름에서 공통코드 조회 서비스 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 수정 화면 조회 과정에서 필요한 업무 처리를 정의하는 서비스 계약이다. 화면 처리 지점의 요청을 받아 조회·등록·수정·삭제 등 업무 작업을 수행한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "서비스는 입력 항목의 정합성을 확인한 뒤 데이터베이스에 반영하는 업무 규칙을 담당하며, 처리 결과를 화면 처리 지점에 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+      "name": "일반회원 수정 화면 조회 — 사용자관리 수정 권한 판정",
+      "summary": {
+        "text": "일반회원 수정 화면 조회 흐름에서 사용자관리 수정 권한 판정 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+            "line": 11,
+            "snippet": "public final class EgovUmtAuthorizationHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 수정 화면 조회 에서 사용자관리 수정 권한 판정 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+              "line": 11,
+              "snippet": "public final class EgovUmtAuthorizationHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+              "line": 34,
+              "snippet": "\tpublic static boolean canModifyUser(String targetUniqId) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "일반회원 수정 화면 조회 — 인증 사용자 정보 조회 도구",
+      "summary": {
+        "text": "일반회원 수정 화면 조회 흐름에서 인증 사용자 정보 조회 도구 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 수정 화면 조회 에서 인증 사용자 정보 조회 도구 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+      "name": "일반회원 수정 화면 조회 — 공통 화면 이동 처리",
+      "summary": {
+        "text": "일반회원 수정 화면 조회 흐름에서 공통 화면 이동 처리 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 40,
+            "snippet": "@Controller"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 수정 화면 조회 요청을 받는 화면 처리 지점이다. 요청을 수신해 권한·입력값 확인을 거친 뒤 회원 관리 서비스에 실제 처리를 위임하고, 그 결과를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 40,
+              "snippet": "@Controller"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 처리 시 먼저 인증된 사용자인지 확인하고, 미인증이면 초기 화면으로 되돌린다. 화면 입력값은 전용 정보 객체로 바인딩되어 검증 규칙에 따라 확인된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+              "line": 68,
+              "snippet": "\t@RequestMapping(value = \"/EgovPageLink.do\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "name": "일반회원 수정 화면 조회 — 일반회원 관리 서비스",
+      "summary": {
+        "text": "일반회원 수정 화면 조회 흐름에서 일반회원 관리 서비스 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovMberManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 수정 화면 조회 과정에서 필요한 업무 처리를 정의하는 서비스 계약이다. 화면 처리 지점의 요청을 받아 조회·등록·수정·삭제 등 업무 작업을 수행한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovMberManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "서비스는 입력 항목의 정합성을 확인한 뒤 데이터베이스에 반영하는 업무 규칙을 담당하며, 처리 결과를 화면 처리 지점에 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+              "line": 30,
+              "snippet": "\tpublic String insertMber(MberManageVO mberManageVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "name": "일반회원 수정 화면 조회 — 일반회원 관리 화면 처리",
+      "summary": {
+        "text": "일반회원 수정 화면 조회 흐름에서 일반회원 관리 화면 처리 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+            "line": 90,
+            "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 수정 화면 조회 요청을 받는 화면 처리 지점이다. 요청을 수신해 권한·입력값 확인을 거친 뒤 회원 관리 서비스에 실제 처리를 위임하고, 그 결과를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+              "line": 90,
+              "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 처리 시 먼저 인증된 사용자인지 확인하고, 미인증이면 초기 화면으로 되돌린다. 화면 입력값은 전용 정보 객체로 바인딩되어 검증 규칙에 따라 확인된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+              "line": 95,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "일반회원 탈퇴 처리 — 로그인 사용자 정보",
+      "summary": {
+        "text": "일반회원 탈퇴 처리 흐름에서 로그인 사용자 정보 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 탈퇴 처리 에서 로그인 사용자 정보 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "일반회원 탈퇴 처리 — 인증 사용자 정보 서비스",
+      "summary": {
+        "text": "일반회원 탈퇴 처리 흐름에서 인증 사용자 정보 서비스 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 탈퇴 처리 과정에서 필요한 업무 처리를 정의하는 서비스 계약이다. 화면 처리 지점의 요청을 받아 조회·등록·수정·삭제 등 업무 작업을 수행한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "서비스는 입력 항목의 정합성을 확인한 뒤 데이터베이스에 반영하는 업무 규칙을 담당하며, 처리 결과를 화면 처리 지점에 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "일반회원 탈퇴 처리 — 인증 사용자 정보 조회 도구",
+      "summary": {
+        "text": "일반회원 탈퇴 처리 흐름에서 인증 사용자 정보 조회 도구 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 탈퇴 처리 에서 인증 사용자 정보 조회 도구 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "name": "일반회원 탈퇴 처리 — 일반회원 관리 서비스",
+      "summary": {
+        "text": "일반회원 탈퇴 처리 흐름에서 일반회원 관리 서비스 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovMberManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 탈퇴 처리 과정에서 필요한 업무 처리를 정의하는 서비스 계약이다. 화면 처리 지점의 요청을 받아 조회·등록·수정·삭제 등 업무 작업을 수행한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovMberManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "서비스는 입력 항목의 정합성을 확인한 뒤 데이터베이스에 반영하는 업무 규칙을 담당하며, 처리 결과를 화면 처리 지점에 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+              "line": 30,
+              "snippet": "\tpublic String insertMber(MberManageVO mberManageVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "name": "일반회원 탈퇴 처리 — 일반회원 관리 화면 처리",
+      "summary": {
+        "text": "일반회원 탈퇴 처리 흐름에서 일반회원 관리 화면 처리 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+            "line": 90,
+            "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 탈퇴 처리 요청을 받는 화면 처리 지점이다. 요청을 수신해 권한·입력값 확인을 거친 뒤 회원 관리 서비스에 실제 처리를 위임하고, 그 결과를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+              "line": 90,
+              "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 처리 시 먼저 인증된 사용자인지 확인하고, 미인증이면 초기 화면으로 되돌린다. 화면 입력값은 전용 정보 객체로 바인딩되어 검증 규칙에 따라 확인된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+              "line": 95,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "일반회원 탈퇴 처리 — 문자열 처리 도구",
+      "summary": {
+        "text": "일반회원 탈퇴 처리 흐름에서 문자열 처리 도구 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 탈퇴 처리 에서 문자열 처리 도구 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovRlnmCnfirm.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "업무사용자 실명 확인 — 웹 입력값 보안 처리 도구",
+      "summary": {
+        "text": "업무사용자 실명 확인 흐름에서 웹 입력값 보안 처리 도구 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "업무사용자 실명 확인 에서 웹 입력값 보안 처리 도구 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovRlnmCnfirm.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "name": "업무사용자 실명 확인 — 업무사용자 관리 화면 처리",
+      "summary": {
+        "text": "업무사용자 실명 확인 흐름에서 업무사용자 관리 화면 처리 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+            "line": 92,
+            "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrManage.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "업무사용자 실명 확인 요청을 받는 화면 처리 지점이다. 요청을 수신해 권한·입력값 확인을 거친 뒤 회원 관리 서비스에 실제 처리를 위임하고, 그 결과를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+              "line": 92,
+              "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrManage.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 처리 시 먼저 인증된 사용자인지 확인하고, 미인증이면 초기 화면으로 되돌린다. 화면 입력값은 전용 정보 객체로 바인딩되어 검증 규칙에 따라 확인된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+              "line": 97,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovStplatCnfirmEntrprs.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "name": "기업회원 약관 동의 확인 — 기업회원 관리 서비스",
+      "summary": {
+        "text": "기업회원 약관 동의 확인 흐름에서 기업회원 관리 서비스 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovEntrprsManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "기업회원 약관 동의 확인 과정에서 필요한 업무 처리를 정의하는 서비스 계약이다. 화면 처리 지점의 요청을 받아 조회·등록·수정·삭제 등 업무 작업을 수행한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovEntrprsManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "서비스는 입력 항목의 정합성을 확인한 뒤 데이터베이스에 반영하는 업무 규칙을 담당하며, 처리 결과를 화면 처리 지점에 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+              "line": 30,
+              "snippet": "\tpublic String insertEntrprsmber(EntrprsManageVO entrprsManageVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovStplatCnfirmEntrprs.do:src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+      "name": "기업회원 약관 동의 확인 — 기업회원 등록 정보",
+      "summary": {
+        "text": "기업회원 약관 동의 확인 흐름에서 기업회원 등록 정보 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+            "line": 19,
+            "snippet": "public class EntrprsManageInsertVO extends EntrprsManageVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "기업회원 약관 동의 확인 에서 기업회원 등록 정보 로 사용되는 협력 요소이다. 화면과 서비스 사이에서 필요한 값을 전달하거나 공통 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+              "line": 19,
+              "snippet": "public class EntrprsManageInsertVO extends EntrprsManageVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주요 필드와 처리 규칙이 클래스에 선언되어 있으며, 흐름에서 요구하는 값이 이 구조를 통해 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+              "line": 28,
+              "snippet": "\tprivate String password2;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovStplatCnfirmEntrprs.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "name": "기업회원 약관 동의 확인 — 기업회원 관리 화면 처리",
+      "summary": {
+        "text": "기업회원 약관 동의 확인 흐름에서 기업회원 관리 화면 처리 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+            "line": 90,
+            "snippet": "@RequestMapping(value = \"/uss/umt/EgovEntrprsManage.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "기업회원 약관 동의 확인 요청을 받는 화면 처리 지점이다. 요청을 수신해 권한·입력값 확인을 거친 뒤 회원 관리 서비스에 실제 처리를 위임하고, 그 결과를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+              "line": 90,
+              "snippet": "@RequestMapping(value = \"/uss/umt/EgovEntrprsManage.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 처리 시 먼저 인증된 사용자인지 확인하고, 미인증이면 초기 화면으로 되돌린다. 화면 입력값은 전용 정보 객체로 바인딩되어 검증 규칙에 따라 확인된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+              "line": 95,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovStplatCnfirmMber.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "name": "일반회원 약관 동의 확인 — 일반회원 관리 서비스",
+      "summary": {
+        "text": "일반회원 약관 동의 확인 흐름에서 일반회원 관리 서비스 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovMberManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 약관 동의 확인 과정에서 필요한 업무 처리를 정의하는 서비스 계약이다. 화면 처리 지점의 요청을 받아 조회·등록·수정·삭제 등 업무 작업을 수행한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovMberManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "서비스는 입력 항목의 정합성을 확인한 뒤 데이터베이스에 반영하는 업무 규칙을 담당하며, 처리 결과를 화면 처리 지점에 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+              "line": 30,
+              "snippet": "\tpublic String insertMber(MberManageVO mberManageVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovStplatCnfirmMber.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "name": "일반회원 약관 동의 확인 — 일반회원 관리 화면 처리",
+      "summary": {
+        "text": "일반회원 약관 동의 확인 흐름에서 일반회원 관리 화면 처리 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+            "line": 90,
+            "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "일반회원 약관 동의 확인 요청을 받는 화면 처리 지점이다. 요청을 수신해 권한·입력값 확인을 거친 뒤 회원 관리 서비스에 실제 처리를 위임하고, 그 결과를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+              "line": 90,
+              "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 처리 시 먼저 인증된 사용자인지 확인하고, 미인증이면 초기 화면으로 되돌린다. 화면 입력값은 전용 정보 객체로 바인딩되어 검증 규칙에 따라 확인된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+              "line": 95,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

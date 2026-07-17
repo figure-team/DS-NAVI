@@ -1,0 +1,993 @@
+{
+  "chunkId": "uss.olp.qqm-000",
+  "domainId": "domain:uss.olp.qqm",
+  "domainName": "",
+  "files": [
+    {
+      "className": "ComDefaultCodeVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "slice": {
+        "endLine": 58,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------       --------    ---------------------------\n *   2009.3.11   이삼섭          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class ComDefaultCodeVO implements Serializable {\n    /** 코드 ID */\n    private String codeId = \"\";\n\n    /** 상세코드 */\n    private String code = \"\";\n\n    /** 코드명 */\n    private String codeNm = \"\";\n\n    /** 코드설명 */\n    private String codeDc = \"\";\n\n    /** 특정테이블명 */\n    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용\n\n    /** 상세 조건 여부 */\n    private String haveDetailCondition = \"N\";\n\n    /** 상세 조건 */\n    private String detailCondition = \"\";\n\n    /**\n     * toString 메소드를 대치한다.\n     */\n    public String toString() {\n    \treturn ToStringBuilder.reflectionToString(this);\n    }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "ComDefaultVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/ComDefaultVO.java — java 파일",
+        "tags": []
+      },
+      "line": 22,
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "slice": {
+        "endLine": 91,
+        "startLine": 12,
+        "text": " * @  수정일         수정자                   수정내용\n * @ -------    --------    ---------------------------\n * @ 2009.02.01    조재영         최초 생성\n *\n *  @author 공통서비스 개발팀 조재영\n *  @since 2009.02.01\n *  @version 1.0\n *  @see \n *  \n */\n@SuppressWarnings(\"serial\")\npublic class ComDefaultVO implements Serializable {\n\t\n\t/** 검색조건 */\n    private String searchCondition = \"\";\n    \n    /** 검색Keyword */\n    private String searchKeyword = \"\";\n    \n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n    \n    /** 현재페이지 */\n    private Integer pageIndex = 1;\n    \n    /** 페이지개수 */\n    private Integer pageUnit = 10;\n    \n    /** 페이지사이즈 */\n    private Integer pageSize = 10;\n\n    /** firstIndex */\n    private Integer firstIndex = 1;\n\n    /** lastIndex */\n    private Integer lastIndex = 1;\n\n    /** recordCountPerPage */\n    private Integer recordCountPerPage = 10;\n    \n    /** 검색KeywordFrom */\n    private String searchKeywordFrom = \"\";    \n\n\t/** 검색KeywordTo */\n    private String searchKeywordTo = \"\";  \n    \n\tpublic Integer getFirstIndex() {\n\t\treturn firstIndex == null ? 1 : firstIndex;\n\t}\n\n\tpublic void setFirstIndex(Integer firstIndex) {\n\t\tthis.firstIndex = firstIndex == null ? 1 : firstIndex;\n\t}\n\n\tpublic Integer getLastIndex() {\n\t\treturn lastIndex == null ? 1 : lastIndex;\n\t}\n\n\tpublic void setLastIndex(Integer lastIndex) {\n\t\tthis.lastIndex = lastIndex == null ? 1 : lastIndex;\n\t}\n\n\tpublic Integer getRecordCountPerPage() {\n\t\treturn recordCountPerPage == null ? 10 : recordCountPerPage;\n\t}\n\n\tpublic void setRecordCountPerPage(Integer recordCountPerPage) {\n\t\tthis.recordCountPerPage = recordCountPerPage == null ? 10 : recordCountPerPage;\n\t}\n\n\tpublic String getSearchCondition() {\n        return searchCondition;\n    }\n\n    public void setSearchCondition(String searchCondition) {\n        this.searchCondition = searchCondition;\n    }\n\n    public String getSearchKeyword() {\n        return searchKeyword;",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovMessageSource",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovMessageSource.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이문준          최초 생성\n *   2017.07.21  장동한 \t\t\targs, locale 설정\n *\n * </pre>\n */\n\npublic class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {\n\n\tprivate ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;\n\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @param reloadableResourceBundleMessageSource - resource MessageSource\n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic void setReloadableResourceBundleMessageSource(ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource) {\n\t\tthis.reloadableResourceBundleMessageSource = reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic ReloadableResourceBundleMessageSource getReloadableResourceBundleMessageSource() {\n\t\treturn reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, locale);\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @return String\n\t */\t\n\tpublic String getMessageArgs(String code, Object[] args) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, locale);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "LoginVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/LoginVO.java — java 파일",
+        "tags": []
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 21,
+        "text": " *   2009.03.03     박지욱     최초 생성\n *   2021.05.30     정진오     디지털원패스 사용자키/세션값 추가\n *</pre>\n *\n *  @author 공통서비스 개발팀 박지욱\n *  @since 2009.03.03\n *  @version 1.0\n *  @see\n *\n */\n@Getter\n@Setter\npublic class LoginVO implements Serializable{\n\n\t/**\n\t *\n\t */\n\tprivate static final long serialVersionUID = -8274004534207618049L;\n\n\t/** 아이디 */\n\t@EgovNullCheck\n\tprivate String id;\n\t/** 이름 */\n\t@EgovNullCheck\n\tprivate String name;\n\t/** 주민등록번호 */\n\tprivate String ihidNum;\n\t/** 이메일주소 */\n\t@EgovNullCheck\n\t@EgovEmailCheck\n\tprivate String email;\n\t/** 비밀번호 */\n\tprivate String password;\n\t/** 비밀번호 힌트 */\n\t@EgovNullCheck\n\tprivate String passwordHint;\n\t/** 비밀번호 정답 */\n\t@EgovNullCheck\n\tprivate String passwordCnsr;\n\t/** 사용자구분 */\n\tprivate String userSe;\n\t/** 조직(부서)ID */\n\tprivate String orgnztId;\n\t/** 조직(부서)명 */\n\tprivate String orgnztNm;\n\t/** 고유아이디 */\n\tprivate String uniqId;\n\t/** 로그인 후 이동할 페이지 */\n\tprivate String url;\n\t/** 사용자 IP정보 */\n\tprivate String ip;\n\t/** GPKI인증 DN */\n\tprivate String dn;\n\t/** 디지털원패스 사용자키 */\n\tprivate String onepassUserkey;\n\t/** 디지털원패스 사용자세션값 */\n\tprivate String onepassIntfToken;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCmmUseService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "slice": {
+        "endLine": 60,
+        "startLine": 16,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이삼섭          최초 생성\n *   2025.07.16  이백행          2025년 컨트리뷰션 `throws Exception` 제거\n *\n *      </pre>\n */\npublic interface EgovCmmUseService {\n\n\t/**\n\t * 공통코드를 조회한다.\n\t *\n\t * @param comDefaultCodeVO\n\t * @return List(코드)\n\t */\n\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * ComDefaultCodeVO의 리스트를 받아서 여러개의 코드 리스트를 맵에 담아서 리턴한다.\n\t *\n\t * @param comDefaultCodeVOs\n\t * @return Map(코드)\n\t */\n\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);\n\n\t/**\n\t * 조직정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 조직정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * 그룹정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 그룹정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "slice": {
+        "endLine": 27,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.service;\n\nimport java.util.List;\n\npublic interface EgovUserDetailsService {\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic Object getAuthenticatedUser();\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t * 예) [ROLE_ADMIN, ROLE_USER, ROLE_A, ROLE_B, ROLE_RESTRICTED, IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED_ANONYMOUSLY]\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic List<String> getAuthorities();\n\t\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\t\n\t */\n\tpublic Boolean isAuthenticated(); \n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovUserDetailsHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "slice": {
+        "endLine": 62,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n *   2009.03.10  sjyoon         최초 생성\n *   2011.07.01\t 서준식          interface 생성후 상세 로직의 분리\n * </pre>\n */\n\npublic class EgovUserDetailsHelper {\n\n\tstatic EgovUserDetailsService egovUserDetailsService;\n\n\tpublic EgovUserDetailsService getEgovUserDetailsService() {\n\t\treturn egovUserDetailsService;\n\t}\n\n\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {\n\t\tEgovUserDetailsHelper.egovUserDetailsService = egovUserDetailsService;\n\t}\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic static Object getAuthenticatedUser() {\n\t\treturn egovUserDetailsService.getAuthenticatedUser();\n\t}\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t *\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic static List<String> getAuthorities() {\n\t\treturn egovUserDetailsService.getAuthorities();\n\t}\n\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\n\t */\n\tpublic static Boolean isAuthenticated() {\n\t\treturn egovUserDetailsService.isAuthenticated();\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovQustnrQestnManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+      "slice": {
+        "endLine": 94,
+        "startLine": 15,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.20  장동한          최초 생성\n *\n * </pre>\n */\npublic interface EgovQustnrQestnManageService {\n\n\t/**\n\t * 설문조사 응답자답변내용결과/기타답변내용결과 통계를 조회한다.\n\t * \n\t * @param Map - 설문지 정보가 담김 Parameter\n\t * @return Map\n\t * @throws Exception\n\t */\n\tpublic List<EgovMap> selectQustnrManageStatistics2(Map<?, ?> map) throws Exception;\n\n    /**\n\t * 설문조사 통계를 조회한다.\n\t * @param Map - 설문지 정보가 담김 Parameter\n\t * @return Map\n\t * @throws Exception\n\t */\n\tpublic List<?> selectQustnrManageStatistics(Map<?, ?> map) throws Exception;\n\n    /**\n\t * 설문지정보 설문제목을 조회한다.\n\t * @param Map - 설문지 정보가 담김 Parameter\n\t * @return Map\n\t * @throws Exception\n\t */\n\tpublic Map<?, ?> selectQustnrManageQestnrSj(Map<?, ?> map) throws Exception;\n\n    /**\n\t * 설문문항 목록을 조회한다.\n\t * @param searchVO - 조회할 정보가 담긴 VO\n\t * @return List\n\t * @throws Exception\n\t */\n\tpublic List<?> selectQustnrQestnManageList(ComDefaultVO searchVO) throws Exception;\n\n    /**\n\t * 설문문항를(을) 상세조회 한다.\n\t * @param qustnrQestnManageVO - 설문문항 정보 담김 VO\n\t * @return List\n\t * @throws Exception\n\t */\n\tpublic List<EgovMap> selectQustnrQestnManageDetail(QustnrQestnManageVO qustnrQestnManageVO) throws Exception;\n\n    /**\n\t * 설문문항를(을) 목록 전체 건수를(을) 조회한다.\n\t * @param searchVO - 조회할 정보가 담긴 VO\n\t * @return int\n\t * @throws Exception\n\t */\n\tpublic int selectQustnrQestnManageListCnt(ComDefaultVO searchVO) throws Exception;\n\n    /**\n\t * 설문문항를(을) 등록한다.\n\t * @param qustnrQestnManageVO - 설문문항 정보 담김 VO\n\t * @throws Exception\n\t */\n\tvoid  insertQustnrQestnManage(QustnrQestnManageVO qustnrQestnManageVO) throws Exception;\n\n    /**\n\t * 설문문항를(을) 수정한다.\n\t * @param qustnrQestnManageVO - 설문문항 정보 담김 VO\n\t * @throws Exception\n\t */\n\tvoid  updateQustnrQestnManage(QustnrQestnManageVO qustnrQestnManageVO) throws Exception;\n\n    /**\n\t * 설문문항를(을) 삭제한다.\n\t * @param qustnrQestnManageVO - 설문문항 정보 담김 VO\n\t * @throws Exception\n\t */",
+        "truncated": true
+      }
+    },
+    {
+      "className": "QustnrQestnManageVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java — java 파일",
+        "tags": []
+      },
+      "line": 28,
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+      "slice": {
+        "endLine": 81,
+        "startLine": 18,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.20  장동한          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\npublic class QustnrQestnManageVO implements Serializable {\n\n\tprivate static final long serialVersionUID = -1010670861596333788L;\n\n\t/** 설문제목 */\n\tprivate String qestnrSj = \"\";\n\n\t/** 설문문항 ID */\n\tprivate String qestnrQesitmId = \"\";\n\n\t/** 설문지 ID */\n\tprivate String qestnrId = \"\";\n\n\t/** 질문순번 */\n\t@EgovNullCheck\n\t@Size(max=10)\n\t@Pattern(regexp=\"^[0-9]*$\", message=\"{validation.pattern.integer}\")\n\tprivate String qestnSn = \"\";\n\n\t/** 질문유형코드 */\n\t@EgovNullCheck\n\tprivate String qestnTyCode = \"\";\n\n\t/** 질문내용 */\n\t@EgovNullCheck\n\t@Size(max=2500)\n\tprivate String qestnCn = \"\";\n\n\t/** 초대선택건수 */\n\tprivate String mxmmChoiseCo = \"\";\n\n\t/** 템플릿 ID */\n\t@EgovNullCheck\n\tprivate String qestnrTmplatId = \"\";\n\n\t/** 최초등록자아이디 */\n\tprivate String frstRegisterPnttm = \"\";\n\n\t/** 최초등록시점  */\n\tprivate String frstRegisterId = \"\";\n\n\t/** 최종수정시점 */\n\tprivate String lastUpdusrPnttm = \"\";\n\n\t/** 최종수정시점아이디  */\n\tprivate String lastUpdusrId = \"\";\n\n\t/** 검색모드설정  */\n\tprivate String searchMode = \"\";\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovQustnrQestnManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 246,
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "slice": {
+        "endLine": 315,
+        "startLine": 236,
+        "text": "\n\t/**\n\t * 설문문항 목록을 상세조회 조회한다.\n\t * @param searchVO\n\t * @param qustnrQestnManageVO\n\t * @param commandMap\n\t * @param model\n\t * @return \"egovframework/com/uss/olp/qqm/EgovQustnrQestnManageDetail\"\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageDetail.do\")\n\tpublic String egovQustnrQestnManageDetail(\n\t\t\t@ModelAttribute(\"searchVO\") ComDefaultVO searchVO,\n\t\t\t@ModelAttribute(\"qustnrQestnManageVO\") QustnrQestnManageVO qustnrQestnManageVO,\n\t\t\t@RequestParam Map<?, ?> commandMap,\n    \t\tModelMap model)\n    throws Exception {\n\n\t\tString sLocationUrl = \"egovframework/com/uss/olp/qqm/EgovQustnrQestnManageDetail\";\n\n\t\tString sCmd = commandMap.get(\"cmd\") == null ? \"\" : (String)commandMap.get(\"cmd\");\n\n\t\tif(sCmd.equals(\"del\")){\n\t\t\tegovQustnrQestnManageService.deleteQustnrQestnManage(qustnrQestnManageVO);\n\t\t\t/** 목록으로갈때 검색조건 유지 */\n\t\t\tsLocationUrl = \"redirect:/uss/olp/qqm/EgovQustnrQestnManageList.do?\";\n        \tsLocationUrl = sLocationUrl + \"searchMode=\" + qustnrQestnManageVO.getSearchMode();\n        \tsLocationUrl = sLocationUrl + \"&qestnrId=\" + qustnrQestnManageVO.getQestnrId();\n        \tsLocationUrl = sLocationUrl + \"&qestnrTmplatId=\" +qustnrQestnManageVO.getQestnrTmplatId();\n\t\t}else{\n\t     \t//공통코드 질문유형 조회\n\t    \tComDefaultCodeVO voComCode = new ComDefaultCodeVO();\n\t    \tvoComCode.setCodeId(\"COM018\");\n\t    \tList<?> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);\n\t    \tmodel.addAttribute(\"cmmCode018\", listComCode);\n\n\t        List<EgovMap> sampleList = egovQustnrQestnManageService.selectQustnrQestnManageDetail(qustnrQestnManageVO);\n\t        model.addAttribute(\"resultList\", sampleList);\n\t\t}\n\n\t\treturn sLocationUrl;\n\t}\n\t\n\t/**\n\t * 설문문항 수정페이지 조회.\n\t * @param searchVO\n\t * @param qustnrQestnManageVO\n\t * @param redirectAttributes\n\t * @param model\n\t * @return\n\t * @throws Exception\n\t */\n\t@GetMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageModify.do\")\n\t\tpublic String qustnrQestnManageModifyView(\n\t\t\t\t@RequestParam(\"qestnrQesitmId\") String qestnrQesitmId,\n\t\t        @ModelAttribute(\"searchVO\") ComDefaultVO searchVO,\n\t\t        @ModelAttribute(\"qustnrQestnManageVO\") QustnrQestnManageVO qustnrQestnManageVO,\n\t\t        RedirectAttributes redirectAttributes,\n\t\t        ModelMap model) throws Exception {\n\n\t\t    // 0. 인증 체크\n\t\t    if (!EgovUserDetailsHelper.isAuthenticated()) {\n\t\t        redirectAttributes.addAttribute(\n\t\t            \"message\",\n\t\t            egovMessageSource.getMessage(\"fail.common.login\")\n\t\t        );\n\t\t        return \"redirect:/uat/uia/egovLoginUsr.do\";\n\t\t    }\n\n\t\t    // 1. 공통코드 (질문유형)\n\t\t    ComDefaultCodeVO voComCode = new ComDefaultCodeVO();\n\t\t    voComCode.setCodeId(\"COM018\");\n\t\t    model.addAttribute(\n\t\t        \"cmmCode018\",\n\t\t        cmmUseService.selectCmmCodeDetail(voComCode)\n\t\t    );\n\n\t\t    // 2. 설문문항 상세 조회\n\t\t    QustnrQestnManageVO vo = new QustnrQestnManageVO();\n\t\t    vo.setQestnrQesitmId(qestnrQesitmId);",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovQustnrQestnManageController#egovQustnrQestnManageDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "flowId": "flow:ANY /uss/olp/qqm/EgovQustnrQestnManageDetail.do",
+      "line": 246,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 246,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageDetail.do\")"
+      },
+      "stepIds": [
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageDetail.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageDetail.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageDetail.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageDetail.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageDetail.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovQustnrQestnManageController#egovQustnrQestnManageList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "flowId": "flow:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do",
+      "line": 178,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 178,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageList.do\")"
+      },
+      "stepIds": [
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovQustnrQestnManageController#egovQustnrQestnManageListPopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "flowId": "flow:ANY /uss/olp/qqm/EgovQustnrQestnManageListPopup.do",
+      "line": 123,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 123,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageListPopup.do\")"
+      },
+      "stepIds": [
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageListPopup.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageListPopup.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageListPopup.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageListPopup.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovQustnrQestnManageController#egovQustnrQestnManageStatistics",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "flowId": "flow:ANY /uss/olp/qqm/EgovQustnrQestnManageStatistics.do",
+      "line": 83,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 83,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageStatistics.do\")"
+      },
+      "stepIds": [
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageStatistics.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageStatistics.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "step:ANY /uss/olp/qqm/EgovQustnrQestnManageStatistics.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovQustnrQestnManageController#qustnrQestnManageModifyView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "flowId": "flow:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do",
+      "line": 288,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 288,
+        "snippet": "@GetMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageModify.do\")"
+      },
+      "stepIds": [
+        "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovQustnrQestnManageController#qustnrQestnManageRegistForm",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "flowId": "flow:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do",
+      "line": 415,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 415,
+        "snippet": "@GetMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageRegist.do\")"
+      },
+      "stepIds": [
+        "step:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "step:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "step:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovQustnrQestnManageController#qustnrQestnManageModifySave",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "flowId": "flow:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do",
+      "line": 336,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 336,
+        "snippet": "@PostMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageModify.do\")"
+      },
+      "stepIds": [
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovQustnrQestnManageController#qustnrQestnManageRegistSubmit",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "flowId": "flow:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do",
+      "line": 468,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 468,
+        "snippet": "@PostMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageRegist.do\")"
+      },
+      "stepIds": [
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "header": {
+    "flowIndex": [
+      {
+        "entryPoint": "EgovQustnrQestnManageController#egovQustnrQestnManageDetail",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "flowId": "flow:ANY /uss/olp/qqm/EgovQustnrQestnManageDetail.do",
+        "line": 246,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+          "line": 246,
+          "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageDetail.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovQustnrQestnManageController#egovQustnrQestnManageList",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "flowId": "flow:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do",
+        "line": 178,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+          "line": 178,
+          "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageList.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovQustnrQestnManageController#egovQustnrQestnManageListPopup",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "flowId": "flow:ANY /uss/olp/qqm/EgovQustnrQestnManageListPopup.do",
+        "line": 123,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+          "line": 123,
+          "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageListPopup.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovQustnrQestnManageController#egovQustnrQestnManageStatistics",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "flowId": "flow:ANY /uss/olp/qqm/EgovQustnrQestnManageStatistics.do",
+        "line": 83,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+          "line": 83,
+          "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageStatistics.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovQustnrQestnManageController#qustnrQestnManageModifyView",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "flowId": "flow:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do",
+        "line": 288,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+          "line": 288,
+          "snippet": "@GetMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageModify.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovQustnrQestnManageController#qustnrQestnManageRegistForm",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "flowId": "flow:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do",
+        "line": 415,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+          "line": 415,
+          "snippet": "@GetMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageRegist.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovQustnrQestnManageController#qustnrQestnManageModifySave",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "flowId": "flow:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do",
+        "line": 336,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+          "line": 336,
+          "snippet": "@PostMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageModify.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovQustnrQestnManageController#qustnrQestnManageRegistSubmit",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "flowId": "flow:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do",
+        "line": 468,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+          "line": 468,
+          "snippet": "@PostMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageRegist.do\")"
+        }
+      }
+    ]
+  },
+  "isHeaderChunk": true,
+  "key": "uss.olp.qqm",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageDetail.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageDetail.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovQustnrQestnManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageDetail.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "line": 30,
+        "snippet": "public class QustnrQestnManageVO implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageDetail.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 246,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageDetail.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "line": 22,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovQustnrQestnManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "line": 30,
+        "snippet": "public class QustnrQestnManageVO implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 246,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageList.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "line": 22,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageListPopup.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovQustnrQestnManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageListPopup.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "line": 30,
+        "snippet": "public class QustnrQestnManageVO implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageListPopup.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 246,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageListPopup.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovQustnrQestnManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageStatistics.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "line": 30,
+        "snippet": "public class QustnrQestnManageVO implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageStatistics.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 246,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "stepId": "step:ANY /uss/olp/qqm/EgovQustnrQestnManageStatistics.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovQustnrQestnManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+      "stepId": "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "line": 30,
+        "snippet": "public class QustnrQestnManageVO implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+      "stepId": "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 246,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "stepId": "step:GET /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovQustnrQestnManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+      "stepId": "step:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 246,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "stepId": "step:GET /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovQustnrQestnManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "line": 30,
+        "snippet": "public class QustnrQestnManageVO implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 246,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovQustnrQestnManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "line": 30,
+        "snippet": "public class QustnrQestnManageVO implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 246,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java"
+    }
+  ]
+}

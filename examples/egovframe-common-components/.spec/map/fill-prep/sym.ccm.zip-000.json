@@ -1,0 +1,967 @@
+{
+  "chunkId": "sym.ccm.zip-000",
+  "domainId": "domain:sym.ccm.zip",
+  "domainName": "",
+  "files": [
+    {
+      "className": "LoginVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/LoginVO.java — java 파일",
+        "tags": []
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 21,
+        "text": " *   2009.03.03     박지욱     최초 생성\n *   2021.05.30     정진오     디지털원패스 사용자키/세션값 추가\n *</pre>\n *\n *  @author 공통서비스 개발팀 박지욱\n *  @since 2009.03.03\n *  @version 1.0\n *  @see\n *\n */\n@Getter\n@Setter\npublic class LoginVO implements Serializable{\n\n\t/**\n\t *\n\t */\n\tprivate static final long serialVersionUID = -8274004534207618049L;\n\n\t/** 아이디 */\n\t@EgovNullCheck\n\tprivate String id;\n\t/** 이름 */\n\t@EgovNullCheck\n\tprivate String name;\n\t/** 주민등록번호 */\n\tprivate String ihidNum;\n\t/** 이메일주소 */\n\t@EgovNullCheck\n\t@EgovEmailCheck\n\tprivate String email;\n\t/** 비밀번호 */\n\tprivate String password;\n\t/** 비밀번호 힌트 */\n\t@EgovNullCheck\n\tprivate String passwordHint;\n\t/** 비밀번호 정답 */\n\t@EgovNullCheck\n\tprivate String passwordCnsr;\n\t/** 사용자구분 */\n\tprivate String userSe;\n\t/** 조직(부서)ID */\n\tprivate String orgnztId;\n\t/** 조직(부서)명 */\n\tprivate String orgnztNm;\n\t/** 고유아이디 */\n\tprivate String uniqId;\n\t/** 로그인 후 이동할 페이지 */\n\tprivate String url;\n\t/** 사용자 IP정보 */\n\tprivate String ip;\n\t/** GPKI인증 DN */\n\tprivate String dn;\n\t/** 디지털원패스 사용자키 */\n\tprivate String onepassUserkey;\n\t/** 디지털원패스 사용자세션값 */\n\tprivate String onepassIntfToken;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCcmRdnmadZipManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+      "slice": {
+        "endLine": 86,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *     수정일      \t수정자           수정내용\n *  -----------    --------    ---------------------------\n *   2011.11.21\t\t이기하           도로명주소 최초 생성\n *\n * </pre>\n */\npublic interface EgovCcmRdnmadZipManageService {\n\n\t/**\n\t * 우편번호를 삭제한다.\n\t * @param zip\n\t * @throws Exception\n\t */\n\tvoid deleteZip(Zip zip) throws Exception;\n\n\t/**\n\t * 우편번호 전체를 삭제한다.\n\t * @throws Exception\n\t */\n\tvoid deleteAllZip() throws Exception;\n\n\t/**\n\t * 우편번호를 등록한다.\n\t * @param zip\n\t * @throws Exception\n\t */\n\tvoid insertZip(Zip zip);\n\n\t/**\n\t * 우편번호 엑셀파일을 등록한다.\n\t * @param zip\n\t * @throws Exception\n\t */\n\tvoid insertExcelZip(InputStream file) throws Exception;\n\n\t/**\n\t * 우편번호 상세항목을 조회한다.\n\t * @param zip\n\t * @return Zip(우편번호)\n\t * @throws Exception\n\t */\n\tZip selectZipDetail(Zip zip) throws Exception;\n\n\t/**\n\t * 우편번호 목록을 조회한다.\n\t * @param searchVO\n\t * @return List(우편번호 목록)\n\t * @throws Exception\n\t */\n\tList<EgovMap> selectZipList(ZipVO searchVO) throws Exception;\n\n    /**\n\t * 우편번호 총 개수를 조회한다.\n     * @param searchVO\n     * @return int(우편번호 총 개수)\n     */\n    int selectZipListTotCnt(ZipVO searchVO) throws Exception;\n\n\t/**\n\t * 우편번호를 수정한다.\n\t * @param zip\n\t * @throws Exception\n\t */\n\tvoid updateZip(Zip zip) throws Exception;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCcmZipManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+      "slice": {
+        "endLine": 86,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호          최초 생성\n *\n * </pre>\n */\npublic interface EgovCcmZipManageService {\n\n\t/**\n\t * 우편번호를 삭제한다.\n\t * @param zip\n\t * @throws Exception\n\t */\n\tvoid deleteZip(Zip zip) throws Exception;\n\n\t/**\n\t * 우편번호 전체를 삭제한다.\n\t * @throws Exception\n\t */\n\tvoid deleteAllZip() throws Exception;\n\n\t/**\n\t * 우편번호를 등록한다.\n\t * @param zip\n\t * @throws Exception\n\t */\n\tvoid insertZip(Zip zip);\n\n\t/**\n\t * 우편번호 엑셀파일을 등록한다.\n\t * @param zip\n\t * @throws Exception\n\t */\n\tvoid insertExcelZip(InputStream file) throws Exception;\n\n\t/**\n\t * 우편번호 상세항목을 조회한다.\n\t * @param zip\n\t * @return Zip(우편번호)\n\t * @throws Exception\n\t */\n\tZip selectZipDetail(Zip zip) throws Exception;\n\n\t/**\n\t * 우편번호 목록을 조회한다.\n\t * @param searchVO\n\t * @return List(우편번호 목록)\n\t * @throws Exception\n\t */\n\tList<EgovMap> selectZipList(ZipVO searchVO) throws Exception;\n\n    /**\n\t * 우편번호 총 개수를 조회한다.\n     * @param searchVO\n     * @return int(우편번호 총 개수)\n     */\n    int selectZipListTotCnt(ZipVO searchVO) throws Exception;\n\n\t/**\n\t * 우편번호를 수정한다.\n\t * @param zip\n\t * @throws Exception\n\t */\n\tvoid updateZip(Zip zip) throws Exception;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "Zip",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java",
+      "slice": {
+        "endLine": 95,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호\t\t\t최초 생성\n *   2011.11.21  이기하\t\t\t도로명주소 추가(rdmn, bdnbrMnnm, bdnbrSlno, buldNm, detailBuldNm)\n *   2024.10.29\t 권태성\t\t\t필수값 BindingResult 검증을 위한 @EgovNullCheck 추가\n *\n * </pre>\n */\npublic class Zip implements Serializable {\n\n\tprivate static final long serialVersionUID = -8767083970521429218L;\n\n\t/*\n\t * 우편번호\n\t */\n\t@EgovNullCheck\n\t@Size(max=6)\n    private String zip            = \"\";\n\n    /*\n     * 일련번호\n     */\n    private int    sn             = 0;\n\n    /*\n     * 시도명\n     */\n\t@EgovNullCheck\n\t@Size(max=20)\n\tprivate String ctprvnNm       = \"\";\n\n\t/*\n\t * 시군구명\n\t */\n\t@EgovNullCheck\n\t@Size(max=20)\n    private String signguNm       = \"\";\n\n    /*\n     * 읍면동명\n     */\n\t@EgovNullCheck\n\t@Size(max=30)\n    private String emdNm          = \"\";\n\n    /*\n     * 리건물명\n     */\n\t@Size(max=60)\n    private String liBuldNm      = \"\";\n\n    /*\n     * 도로명코드\n     */\n\t@EgovNullCheck\n\t@Size(max=12)\n    private String rdmnCode       = \"\";\n\n\t/*\n     * 도로명\n     */\n\t@EgovNullCheck\n\t@Size(max=60)\n    private String rdmn       = \"\";\n\n    /*\n     * 건물번호본번\n     */\n\t@Size(max=5)\n    private String bdnbrMnnm          = \"\";\n\n    /*\n     * 건물번호부번\n     */\n\t@Size(max=5)\n    private String bdnbrSlno      = \"\";\n\n    /*",
+        "truncated": true
+      }
+    },
+    {
+      "className": "ZipVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+      "slice": {
+        "endLine": 66,
+        "startLine": 16,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호          최초 생성\n *   2011.11.21  이기하          도로명주소 추가(searchList, searchCondition, searchCondition2)\n *\n * </pre>\n */\n@Getter\n@Setter\npublic class ZipVO extends Zip implements Serializable {\n\n\tprivate static final long serialVersionUID = -1884618301732456348L;\n\n\t/** 일반주소와 도로명주소 구분 */\n    private String searchList = \"\";\n\n    /** 일반주소 검색조건 */\n    private String searchCondition = \"\";\n\n    /** 도로명주소 검색조건 */\n    private String searchCondition2 = \"\";\n\n    /** 검색Keyword */\n    private String searchKeyword = \"\";\n\n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n\n    /** 현재페이지 */\n    private int pageIndex = 1;\n\n    /** 페이지개수 */\n    private int pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private int pageSize = 10;\n\n    /** firstIndex */\n    private int firstIndex = 1;\n\n    /** lastIndex */\n    private int lastIndex = 1;\n\n    /** recordCountPerPage */\n    private int recordCountPerPage = 10;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCcmZipManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 429,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "slice": {
+        "endLine": 433,
+        "startLine": 419,
+        "text": "\t\t\tzipManageService.updateZip(zip);\n\t\t}\n\t\treturn \"redirect:/sym/ccm/zip/EgovCcmZipList.do\";\n\t}\n\n\t/**\n\t * 주소정보연계 팝업을 위한 입력 페이지를 호출한다.\n\t *\n\t * @return\n\t */\n\t@RequestMapping(value = \"/sym/ccm/zip/EgovAdressPop.do\")\n\tpublic String selectAddPop() {\n\t\treturn \"egovframework/com/sym/ccm/zip/EgovAdressPop\";\n\t}\n}",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovCcmZipManageController#selectAddPop",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "flowId": "flow:ANY /sym/ccm/zip/EgovAdressPop.do",
+      "line": 429,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 429,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovAdressPop.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/zip/EgovAdressPop.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmZipManageController#insertExcelZip",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "flowId": "flow:ANY /sym/ccm/zip/EgovCcmExcelZipRegist.do",
+      "line": 239,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 239,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmExcelZipRegist.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/zip/EgovCcmExcelZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "step:ANY /sym/ccm/zip/EgovCcmExcelZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "step:ANY /sym/ccm/zip/EgovCcmExcelZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "step:ANY /sym/ccm/zip/EgovCcmExcelZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmZipManageController#selectZipDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipDetail.do",
+      "line": 299,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 299,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipDetail.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/zip/EgovCcmZipDetail.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipDetail.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipDetail.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipDetail.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmZipManageController#selectZipList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipList.do",
+      "line": 326,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 326,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipList.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/zip/EgovCcmZipList.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipList.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipList.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipList.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmZipManageController#updateZip",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipModify.do",
+      "line": 398,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 398,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipModify.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/zip/EgovCcmZipModify.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipModify.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipModify.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipModify.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipModify.do:src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipModify.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmZipManageController#updateZip",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipModifyView.do",
+      "line": 371,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 371,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipModifyView.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/zip/EgovCcmZipModifyView.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipModifyView.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipModifyView.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipModifyView.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipModifyView.do:src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipModifyView.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmZipManageController#insertZip",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipRegist.do",
+      "line": 193,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 193,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipRegist.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/zip/EgovCcmZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmZipManageController#insertZip",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipRegistView.do",
+      "line": 174,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 174,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipRegistView.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/zip/EgovCcmZipRegistView.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipRegistView.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipRegistView.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipRegistView.do:src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipRegistView.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipRegistView.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmZipManageController#deleteZip",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipRemove.do",
+      "line": 154,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 154,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipRemove.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/zip/EgovCcmZipRemove.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipRemove.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipRemove.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipRemove.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmZipManageController#selectZipSearchList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipSearchList.do",
+      "line": 103,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 103,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipSearchList.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/zip/EgovCcmZipSearchList.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipSearchList.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipSearchList.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "step:ANY /sym/ccm/zip/EgovCcmZipSearchList.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmZipManageController#callNormalCalPopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipSearchPopup.do",
+      "line": 90,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 90,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipSearchPopup.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/zip/EgovCcmZipSearchPopup.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "header": {
+    "flowIndex": [
+      {
+        "entryPoint": "EgovCcmZipManageController#selectAddPop",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "flowId": "flow:ANY /sym/ccm/zip/EgovAdressPop.do",
+        "line": 429,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+          "line": 429,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovAdressPop.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmZipManageController#insertExcelZip",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "flowId": "flow:ANY /sym/ccm/zip/EgovCcmExcelZipRegist.do",
+        "line": 239,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+          "line": 239,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmExcelZipRegist.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmZipManageController#selectZipDetail",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipDetail.do",
+        "line": 299,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+          "line": 299,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipDetail.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmZipManageController#selectZipList",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipList.do",
+        "line": 326,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+          "line": 326,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipList.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmZipManageController#updateZip",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipModify.do",
+        "line": 398,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+          "line": 398,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipModify.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmZipManageController#updateZip",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipModifyView.do",
+        "line": 371,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+          "line": 371,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipModifyView.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmZipManageController#insertZip",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipRegist.do",
+        "line": 193,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+          "line": 193,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipRegist.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmZipManageController#insertZip",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipRegistView.do",
+        "line": 174,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+          "line": 174,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipRegistView.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmZipManageController#deleteZip",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipRemove.do",
+        "line": 154,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+          "line": 154,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipRemove.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmZipManageController#selectZipSearchList",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipSearchList.do",
+        "line": 103,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+          "line": 103,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipSearchList.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCcmZipManageController#callNormalCalPopup",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "flowId": "flow:ANY /sym/ccm/zip/EgovCcmZipSearchPopup.do",
+        "line": 90,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+          "line": 90,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovCcmZipSearchPopup.do\")"
+        }
+      }
+    ]
+  },
+  "isHeaderChunk": true,
+  "key": "sym.ccm.zip",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 429,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovAdressPop.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovAdressPop.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmRdnmadZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmExcelZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmExcelZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "line": 28,
+        "snippet": "public class ZipVO extends Zip implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmExcelZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 429,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovAdressPop.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmExcelZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmRdnmadZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipDetail.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipDetail.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "line": 28,
+        "snippet": "public class ZipVO extends Zip implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipDetail.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 429,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovAdressPop.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipDetail.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmRdnmadZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipList.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipList.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "line": 28,
+        "snippet": "public class ZipVO extends Zip implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipList.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 429,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovAdressPop.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipList.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipModify.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmRdnmadZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipModify.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipModify.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java",
+        "line": 26,
+        "snippet": "public class Zip implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipModify.do:src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "line": 28,
+        "snippet": "public class ZipVO extends Zip implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipModify.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 429,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovAdressPop.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipModify.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipModifyView.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmRdnmadZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipModifyView.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipModifyView.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java",
+        "line": 26,
+        "snippet": "public class Zip implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipModifyView.do:src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "line": 28,
+        "snippet": "public class ZipVO extends Zip implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipModifyView.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 429,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovAdressPop.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipModifyView.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmRdnmadZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java",
+        "line": 26,
+        "snippet": "public class Zip implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "line": 28,
+        "snippet": "public class ZipVO extends Zip implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 429,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovAdressPop.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRegist.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRegistView.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmRdnmadZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRegistView.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRegistView.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java",
+        "line": 26,
+        "snippet": "public class Zip implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRegistView.do:src/main/java/egovframework/com/sym/ccm/zip/service/Zip.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "line": 28,
+        "snippet": "public class ZipVO extends Zip implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRegistView.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 429,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovAdressPop.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRegistView.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmRdnmadZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRemove.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRemove.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "line": 28,
+        "snippet": "public class ZipVO extends Zip implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRemove.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 429,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovAdressPop.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipRemove.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmRdnmadZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipSearchList.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmRdnmadZipManageService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+        "line": 26,
+        "snippet": "public interface EgovCcmZipManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipSearchList.do:src/main/java/egovframework/com/sym/ccm/zip/service/EgovCcmZipManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+        "line": 28,
+        "snippet": "public class ZipVO extends Zip implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipSearchList.do:src/main/java/egovframework/com/sym/ccm/zip/service/ZipVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 429,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovAdressPop.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipSearchList.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+        "line": 429,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/zip/EgovAdressPop.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java",
+      "stepId": "step:ANY /sym/ccm/zip/EgovCcmZipSearchPopup.do:src/main/java/egovframework/com/sym/ccm/zip/web/EgovCcmZipManageController.java"
+    }
+  ]
+}

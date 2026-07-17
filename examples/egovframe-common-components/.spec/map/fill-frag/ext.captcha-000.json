@@ -1,0 +1,575 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "ext.captcha-000",
+  "domainId": "domain:ext.captcha",
+  "header": {
+    "name": "캡차 자동입력 방지",
+    "summary": {
+      "text": "사람 여부를 확인하기 위해 왜곡된 문자 이미지를 만들어 화면에 보여주고, 이용자가 눈으로 읽어 입력한 값이 서버가 보관한 정답과 일치하는지 검증하는 자동입력 방지 업무이다. 입력 화면 제공, 이미지 생성, 입력값 검증의 세 가지 처리로 구성된다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+          "line": 69,
+          "snippet": "@RequestMapping(\"/ext/captcha/input.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+          "line": 107,
+          "snippet": "@GetMapping(\"/ext/captcha/generate.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+          "line": 83,
+          "snippet": "@PostMapping(\"/ext/captcha/result.do\")"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "캡차 정답 문자열: 이미지에 그려 넣은 무작위 문자로, 프로그램 구분값을 덧붙인 이름으로 이용자 세션에 보관된다. 별도 테이블 없이 세션이 유일한 저장소이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 122,
+            "snippet": "request.getSession().setAttribute(\"captcha\" + pgNm, captchaTxt);"
+          }
+        ]
+      },
+      {
+        "text": "프로그램 구분값: 캡차를 사용하는 화면을 구분하는 값으로, 지정하지 않으면 기본 구분값이 적용되며 정답 보관 이름과 조회 이름을 잇는 열쇠 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 113,
+            "snippet": "@RequestParam(value = \"pgNm\", defaultValue = \"capt\") String pgNm) {"
+          }
+        ]
+      },
+      {
+        "text": "캡차 이미지: 요청된 가로·세로 크기로 만들어지는 그림으로, 흰 바탕에 정답 문자를 굵은 글씨로 그린 뒤 무작위 선을 덧그려 기계 판독을 방해한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 124,
+            "snippet": "BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 133,
+            "snippet": "g2d.drawString(captchaTxt, 10, 35);//텍스트,위치"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "이미지 생성 요청은 가로·세로 크기, 문자 길이, 프로그램 구분값이 유효할 때만 처리하며, 유효하지 않으면 이미지를 만들지 않고 잘못된 요청으로 응답한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 115,
+            "snippet": "if (!isValidRequest(width, height, captchaLength, pgNm)) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 116,
+            "snippet": "response.setStatus(HttpServletResponse.SC_BAD_REQUEST);"
+          }
+        ]
+      },
+      {
+        "text": "입력값 검증은 세션에 보관된 정답이 존재하고 이용자 입력과 대소문자를 구분하지 않고 일치할 때만 통과로 판정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 87,
+            "snippet": "boolean result = expectedCaptcha != null && expectedCaptcha.equalsIgnoreCase(captcha);"
+          }
+        ]
+      },
+      {
+        "text": "검증 결과에 따라 이용자에게 보여줄 안내 문구가 갈리며, 통과 여부 자체도 결과 화면으로 함께 전달된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 89,
+            "snippet": "model.addAttribute(\"message\", \"Captcha 값이 올바르게 입력되었습니다.\");"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 91,
+            "snippet": "model.addAttribute(\"message\", \"Captcha 값이 올바르지 않습니다.\");"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 93,
+            "snippet": "model.addAttribute(\"result\", result);"
+          }
+        ]
+      },
+      {
+        "text": "문자 길이는 정식 항목과 과거 오탈자 항목을 함께 받아 하나로 정리하므로, 예전 방식으로 호출하는 화면도 계속 동작한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 112,
+            "snippet": "@RequestParam(value = \"lenght\", required = false) Integer legacyLength,"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 114,
+            "snippet": "int captchaLength = resolveCaptchaLength(length, legacyLength);"
+          }
+        ]
+      },
+      {
+        "text": "이미지 크기는 요청이 없으면 기본 가로·세로 값으로 자동 적용되어, 크기를 지정하지 않아도 표준 캡차가 제공된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 109,
+            "snippet": "@RequestParam(value = \"width\", defaultValue = \"150\") int width,"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 110,
+            "snippet": "@RequestParam(value = \"height\", defaultValue = \"50\") int height,"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "이용자 세션을 매개로 다른 화면과 연결된다. 이미지 생성 시 세션에 정답을 남기고 검증 시 같은 세션에서 정답을 꺼내므로, 캡차를 쓰는 모든 업무 화면이 이 세션 값을 공유한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 122,
+            "snippet": "request.getSession().setAttribute(\"captcha\" + pgNm, captchaTxt);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 86,
+            "snippet": "String expectedCaptcha = (String) session.getAttribute(\"captcha\" + pgNm);"
+          }
+        ]
+      },
+      {
+        "text": "공통 메뉴 정보에 캡차 항목으로 등록되어 포털 성격의 상위 메뉴 체계에서 노출된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 68,
+            "snippet": "@IncludedInfo(name = \"Captcha\", order = 3300, gid = 100)"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "캡차 자동입력 방지",
+        "nodes": [
+          {
+            "id": "start",
+            "kind": "start",
+            "label": "이용자 캡차 화면 접근"
+          },
+          {
+            "id": "input",
+            "kind": "activity",
+            "label": "캡차 입력 화면 제공",
+            "flowRef": "flow:ANY /ext/captcha/input.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+                "line": 69,
+                "snippet": "@RequestMapping(\"/ext/captcha/input.do\")"
+              }
+            ]
+          },
+          {
+            "id": "genReq",
+            "kind": "activity",
+            "label": "캡차 이미지 생성 요청",
+            "flowRef": "flow:GET /ext/captcha/generate.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+                "line": 107,
+                "snippet": "@GetMapping(\"/ext/captcha/generate.do\")"
+              }
+            ]
+          },
+          {
+            "id": "paramCheck",
+            "kind": "decision",
+            "label": "요청 조건 유효 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+                "line": 115,
+                "snippet": "if (!isValidRequest(width, height, captchaLength, pgNm)) {"
+              }
+            ]
+          },
+          {
+            "id": "badReq",
+            "kind": "activity",
+            "label": "잘못된 요청 응답",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+                "line": 116,
+                "snippet": "response.setStatus(HttpServletResponse.SC_BAD_REQUEST);"
+              }
+            ]
+          },
+          {
+            "id": "makeImg",
+            "kind": "activity",
+            "label": "정답 생성·세션 보관·이미지 작성",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+                "line": 121,
+                "snippet": "String captchaTxt = generateRandomText(captchaLength);"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+                "line": 122,
+                "snippet": "request.getSession().setAttribute(\"captcha\" + pgNm, captchaTxt);"
+              }
+            ]
+          },
+          {
+            "id": "submit",
+            "kind": "activity",
+            "label": "이용자 입력값 제출",
+            "flowRef": "flow:POST /ext/captcha/result.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+                "line": 83,
+                "snippet": "@PostMapping(\"/ext/captcha/result.do\")"
+              }
+            ]
+          },
+          {
+            "id": "match",
+            "kind": "decision",
+            "label": "정답 일치 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+                "line": 87,
+                "snippet": "boolean result = expectedCaptcha != null && expectedCaptcha.equalsIgnoreCase(captcha);"
+              }
+            ]
+          },
+          {
+            "id": "ok",
+            "kind": "activity",
+            "label": "정상 입력 안내",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+                "line": 89,
+                "snippet": "model.addAttribute(\"message\", \"Captcha 값이 올바르게 입력되었습니다.\");"
+              }
+            ]
+          },
+          {
+            "id": "ng",
+            "kind": "activity",
+            "label": "불일치 안내",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+                "line": 91,
+                "snippet": "model.addAttribute(\"message\", \"Captcha 값이 올바르지 않습니다.\");"
+              }
+            ]
+          },
+          {
+            "id": "end",
+            "kind": "end",
+            "label": "검증 결과 화면 표시"
+          },
+          {
+            "id": "endErr",
+            "kind": "end",
+            "label": "이미지 미제공 종료"
+          }
+        ],
+        "edges": [
+          { "from": "start", "to": "input" },
+          { "from": "input", "to": "genReq" },
+          { "from": "genReq", "to": "paramCheck" },
+          { "from": "paramCheck", "to": "badReq", "label": "유효하지 않음" },
+          { "from": "paramCheck", "to": "makeImg", "label": "유효함" },
+          { "from": "badReq", "to": "endErr" },
+          { "from": "makeImg", "to": "submit" },
+          { "from": "submit", "to": "match" },
+          { "from": "match", "to": "ok", "label": "일치" },
+          { "from": "match", "to": "ng", "label": "불일치" },
+          { "from": "ok", "to": "end" },
+          { "from": "ng", "to": "end" }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /ext/captcha/input.do",
+      "name": "캡차 입력 화면 제공",
+      "summary": {
+        "text": "이용자가 캡차 문자를 눈으로 확인하고 입력할 수 있는 화면을 제공한다. 별도 처리 없이 입력 화면만 내려주며, 실제 이미지는 화면에서 이미지 생성 요청을 통해 받아온다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 69,
+            "snippet": "@RequestMapping(\"/ext/captcha/input.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 71,
+            "snippet": "return \"egovframework/com/ext/captcha/EgovCaptcha\";"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:GET /ext/captcha/generate.do",
+      "name": "캡차 이미지 생성",
+      "summary": {
+        "text": "요청받은 크기와 문자 길이로 무작위 문자를 만들어 이용자 세션에 정답으로 보관하고, 흰 바탕에 문자를 그린 뒤 무작위 선을 덧대어 기계 판독이 어려운 이미지를 만들어 응답한다. 요청 조건이 유효하지 않으면 이미지를 만들지 않는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 107,
+            "snippet": "@GetMapping(\"/ext/captcha/generate.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 115,
+            "snippet": "if (!isValidRequest(width, height, captchaLength, pgNm)) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 122,
+            "snippet": "request.getSession().setAttribute(\"captcha\" + pgNm, captchaTxt);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/captcha/result.do",
+      "name": "캡차 입력값 검증",
+      "summary": {
+        "text": "이용자가 제출한 문자와 프로그램 구분값을 받아 세션에 보관된 정답과 대소문자 구분 없이 비교하고, 통과 여부와 안내 문구를 결과 화면으로 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 83,
+            "snippet": "@PostMapping(\"/ext/captcha/result.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 87,
+            "snippet": "boolean result = expectedCaptcha != null && expectedCaptcha.equalsIgnoreCase(captcha);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 94,
+            "snippet": "return \"egovframework/com/ext/captcha/EgovCaptchaResult\";"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /ext/captcha/input.do:src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "name": "캡차 입력 화면 요청 접수",
+      "summary": {
+        "text": "캡차 입력 주소로 들어온 요청을 받아 이용자 입력 화면을 지정해 돌려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 69,
+            "snippet": "@RequestMapping(\"/ext/captcha/input.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "캡차 업무의 진입점 역할을 한다. 입력 화면 주소로 들어온 요청을 받아 별도 조회나 계산 없이 캡차 입력 화면을 지정해 돌려주며, 실제 이미지 확보와 정답 검증은 각각 이미지 생성 요청과 검증 요청으로 넘긴다. 공통 메뉴 정보에도 캡차 항목으로 등록되어 상위 메뉴에서 접근할 수 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 68,
+              "snippet": "@IncludedInfo(name = \"Captcha\", order = 3300, gid = 100)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 71,
+              "snippet": "return \"egovframework/com/ext/captcha/EgovCaptcha\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "이용자가 보내는 별도 항목은 받지 않고 세션과 화면 전달 상자만 넘겨받는다. 입력값 검증이나 권한 확인 절차가 없어 누구나 입력 화면을 열 수 있으며, 어떤 주소 방식으로 들어와도 동일하게 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 69,
+              "snippet": "@RequestMapping(\"/ext/captcha/input.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 70,
+              "snippet": "public String input(HttpSession session, ModelMap model) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:GET /ext/captcha/generate.do:src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "name": "캡차 이미지 생성 처리",
+      "summary": {
+        "text": "크기·문자 길이·프로그램 구분값을 받아 유효성을 확인한 뒤 무작위 정답을 세션에 보관하고 왜곡된 문자 이미지를 만들어 응답한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 107,
+            "snippet": "@GetMapping(\"/ext/captcha/generate.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 121,
+            "snippet": "String captchaTxt = generateRandomText(captchaLength);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "캡차 이미지 공급 역할을 한다. 조회 방식 요청으로 크기와 문자 길이를 받아 무작위 문자를 만들고, 그 값을 프로그램 구분값과 묶어 이용자 세션에 정답으로 남긴 뒤 흰 바탕에 문자를 그리고 무작위 선을 덧대어 기계가 읽기 어려운 그림으로 응답한다. 정답을 세션에 남기는 이 처리가 이후 검증 처리의 판정 기준을 만든다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 122,
+              "snippet": "request.getSession().setAttribute(\"captcha\" + pgNm, captchaTxt);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 124,
+              "snippet": "BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 133,
+              "snippet": "g2d.drawString(captchaTxt, 10, 35);//텍스트,위치"
+            }
+          ]
+        },
+        "request": {
+          "text": "가로·세로 크기는 값이 없으면 기본값이 적용되고, 문자 길이는 정식 항목과 과거 오탈자 항목을 함께 받아 하나로 정리하며, 프로그램 구분값도 없으면 기본 구분값을 쓴다. 정리된 값들이 유효 범위를 벗어나면 이미지를 만들지 않고 잘못된 요청으로 응답을 끝낸다. 별도 인증이나 권한 확인 절차는 두지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 109,
+              "snippet": "@RequestParam(value = \"width\", defaultValue = \"150\") int width,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 112,
+              "snippet": "@RequestParam(value = \"lenght\", required = false) Integer legacyLength,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 114,
+              "snippet": "int captchaLength = resolveCaptchaLength(length, legacyLength);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 115,
+              "snippet": "if (!isValidRequest(width, height, captchaLength, pgNm)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 116,
+              "snippet": "response.setStatus(HttpServletResponse.SC_BAD_REQUEST);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /ext/captcha/result.do:src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "name": "캡차 입력값 검증 처리",
+      "summary": {
+        "text": "제출된 문자를 세션에 보관된 정답과 대소문자 구분 없이 비교하고, 통과 여부와 안내 문구를 결과 화면에 담아 돌려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 83,
+            "snippet": "@PostMapping(\"/ext/captcha/result.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+            "line": 87,
+            "snippet": "boolean result = expectedCaptcha != null && expectedCaptcha.equalsIgnoreCase(captcha);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "자동입력 방지의 판정 역할을 한다. 이용자가 제출한 문자를 받아 같은 프로그램 구분값으로 세션에 남아 있는 정답을 꺼내 비교하고, 통과 여부와 이용자 안내 문구를 결과 화면으로 전달한다. 판정을 다른 계층에 위임하지 않고 이 처리 안에서 직접 수행한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 86,
+              "snippet": "String expectedCaptcha = (String) session.getAttribute(\"captcha\" + pgNm);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 93,
+              "snippet": "model.addAttribute(\"result\", result);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 94,
+              "snippet": "return \"egovframework/com/ext/captcha/EgovCaptchaResult\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "이용자 입력 문자와 프로그램 구분값을 필수로 받으며 전송 방식은 등록 방식만 허용한다. 세션에 정답이 없거나 입력이 다르면 통과하지 못하고, 일치하면 정상 입력 안내를, 그렇지 않으면 불일치 안내를 화면에 담는다. 인증이나 권한 확인 절차는 두지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 84,
+              "snippet": "public String result(HttpSession session, ModelMap model, @RequestParam(\"captcha\") String captcha,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 85,
+              "snippet": "@RequestParam(\"pgNm\") String pgNm) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 89,
+              "snippet": "model.addAttribute(\"message\", \"Captcha 값이 올바르게 입력되었습니다.\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+              "line": 91,
+              "snippet": "model.addAttribute(\"message\", \"Captcha 값이 올바르지 않습니다.\");"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

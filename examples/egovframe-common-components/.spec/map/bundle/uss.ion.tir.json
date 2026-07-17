@@ -1,0 +1,514 @@
+{
+  "domainId": "domain:uss.ion.tir",
+  "files": [
+    {
+      "className": "EgovMessageSource",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovMessageSource.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이문준          최초 생성\n *   2017.07.21  장동한 \t\t\targs, locale 설정\n *\n * </pre>\n */\n\npublic class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {\n\n\tprivate ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;\n\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @param reloadableResourceBundleMessageSource - resource MessageSource\n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic void setReloadableResourceBundleMessageSource(ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource) {\n\t\tthis.reloadableResourceBundleMessageSource = reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic ReloadableResourceBundleMessageSource getReloadableResourceBundleMessageSource() {\n\t\treturn reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, locale);\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @return String\n\t */\t\n\tpublic String getMessageArgs(String code, Object[] args) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, locale);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "slice": {
+        "endLine": 27,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.service;\n\nimport java.util.List;\n\npublic interface EgovUserDetailsService {\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic Object getAuthenticatedUser();\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t * 예) [ROLE_ADMIN, ROLE_USER, ROLE_A, ROLE_B, ROLE_RESTRICTED, IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED_ANONYMOUSLY]\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic List<String> getAuthorities();\n\t\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\t\n\t */\n\tpublic Boolean isAuthenticated(); \n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovUserDetailsHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "slice": {
+        "endLine": 62,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n *   2009.03.10  sjyoon         최초 생성\n *   2011.07.01\t 서준식          interface 생성후 상세 로직의 분리\n * </pre>\n */\n\npublic class EgovUserDetailsHelper {\n\n\tstatic EgovUserDetailsService egovUserDetailsService;\n\n\tpublic EgovUserDetailsService getEgovUserDetailsService() {\n\t\treturn egovUserDetailsService;\n\t}\n\n\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {\n\t\tEgovUserDetailsHelper.egovUserDetailsService = egovUserDetailsService;\n\t}\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic static Object getAuthenticatedUser() {\n\t\treturn egovUserDetailsService.getAuthenticatedUser();\n\t}\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t *\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic static List<String> getAuthorities() {\n\t\treturn egovUserDetailsService.getAuthorities();\n\t}\n\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\n\t */\n\tpublic static Boolean isAuthenticated() {\n\t\treturn egovUserDetailsService.isAuthenticated();\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovXOAuthService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXOAuthService.java — java 파일",
+        "tags": []
+      },
+      "line": 27,
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXOAuthService.java",
+      "slice": {
+        "endLine": 96,
+        "startLine": 17,
+        "text": "import org.springframework.http.ResponseEntity;\nimport org.springframework.stereotype.Service;\nimport org.springframework.web.client.HttpStatusCodeException;\nimport org.springframework.web.client.RestTemplate;\n\nimport jakarta.servlet.http.HttpSession;\n\n/**\n * Twitter(X) OAuth 2.0 + PKCE 인증 URL 생성 및 토큰 발급을 처리하는 서비스.\n */\n@Service\npublic class EgovXOAuthService {\n\n    private static final Logger LOGGER = LoggerFactory.getLogger(EgovXOAuthService.class);\n\n    private static final String REDIRECT_URI = \"http://localhost:8080/egovframe-template-common-components/twitter/callback.do\";\n\n    private static final String AUTH_URL = \"https://twitter.com/i/oauth2/authorize\";\n    private static final String TOKEN_URL = \"https://api.x.com/2/oauth2/token\";\n    private static final String SESSION_OAUTH_CTX_PREFIX = \"TWITTER_OAUTH_CTX_\";\n    private static final Pattern ACCESS_TOKEN_PATTERN =\n            Pattern.compile(\"\\\"access_token\\\"\\\\s*:\\\\s*\\\"([^\\\"]+)\\\"\");\n\n    private final RestTemplate restTemplate = new RestTemplate();\n\n    /**\n     * state별로 PKCE verifier와 client 인증정보를 함께 보관하기 위한 컨텍스트 객체.\n     * OAuth 콜백 완료 시 세션에서 즉시 제거한다.\n     */\n    private static class OAuthContext implements Serializable {\n        private static final long serialVersionUID = 1L;\n\n        private final String codeVerifier;\n        private final String clientId;\n        private final String clientSecret;\n\n        private OAuthContext(String codeVerifier, String clientId, String clientSecret) {\n            this.codeVerifier = codeVerifier;\n            this.clientId = clientId;\n            this.clientSecret = clientSecret;\n        }\n    }\n\n    /**\n     * PKCE 파라미터를 포함한 Twitter 인증 URL을 생성한다.\n     * OAuth 콜백에서 토큰 교환에 필요한 값은 세션에 임시 저장한다.\n     *\n     * @param session 현재 사용자 세션\n     * @param clientId Twitter OAuth Client ID (기존 ConsumerKey 컬럼 사용)\n     * @param clientSecret Twitter OAuth Client Secret (기존 ConsumerSecret 컬럼 사용)\n     * @return OAuth 인증 URL\n     * @throws Exception 해시 생성 등 URL 조합 중 오류\n     */\n    public String getAuthorizationUrl(HttpSession session, String clientId, String clientSecret) throws Exception {\n        if (session == null) {\n            throw new IllegalArgumentException(\"session is required\");\n        }\n        if (clientId == null || clientId.trim().isEmpty()) {\n            throw new IllegalArgumentException(\"clientId is required\");\n        }\n        if (clientSecret == null || clientSecret.trim().isEmpty()) {\n            throw new IllegalArgumentException(\"clientSecret is required\");\n        }\n\n        String trimmedClientId = clientId.trim();\n        String trimmedClientSecret = clientSecret.trim();\n        String state = UUID.randomUUID().toString();\n        String codeVerifier = UUID.randomUUID().toString().replace(\"-\", \"\");\n\n        session.setAttribute(SESSION_OAUTH_CTX_PREFIX + state,\n                new OAuthContext(codeVerifier, trimmedClientId, trimmedClientSecret));\n\n        String challenge = Base64.getUrlEncoder()\n                .withoutPadding()\n                .encodeToString(\n                        MessageDigest.getInstance(\"SHA-256\")\n                                .digest(codeVerifier.getBytes(StandardCharsets.UTF_8))\n                );\n        //앱 권한 범위\n        String scope = URLEncoder.encode(\"tweet.read tweet.write users.read offline.access\", StandardCharsets.UTF_8.name());",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovXService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java — java 파일",
+        "tags": []
+      },
+      "line": 6,
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java",
+      "slice": {
+        "endLine": 53,
+        "startLine": 1,
+        "text": "package egovframework.com.uss.ion.tir.service;\n\n/**\n * Twitter(X) API 호출 기능을 제공하는 서비스 인터페이스.\n */\npublic interface EgovXService {\n\n    /**\n     * 액세스 토큰으로 내 계정 정보를 조회한다.\n     *\n     * @param bearerToken OAuth 액세스 토큰\n     * @return 계정 정보 JSON 문자열\n     */\n    String getAccount(String bearerToken);\n\n    /**\n     * 트윗을 등록한다.\n     *\n     * @param bearerToken OAuth 액세스 토큰\n     * @param text 등록할 트윗 본문\n     * @return 등록 결과 JSON 문자열\n     */\n    String writeTweet(String bearerToken, String text);\n\n    /**\n     * 트윗 ID로 트윗을 삭제한다.\n     *\n     * @param bearerToken OAuth 액세스 토큰\n     * @param tweetId 삭제할 트윗 ID\n     * @return 삭제 결과 JSON 문자열\n     */\n    String deleteTweet(String bearerToken, String tweetId);\n\n    /**\n     * 사용자 ID 기준 최근 트윗 목록을 조회한다.\n     *\n     * @param bearerToken OAuth 액세스 토큰\n     * @param userId 조회 대상 사용자 ID\n     * @return 트윗 목록 JSON 문자열\n     */\n    String getLatestTweets(String bearerToken, String userId);\n\n    /**\n     * pagination token 기준 다음 트윗 목록을 조회한다.\n     *\n     * @param bearerToken OAuth 액세스 토큰\n     * @param userId 조회 대상 사용자 ID\n     * @param token 다음 페이지 조회 토큰\n     * @return 다음 트윗 목록 JSON 문자열\n     */\n    String getNextTweets(String bearerToken, String userId, String token);\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovTwitterController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/tir/web/EgovTwitterController.java — java 파일",
+        "tags": []
+      },
+      "line": 24,
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovTwitterController.java",
+      "slice": {
+        "endLine": 47,
+        "startLine": 14,
+        "text": " * Twitter(X) TIR 화면 이동을 담당하는 컨트롤러.\n * 기존 전송/저장 로직은 X API 전용 컨트롤러로 분리되어 페이지 라우팅만 유지한다.\n */\n@Controller\npublic class EgovTwitterController {\n\n\t@Resource(name = \"egovMessageSource\")\n\tprivate EgovMessageSource egovMessageSource;\n\n\t@IncludedInfo(name = \"Twitter연동\", order = 830, gid = 50)\n\t@RequestMapping(value = \"/uss/ion/tir/selectTwitterMain.do\")\n\tpublic String selectTwitterMain() {\n\t\treturn \"egovframework/com/uss/ion/tir/EgovTwitterMain\";\n\t}\n\n\t@RequestMapping(value = \"/uss/ion/tir/selectTwitterV2Demo.do\")\n\tpublic String selectTwitterV2Demo(ModelMap model) {\n\t\tif (!EgovUserDetailsHelper.isAuthenticated()) {\n\t\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));\n\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";\n\t\t}\n\t\treturn \"egovframework/com/uss/ion/tir/EgovXV2Demo\";\n\t}\n\n\t@RequestMapping(value = \"/uss/ion/tir/selectTwitterPopup.do\")\n\tpublic String selectTwitterPopup(ModelMap model) {\n\t\tif (!EgovUserDetailsHelper.isAuthenticated()) {\n\t\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));\n\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";\n\t\t}\n\t\treturn \"egovframework/com/uss/ion/tir/EgovTwitterPopup\";\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovXAuthController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java — java 파일",
+        "tags": []
+      },
+      "line": 142,
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+      "slice": {
+        "endLine": 211,
+        "startLine": 132,
+        "text": "     * OAuth 콜백을 처리하고 인증 성공/실패 결과를 콜백 JSP에 전달한다.\n     *\n     * @param code OAuth 인가 코드\n     * @param state OAuth state 값(PKCE verifier 조회 키)\n     * @param oauthError OAuth 오류 코드\n     * @param errorDescription OAuth 오류 상세 설명\n     * @param session 현재 사용자 세션(액세스 토큰 저장소)\n     * @param model 콜백 결과 화면에 전달할 모델 객체\n     * @return 인증 결과를 표시할 콜백 JSP 경로\n     */\n    @GetMapping(\"/callback.do\")\n    public String callback(@RequestParam(name = \"code\", required = false) String code,\n                           @RequestParam(name = \"state\", required = false) String state,\n                           @RequestParam(required = false, name = \"error\") String oauthError,\n                           @RequestParam(required = false, name = \"error_description\") String errorDescription,\n                           HttpSession session,\n                           Model model) {\n        LOGGER.info(\"Twitter callback called. state={}, codePresent={}, oauthError={}\", state, code != null, oauthError);\n\n        if (oauthError != null) {\n            model.addAttribute(\"authSuccess\", false);\n            model.addAttribute(\"errorMessage\", \"OAuth 오류: \" + oauthError + \" / \" + errorDescription);\n            return \"egovframework/com/uss/ion/tir/EgovXAuthCallback\";\n        }\n\n        if (code == null || state == null) {\n            model.addAttribute(\"authSuccess\", false);\n            model.addAttribute(\"errorMessage\", \"콜백 파라미터(code/state)가 누락되었습니다.\");\n            return \"egovframework/com/uss/ion/tir/EgovXAuthCallback\";\n        }\n\n        try {\n            String accessToken = twitterOAuthService.requestAccessToken(session, code, state);\n            session.setAttribute(\"twitter_access_token\", accessToken);\n            model.addAttribute(\"authSuccess\", true);\n            model.addAttribute(\"redirectUrl\", \"/uss/ion/tir/selectTwitterV2Demo.do\");\n            return \"egovframework/com/uss/ion/tir/EgovXAuthCallback\";\n         // 2026.03.23 kisa 보안점검 대응 조치\n        } catch (IllegalArgumentException e) {\n            LOGGER.warn(\"Twitter callback invalid request: {}\", e.getMessage(), e);\n            model.addAttribute(\"authSuccess\", false);\n            model.addAttribute(\"errorMessage\", \"잘못된 요청입니다.\");\n            return \"egovframework/com/uss/ion/tir/EgovXAuthCallback\";\n        } catch (IllegalStateException e) {\n            LOGGER.warn(\"Twitter callback state/token processing failed: {}\", e.getMessage(), e);\n            model.addAttribute(\"authSuccess\", false);\n            model.addAttribute(\"errorMessage\", \"OAuth 인증 처리에 실패했습니다.\");\n            return \"egovframework/com/uss/ion/tir/EgovXAuthCallback\";\n        }\n    }\n\n    /**\n     * 로그인 여부를 확인하고 미로그인 시 공통 메시지를 모델에 담는다.\n     */\n    private LoginVO requireLogin(ModelMap model) {\n        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n        if (!isAuthenticated) {\n            model.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));\n            return null;\n        }\n        return (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();\n    }\n\n    private String trim(String value) {\n        return value == null ? \"\" : value.trim();\n    }\n\n    /*\n     * TODO(필수): CNSMRY_KEY / CNSMRY_SECRET 를 DB에 저장시 암복호화 저장 로직 복구 필요\n     * - Client ID / Client Secret 은 비밀번호급 정보이므로 평문 저장 금지, 암호화 저장 필수\n     * \n     *\n     * [복구 시 컨트롤러 내에 다시 둘 조회/저장 로직 스켈레톤]\n     * - DAO/Service는 기존 egovTwitterTrnsmitService.selectTwitterAccount / updt / insert / delete 재사용\n     *\n     * // 조회 (저장값 존재 여부 확인 + 필요 시 복호화)\n     * // ConsumerKey = Client ID, ConsumerSecret = Client Secret (기존 컬럼명 유지)\n     * // private Map<?, ?> getSavedTwitterClient(LoginVO loginVO) throws Exception {\n     * //     HashMap<String, String> param = new HashMap<String, String>();\n     * //     param.put(\"usid\", EgovStringUtil.isNullToString(loginVO.getUniqId()));",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovXController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java — java 파일",
+        "tags": []
+      },
+      "line": 73,
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+      "slice": {
+        "endLine": 142,
+        "startLine": 63,
+        "text": "        return twitterService.writeTweet(accessToken, text);\n    }\n\n    /**\n     * 트윗 ID로 트윗을 삭제한다.\n     *\n     * @param tweetId 삭제할 트윗 ID\n     * @param session 현재 사용자 세션(액세스 토큰 저장소)\n     * @return 삭제 결과 JSON 문자열 또는 오류 JSON 문자열\n     */\n    @DeleteMapping(\"/tweet\")\n    @ResponseBody\n    public String deleteTweet(@RequestParam(name = \"tweetId\") String tweetId, HttpSession session) {\n        String accessToken = getAccessToken(session);\n        if (accessToken == null) {\n            return \"{\\\"error\\\":\\\"twitter_access_token not found in session\\\"}\";\n        }\n        if (tweetId == null || tweetId.trim().isEmpty()) {\n            return \"{\\\"error\\\":\\\"tweetId is required\\\"}\";\n        }\n        return twitterService.deleteTweet(accessToken, tweetId);\n    }\n\n    /**\n     * 사용자 ID 기준 최근 트윗 목록을 조회한다.\n     *\n     * @param userId 조회 대상 Twitter 사용자 ID\n     * @param session 현재 사용자 세션(액세스 토큰 저장소)\n     * @return 트윗 목록 JSON 문자열 또는 오류 JSON 문자열\n     */\n    @GetMapping(\"/tweets\")\n    @ResponseBody\n    public String getTweets(@RequestParam(name = \"userId\") String userId, HttpSession session) {\n        String accessToken = getAccessToken(session);\n        if (accessToken == null) {\n            return \"{\\\"error\\\":\\\"twitter_access_token not found in session\\\"}\";\n        }\n        if (userId == null || userId.trim().isEmpty()) {\n            return \"{\\\"error\\\":\\\"userId is required\\\"}\";\n        }\n        return twitterService.getLatestTweets(accessToken, userId);\n    }\n\n    /**\n     * 페이징 토큰 기준 다음 트윗 목록을 조회한다.\n     *\n     * @param userId 조회 대상 Twitter 사용자 ID\n     * @param token 다음 페이지 조회용 pagination token\n     * @param session 현재 사용자 세션(액세스 토큰 저장소)\n     * @return 다음 트윗 목록 JSON 문자열 또는 오류 JSON 문자열\n     */\n    @GetMapping(\"/tweets/next\")\n    @ResponseBody\n    public String getNextTweets(@RequestParam(name = \"userId\") String userId,\n                                @RequestParam(name = \"token\") String token,\n                                HttpSession session) {\n        String accessToken = getAccessToken(session);\n        if (accessToken == null) {\n            return \"{\\\"error\\\":\\\"twitter_access_token not found in session\\\"}\";\n        }\n        if (userId == null || userId.trim().isEmpty()) {\n            return \"{\\\"error\\\":\\\"userId is required\\\"}\";\n        }\n        if (token == null || token.trim().isEmpty()) {\n            return \"{\\\"error\\\":\\\"token is required\\\"}\";\n        }\n        return twitterService.getNextTweets(accessToken, userId, token);\n    }\n\n    /**\n     * 세션에서 Twitter 액세스 토큰을 읽어온다.\n     *\n     * @param session 현재 사용자 세션\n     * @return 액세스 토큰 문자열(없으면 {@code null})\n     */\n    private String getAccessToken(HttpSession session) {\n        Object token = session.getAttribute(\"twitter_access_token\");\n        if (token == null) {\n            LOGGER.warn(\"twitter_access_token not found in session\");\n            return null;",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovTwitterController#selectTwitterMain",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovTwitterController.java",
+      "flowId": "flow:ANY /uss/ion/tir/selectTwitterMain.do",
+      "line": 24,
+      "stepIds": [
+        "step:ANY /uss/ion/tir/selectTwitterMain.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovTwitterController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovTwitterController#selectTwitterPopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovTwitterController.java",
+      "flowId": "flow:ANY /uss/ion/tir/selectTwitterPopup.do",
+      "line": 38,
+      "stepIds": [
+        "step:ANY /uss/ion/tir/selectTwitterPopup.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovTwitterController.java",
+        "step:ANY /uss/ion/tir/selectTwitterPopup.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/tir/selectTwitterPopup.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uss/ion/tir/selectTwitterPopup.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovTwitterController#selectTwitterV2Demo",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovTwitterController.java",
+      "flowId": "flow:ANY /uss/ion/tir/selectTwitterV2Demo.do",
+      "line": 29,
+      "stepIds": [
+        "step:ANY /uss/ion/tir/selectTwitterV2Demo.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovTwitterController.java",
+        "step:ANY /uss/ion/tir/selectTwitterV2Demo.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/tir/selectTwitterV2Demo.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uss/ion/tir/selectTwitterV2Demo.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovXController#deleteTweet",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+      "flowId": "flow:DELETE /twitter/tweet",
+      "line": 73,
+      "stepIds": [
+        "step:DELETE /twitter/tweet:src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+        "step:DELETE /twitter/tweet:src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovXAuthController#callback",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+      "flowId": "flow:GET /twitter/callback.do",
+      "line": 142,
+      "stepIds": [
+        "step:GET /twitter/callback.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+        "step:GET /twitter/callback.do:src/main/java/egovframework/com/uss/ion/tir/service/EgovXOAuthService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovXAuthController#callbackDebug",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+      "flowId": "flow:GET /twitter/callbackDebug.do",
+      "line": 111,
+      "stepIds": [
+        "step:GET /twitter/callbackDebug.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+        "step:GET /twitter/callbackDebug.do:src/main/java/egovframework/com/uss/ion/tir/service/EgovXOAuthService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovXAuthController#login",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+      "flowId": "flow:GET /twitter/login.do",
+      "line": 46,
+      "stepIds": [
+        "step:GET /twitter/login.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+        "step:GET /twitter/login.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:GET /twitter/login.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:GET /twitter/login.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovXController#getMe",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+      "flowId": "flow:GET /twitter/me.do",
+      "line": 36,
+      "stepIds": [
+        "step:GET /twitter/me.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+        "step:GET /twitter/me.do:src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovXAuthController#ping",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+      "flowId": "flow:GET /twitter/ping.do",
+      "line": 97,
+      "stepIds": [
+        "step:GET /twitter/ping.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovXController#getTweets",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+      "flowId": "flow:GET /twitter/tweets",
+      "line": 93,
+      "stepIds": [
+        "step:GET /twitter/tweets:src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+        "step:GET /twitter/tweets:src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovXController#getNextTweets",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+      "flowId": "flow:GET /twitter/tweets/next",
+      "line": 114,
+      "stepIds": [
+        "step:GET /twitter/tweets/next:src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+        "step:GET /twitter/tweets/next:src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovXAuthController#loginSubmit",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+      "flowId": "flow:POST /twitter/login.do",
+      "line": 66,
+      "stepIds": [
+        "step:POST /twitter/login.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+        "step:POST /twitter/login.do:src/main/java/egovframework/com/uss/ion/tir/service/EgovXOAuthService.java",
+        "step:POST /twitter/login.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /twitter/login.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /twitter/login.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovXController#writeTweet",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+      "flowId": "flow:POST /twitter/tweet",
+      "line": 53,
+      "stepIds": [
+        "step:POST /twitter/tweet:src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+        "step:POST /twitter/tweet:src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "uss.ion.tir",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovTwitterController.java",
+      "stepId": "step:ANY /uss/ion/tir/selectTwitterMain.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovTwitterController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/tir/selectTwitterPopup.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /uss/ion/tir/selectTwitterPopup.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/tir/selectTwitterPopup.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovTwitterController.java",
+      "stepId": "step:ANY /uss/ion/tir/selectTwitterPopup.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovTwitterController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/tir/selectTwitterV2Demo.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /uss/ion/tir/selectTwitterV2Demo.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/tir/selectTwitterV2Demo.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovTwitterController.java",
+      "stepId": "step:ANY /uss/ion/tir/selectTwitterV2Demo.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovTwitterController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java",
+      "stepId": "step:DELETE /twitter/tweet:src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+      "stepId": "step:DELETE /twitter/tweet:src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXOAuthService.java",
+      "stepId": "step:GET /twitter/callback.do:src/main/java/egovframework/com/uss/ion/tir/service/EgovXOAuthService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+      "stepId": "step:GET /twitter/callback.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXOAuthService.java",
+      "stepId": "step:GET /twitter/callbackDebug.do:src/main/java/egovframework/com/uss/ion/tir/service/EgovXOAuthService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+      "stepId": "step:GET /twitter/callbackDebug.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:GET /twitter/login.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:GET /twitter/login.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:GET /twitter/login.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+      "stepId": "step:GET /twitter/login.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java",
+      "stepId": "step:GET /twitter/me.do:src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+      "stepId": "step:GET /twitter/me.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+      "stepId": "step:GET /twitter/ping.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java",
+      "stepId": "step:GET /twitter/tweets/next:src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+      "stepId": "step:GET /twitter/tweets/next:src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java",
+      "stepId": "step:GET /twitter/tweets:src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+      "stepId": "step:GET /twitter/tweets:src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:POST /twitter/login.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /twitter/login.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /twitter/login.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXOAuthService.java",
+      "stepId": "step:POST /twitter/login.do:src/main/java/egovframework/com/uss/ion/tir/service/EgovXOAuthService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+      "stepId": "step:POST /twitter/login.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java",
+      "stepId": "step:POST /twitter/tweet:src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+      "stepId": "step:POST /twitter/tweet:src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java"
+    }
+  ]
+}

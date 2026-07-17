@@ -1,0 +1,1241 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "start",
+          "to": "set"
+        },
+        {
+          "from": "set",
+          "to": "auth"
+        },
+        {
+          "from": "auth",
+          "to": "authed"
+        },
+        {
+          "from": "authed",
+          "label": "인증 사용자 있음",
+          "to": "save"
+        },
+        {
+          "from": "authed",
+          "label": "인증 사용자 없음",
+          "to": "view"
+        },
+        {
+          "from": "save",
+          "to": "view"
+        },
+        {
+          "from": "view",
+          "to": "check"
+        },
+        {
+          "from": "check",
+          "to": "chkAuthed"
+        },
+        {
+          "from": "chkAuthed",
+          "label": "인증 사용자 있음",
+          "to": "readUrl"
+        },
+        {
+          "from": "chkAuthed",
+          "label": "인증 사용자 없음",
+          "to": "empty"
+        },
+        {
+          "from": "readUrl",
+          "to": "render"
+        },
+        {
+          "from": "empty",
+          "to": "render"
+        },
+        {
+          "from": "render",
+          "to": "end"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "start",
+          "kind": "start",
+          "label": "요청 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 56,
+              "snippet": "@RequestMapping(value = \"/utl/sys/rsc/setLoginSession.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 57,
+              "snippet": "public String setLoginSession(@RequestParam(\"url\") String url) throws Exception {"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/rsc/setLoginSession.do",
+          "id": "set",
+          "kind": "activity",
+          "label": "이동화면 등록 요청 접수"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 29,
+              "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            }
+          ],
+          "id": "auth",
+          "kind": "activity",
+          "label": "인증 사용자 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 31,
+              "snippet": "if ( user != null ) {"
+            }
+          ],
+          "id": "authed",
+          "kind": "decision",
+          "label": "인증 사용자 있음"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 33,
+              "snippet": "user.setUrl(url);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 69,
+              "snippet": "private String url;"
+            }
+          ],
+          "id": "save",
+          "kind": "activity",
+          "label": "이동화면 주소 세션 등록"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 46,
+              "snippet": "@RequestMapping(value = \"/utl/sys/rsc/loginSessionView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 59,
+              "snippet": "return \"forward:/utl/sys/rsc/loginSessionView.do\";"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/rsc/loginSessionView.do",
+          "id": "view",
+          "kind": "activity",
+          "label": "세션정보 화면 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 66,
+              "snippet": "@RequestMapping(value = \"/utl/sys/rsc/checkLloginSession.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 68,
+              "snippet": "egovLoginSesionCeckUtil.checkLoginSessionView();"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/rsc/checkLloginSession.do",
+          "id": "check",
+          "kind": "activity",
+          "label": "세션정보 체크 요청 접수"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 45,
+              "snippet": "if ( user == null ) {"
+            }
+          ],
+          "id": "chkAuthed",
+          "kind": "decision",
+          "label": "인증 사용자 있음"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 48,
+              "snippet": "return user.getUrl();"
+            }
+          ],
+          "id": "readUrl",
+          "kind": "activity",
+          "label": "등록된 이동화면 주소 반환"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 46,
+              "snippet": "return \"\";"
+            }
+          ],
+          "id": "empty",
+          "kind": "activity",
+          "label": "빈 값 반환"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 69,
+              "snippet": "return \"egovframework/com/utl/sys/rsc/EgovLoginSesionCheck\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 48,
+              "snippet": "return \"egovframework/com/utl/sys/rsc/EgovLoginSesionCheck\";"
+            }
+          ],
+          "id": "render",
+          "kind": "activity",
+          "label": "세션정보체크 화면 응답"
+        },
+        {
+          "id": "end",
+          "kind": "end",
+          "label": "처리 종료"
+        }
+      ],
+      "title": "로그인 세션정보 체크"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+          "line": 29,
+          "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+          "line": 31,
+          "snippet": "if ( user != null ) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+          "line": 33,
+          "snippet": "user.setUrl(url);"
+        }
+      ],
+      "text": "이동 대상 화면 주소는 인증된 사용자가 확인된 경우에만 세션에 등록한다. 인증된 사용자가 없으면 등록 없이 넘어간다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+          "line": 43,
+          "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+          "line": 45,
+          "snippet": "if ( user == null ) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+          "line": 46,
+          "snippet": "return \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+          "line": 48,
+          "snippet": "return user.getUrl();"
+        }
+      ],
+      "text": "세션정보 조회 시 인증된 사용자가 없으면 이동 화면 주소 대신 빈 값을 돌려준다. 인증 사용자가 있을 때에만 등록된 주소를 반환한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+          "line": 58,
+          "snippet": "egovLoginSesionCeckUtil.setLoginSession(url);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+          "line": 59,
+          "snippet": "return \"forward:/utl/sys/rsc/loginSessionView.do\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+          "line": 48,
+          "snippet": "return \"egovframework/com/utl/sys/rsc/EgovLoginSesionCheck\";"
+        }
+      ],
+      "text": "이동화면 등록이 끝나면 곧바로 로그인 세션정보 화면 조회로 내부 전달되어 등록 결과를 확인하는 화면으로 이어진다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 25,
+          "snippet": "public class EgovUserDetailsHelper {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 5,
+          "snippet": "public interface EgovUserDetailsService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 42,
+          "snippet": "return egovUserDetailsService.getAuthenticatedUser();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+          "line": 29,
+          "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+        }
+      ],
+      "text": "인증 사용자 조회를 공통 인증 영역의 조회 도우미와 규약에 위임하여, 이 영역은 인증 방식 자체를 알지 못한 채 인증 주체만 확보한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 69,
+          "snippet": "private String url;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+          "line": 43,
+          "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+        }
+      ],
+      "text": "공통 영역의 로그인 사용자 정보 구조를 그대로 사용해 이동 화면 주소를 보관하므로, 해당 사용자 정보 구조 변경에 함께 영향을 받는다."
+    }
+  ],
+  "domainId": "domain:utl.sys.rsc",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 69,
+          "snippet": "private String url;"
+        }
+      ],
+      "text": "로그인 사용자 정보 — 아이디·이름·이메일 등 사용자 식별 정보와 함께 로그인 후 이동할 페이지 주소를 보관하는 세션 대상 데이터이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 69,
+          "snippet": "private String url;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+          "line": 33,
+          "snippet": "user.setUrl(url);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+          "line": 48,
+          "snippet": "return user.getUrl();"
+        }
+      ],
+      "text": "로그인 후 이동 화면 주소 — 사용자가 로그인 처리를 마친 뒤 이동해야 할 대상 화면을 가리키는 값으로, 로그인 사용자 정보에 담겨 세션에 유지된다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /utl/sys/rsc/checkLloginSession.do",
+      "name": "로그인 세션정보 체크",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 66,
+            "snippet": "@RequestMapping(value = \"/utl/sys/rsc/checkLloginSession.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 68,
+            "snippet": "egovLoginSesionCeckUtil.checkLoginSessionView();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+            "line": 45,
+            "snippet": "if ( user == null ) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 69,
+            "snippet": "return \"egovframework/com/utl/sys/rsc/EgovLoginSesionCheck\";"
+          }
+        ],
+        "text": "로그인 세션정보체크 요청을 받아 현재 인증된 사용자의 세션에 보관된 이동 대상 화면 정보를 조회하고, 세션정보체크 화면을 응답한다. 인증된 사용자가 없으면 빈 값으로 처리된다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/rsc/loginSessionView.do",
+      "name": "로그인 세션정보 화면 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 46,
+            "snippet": "@RequestMapping(value = \"/utl/sys/rsc/loginSessionView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 47,
+            "snippet": "public String checkLoginSessionView() throws Exception {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 48,
+            "snippet": "return \"egovframework/com/utl/sys/rsc/EgovLoginSesionCheck\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 59,
+            "snippet": "return \"forward:/utl/sys/rsc/loginSessionView.do\";"
+          }
+        ],
+        "text": "세션에 등록된 로그인 후 이동 정보를 확인하는 화면을 조회한다. 이동 대상 화면 등록 처리가 끝난 뒤 내부 전달로 이 흐름에 도달하며, 세션정보체크 화면을 그대로 응답한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/rsc/setLoginSession.do",
+      "name": "로그인 후 이동화면 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 56,
+            "snippet": "@RequestMapping(value = \"/utl/sys/rsc/setLoginSession.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 57,
+            "snippet": "public String setLoginSession(@RequestParam(\"url\") String url) throws Exception {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+            "line": 31,
+            "snippet": "if ( user != null ) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+            "line": 33,
+            "snippet": "user.setUrl(url);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 59,
+            "snippet": "return \"forward:/utl/sys/rsc/loginSessionView.do\";"
+          }
+        ],
+        "text": "요청으로 전달받은 이동 대상 화면 주소를 현재 인증된 사용자의 로그인 세션에 등록한 뒤, 로그인 세션정보 화면 조회로 내부 전달한다. 인증된 사용자가 있을 때에만 등록한다."
+      }
+    }
+  ],
+  "name": "로그인 세션정보 체크",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 69,
+              "snippet": "private String url;"
+            }
+          ],
+          "text": "아이디·이름·이메일 등 사용자 식별 정보와 함께 로그인 후 이동할 페이지 주소를 필드로 보유한다. 직렬화 가능한 구조여서 세션에 그대로 보관될 수 있다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 43,
+              "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 48,
+              "snippet": "return user.getUrl();"
+            }
+          ],
+          "text": "인증된 사용자 정보를 담아 세션에 보관되는 데이터 객체이다. 로그인 세션정보 체크 흐름에서는 이 객체에 보관된 이동 대상 화면 주소를 조회하는 대상이 된다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 69,
+            "snippet": "private String url;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+            "line": 48,
+            "snippet": "return user.getUrl();"
+          }
+        ],
+        "text": "로그인한 사용자의 신원·소속·인증 관련 정보를 담는 데이터 구조로, 이 흐름에서는 로그인 후 이동할 화면 주소를 세션에서 읽어오는 통로 역할을 한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 42,
+              "snippet": "return egovUserDetailsService.getAuthenticatedUser();"
+            }
+          ],
+          "text": "인증된 사용자 정보를 사용자 객체 형태로 돌려주는 조회 규약을 정의한다. 구체적인 인증 판단은 이 규약을 구현하는 쪽이 담당한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 42,
+              "snippet": "return egovUserDetailsService.getAuthenticatedUser();"
+            }
+          ],
+          "text": "인증된 사용자 조회를 표준화한 규약이다. 로그인 세션정보 체크가 인증 주체를 확인할 때 실제 구현 대신 이 규약에 의존하도록 하여 인증 방식과 업무 로직을 분리한다."
+        }
+      },
+      "name": "인증 사용자 조회 규약",
+      "stepId": "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 11,
+            "snippet": "public Object getAuthenticatedUser();"
+          }
+        ],
+        "text": "인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 규약으로, 이 흐름에서는 현재 인증된 사용자 정보를 얻는 창구가 된다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 42,
+              "snippet": "return egovUserDetailsService.getAuthenticatedUser();"
+            }
+          ],
+          "text": "인증 사용자 조회 규약 구현체를 보유하고, 인증된 사용자 조회 요청을 그 구현체로 위임한다. 구현체가 설정되어 있어야 조회가 성립한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 43,
+              "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ],
+          "text": "인증 사용자 조회 규약으로 요청을 그대로 넘기는 중개 역할이다. 로그인 세션정보 체크는 이 도우미를 통해 현재 인증된 사용자를 확보한다."
+        }
+      },
+      "name": "인증 사용자 조회 도우미",
+      "stepId": "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "public static Object getAuthenticatedUser() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 42,
+            "snippet": "return egovUserDetailsService.getAuthenticatedUser();"
+          }
+        ],
+        "text": "인증 사용자 조회 규약을 감싸 어디서든 현재 인증된 사용자 정보를 꺼내 쓸 수 있게 해주는 협력 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 43,
+              "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 45,
+              "snippet": "if ( user == null ) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 46,
+              "snippet": "return \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 48,
+              "snippet": "return user.getUrl();"
+            }
+          ],
+          "text": "인증된 사용자가 없으면 빈 값을 반환하고, 있으면 세션에 보관된 이동 대상 화면 주소를 반환한다. 인증 사용자 없는 경우를 먼저 가려내는 것은 보안취약점 조치로 도입된 규칙이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 20,
+              "snippet": "@Service(\"egovLoginSesionCeckUtil\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 42,
+              "snippet": "public String checkLoginSessionView() throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 43,
+              "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ],
+          "text": "로그인 세션정보체크 업무를 담당하는 처리 단위이다. 인증된 사용자를 조회한 뒤 세션에 등록된 이동 대상 화면 주소를 확인해 돌려주는 작업을 조율한다."
+        }
+      },
+      "name": "로그인 세션정보 체크 처리",
+      "stepId": "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+            "line": 20,
+            "snippet": "@Service(\"egovLoginSesionCeckUtil\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+            "line": 42,
+            "snippet": "public String checkLoginSessionView() throws Exception {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+            "line": 45,
+            "snippet": "if ( user == null ) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+            "line": 46,
+            "snippet": "return \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+            "line": 48,
+            "snippet": "return user.getUrl();"
+          }
+        ],
+        "text": "현재 인증된 사용자를 확인해 세션에 보관된 이동 대상 화면 주소를 돌려준다. 인증된 사용자가 없으면 빈 값을 반환한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 67,
+              "snippet": "public String checkLoginSession() throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 68,
+              "snippet": "egovLoginSesionCeckUtil.checkLoginSessionView();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 43,
+              "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ],
+          "text": "별도의 요청 파라미터 없이 접수되며, 인증 주체 확인은 위임받은 처리 단위가 세션의 인증 사용자 조회로 수행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 66,
+              "snippet": "@RequestMapping(value = \"/utl/sys/rsc/checkLloginSession.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 68,
+              "snippet": "egovLoginSesionCeckUtil.checkLoginSessionView();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 69,
+              "snippet": "return \"egovframework/com/utl/sys/rsc/EgovLoginSesionCheck\";"
+            }
+          ],
+          "text": "로그인 세션정보체크 주소로 들어온 요청을 받아 로그인 세션정보 체크 처리로 위임하고, 결과 확인용 세션정보체크 화면으로 응답을 넘기는 접수 창구이다."
+        }
+      },
+      "name": "로그인 세션정보 체크 접수",
+      "stepId": "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 66,
+            "snippet": "@RequestMapping(value = \"/utl/sys/rsc/checkLloginSession.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 67,
+            "snippet": "public String checkLoginSession() throws Exception {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 68,
+            "snippet": "egovLoginSesionCeckUtil.checkLoginSessionView();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 69,
+            "snippet": "return \"egovframework/com/utl/sys/rsc/EgovLoginSesionCheck\";"
+          }
+        ],
+        "text": "로그인 세션정보체크 요청을 접수해 세션정보 체크 처리에 위임하고, 세션정보체크 화면을 응답한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 47,
+              "snippet": "public String checkLoginSessionView() throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 48,
+              "snippet": "return \"egovframework/com/utl/sys/rsc/EgovLoginSesionCheck\";"
+            }
+          ],
+          "text": "요청 파라미터를 받지 않고 화면 이름만 돌려주는 단순 조회 창구이다. 별도의 검증 없이 세션정보체크 화면으로 연결된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 46,
+              "snippet": "@RequestMapping(value = \"/utl/sys/rsc/loginSessionView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 48,
+              "snippet": "return \"egovframework/com/utl/sys/rsc/EgovLoginSesionCheck\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 59,
+              "snippet": "return \"forward:/utl/sys/rsc/loginSessionView.do\";"
+            }
+          ],
+          "text": "세션정보 확인 화면 주소로 들어온 요청을 받아 로그인 세션정보체크 화면을 그대로 응답하는 접수 창구이다. 이동화면 등록 처리가 끝난 뒤 내부 전달로도 이 창구에 도달한다."
+        }
+      },
+      "name": "로그인 세션정보 화면 접수",
+      "stepId": "step:ANY /utl/sys/rsc/loginSessionView.do:src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 66,
+            "snippet": "@RequestMapping(value = \"/utl/sys/rsc/checkLloginSession.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 46,
+            "snippet": "@RequestMapping(value = \"/utl/sys/rsc/loginSessionView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 47,
+            "snippet": "public String checkLoginSessionView() throws Exception {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 48,
+            "snippet": "return \"egovframework/com/utl/sys/rsc/EgovLoginSesionCheck\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 59,
+            "snippet": "return \"forward:/utl/sys/rsc/loginSessionView.do\";"
+          }
+        ],
+        "text": "세션정보 확인 화면 요청을 접수해 로그인 세션정보체크 화면을 응답한다. 이동화면 등록 처리 뒤 내부 전달로도 도달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 69,
+              "snippet": "private String url;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 33,
+              "snippet": "user.setUrl(url);"
+            }
+          ],
+          "text": "사용자 식별 정보와 함께 로그인 후 이동할 페이지 주소를 필드로 가진다. 이동 주소는 등록 시점에 새 값으로 덮어써진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 29,
+              "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 33,
+              "snippet": "user.setUrl(url);"
+            }
+          ],
+          "text": "세션에 보관되는 인증 사용자 정보 객체이다. 이동화면 등록 흐름에서는 전달받은 이동 대상 화면 주소를 담아 두는 보관 대상 역할을 한다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 69,
+            "snippet": "private String url;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+            "line": 33,
+            "snippet": "user.setUrl(url);"
+          }
+        ],
+        "text": "로그인한 사용자 정보를 담는 데이터 구조로, 이 흐름에서는 로그인 후 이동할 화면 주소를 보관하는 대상이 된다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 42,
+              "snippet": "return egovUserDetailsService.getAuthenticatedUser();"
+            }
+          ],
+          "text": "인증된 사용자 정보를 사용자 객체 형태로 반환하는 조회 규약을 정의하며, 인증 여부 판단 자체는 구현하는 쪽의 몫이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 29,
+              "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ],
+          "text": "인증된 사용자 조회를 표준화한 규약이다. 이동화면 등록은 이 규약을 통해 등록 대상이 될 인증 사용자를 확보한다."
+        }
+      },
+      "name": "인증 사용자 조회 규약",
+      "stepId": "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 11,
+            "snippet": "public Object getAuthenticatedUser();"
+          }
+        ],
+        "text": "인증된 사용자 정보를 제공하는 공통 규약으로, 이 흐름에서는 이동화면을 등록할 대상 사용자를 확인하는 창구가 된다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 42,
+              "snippet": "return egovUserDetailsService.getAuthenticatedUser();"
+            }
+          ],
+          "text": "인증 사용자 조회 규약 구현체를 보유하고 조회 요청을 그 구현체로 위임한다. 구현체가 설정되어 있어야 사용자 조회가 성립한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 29,
+              "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ],
+          "text": "인증 사용자 조회 규약으로 요청을 넘기는 중개 역할이다. 이동화면 등록 처리는 이 도우미를 통해 등록 대상 사용자를 얻는다."
+        }
+      },
+      "name": "인증 사용자 조회 도우미",
+      "stepId": "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "public static Object getAuthenticatedUser() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 42,
+            "snippet": "return egovUserDetailsService.getAuthenticatedUser();"
+          }
+        ],
+        "text": "인증 사용자 조회 규약을 감싸 현재 인증된 사용자 정보를 꺼내 주는 협력 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 29,
+              "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 31,
+              "snippet": "if ( user != null ) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 33,
+              "snippet": "user.setUrl(url);"
+            }
+          ],
+          "text": "인증된 사용자가 있을 때에만 이동 대상 화면 주소를 등록하며, 인증 사용자가 없으면 아무 것도 등록하지 않는다. 인증 사용자 존재를 먼저 확인하는 것은 보안취약점 조치로 도입된 규칙이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 20,
+              "snippet": "@Service(\"egovLoginSesionCeckUtil\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 28,
+              "snippet": "public void setLoginSession(String url) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 29,
+              "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ],
+          "text": "로그인 후 이동할 처리화면을 세션에 등록하는 업무를 담당한다. 인증된 사용자를 조회한 뒤 그 사용자 정보에 이동 대상 화면 주소를 반영하는 작업을 조율한다."
+        }
+      },
+      "name": "이동화면 세션 등록 처리",
+      "stepId": "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+            "line": 20,
+            "snippet": "@Service(\"egovLoginSesionCeckUtil\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+            "line": 28,
+            "snippet": "public void setLoginSession(String url) throws Exception {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+            "line": 31,
+            "snippet": "if ( user != null ) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+            "line": 33,
+            "snippet": "user.setUrl(url);"
+          }
+        ],
+        "text": "인증된 사용자를 확인해 전달받은 이동 대상 화면 주소를 로그인 세션에 등록한다. 인증된 사용자가 없으면 등록하지 않는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 57,
+              "snippet": "public String setLoginSession(@RequestParam(\"url\") String url) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 58,
+              "snippet": "egovLoginSesionCeckUtil.setLoginSession(url);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+              "line": 31,
+              "snippet": "if ( user != null ) {"
+            }
+          ],
+          "text": "이동 대상 화면 주소를 필수 요청 파라미터로 받는다. 값에 대한 별도 형식 검증은 없고, 인증 사용자 확인은 위임받은 처리 단위가 담당한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 56,
+              "snippet": "@RequestMapping(value = \"/utl/sys/rsc/setLoginSession.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 58,
+              "snippet": "egovLoginSesionCeckUtil.setLoginSession(url);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+              "line": 59,
+              "snippet": "return \"forward:/utl/sys/rsc/loginSessionView.do\";"
+            }
+          ],
+          "text": "이동화면 등록 주소로 들어온 요청을 받아 이동화면 세션 등록 처리로 위임한 뒤, 결과 확인을 위해 로그인 세션정보 화면 조회로 내부 전달하는 접수 창구이다."
+        }
+      },
+      "name": "이동화면 등록 접수",
+      "stepId": "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 66,
+            "snippet": "@RequestMapping(value = \"/utl/sys/rsc/checkLloginSession.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 56,
+            "snippet": "@RequestMapping(value = \"/utl/sys/rsc/setLoginSession.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 57,
+            "snippet": "public String setLoginSession(@RequestParam(\"url\") String url) throws Exception {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 58,
+            "snippet": "egovLoginSesionCeckUtil.setLoginSession(url);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+            "line": 59,
+            "snippet": "return \"forward:/utl/sys/rsc/loginSessionView.do\";"
+          }
+        ],
+        "text": "이동 대상 화면 주소를 요청 파라미터로 받아 세션 등록 처리에 위임하고, 로그인 세션정보 화면 조회로 내부 전달한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+        "line": 20,
+        "snippet": "@Service(\"egovLoginSesionCeckUtil\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+        "line": 56,
+        "snippet": "@RequestMapping(value = \"/utl/sys/rsc/setLoginSession.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+        "line": 66,
+        "snippet": "@RequestMapping(value = \"/utl/sys/rsc/checkLloginSession.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+        "line": 31,
+        "snippet": "if ( user != null ) {"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+        "line": 45,
+        "snippet": "if ( user == null ) {"
+      }
+    ],
+    "text": "로그인한 사용자가 로그인 이후 이동할 화면 주소를 세션에 등록하고, 등록된 세션정보를 다시 확인·조회할 수 있게 해주는 공통 유틸리티 업무 영역이다. 인증된 사용자가 있을 때에만 등록·조회가 성립한다."
+  }
+}

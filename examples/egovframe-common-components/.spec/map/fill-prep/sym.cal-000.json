@@ -1,0 +1,1382 @@
+{
+  "chunkId": "sym.cal-000",
+  "domainId": "domain:sym.cal",
+  "domainName": "",
+  "files": [
+    {
+      "className": "ComDefaultCodeVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "slice": {
+        "endLine": 58,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------       --------    ---------------------------\n *   2009.3.11   이삼섭          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class ComDefaultCodeVO implements Serializable {\n    /** 코드 ID */\n    private String codeId = \"\";\n\n    /** 상세코드 */\n    private String code = \"\";\n\n    /** 코드명 */\n    private String codeNm = \"\";\n\n    /** 코드설명 */\n    private String codeDc = \"\";\n\n    /** 특정테이블명 */\n    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용\n\n    /** 상세 조건 여부 */\n    private String haveDetailCondition = \"N\";\n\n    /** 상세 조건 */\n    private String detailCondition = \"\";\n\n    /**\n     * toString 메소드를 대치한다.\n     */\n    public String toString() {\n    \treturn ToStringBuilder.reflectionToString(this);\n    }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "LoginVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/LoginVO.java — java 파일",
+        "tags": []
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 21,
+        "text": " *   2009.03.03     박지욱     최초 생성\n *   2021.05.30     정진오     디지털원패스 사용자키/세션값 추가\n *</pre>\n *\n *  @author 공통서비스 개발팀 박지욱\n *  @since 2009.03.03\n *  @version 1.0\n *  @see\n *\n */\n@Getter\n@Setter\npublic class LoginVO implements Serializable{\n\n\t/**\n\t *\n\t */\n\tprivate static final long serialVersionUID = -8274004534207618049L;\n\n\t/** 아이디 */\n\t@EgovNullCheck\n\tprivate String id;\n\t/** 이름 */\n\t@EgovNullCheck\n\tprivate String name;\n\t/** 주민등록번호 */\n\tprivate String ihidNum;\n\t/** 이메일주소 */\n\t@EgovNullCheck\n\t@EgovEmailCheck\n\tprivate String email;\n\t/** 비밀번호 */\n\tprivate String password;\n\t/** 비밀번호 힌트 */\n\t@EgovNullCheck\n\tprivate String passwordHint;\n\t/** 비밀번호 정답 */\n\t@EgovNullCheck\n\tprivate String passwordCnsr;\n\t/** 사용자구분 */\n\tprivate String userSe;\n\t/** 조직(부서)ID */\n\tprivate String orgnztId;\n\t/** 조직(부서)명 */\n\tprivate String orgnztNm;\n\t/** 고유아이디 */\n\tprivate String uniqId;\n\t/** 로그인 후 이동할 페이지 */\n\tprivate String url;\n\t/** 사용자 IP정보 */\n\tprivate String ip;\n\t/** GPKI인증 DN */\n\tprivate String dn;\n\t/** 디지털원패스 사용자키 */\n\tprivate String onepassUserkey;\n\t/** 디지털원패스 사용자세션값 */\n\tprivate String onepassIntfToken;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCmmUseService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "slice": {
+        "endLine": 60,
+        "startLine": 16,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이삼섭          최초 생성\n *   2025.07.16  이백행          2025년 컨트리뷰션 `throws Exception` 제거\n *\n *      </pre>\n */\npublic interface EgovCmmUseService {\n\n\t/**\n\t * 공통코드를 조회한다.\n\t *\n\t * @param comDefaultCodeVO\n\t * @return List(코드)\n\t */\n\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * ComDefaultCodeVO의 리스트를 받아서 여러개의 코드 리스트를 맵에 담아서 리턴한다.\n\t *\n\t * @param comDefaultCodeVOs\n\t * @return Map(코드)\n\t */\n\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);\n\n\t/**\n\t * 조직정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 조직정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * 그룹정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 그룹정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCalRestdeManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 24,
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "slice": {
+        "endLine": 93,
+        "startLine": 14,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호          최초 생성\n *\n * </pre>\n */\npublic interface EgovCalRestdeManageService {\n\n\t/**\n\t * 일반달력 팝업 정보를 조회한다.\n\t * @param restde\n\t * @return List(일반달력 팝업 날짜정보)\n\t * @throws Exception\n\t */\n\tList<EgovMap> selectNormalRestdePopup(Restde restde)\tthrows Exception;\n\n\t/**\n\t * 행정달력 팝업 정보를 조회한다.\n\t * @param restde\n\t * @return List(행정달력 팝업 날짜정보)\n\t * @throws Exception\n\t */\n\tList<EgovMap> selectAdministRestdePopup(Restde restde)\tthrows Exception;\n\n\t/**\n\t * 일반달력 일간 정보를 조회한다.\n\t * @param restde\n\t * @return List(일반달력 일간 날짜정보)\n\t * @throws Exception\n\t */\n\tList<EgovMap> selectNormalDayCal(Restde restde)\tthrows Exception;\n\n\t/**\n\t * 일반달력 일간 휴일을 조회한다.\n\t * @param restde\n\t * @return List(일반달력 일간 휴일정보)\n\t * @throws Exception\n\t */\n\tList<EgovMap> selectNormalDayRestde(Restde restde)\tthrows Exception;\n\n\t/**\n\t * 일반달력 월간 휴일을 조회한다.\n\t * @param restde\n\t * @return List(일반달력 월간 휴일정보)\n\t * @throws Exception\n\t */\n\tList<EgovMap> selectNormalMonthRestde(Restde restde)\tthrows Exception;\n\n\t/**\n\t * 행정달력 일간 정보를 조회한다.\n\t * @param restde\n\t * @return List(행정달력 일간 날짜정보)\n\t * @throws Exception\n\t */\n\tList<EgovMap> selectAdministDayCal(Restde restde)\tthrows Exception;\n\n\t/**\n\t * 행정달력 일간 휴일을 조회한다.\n\t * @param restde\n\t * @return List(행정달력 일간 휴일정보)\n\t * @throws Exception\n\t */\n\tList<EgovMap> selectAdministDayRestde(Restde restde)\tthrows Exception;\n\n\t/**\n\t * 행정달력 월간 휴일을 조회한다.\n\t * @param restde\n\t * @return List(행정달력 월간 휴일정보)\n\t * @throws Exception\n\t */\n\tList<?> selectAdministMonthRestde(Restde restde)\tthrows Exception;\n\n\t/**\n\t * 휴일을 삭제한다.\n\t * @param restde\n\t * @throws Exception",
+        "truncated": true
+      }
+    },
+    {
+      "className": "Restde",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/cal/service/Restde.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "slice": {
+        "endLine": 94,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호\t\t\t최초 생성\n *   2024.10.20  권태성\t\t필수값 BindingResult 검증을 위한 @EgovNullCheck 추가\n *\n * </pre>\n */\npublic class Restde implements Serializable {\n\n\tprivate static final long serialVersionUID = -8509545779844669658L;\n\n\t/*\n\t * 휴일번호\n\t */\n    private int    restdeNo       = 0;\n\n    /*\n     * 휴일일자\n     */\n\t@EgovNullCheck\n\t@Size(max=8)\n    private String restdeDe       = \"\";\n\n    /*\n     * 휴일명\n     */\n\t@EgovNullCheck\n\t@Size(max=50)\n    private String restdeNm       = \"\";\n\n    /*\n     * 휴일설명\n     */\n\t@EgovNullCheck\n\t@Size(max=200)\n    private String restdeDc       = \"\";\n\n    /*\n     * 휴일구분\n     */\n    private String restdeSe       = \"\";\n\n    /*\n     * 휴일구분코드\n     */\n\t@EgovNullCheck\n    private String restdeSeCode   = \"\";\n\n    /*\n     * 최초등록자ID\n     */\n    private String frstRegisterId = \"\";\n\n    /*\n     * 최종수정자ID\n     */\n    private String lastUpdusrId   = \"\";\n\n    /*\n     * 년\n     */\n    private String year           = \"\";\n\n    /*\n     * 월\n     */\n    private String month          = \"\";\n\n    /*\n     * 일\n     */\n    private String day            = \"\";\n\n    /*\n     * 휴일여부\n     */\n    private String restdeAt       = \"\";",
+        "truncated": true
+      }
+    },
+    {
+      "className": "RestdeVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/cal/service/RestdeVO.java — java 파일",
+        "tags": []
+      },
+      "line": 27,
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/RestdeVO.java",
+      "slice": {
+        "endLine": 70,
+        "startLine": 17,
+        "text": " *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호          최초 생성\n *   2024.10.29  권태성          날짜 검색 시 검색어를 DB에 저장된 포맷으로 변환하여 반환\n *   2025.07.04  이백행          컨트리뷰션 PMD로 소프트웨어 보안약점 진단하고 제거하기-UselessParentheses(불필요한 괄호사용)\n *\n *      </pre>\n */\n@Getter\n@Setter\npublic class RestdeVO extends Restde implements Serializable {\n\n\tprivate static final long serialVersionUID = 2548377950888283294L;\n\n\t/** 검색조건 */\n\tprivate String searchCondition = \"\";\n\n\t/** 검색Keyword */\n\tprivate String searchKeyword = \"\";\n\n\t/** 검색사용여부 */\n\tprivate String searchUseYn = \"\";\n\n\t/** 현재페이지 */\n\tprivate int pageIndex = 1;\n\n\t/** 페이지개수 */\n\tprivate int pageUnit = 10;\n\n\t/** 페이지사이즈 */\n\tprivate int pageSize = 10;\n\n\t/** firstIndex */\n\tprivate int firstIndex = 1;\n\n\t/** lastIndex */\n\tprivate int lastIndex = 1;\n\n\t/** recordCountPerPage */\n\tprivate int recordCountPerPage = 10;\n\n\t/**\n\t * 날짜 검색 시 검색어를 DB에 저장된 포맷으로 변환하여 반환\n\t *\n\t * @return\n\t */\n\tpublic String getFormattedDtKeyword() {\n\t\treturn this.searchKeyword != null ? this.searchKeyword.replace(\"-\", \"\") : \"\";\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCalRestdeManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 259,
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "slice": {
+        "endLine": 328,
+        "startLine": 249,
+        "text": "\t\treturn \"egovframework/com/sym/cal/EgovNormalCalendar\";\n\t}\n\n\t/**\n\t * 행정달력 팝업 메인창을 호출한다.\n\t * \n\t * @param model\n\t * @return \"egovframework/com/sym/cal/EgovAdministCalPopup\"\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")\n\tpublic String callAdministCalPopup(ModelMap model) throws Exception {\n\t\treturn \"egovframework/com/sym/cal/EgovAdministCalPopup\";\n\t}\n\n\t/**\n\t * 행정달력 팝업 정보를 조회한다.\n\t * \n\t * @param restde\n\t * @param model\n\t * @return \"egovframework/com/sym/cal/EgovAdministCalendar\"\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/sym/cal/EgovselectAdministCalendar.do\")\n\tpublic String selectAdministRestdePopup(@Valid Restde restde, BindingResult bindingResult, ModelMap model)\n\t\t\tthrows Exception {\n\n\t\tif (bindingResult.hasErrors()) {\n\n\t\t\treturn \"egovframework/com/cmm/error/dataAccessFailure\";\n\n\t\t}\n\n\t\tCalendar cal = Calendar.getInstance();\n\n\t\tif (restde.getYear() == null || restde.getYear().equals(\"\")) {\n\t\t\trestde.setYear(Integer.toString(cal.get(Calendar.YEAR)));\n\t\t}\n\t\tif (restde.getMonth() == null || restde.getMonth().equals(\"\")) {\n\t\t\trestde.setMonth(Integer.toString(cal.get(Calendar.MONTH) + 1));\n\t\t}\n\t\tint iYear = Integer.parseInt(restde.getYear());\n\t\tint iMonth = Integer.parseInt(restde.getMonth());\n\n\t\tif (iMonth < 1) {\n\t\t\tiYear--;\n\t\t\tiMonth = 12;\n\t\t}\n\t\tif (iMonth > 12) {\n\t\t\tiYear++;\n\t\t\tiMonth = 1;\n\t\t}\n\t\tif (iYear < 1) {\n\t\t\tiYear = 1;\n\t\t\tiMonth = 1;\n\t\t}\n\t\tif (iYear > 9999) {\n\t\t\tiYear = 9999;\n\t\t\tiMonth = 12;\n\t\t}\n\t\trestde.setYear(Integer.toString(iYear));\n\t\trestde.setMonth(Integer.toString(iMonth));\n\n\t\tcal.set(iYear, iMonth - 1, 1);\n\n\t\trestde.setStartWeekMonth(cal.get(Calendar.DAY_OF_WEEK));\n\t\trestde.setLastDayMonth(cal.getActualMaximum(Calendar.DATE));\n\n\t\tList<EgovMap> resultCalInfoList = restdeManageService.selectAdministRestdePopup(restde);\n\n\t\tmodel.addAttribute(\"resultList\", resultCalInfoList);\n\n\t\treturn \"egovframework/com/sym/cal/EgovAdministCalendar\";\n\t}\n\n\t/**\n\t * 일반달력 일간\n\t * \n\t * @param restde\n\t * @param model",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovCalRestdeManageController#callAdministCalPopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/EgovAdministCalPopup.do",
+      "line": 259,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/EgovAdministCalPopup.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#selectAdministDayCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/EgovAdministDayCalendar.do",
+      "line": 823,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 823,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministDayCalendar.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/EgovAdministDayCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovAdministDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovAdministDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#selectAdministMonthCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/EgovAdministMonthCalendar.do",
+      "line": 1067,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 1067,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministMonthCalendar.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/EgovAdministMonthCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovAdministMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovAdministMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#selectAdministWeekCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/EgovAdministWeekCalendar.do",
+      "line": 898,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 898,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministWeekCalendar.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/EgovAdministWeekCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovAdministWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovAdministWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#selectAdministYearCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/EgovAdministYearCalendar.do",
+      "line": 1130,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 1130,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministYearCalendar.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/EgovAdministYearCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovAdministYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovAdministYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#callNormalCalPopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/EgovNormalCalPopup.do",
+      "line": 188,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 188,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovNormalCalPopup.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/EgovNormalCalPopup.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#selectNormalDayCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/EgovNormalDayCalendar.do",
+      "line": 332,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 332,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovNormalDayCalendar.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/EgovNormalDayCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovNormalDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovNormalDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#selectNormalMonthCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/EgovNormalMonthCalendar.do",
+      "line": 574,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 574,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovNormalMonthCalendar.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/EgovNormalMonthCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovNormalMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovNormalMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#selectNormalWeekCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/EgovNormalWeekCalendar.do",
+      "line": 405,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 405,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovNormalWeekCalendar.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/EgovNormalWeekCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovNormalWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovNormalWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#selectNormalYearCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/EgovNormalYearCalendar.do",
+      "line": 637,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 637,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovNormalYearCalendar.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/EgovNormalYearCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovNormalYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovNormalYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#selectRestdeDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/EgovRestdeDetail.do",
+      "line": 1380,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 1380,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovRestdeDetail.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/EgovRestdeDetail.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovRestdeDetail.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#selectRestdeList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/EgovRestdeList.do",
+      "line": 1399,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 1399,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovRestdeList.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/EgovRestdeList.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovRestdeList.do:src/main/java/egovframework/com/sym/cal/service/RestdeVO.java",
+        "step:ANY /sym/cal/EgovRestdeList.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#deleteRestde",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/EgovRestdeRemove.do",
+      "line": 1316,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 1316,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovRestdeRemove.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/EgovRestdeRemove.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovRestdeRemove.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#selectAdministRestdePopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/EgovselectAdministCalendar.do",
+      "line": 272,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 272,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovselectAdministCalendar.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/EgovselectAdministCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovselectAdministCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovselectAdministCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#selectNormalRestdePopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/EgovselectNormalCalendar.do",
+      "line": 201,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 201,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovselectNormalCalendar.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/EgovselectNormalCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovselectNormalCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovselectNormalCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#callCal",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/callCal.do",
+      "line": 89,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 89,
+        "snippet": "@RequestMapping(value = \"/sym/cal/callCal.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/callCal.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/callCal.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#callCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:ANY /sym/cal/callCalPopup.do",
+      "line": 76,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 76,
+        "snippet": "@RequestMapping(value = \"/sym/cal/callCalPopup.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/cal/callCalPopup.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#updateRestde",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:GET /sym/cal/EgovRestdeModifyView.do",
+      "line": 1435,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 1435,
+        "snippet": "@GetMapping(\"/sym/cal/EgovRestdeModifyView.do\")"
+      },
+      "stepIds": [
+        "step:GET /sym/cal/EgovRestdeModifyView.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:GET /sym/cal/EgovRestdeModifyView.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "step:GET /sym/cal/EgovRestdeModifyView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:GET /sym/cal/EgovRestdeModifyView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:GET /sym/cal/EgovRestdeModifyView.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:GET /sym/cal/EgovRestdeModifyView.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#insertRestde",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:GET /sym/cal/EgovRestdeRegistView.do",
+      "line": 1331,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 1331,
+        "snippet": "@GetMapping(\"/sym/cal/EgovRestdeRegistView.do\")"
+      },
+      "stepIds": [
+        "step:GET /sym/cal/EgovRestdeRegistView.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:GET /sym/cal/EgovRestdeRegistView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:GET /sym/cal/EgovRestdeRegistView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:GET /sym/cal/EgovRestdeRegistView.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:GET /sym/cal/EgovRestdeRegistView.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:GET /sym/cal/EgovRestdeRegistView.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCalRestdeManageController#updateRestde",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "flowId": "flow:POST /sym/cal/EgovRestdeModify.do",
+      "line": 1459,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 1459,
+        "snippet": "@PostMapping(\"/sym/cal/EgovRestdeModify.do\")"
+      },
+      "stepIds": [
+        "step:POST /sym/cal/EgovRestdeModify.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:POST /sym/cal/EgovRestdeModify.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "step:POST /sym/cal/EgovRestdeModify.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /sym/cal/EgovRestdeModify.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /sym/cal/EgovRestdeModify.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /sym/cal/EgovRestdeModify.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "header": {
+    "flowIndex": [
+      {
+        "entryPoint": "EgovCalRestdeManageController#callAdministCalPopup",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/EgovAdministCalPopup.do",
+        "line": 259,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 259,
+          "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#selectAdministDayCalendar",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/EgovAdministDayCalendar.do",
+        "line": 823,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 823,
+          "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministDayCalendar.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#selectAdministMonthCalendar",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/EgovAdministMonthCalendar.do",
+        "line": 1067,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 1067,
+          "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministMonthCalendar.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#selectAdministWeekCalendar",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/EgovAdministWeekCalendar.do",
+        "line": 898,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 898,
+          "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministWeekCalendar.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#selectAdministYearCalendar",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/EgovAdministYearCalendar.do",
+        "line": 1130,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 1130,
+          "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministYearCalendar.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#callNormalCalPopup",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/EgovNormalCalPopup.do",
+        "line": 188,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 188,
+          "snippet": "@RequestMapping(value = \"/sym/cal/EgovNormalCalPopup.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#selectNormalDayCalendar",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/EgovNormalDayCalendar.do",
+        "line": 332,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 332,
+          "snippet": "@RequestMapping(value = \"/sym/cal/EgovNormalDayCalendar.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#selectNormalMonthCalendar",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/EgovNormalMonthCalendar.do",
+        "line": 574,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 574,
+          "snippet": "@RequestMapping(value = \"/sym/cal/EgovNormalMonthCalendar.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#selectNormalWeekCalendar",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/EgovNormalWeekCalendar.do",
+        "line": 405,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 405,
+          "snippet": "@RequestMapping(value = \"/sym/cal/EgovNormalWeekCalendar.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#selectNormalYearCalendar",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/EgovNormalYearCalendar.do",
+        "line": 637,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 637,
+          "snippet": "@RequestMapping(value = \"/sym/cal/EgovNormalYearCalendar.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#selectRestdeDetail",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/EgovRestdeDetail.do",
+        "line": 1380,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 1380,
+          "snippet": "@RequestMapping(value = \"/sym/cal/EgovRestdeDetail.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#selectRestdeList",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/EgovRestdeList.do",
+        "line": 1399,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 1399,
+          "snippet": "@RequestMapping(value = \"/sym/cal/EgovRestdeList.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#deleteRestde",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/EgovRestdeRemove.do",
+        "line": 1316,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 1316,
+          "snippet": "@RequestMapping(value = \"/sym/cal/EgovRestdeRemove.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#selectAdministRestdePopup",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/EgovselectAdministCalendar.do",
+        "line": 272,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 272,
+          "snippet": "@RequestMapping(value = \"/sym/cal/EgovselectAdministCalendar.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#selectNormalRestdePopup",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/EgovselectNormalCalendar.do",
+        "line": 201,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 201,
+          "snippet": "@RequestMapping(value = \"/sym/cal/EgovselectNormalCalendar.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#callCal",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/callCal.do",
+        "line": 89,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 89,
+          "snippet": "@RequestMapping(value = \"/sym/cal/callCal.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#callCalendar",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:ANY /sym/cal/callCalPopup.do",
+        "line": 76,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 76,
+          "snippet": "@RequestMapping(value = \"/sym/cal/callCalPopup.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#updateRestde",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:GET /sym/cal/EgovRestdeModifyView.do",
+        "line": 1435,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 1435,
+          "snippet": "@GetMapping(\"/sym/cal/EgovRestdeModifyView.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#insertRestde",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:GET /sym/cal/EgovRestdeRegistView.do",
+        "line": 1331,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 1331,
+          "snippet": "@GetMapping(\"/sym/cal/EgovRestdeRegistView.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#updateRestde",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:POST /sym/cal/EgovRestdeModify.do",
+        "line": 1459,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 1459,
+          "snippet": "@PostMapping(\"/sym/cal/EgovRestdeModify.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovCalRestdeManageController#insertRestde",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "flowId": "flow:POST /sym/cal/EgovRestdeRegist.do",
+        "line": 1351,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+          "line": 1351,
+          "snippet": "@PostMapping(value = \"/sym/cal/EgovRestdeRegist.do\")"
+        }
+      }
+    ]
+  },
+  "isHeaderChunk": true,
+  "key": "sym.cal",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/EgovAdministCalPopup.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:ANY /sym/cal/EgovAdministDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "stepId": "step:ANY /sym/cal/EgovAdministDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/EgovAdministDayCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:ANY /sym/cal/EgovAdministMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "stepId": "step:ANY /sym/cal/EgovAdministMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/EgovAdministMonthCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:ANY /sym/cal/EgovAdministWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "stepId": "step:ANY /sym/cal/EgovAdministWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/EgovAdministWeekCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:ANY /sym/cal/EgovAdministYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "stepId": "step:ANY /sym/cal/EgovAdministYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/EgovAdministYearCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/EgovNormalCalPopup.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:ANY /sym/cal/EgovNormalDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "stepId": "step:ANY /sym/cal/EgovNormalDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/EgovNormalDayCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:ANY /sym/cal/EgovNormalMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "stepId": "step:ANY /sym/cal/EgovNormalMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/EgovNormalMonthCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:ANY /sym/cal/EgovNormalWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "stepId": "step:ANY /sym/cal/EgovNormalWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/EgovNormalWeekCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:ANY /sym/cal/EgovNormalYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "stepId": "step:ANY /sym/cal/EgovNormalYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/EgovNormalYearCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:ANY /sym/cal/EgovRestdeDetail.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/EgovRestdeDetail.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:ANY /sym/cal/EgovRestdeList.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/RestdeVO.java",
+        "line": 29,
+        "snippet": "public class RestdeVO extends Restde implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/RestdeVO.java",
+      "stepId": "step:ANY /sym/cal/EgovRestdeList.do:src/main/java/egovframework/com/sym/cal/service/RestdeVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/EgovRestdeList.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:ANY /sym/cal/EgovRestdeRemove.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/EgovRestdeRemove.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:ANY /sym/cal/EgovselectAdministCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "stepId": "step:ANY /sym/cal/EgovselectAdministCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/EgovselectAdministCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:ANY /sym/cal/EgovselectNormalCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "stepId": "step:ANY /sym/cal/EgovselectNormalCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/EgovselectNormalCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "stepId": "step:ANY /sym/cal/callCal.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/callCal.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:ANY /sym/cal/callCalPopup.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:GET /sym/cal/EgovRestdeModifyView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:GET /sym/cal/EgovRestdeModifyView.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:GET /sym/cal/EgovRestdeModifyView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:GET /sym/cal/EgovRestdeModifyView.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "stepId": "step:GET /sym/cal/EgovRestdeModifyView.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:GET /sym/cal/EgovRestdeModifyView.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:GET /sym/cal/EgovRestdeRegistView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:GET /sym/cal/EgovRestdeRegistView.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:GET /sym/cal/EgovRestdeRegistView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:GET /sym/cal/EgovRestdeRegistView.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "stepId": "step:GET /sym/cal/EgovRestdeRegistView.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:GET /sym/cal/EgovRestdeRegistView.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:POST /sym/cal/EgovRestdeModify.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /sym/cal/EgovRestdeModify.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:POST /sym/cal/EgovRestdeModify.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "stepId": "step:POST /sym/cal/EgovRestdeModify.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "stepId": "step:POST /sym/cal/EgovRestdeModify.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepId": "step:POST /sym/cal/EgovRestdeModify.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+    }
+  ]
+}

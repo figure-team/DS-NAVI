@@ -1,0 +1,310 @@
+{
+  "domainId": "domain:utl.wed",
+  "files": [
+    {
+      "className": "EgovMessageSource",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovMessageSource.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이문준          최초 생성\n *   2017.07.21  장동한 \t\t\targs, locale 설정\n *\n * </pre>\n */\n\npublic class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {\n\n\tprivate ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;\n\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @param reloadableResourceBundleMessageSource - resource MessageSource\n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic void setReloadableResourceBundleMessageSource(ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource) {\n\t\tthis.reloadableResourceBundleMessageSource = reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic ReloadableResourceBundleMessageSource getReloadableResourceBundleMessageSource() {\n\t\treturn reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, locale);\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @return String\n\t */\t\n\tpublic String getMessageArgs(String code, Object[] args) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, locale);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovWebUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovWebUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "slice": {
+        "endLine": 94,
+        "startLine": 15,
+        "text": " *\t2017-02-07   이정은      시큐어코딩(ES) - 시큐어코딩 경로 조작 및 자원 삽입[CWE-22, CWE-23, CWE-95, CWE-99]\n *  2018.08.17   신용호      filePathBlackList 수정\n *  2018.10.10   신용호      . => \\\\.으로 수정\n *  2022.05.10   정진오      clearXSS() 메소드 추가\n *  2022.06.09   김장하      NSR 보안조치 (removeOSCmdRisk 함수에 윈도우 다중 명령 실행 키워드 추가)\n *  2023.08.10   신용호      removeLDAPInjectionRisk() 오류 수정\n *  2024.12.04   신용호      filePathBlackList() basePath 추가\n * </pre>\n */\n\npublic class EgovWebUtil {\n\tpublic static String clearXSSMinimum(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\"\", \"&#34;\");\n\t\treturnValue = returnValue.replaceAll(\"\\'\", \"&#39;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSSMaximum(String value) {\n\t\tString returnValue = value;\n\t\treturnValue = clearXSSMinimum(returnValue);\n\n\t\treturnValue = returnValue.replace(\"%00\", \"\");\n\n\t\treturnValue = returnValue.replaceAll(\"%\", \"&#37;\");\n\n\t\t// \\\\. => .\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\\\\\\\\\", \"\"); // ..\\\n\t\treturnValue = returnValue.replaceAll(\"\\\\./\", \"\"); // ./\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSS(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3C\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3E\", \"&gt;\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String filePathBlackList(String value) {\n\t\tString returnValue = value;\n\t\tif (returnValue == null || returnValue.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\t/**\n\t * 파일경로 보안취약점 조치\n\t * # 주의사항\n\t * 1. basePath는 반드시 지정해야 한다.\n\t * 2. basePath는 ROOT Path \"/\" 사용 금지 한다.",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovFileUploadUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 36,
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+      "slice": {
+        "endLine": 105,
+        "startLine": 26,
+        "text": " *  2019.12.06   신용호            checkFileExtension(), checkFileMaxSize() 추가\n *  2020.08.05   신용호            uploadFilesExt Parameter 수정\n *  2021.02.16   신용호            WebUtils.getNativeRequest(request,MultipartHttpServletRequest.class);\n *  2022.11.11   김혜준            시큐어코딩 처리\n *\n * @author 공통컴포넌트 개발팀 한성곤\n * @since 2009.08.26\n * @version 1.0\n * @see\n */\npublic class EgovFileUploadUtil extends EgovFormBasedFileUtil {\n\t/**\n\t * 파일을 Upload 처리한다.\n\t *\n\t * @param request\n\t * @param where\n\t * @param maxFileSize\n\t * @return\n\t * @throws Exception\n\t */\n\tpublic static List<EgovFormBasedFileVo> uploadFiles(HttpServletRequest request, String where, long maxFileSize) throws Exception {\n\t\tList<EgovFormBasedFileVo> list = new ArrayList<>();\n\t\tMultipartHttpServletRequest mptRequest = WebUtils.getNativeRequest(request, MultipartHttpServletRequest.class);\n\n\t\tif (mptRequest != null) {//2022.01 Possible null pointer dereference due to return value of called method 조치\n\t\t\tIterator<?> fileIter = mptRequest.getFileNames();\n\n\t\t\twhile (fileIter.hasNext()) {\n\t\t\t\tMultipartFile mFile = mptRequest.getFile((String)fileIter.next());\n\n\t\t\t\t// 2022.11.11 김혜준 시큐어코딩 처리\n\t\t\t\tif (mFile == null) {\n\t\t\t\t\tcontinue;\n\t\t\t\t}\n\n\t\t\t\tEgovFormBasedFileVo vo = new EgovFormBasedFileVo();\n\n\t\t\t\tString tmp = mFile.getOriginalFilename();\n\n\t\t\t\t//2022.01 Possible null pointer dereference due to return value of called method\n\t\t\t\tif (StringUtils.isNotEmpty(tmp)) {\n\n\t\t\t\t\tif (tmp.lastIndexOf(\"\\\\\") >= 0) {\n\t\t\t\t\t\ttmp = tmp.substring(tmp.lastIndexOf(\"\\\\\") + 1);\n\t\t\t\t\t}\n\n\t\t\t\t\tvo.setFileName(tmp);\n\t\t\t\t\tvo.setContentType(mFile.getContentType());\n\t\t\t\t\tvo.setServerSubPath(getTodayString());\n\t\t\t\t\tvo.setPhysicalName(getPhysicalFileName());\n\t\t\t\t\tvo.setSize(mFile.getSize());\n\n\t\t\t\t\tif (tmp.lastIndexOf(\".\") >= 0) {\n\t\t\t\t\t\tvo.setPhysicalName(vo.getPhysicalName()); // 2012.11 KISA 보안조치\n\t\t\t\t\t}\n\n\t\t\t\t\tif (mFile.getSize() > 0) {\n\t\t\t\t\t\tInputStream is = null;\n\n\t\t\t\t\t\ttry {\n\t\t\t\t\t\t\tis = mFile.getInputStream();\n\t\t\t\t\t\t\tsaveFile(is, new File(EgovWebUtil.filePathBlackList(\n\t\t\t\t\t\t\t\twhere + SEPERATOR + vo.getServerSubPath() + SEPERATOR + vo.getPhysicalName())));\n\t\t\t\t\t\t} finally {\n\t\t\t\t\t\t\tif (is != null) {\n\t\t\t\t\t\t\t\tis.close();\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t\tlist.add(vo);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\treturn list;\n\t}\n\n\t/**\n\t * 파일을 Upload(확장명 저장 및 확장자 제한) 처리한다.\n\t *",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovFormBasedFileUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 45,
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+      "slice": {
+        "endLine": 114,
+        "startLine": 35,
+        "text": " *   2009.08.26  한성곤          최초 생성\n *   2017.03.03  조성원          시큐어코딩(ES)-부적절한 예외 처리[CWE-253, CWE-440, CWE-754]\n *   2019.12.09  신용호          KISA 보안약점 조치 (위험한 형식 파일 업로드) : uploadFiles 삭제  => EgovFileUploadUtil.uploadFilesExt(확장자 기록) 대체\n *   2023.06.27  김혜준          NSR 보안조치 (CKEditor 이미지 보기 기능의 스크립트 실행 취약점)\n *   2025.09.01  이백행          2025년 컨트리뷰션 PMD로 소프트웨어 보안약점 진단하고 제거하기-CloseResource(부적절한 자원 해제)\n *   2025.09.01  이백행          2025년 컨트리뷰션 PMD로 소프트웨어 보안약점 진단하고 제거하기-AssignmentInOperand(피연산자내에 할당문이 사용됨. 해당 코드를 복잡하고 가독성이 떨어지게 만듬)\n *   2025.09.01  이백행          2025년 컨트리뷰션 PMD로 소프트웨어 보안약점 진단하고 제거하기-AvoidReassigningParameters(넘겨받는 메소드 parameter 값을 직접 변경하는 코드 탐지)\n *\n *      </pre>\n */\npublic class EgovFormBasedFileUtil {\n\t/** Buffer size */\n\tpublic static final int BUFFER_SIZE = 8192;\n\n\tpublic static final String SEPERATOR = File.separator;\n\n\tprivate static final Logger LOGGER = LoggerFactory.getLogger(EgovFormBasedFileUtil.class);\n\n\t/**\n\t * 오늘 날짜 문자열 취득. ex) 20090101\n\t *\n\t * @return\n\t */\n\tpublic static String getTodayString() {\n\t\tSimpleDateFormat format = new SimpleDateFormat(\"yyyyMMdd\", Locale.getDefault());\n\n\t\treturn format.format(new Date());\n\t}\n\n\t/**\n\t * 물리적 파일명 생성.\n\t *\n\t * @return\n\t */\n\tpublic static String getPhysicalFileName() {\n\t\treturn EgovFormBasedUUID.randomUUID().toString().replaceAll(\"-\", \"\").toUpperCase();\n\t}\n\n\t/**\n\t * 파일명 변환.\n\t *\n\t * @param filename String\n\t * @return\n\t * @throws Exception\n\t */\n\tprotected static String convert(String filename) throws Exception {\n\t\t// return java.net.URLEncoder.encode(filename, \"utf-8\");\n\t\treturn filename;\n\t}\n\n\t/**\n\t * Stream으로부터 파일을 저장함.\n\t *\n\t * @param is   InputStream\n\t * @param file File\n\t * @throws IOException\n\t */\n\tpublic static long saveFile(InputStream is, File file) throws IOException {\n\t\t// KISA 보안약점 조치 (2018-10-29, 윤창원)\n\t\tif (file.getParentFile() == null) {\n\t\t\tLOGGER.debug(\"file.getParentFile() is null\");\n\t\t\tthrow new RuntimeException(\"file.getParentFile() is null\");\n\t\t}\n\n\t\t// 디렉토리 생성\n\t\tif (!file.getParentFile().exists()) {\n\t\t\t// 2017.03.03 조성원 시큐어코딩(ES)-부적절한 예외 처리[CWE-253, CWE-440, CWE-754]\n\t\t\tif (file.getParentFile().mkdirs()) {\n\t\t\t\tLOGGER.debug(\"[file.mkdirs] file : Directory Creation Success\");\n\t\t\t} else {\n\t\t\t\tLOGGER.error(\"[file.mkdirs] file : Directory Creation Fail\");\n\t\t\t}\n\t\t}\n\n\t\treturn FileCopyUtils.copy(is, new FileOutputStream(file));\n\t}\n\n\t/**\n\t * 파일을 Upload 처리한다. (삭제) EgovFileUploadUtil.uploadFilesExt(확장자 확인) 대체\n\t *",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovFormBasedFileVo",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java — java 파일",
+        "tags": []
+      },
+      "line": 24,
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+      "slice": {
+        "endLine": 39,
+        "startLine": 14,
+        "text": " *     -------          --------        ---------------------------\n *   2009.08.26       한성곤                  최초 생성\n *\n * @author 공통컴포넌트 개발팀 한성곤\n * @since 2009.08.26\n * @version 1.0\n * @see\n *\n *  Copyright (C) 2008 by MOPAS  All rights reserved.\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class EgovFormBasedFileVo implements Serializable {\n    /** 파일명 */\n    private String fileName = \"\";\n    /** ContextType */\n    private String contentType = \"\";\n    /** 하위 디렉토리 지정 */\n    private String serverSubPath = \"\";\n    /** 물리적 파일명 */\n    private String physicalName = \"\";\n    /** 파일 사이즈 */\n    private long size = 0L;\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovStringUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 43,
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "slice": {
+        "endLine": 112,
+        "startLine": 33,
+        "text": " * See the License for the specific language governing permissions and\n * limitations under the License.\n */\nimport java.io.UnsupportedEncodingException;\nimport java.math.BigDecimal;\nimport java.security.SecureRandom;\nimport java.sql.Timestamp;\nimport java.text.SimpleDateFormat;\nimport java.util.Locale;\n\npublic class EgovStringUtil {\n\t/**\n\t * 빈 문자열 <code>\"\"</code>.\n\t */\n\tpublic static final String EMPTY = \"\";\n\n\t// 221116\t김혜준\t2022 시큐어코딩 조치\n\tprivate static SecureRandom rnd = new SecureRandom();\n\n\t/**\n\t * <p>Padding을 할 수 있는 최대 수치</p>\n\t */\n\t// private static final int PAD_LIMIT = 8192;\n\n\t/**\n\t * <p>An array of <code>String</code>s used for padding.</p>\n\t * <p>Used for efficient space padding. The length of each String expands as needed.</p>\n\t */\n\t/*\n\tprivate static final String[] PADDING = new String[Character.MAX_VALUE];\n\n\tstatic {\n\t\t// space padding is most common, start with 64 chars\n\t\tPADDING[32] = \"                                                                \";\n\t}\n\t */\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 지정한길이에다가 해당 문자열을 붙여주는 메서드.\n\t * @param source 원본 문자열 배열\n\t * @param output 더할문자열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, String output, int slength) {\n\t\tString returnVal = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\treturnVal = source.substring(0, slength) + output;\n\t\t\t} else {\n\t\t\t\treturnVal = source;\n\t\t\t}\n\t\t}\n\t\treturn returnVal;\n\t}\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 해당 문자열을 삭제하는 메서드\n\t * @param source 원본 문자열 배열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, int slength) {\n\t\tString result = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\tresult = source.substring(0, slength);\n\t\t\t} else {\n\t\t\t\tresult = source;\n\t\t\t}\n\t\t}\n\t\treturn result;\n\t}\n\n\t/**\n\t * <p>\n\t * String이 비었거나(\"\") 혹은 null 인지 검증한다.\n\t * </p>\n\t *\n\t * <pre>",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovWebEditorImageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java — java 파일",
+        "tags": []
+      },
+      "line": 161,
+      "relPath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "slice": {
+        "endLine": 222,
+        "startLine": 151,
+        "text": "\t\t}\n\t}\n\n\t/**\n\t * 이미지 view를 제공한다.\n\t *\n\t * @param request\n\t * @param response\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/utl/web/imageSrc.do\",method = RequestMethod.GET)\n\tpublic void download(HttpServletRequest request, HttpServletResponse response) throws Exception {\n\t\t//2017.12.12 - 출력 모듈 경로 변경 취약점 조치\n\t\t//KISA 보안약점 조치 (2018-10-29, 윤창원)\n\t\tString subPath = this.decrypt(EgovStringUtil.isNullToString(request.getParameter(\"path\")));\n\t\tString physical = this.decrypt(EgovStringUtil.isNullToString(request.getParameter(\"physical\")));\n\t\tString mimeType = this.decrypt(EgovStringUtil.isNullToString(request.getParameter(\"contentType\")));\n\n\t\tif ((subPath.indexOf(\"..\") >= 0) || (physical.indexOf(\"..\") >= 0) ) {\n\t\t\tthrow new Exception(\"Security Exception - illegal url called.\");\n\t\t}\n\n\t\tString ext = \"\";\n\t\tif ( physical.lastIndexOf(\".\") > 0 ) {\n\t\t\text = physical.substring(physical.lastIndexOf(\".\") + 1,physical.length()).toLowerCase();\n\t\t}\n\t\tif ( ext == null ) {\n\t\t\tthrow new FileNotFoundException();\n\t\t}\n\n\t\tif ( extWhiteList.indexOf(ext) >= 0 ) {\n\t\t\tEgovFormBasedFileUtil.viewFile(response, uploadDir, subPath, physical, mimeType);\n\t\t} else {\n\t\t\tthrow new FileNotFoundException();\n\t\t}\n\t}\n\n\t/**\n\t * 암호화\n\t *\n\t * @param encrypt\n\t * @return\n\t */\n\tprivate String encrypt(String encrypt) {\n\n\t\ttry {\n\t\t\treturn cryptoService.encrypt(encrypt); // Handles URLEncoding.\n\t\t\t//return cryptoService.encryptNone(encrypt); // Does not handle URLEncoding.\n\t\t} catch(IllegalArgumentException e) {\n\t\t\tLOGGER.error(\"[IllegalArgumentException] Try/Catch...usingParameters Running : \"+ e.getMessage());\n\t\t}\n\t\treturn encrypt;\n\t}\n\n\t/**\n\t * 복호화\n\t *\n\t * @param decrypt\n\t * @return\n\t */\n\tprivate String decrypt(String decrypt){\n\n\t\ttry {\n\t\t\t//return cryptoService.decrypt(decrypt); // Handles URLDecoding.\n\t\t\treturn cryptoService.decryptNone(decrypt); // Does not handle URLDecoding.\n\t\t} catch(IllegalArgumentException e) {\n\t\t\tLOGGER.error(\"[IllegalArgumentException] Try/Catch...usingParameters Running : \"+ e.getMessage());\n\t\t}\n\t\treturn decrypt;\n\t}\n\n}",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovWebEditorImageController#download",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "flowId": "flow:GET /utl/web/imageSrc.do",
+      "line": 161,
+      "stepIds": [
+        "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+        "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovWebEditorImageController#goInsertImage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "flowId": "flow:GET /utl/wed/insertImage.do",
+      "line": 82,
+      "stepIds": [
+        "step:GET /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovWebEditorImageController#imageUpload",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "flowId": "flow:POST /utl/wed/insertImage.do",
+      "line": 97,
+      "stepIds": [
+        "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+        "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+        "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovWebEditorImageController#imageUploadCk",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "flowId": "flow:POST /utl/wed/insertImageCk.do",
+      "line": 114,
+      "stepIds": [
+        "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+        "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+        "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "utl.wed",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "stepId": "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+      "stepId": "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "stepId": "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "stepId": "step:GET /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "stepId": "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+      "stepId": "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+      "stepId": "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "stepId": "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "stepId": "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+      "stepId": "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+      "stepId": "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "stepId": "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java"
+    }
+  ]
+}

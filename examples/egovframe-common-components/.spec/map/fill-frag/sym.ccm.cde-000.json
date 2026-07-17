@@ -1,0 +1,2220 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "sym.ccm.cde-000",
+  "domainId": "domain:sym.ccm.cde",
+  "header": {
+    "name": "공통상세코드 관리",
+    "summary": {
+      "text": "공통분류코드와 공통코드 아래에 놓이는 공통상세코드를 목록·상세로 조회하고 등록·수정·삭제하는 시스템 관리 업무이다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+          "line": 79,
+          "snippet": "\t@IncludedInfo(name = \"공통상세코드\", listUrl = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeList.do\", order = 970, gid = 60)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+          "line": 80,
+          "snippet": "\t@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeList.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+          "line": 25,
+          "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "공통상세코드는 분류코드와 코드 아이디로 식별되는 코드 항목이며, 조회·입력 시 검색조건과 페이지 정보를 함께 갖춘 정보 묶음으로 다뤄진다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+            "line": 28,
+            "snippet": "public class CmmnDetailCodeVO extends CmmnDetailCode implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+            "line": 33,
+            "snippet": "    private String searchCondition = \"\";"
+          }
+        ]
+      },
+      {
+        "text": "공통분류코드는 상세코드가 속할 분류를 나타내며 등록 화면의 선택 목록으로 제공된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+            "line": 27,
+            "snippet": "public class CmmnClCodeVO extends CmmnClCode implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 168,
+            "snippet": "\t\tList<CmmnClCodeVO> clCodeList = cmmnClCodeManageService.selectCmmnClCodeList(searchClCodeVO);"
+          }
+        ]
+      },
+      {
+        "text": "공통코드는 선택한 분류에 속한 상위 코드로, 등록 화면에서 분류코드를 검색조건으로 조회된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cca/service/CmmnCodeVO.java",
+            "line": 27,
+            "snippet": "public class CmmnCodeVO extends CmmnCode implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 179,
+            "snippet": "\t\t\tList<CmmnCodeVO> codeList = cmmnCodeManageService.selectCmmnCodeList(searchCodeVO);"
+          }
+        ]
+      },
+      {
+        "text": "로그인 사용자는 상세코드 등록·수정 시 등록자·수정자로 기록되는 고유아이디를 가진 사용자 정보이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "\tprivate String uniqId;"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "등록 요청은 입력값 검증에 실패하면 저장하지 않고 분류·코드 선택 목록을 다시 준비해 등록 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 200,
+            "snippet": "\t\tif (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 202,
+            "snippet": "\t\t\taddCodeSelectLists(cmmnDetailCodeVO.getClCode(), model);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 204,
+            "snippet": "\t\t\treturn \"egovframework/com/sym/ccm/cde/EgovCcmCmmnDetailCodeRegist\";"
+          }
+        ]
+      },
+      {
+        "text": "등록 시 같은 코드가 이미 있으면 중복 안내 메시지를 표시하고 등록을 중단한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 210,
+            "snippet": "\t\t\tif (vo != null) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 211,
+            "snippet": "\t\t\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"comSymCcmCde.validate.codeCheck\"));"
+          }
+        ]
+      },
+      {
+        "text": "등록 시 최초 등록자는 로그인 사용자의 고유아이디로 기록하며, 사용자 정보가 없으면 빈 값으로 저장한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 219,
+            "snippet": "\t\tcmmnDetailCodeVO.setFrstRegisterId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 220,
+            "snippet": "\t\tcmmnDetailCodeManageService.insertCmmnDetailCode(cmmnDetailCodeVO);"
+          }
+        ]
+      },
+      {
+        "text": "목록 조회는 설정값에서 읽은 페이지 단위와 페이지 크기를 적용해 페이징 처리하고 총 건수를 함께 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 85,
+            "snippet": "\t\tsearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 86,
+            "snippet": "\t\tsearchVO.setPageSize(propertiesService.getInt(\"pageSize\"));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 101,
+            "snippet": "\t\tint totCnt = cmmnDetailCodeManageService.selectCmmnDetailCodeListTotCnt(searchVO);"
+          }
+        ]
+      },
+      {
+        "text": "등록·삭제 처리 후에는 기존 검색조건과 페이지 번호를 유지한 채 목록 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 140,
+            "snippet": "\t\tmodel.addAttribute(\"searchCondition\", cmmnDetailCodeVO.getSearchCondition());"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 142,
+            "snippet": "\t\tmodel.addAttribute(\"pageIndex\", cmmnDetailCodeVO.getPageIndex());"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 144,
+            "snippet": "\t\treturn \"redirect:/sym/ccm/cde/SelectCcmCmmnDetailCodeList.do\";"
+          }
+        ]
+      },
+      {
+        "text": "등록 화면의 코드 선택 목록은 분류코드가 지정된 경우에만 해당 분류의 공통코드 목록을 함께 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 171,
+            "snippet": "\t\tif (!\"\".equals(clCode)) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 179,
+            "snippet": "\t\t\tList<CmmnCodeVO> codeList = cmmnCodeManageService.selectCmmnCodeList(searchCodeVO);"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "공통분류코드 관리 업무의 분류코드 목록 조회를 사용해 등록 화면의 분류 선택 항목을 구성한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/EgovCcmCmmnClCodeManageService.java",
+            "line": 40,
+            "snippet": "\tList<CmmnClCodeVO> selectCmmnClCodeList(CmmnClCodeVO searchVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 168,
+            "snippet": "\t\tList<CmmnClCodeVO> clCodeList = cmmnClCodeManageService.selectCmmnClCodeList(searchClCodeVO);"
+          }
+        ]
+      },
+      {
+        "text": "공통코드 관리 업무의 코드 목록 조회를 사용해 선택한 분류에 속한 코드 선택 항목을 구성한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cca/service/EgovCcmCmmnCodeManageService.java",
+            "line": 41,
+            "snippet": "\tList<CmmnCodeVO> selectCmmnCodeList(CmmnCodeVO searchVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 179,
+            "snippet": "\t\t\tList<CmmnCodeVO> codeList = cmmnCodeManageService.selectCmmnCodeList(searchCodeVO);"
+          }
+        ]
+      },
+      {
+        "text": "인증 사용자 확인 기능을 통해 로그인 사용자를 얻어 등록자·수정자 정보로 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "\tpublic static Object getAuthenticatedUser() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 198,
+            "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          }
+        ]
+      },
+      {
+        "text": "공통 메시지 자원 기능을 통해 코드 중복 등 업무 오류 안내 문구를 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 211,
+            "snippet": "\t\t\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"comSymCcmCde.validate.codeCheck\"));"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "공통상세코드 관리",
+        "nodes": [
+          {
+            "id": "n_start",
+            "kind": "start",
+            "label": "시작"
+          },
+          {
+            "id": "n_list",
+            "kind": "activity",
+            "label": "공통상세코드 목록 조회",
+            "flowRef": "flow:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 80,
+                "snippet": "\t@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeList.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 98,
+                "snippet": "\t\tList<CmmnDetailCodeVO> resultList = cmmnDetailCodeManageService.selectCmmnDetailCodeList(searchVO);"
+              }
+            ]
+          },
+          {
+            "id": "n_detail",
+            "kind": "activity",
+            "label": "상세코드 내용 확인",
+            "flowRef": "flow:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 117,
+                "snippet": "\t@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 120,
+                "snippet": "\t\tCmmnDetailCode vo = cmmnDetailCodeManageService.selectCmmnDetailCodeDetail(cmmnDetailCodeVO);"
+              }
+            ]
+          },
+          {
+            "id": "n_regist_view",
+            "kind": "activity",
+            "label": "등록 화면 진입",
+            "flowRef": "flow:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 155,
+                "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCodeView.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 160,
+                "snippet": "\t\taddCodeSelectLists(cmmnCodeVO.getClCode(), model);"
+              }
+            ]
+          },
+          {
+            "id": "n_valid",
+            "kind": "decision",
+            "label": "입력값 검증 통과 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 200,
+                "snippet": "\t\tif (bindingResult.hasErrors()) {"
+              }
+            ]
+          },
+          {
+            "id": "n_dup",
+            "kind": "decision",
+            "label": "동일 코드 존재 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 210,
+                "snippet": "\t\t\tif (vo != null) {"
+              }
+            ]
+          },
+          {
+            "id": "n_regist",
+            "kind": "activity",
+            "label": "공통상세코드 등록",
+            "flowRef": "flow:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 220,
+                "snippet": "\t\tcmmnDetailCodeManageService.insertCmmnDetailCode(cmmnDetailCodeVO);"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 219,
+                "snippet": "\t\tcmmnDetailCodeVO.setFrstRegisterId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());"
+              }
+            ]
+          },
+          {
+            "id": "n_updt_view",
+            "kind": "activity",
+            "label": "수정 화면 진입",
+            "flowRef": "flow:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 237,
+                "snippet": "\t@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 241,
+                "snippet": "\t\tCmmnDetailCode result = cmmnDetailCodeManageService.selectCmmnDetailCodeDetail(cmmnDetailCodeVO);"
+              }
+            ]
+          },
+          {
+            "id": "n_updt_valid",
+            "kind": "decision",
+            "label": "수정 입력값 검증 통과 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 262,
+                "snippet": "\t\tif (bindingResult.hasErrors()) {"
+              }
+            ]
+          },
+          {
+            "id": "n_updt",
+            "kind": "activity",
+            "label": "공통상세코드 수정",
+            "flowRef": "flow:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 256,
+                "snippet": "\t@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCode.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n_del",
+            "kind": "activity",
+            "label": "공통상세코드 삭제",
+            "flowRef": "flow:ANY /sym/ccm/cde/RemoveCcmCmmnDetailCode.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 135,
+                "snippet": "\t@RequestMapping(value = \"/sym/ccm/cde/RemoveCcmCmmnDetailCode.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+                "line": 138,
+                "snippet": "\t\tcmmnDetailCodeManageService.deleteCmmnDetailCode(cmmnDetailCodeVO);"
+              }
+            ]
+          },
+          {
+            "id": "n_end",
+            "kind": "end",
+            "label": "종료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "n_start",
+            "to": "n_list"
+          },
+          {
+            "from": "n_list",
+            "to": "n_detail"
+          },
+          {
+            "from": "n_list",
+            "to": "n_regist_view"
+          },
+          {
+            "from": "n_list",
+            "to": "n_del"
+          },
+          {
+            "from": "n_detail",
+            "to": "n_updt_view"
+          },
+          {
+            "from": "n_regist_view",
+            "to": "n_valid"
+          },
+          {
+            "from": "n_valid",
+            "to": "n_dup",
+            "label": "검증 통과"
+          },
+          {
+            "from": "n_valid",
+            "to": "n_regist_view",
+            "label": "검증 실패"
+          },
+          {
+            "from": "n_dup",
+            "to": "n_regist",
+            "label": "중복 없음"
+          },
+          {
+            "from": "n_dup",
+            "to": "n_regist_view",
+            "label": "중복 있음"
+          },
+          {
+            "from": "n_regist",
+            "to": "n_list"
+          },
+          {
+            "from": "n_updt_view",
+            "to": "n_updt_valid"
+          },
+          {
+            "from": "n_updt_valid",
+            "to": "n_updt",
+            "label": "검증 통과"
+          },
+          {
+            "from": "n_updt_valid",
+            "to": "n_updt_view",
+            "label": "검증 실패"
+          },
+          {
+            "from": "n_updt",
+            "to": "n_list"
+          },
+          {
+            "from": "n_del",
+            "to": "n_list"
+          },
+          {
+            "from": "n_list",
+            "to": "n_end"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do",
+      "name": "공통상세코드 등록",
+      "summary": {
+        "text": "입력값 검증과 코드 중복 확인을 거쳐 공통상세코드를 신규 등록하고 최초 등록자로 로그인 사용자를 기록한 뒤 목록 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 200,
+            "snippet": "\t\tif (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 210,
+            "snippet": "\t\t\tif (vo != null) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 220,
+            "snippet": "\t\tcmmnDetailCodeManageService.insertCmmnDetailCode(cmmnDetailCodeVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do",
+      "name": "공통상세코드 등록 화면 조회",
+      "summary": {
+        "text": "등록 화면 진입 시 분류코드 목록과 해당 분류의 공통코드 목록을 선택 항목으로 준비하여 등록 화면을 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 155,
+            "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCodeView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 160,
+            "snippet": "\t\taddCodeSelectLists(cmmnCodeVO.getClCode(), model);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 168,
+            "snippet": "\t\tList<CmmnClCodeVO> clCodeList = cmmnClCodeManageService.selectCmmnClCodeList(searchClCodeVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/cde/RemoveCcmCmmnDetailCode.do",
+      "name": "공통상세코드 삭제",
+      "summary": {
+        "text": "선택한 공통상세코드를 삭제하고 기존 검색조건을 유지한 채 목록 화면으로 되돌아간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 135,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/cde/RemoveCcmCmmnDetailCode.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 138,
+            "snippet": "\t\tcmmnDetailCodeManageService.deleteCmmnDetailCode(cmmnDetailCodeVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do",
+      "name": "공통상세코드 상세 조회",
+      "summary": {
+        "text": "선택한 공통상세코드 한 건의 상세 항목을 조회하여 상세 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 117,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 120,
+            "snippet": "\t\tCmmnDetailCode vo = cmmnDetailCodeManageService.selectCmmnDetailCodeDetail(cmmnDetailCodeVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeList.do",
+      "name": "공통상세코드 목록 조회",
+      "summary": {
+        "text": "검색조건과 페이지 정보를 받아 공통상세코드 목록과 총 건수를 조회하고 목록 화면에 결과와 페이징 정보를 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 80,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 98,
+            "snippet": "\t\tList<CmmnDetailCodeVO> resultList = cmmnDetailCodeManageService.selectCmmnDetailCodeList(searchVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 101,
+            "snippet": "\t\tint totCnt = cmmnDetailCodeManageService.selectCmmnDetailCodeListTotCnt(searchVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do",
+      "name": "공통상세코드 수정",
+      "summary": {
+        "text": "입력값 검증을 통과한 공통상세코드의 변경 내용을 반영하고 최종 수정자로 로그인 사용자를 기록한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 256,
+            "snippet": "@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCode.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 262,
+            "snippet": "\t\tif (bindingResult.hasErrors()) {"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do",
+      "name": "공통상세코드 수정 화면 조회",
+      "summary": {
+        "text": "수정 대상 공통상세코드의 현재 값을 조회하여 수정 화면에 채워 넣는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 237,
+            "snippet": "@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 241,
+            "snippet": "\t\tCmmnDetailCode result = cmmnDetailCodeManageService.selectCmmnDetailCodeDetail(cmmnDetailCodeVO);"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "공통상세코드 등록 처리에서 메시지 코드에 대응하는 안내 문구를 자원 파일에서 찾아 화면에 돌려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 등록 시 코드 중복 같은 업무 오류를 사용자에게 알릴 안내 문구를 메시지 코드로 조회해 준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 211,
+              "snippet": "\t\t\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"comSymCcmCde.validate.codeCheck\"));"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드를 받아 기본 지역 설정 기준으로 정의된 안내 문구를 찾아 돌려주며, 필요하면 매개변수와 지역을 함께 지정할 수 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "공통상세코드 등록 처리에서 로그인한 사용자의 아이디·이름·고유아이디 등 인증 정보를 담는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드를 등록·수정할 때 등록자와 수정자로 기록할 로그인 사용자 정보를 담는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 198,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디와 이름 등 필수 항목과 함께 사용자 고유아이디를 갖추며, 상세코드 등록·수정은 이 고유아이디를 등록자·수정자 값으로 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 219,
+              "snippet": "\t\tcmmnDetailCodeVO.setFrstRegisterId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "인증 사용자 조회 서비스",
+      "summary": {
+        "text": "공통상세코드 등록 처리에서 인증된 사용자 정보와 권한 목록, 인증 여부를 확인하는 서비스 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "현재 인증된 사용자와 그 권한, 인증 여부를 확인하는 통로를 제공하는 서비스 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 정보를 값 객체 형태로 돌려주고 인증 여부를 참·거짓으로 판정하는 업무를 정의한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 확인 도우미",
+      "summary": {
+        "text": "공통상세코드 등록 처리에서 인증 사용자 조회 기능을 감싸 인증된 사용자와 권한을 어디서든 꺼내 쓰게 해주는 도우미다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 등록·수정 처리에서 현재 로그인한 사용자를 꺼내오는 통로 역할을 하며, 인증 사용자 조회 서비스에 실제 확인을 위임한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 198,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 돌려주는 확인 수단을 갖추며 사용자가 없으면 등록자 값은 빈 값으로 처리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 219,
+              "snippet": "\t\tcmmnDetailCodeVO.setFrstRegisterId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+      "name": "공통분류코드 조회 정보",
+      "summary": {
+        "text": "공통상세코드 등록 처리에서 등록 화면의 분류코드 선택 목록을 조회할 때 쓰는 검색조건과 페이지 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+            "line": 27,
+            "snippet": "public class CmmnClCodeVO extends CmmnClCode implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 등록 화면에서 분류코드 선택 목록을 뽑을 때 검색조건을 전달하는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+              "line": 27,
+              "snippet": "public class CmmnClCodeVO extends CmmnClCode implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 166,
+              "snippet": "\t\tCmmnClCodeVO searchClCodeVO = new CmmnClCodeVO();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "검색조건·검색어와 현재 페이지·페이지 건수를 기본값으로 갖추어 분류코드 목록 조회 조건을 표현한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+              "line": 32,
+              "snippet": "    private String searchCondition = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+              "line": 35,
+              "snippet": "    private String searchKeyword = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+              "line": 41,
+              "snippet": "    private int pageIndex = 1;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+      "name": "공통상세코드 조회·입력 정보",
+      "summary": {
+        "text": "공통상세코드 등록 처리에서 검색조건·검색어·페이지 정보와 코드 입력값을 담아 화면과 서비스 사이를 오가는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+            "line": 28,
+            "snippet": "public class CmmnDetailCodeVO extends CmmnDetailCode implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 화면의 검색조건과 페이지 정보, 코드 입력값을 담아 화면과 관리 서비스 사이를 오가는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 28,
+              "snippet": "public class CmmnDetailCodeVO extends CmmnDetailCode implements Serializable {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "검색조건과 검색어를 빈 값으로 시작하고 현재 페이지는 1, 한 페이지 건수는 기본 10건으로 두어 목록 조회의 기본 상태를 정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 33,
+              "snippet": "    private String searchCondition = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 36,
+              "snippet": "    private String searchKeyword = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 42,
+              "snippet": "    private int pageIndex = 1;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+      "name": "공통상세코드 관리 서비스",
+      "summary": {
+        "text": "공통상세코드 등록 처리에서 공통상세코드의 총 건수·목록·상세 조회와 등록·수정·삭제 업무를 제공하는 서비스 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+            "line": 25,
+            "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드에 대한 조회와 등록·수정·삭제 업무를 한 곳에 모아 화면 계층에 제공하는 서비스 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 25,
+              "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "검색조건에 맞는 상세코드 목록과 총 건수를 조회하고, 코드 한 건의 상세 조회 및 등록·수정·삭제 업무를 각각의 작업으로 정의한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 39,
+              "snippet": "\tList<CmmnDetailCodeVO> selectCmmnDetailCodeList(CmmnDetailCodeVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 47,
+              "snippet": "\tCmmnDetailCode selectCmmnDetailCodeDetail(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 61,
+              "snippet": "\tvoid insertCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 68,
+              "snippet": "\tvoid updateCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 54,
+              "snippet": "\tvoid deleteCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "name": "공통상세코드 관리 화면 처리",
+      "summary": {
+        "text": "공통상세코드 등록 처리에서 공통상세코드의 목록·상세·등록·수정·삭제 요청을 받아 검증한 뒤 관리 서비스에 위임하고 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 등록 요청을 받아 화면 입력값을 담아 공통상세코드 관리 서비스에 처리를 위임하고, 결과에 따라 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 194,
+              "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "화면에서 넘어온 검색조건·페이지 정보와 코드 입력값을 값 객체로 받아 처리하며, 등록·수정 요청은 입력값 검증 결과를 먼저 확인하고 로그인 사용자 정보를 함께 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 195,
+              "snippet": "\tpublic String insertCmmnDetailCode(@Valid @ModelAttribute(\"cmmnDetailCodeVO\") CmmnDetailCodeVO cmmnDetailCodeVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 200,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 198,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/cca/service/CmmnCodeVO.java",
+      "name": "공통코드 조회 정보",
+      "summary": {
+        "text": "공통상세코드 등록 화면 조회 처리에서 등록 화면에서 선택한 분류에 속한 공통코드 목록을 조회할 때 쓰는 검색조건 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cca/service/CmmnCodeVO.java",
+            "line": 27,
+            "snippet": "public class CmmnCodeVO extends CmmnCode implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 155,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCodeView.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 등록 화면에서 선택한 분류에 속한 공통코드 목록을 뽑을 때 검색조건을 전달하는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cca/service/CmmnCodeVO.java",
+              "line": 27,
+              "snippet": "public class CmmnCodeVO extends CmmnCode implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 173,
+              "snippet": "\t\t\tCmmnCodeVO searchCodeVO = new CmmnCodeVO();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "검색조건과 검색어, 페이지 정보를 기본값으로 갖추며 등록 화면은 분류코드를 검색조건으로 지정해 코드 목록을 조회한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cca/service/CmmnCodeVO.java",
+              "line": 32,
+              "snippet": "    private String searchCondition = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cca/service/CmmnCodeVO.java",
+              "line": 35,
+              "snippet": "    private String searchKeyword = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 176,
+              "snippet": "\t\t\tsearchCodeVO.setSearchCondition(\"clCode\");"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/cca/service/EgovCcmCmmnCodeManageService.java",
+      "name": "공통코드 관리 서비스",
+      "summary": {
+        "text": "공통상세코드 등록 화면 조회 처리에서 공통코드의 목록·상세 조회와 등록·수정·삭제 업무를 제공하는 서비스 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cca/service/EgovCcmCmmnCodeManageService.java",
+            "line": 23,
+            "snippet": "public interface EgovCcmCmmnCodeManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 155,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCodeView.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 등록 화면이 상위 공통코드 목록을 얻기 위해 사용하는 공통코드 관리 서비스 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cca/service/EgovCcmCmmnCodeManageService.java",
+              "line": 23,
+              "snippet": "public interface EgovCcmCmmnCodeManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "검색조건에 맞는 공통코드 목록을 조회하는 업무를 정의하며, 등록 화면은 선택한 분류코드에 속한 코드 목록을 이 업무로 얻는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cca/service/EgovCcmCmmnCodeManageService.java",
+              "line": 41,
+              "snippet": "\tList<CmmnCodeVO> selectCmmnCodeList(CmmnCodeVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 179,
+              "snippet": "\t\t\tList<CmmnCodeVO> codeList = cmmnCodeManageService.selectCmmnCodeList(searchCodeVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+      "name": "공통분류코드 조회 정보",
+      "summary": {
+        "text": "공통상세코드 등록 화면 조회 처리에서 등록 화면의 분류코드 선택 목록을 조회할 때 쓰는 검색조건과 페이지 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+            "line": 27,
+            "snippet": "public class CmmnClCodeVO extends CmmnClCode implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 155,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCodeView.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 등록 화면에서 분류코드 선택 목록을 뽑을 때 검색조건을 전달하는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+              "line": 27,
+              "snippet": "public class CmmnClCodeVO extends CmmnClCode implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 166,
+              "snippet": "\t\tCmmnClCodeVO searchClCodeVO = new CmmnClCodeVO();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "검색조건·검색어와 현재 페이지·페이지 건수를 기본값으로 갖추어 분류코드 목록 조회 조건을 표현한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+              "line": 32,
+              "snippet": "    private String searchCondition = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+              "line": 35,
+              "snippet": "    private String searchKeyword = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/CmmnClCodeVO.java",
+              "line": 41,
+              "snippet": "    private int pageIndex = 1;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/ccc/service/EgovCcmCmmnClCodeManageService.java",
+      "name": "공통분류코드 관리 서비스",
+      "summary": {
+        "text": "공통상세코드 등록 화면 조회 처리에서 공통분류코드의 목록·상세 조회와 등록·수정·삭제 업무를 제공하는 서비스 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/EgovCcmCmmnClCodeManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovCcmCmmnClCodeManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 155,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCodeView.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 등록 화면에 필요한 분류코드 목록을 제공하는 공통분류코드 관리 서비스 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/EgovCcmCmmnClCodeManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovCcmCmmnClCodeManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "검색조건에 맞는 분류코드 목록을 조회하는 업무를 정의하며, 등록 화면은 이 목록을 선택 항목으로 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/ccc/service/EgovCcmCmmnClCodeManageService.java",
+              "line": 40,
+              "snippet": "\tList<CmmnClCodeVO> selectCmmnClCodeList(CmmnClCodeVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 168,
+              "snippet": "\t\tList<CmmnClCodeVO> clCodeList = cmmnClCodeManageService.selectCmmnClCodeList(searchClCodeVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RegistCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "name": "공통상세코드 관리 화면 처리",
+      "summary": {
+        "text": "공통상세코드 등록 화면 조회 처리에서 공통상세코드의 목록·상세·등록·수정·삭제 요청을 받아 검증한 뒤 관리 서비스에 위임하고 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 155,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCodeView.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 등록 화면 조회 요청을 받아 화면 입력값을 담아 공통상세코드 관리 서비스에 처리를 위임하고, 결과에 따라 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 155,
+              "snippet": "\t@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCodeView.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "화면에서 넘어온 검색조건·페이지 정보와 코드 입력값을 값 객체로 받아 처리하며, 등록·수정 요청은 입력값 검증 결과를 먼저 확인하고 로그인 사용자 정보를 함께 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 195,
+              "snippet": "\tpublic String insertCmmnDetailCode(@Valid @ModelAttribute(\"cmmnDetailCodeVO\") CmmnDetailCodeVO cmmnDetailCodeVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 200,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 198,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RemoveCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+      "name": "공통상세코드 조회·입력 정보",
+      "summary": {
+        "text": "공통상세코드 삭제 처리에서 검색조건·검색어·페이지 정보와 코드 입력값을 담아 화면과 서비스 사이를 오가는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+            "line": 28,
+            "snippet": "public class CmmnDetailCodeVO extends CmmnDetailCode implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 135,
+            "snippet": "\t@RequestMapping(value = \"/sym/ccm/cde/RemoveCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 화면의 검색조건과 페이지 정보, 코드 입력값을 담아 화면과 관리 서비스 사이를 오가는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 28,
+              "snippet": "public class CmmnDetailCodeVO extends CmmnDetailCode implements Serializable {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "검색조건과 검색어를 빈 값으로 시작하고 현재 페이지는 1, 한 페이지 건수는 기본 10건으로 두어 목록 조회의 기본 상태를 정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 33,
+              "snippet": "    private String searchCondition = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 36,
+              "snippet": "    private String searchKeyword = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 42,
+              "snippet": "    private int pageIndex = 1;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RemoveCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+      "name": "공통상세코드 관리 서비스",
+      "summary": {
+        "text": "공통상세코드 삭제 처리에서 공통상세코드의 총 건수·목록·상세 조회와 등록·수정·삭제 업무를 제공하는 서비스 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+            "line": 25,
+            "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 135,
+            "snippet": "\t@RequestMapping(value = \"/sym/ccm/cde/RemoveCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드에 대한 조회와 등록·수정·삭제 업무를 한 곳에 모아 화면 계층에 제공하는 서비스 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 25,
+              "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "검색조건에 맞는 상세코드 목록과 총 건수를 조회하고, 코드 한 건의 상세 조회 및 등록·수정·삭제 업무를 각각의 작업으로 정의한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 39,
+              "snippet": "\tList<CmmnDetailCodeVO> selectCmmnDetailCodeList(CmmnDetailCodeVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 47,
+              "snippet": "\tCmmnDetailCode selectCmmnDetailCodeDetail(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 61,
+              "snippet": "\tvoid insertCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 68,
+              "snippet": "\tvoid updateCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 54,
+              "snippet": "\tvoid deleteCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/RemoveCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "name": "공통상세코드 관리 화면 처리",
+      "summary": {
+        "text": "공통상세코드 삭제 처리에서 공통상세코드의 목록·상세·등록·수정·삭제 요청을 받아 검증한 뒤 관리 서비스에 위임하고 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 135,
+            "snippet": "\t@RequestMapping(value = \"/sym/ccm/cde/RemoveCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 삭제 요청을 받아 화면 입력값을 담아 공통상세코드 관리 서비스에 처리를 위임하고, 결과에 따라 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 135,
+              "snippet": "\t@RequestMapping(value = \"/sym/ccm/cde/RemoveCcmCmmnDetailCode.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "화면에서 넘어온 검색조건·페이지 정보와 코드 입력값을 값 객체로 받아 처리하며, 등록·수정 요청은 입력값 검증 결과를 먼저 확인하고 로그인 사용자 정보를 함께 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 195,
+              "snippet": "\tpublic String insertCmmnDetailCode(@Valid @ModelAttribute(\"cmmnDetailCodeVO\") CmmnDetailCodeVO cmmnDetailCodeVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 200,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 198,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+      "name": "공통상세코드 관리 서비스",
+      "summary": {
+        "text": "공통상세코드 상세 조회 처리에서 공통상세코드의 총 건수·목록·상세 조회와 등록·수정·삭제 업무를 제공하는 서비스 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+            "line": 25,
+            "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 117,
+            "snippet": "\t@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드에 대한 조회와 등록·수정·삭제 업무를 한 곳에 모아 화면 계층에 제공하는 서비스 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 25,
+              "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "검색조건에 맞는 상세코드 목록과 총 건수를 조회하고, 코드 한 건의 상세 조회 및 등록·수정·삭제 업무를 각각의 작업으로 정의한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 39,
+              "snippet": "\tList<CmmnDetailCodeVO> selectCmmnDetailCodeList(CmmnDetailCodeVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 47,
+              "snippet": "\tCmmnDetailCode selectCmmnDetailCodeDetail(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 61,
+              "snippet": "\tvoid insertCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 68,
+              "snippet": "\tvoid updateCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 54,
+              "snippet": "\tvoid deleteCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "name": "공통상세코드 관리 화면 처리",
+      "summary": {
+        "text": "공통상세코드 상세 조회 처리에서 공통상세코드의 목록·상세·등록·수정·삭제 요청을 받아 검증한 뒤 관리 서비스에 위임하고 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 117,
+            "snippet": "\t@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 상세 조회 요청을 받아 화면 입력값을 담아 공통상세코드 관리 서비스에 처리를 위임하고, 결과에 따라 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 117,
+              "snippet": "\t@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeDetail.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "화면에서 넘어온 검색조건·페이지 정보와 코드 입력값을 값 객체로 받아 처리하며, 등록·수정 요청은 입력값 검증 결과를 먼저 확인하고 로그인 사용자 정보를 함께 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 195,
+              "snippet": "\tpublic String insertCmmnDetailCode(@Valid @ModelAttribute(\"cmmnDetailCodeVO\") CmmnDetailCodeVO cmmnDetailCodeVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 200,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 198,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeList.do:src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+      "name": "공통상세코드 조회·입력 정보",
+      "summary": {
+        "text": "공통상세코드 목록 조회 처리에서 검색조건·검색어·페이지 정보와 코드 입력값을 담아 화면과 서비스 사이를 오가는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+            "line": 28,
+            "snippet": "public class CmmnDetailCodeVO extends CmmnDetailCode implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 80,
+            "snippet": "\t@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeList.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 화면의 검색조건과 페이지 정보, 코드 입력값을 담아 화면과 관리 서비스 사이를 오가는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 28,
+              "snippet": "public class CmmnDetailCodeVO extends CmmnDetailCode implements Serializable {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "검색조건과 검색어를 빈 값으로 시작하고 현재 페이지는 1, 한 페이지 건수는 기본 10건으로 두어 목록 조회의 기본 상태를 정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 33,
+              "snippet": "    private String searchCondition = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 36,
+              "snippet": "    private String searchKeyword = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 42,
+              "snippet": "    private int pageIndex = 1;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeList.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+      "name": "공통상세코드 관리 서비스",
+      "summary": {
+        "text": "공통상세코드 목록 조회 처리에서 공통상세코드의 총 건수·목록·상세 조회와 등록·수정·삭제 업무를 제공하는 서비스 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+            "line": 25,
+            "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 80,
+            "snippet": "\t@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeList.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드에 대한 조회와 등록·수정·삭제 업무를 한 곳에 모아 화면 계층에 제공하는 서비스 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 25,
+              "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "검색조건에 맞는 상세코드 목록과 총 건수를 조회하고, 코드 한 건의 상세 조회 및 등록·수정·삭제 업무를 각각의 작업으로 정의한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 39,
+              "snippet": "\tList<CmmnDetailCodeVO> selectCmmnDetailCodeList(CmmnDetailCodeVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 47,
+              "snippet": "\tCmmnDetailCode selectCmmnDetailCodeDetail(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 61,
+              "snippet": "\tvoid insertCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 68,
+              "snippet": "\tvoid updateCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 54,
+              "snippet": "\tvoid deleteCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/SelectCcmCmmnDetailCodeList.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "name": "공통상세코드 관리 화면 처리",
+      "summary": {
+        "text": "공통상세코드 목록 조회 처리에서 공통상세코드의 목록·상세·등록·수정·삭제 요청을 받아 검증한 뒤 관리 서비스에 위임하고 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 80,
+            "snippet": "\t@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeList.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 목록 조회 요청을 받아 화면 입력값을 담아 공통상세코드 관리 서비스에 처리를 위임하고, 결과에 따라 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 80,
+              "snippet": "\t@RequestMapping(value = \"/sym/ccm/cde/SelectCcmCmmnDetailCodeList.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "화면에서 넘어온 검색조건·페이지 정보와 코드 입력값을 값 객체로 받아 처리하며, 등록·수정 요청은 입력값 검증 결과를 먼저 확인하고 로그인 사용자 정보를 함께 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 195,
+              "snippet": "\tpublic String insertCmmnDetailCode(@Valid @ModelAttribute(\"cmmnDetailCodeVO\") CmmnDetailCodeVO cmmnDetailCodeVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 200,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 198,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "공통상세코드 수정 처리에서 로그인한 사용자의 아이디·이름·고유아이디 등 인증 정보를 담는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 256,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드를 등록·수정할 때 등록자와 수정자로 기록할 로그인 사용자 정보를 담는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 198,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디와 이름 등 필수 항목과 함께 사용자 고유아이디를 갖추며, 상세코드 등록·수정은 이 고유아이디를 등록자·수정자 값으로 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 219,
+              "snippet": "\t\tcmmnDetailCodeVO.setFrstRegisterId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "인증 사용자 조회 서비스",
+      "summary": {
+        "text": "공통상세코드 수정 처리에서 인증된 사용자 정보와 권한 목록, 인증 여부를 확인하는 서비스 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 256,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "현재 인증된 사용자와 그 권한, 인증 여부를 확인하는 통로를 제공하는 서비스 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 정보를 값 객체 형태로 돌려주고 인증 여부를 참·거짓으로 판정하는 업무를 정의한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 확인 도우미",
+      "summary": {
+        "text": "공통상세코드 수정 처리에서 인증 사용자 조회 기능을 감싸 인증된 사용자와 권한을 어디서든 꺼내 쓰게 해주는 도우미다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 256,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 등록·수정 처리에서 현재 로그인한 사용자를 꺼내오는 통로 역할을 하며, 인증 사용자 조회 서비스에 실제 확인을 위임한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 198,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 돌려주는 확인 수단을 갖추며 사용자가 없으면 등록자 값은 빈 값으로 처리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 219,
+              "snippet": "\t\tcmmnDetailCodeVO.setFrstRegisterId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+      "name": "공통상세코드 조회·입력 정보",
+      "summary": {
+        "text": "공통상세코드 수정 처리에서 검색조건·검색어·페이지 정보와 코드 입력값을 담아 화면과 서비스 사이를 오가는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+            "line": 28,
+            "snippet": "public class CmmnDetailCodeVO extends CmmnDetailCode implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 256,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 화면의 검색조건과 페이지 정보, 코드 입력값을 담아 화면과 관리 서비스 사이를 오가는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 28,
+              "snippet": "public class CmmnDetailCodeVO extends CmmnDetailCode implements Serializable {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "검색조건과 검색어를 빈 값으로 시작하고 현재 페이지는 1, 한 페이지 건수는 기본 10건으로 두어 목록 조회의 기본 상태를 정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 33,
+              "snippet": "    private String searchCondition = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 36,
+              "snippet": "    private String searchKeyword = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/CmmnDetailCodeVO.java",
+              "line": 42,
+              "snippet": "    private int pageIndex = 1;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+      "name": "공통상세코드 관리 서비스",
+      "summary": {
+        "text": "공통상세코드 수정 처리에서 공통상세코드의 총 건수·목록·상세 조회와 등록·수정·삭제 업무를 제공하는 서비스 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+            "line": 25,
+            "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 256,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드에 대한 조회와 등록·수정·삭제 업무를 한 곳에 모아 화면 계층에 제공하는 서비스 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 25,
+              "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "검색조건에 맞는 상세코드 목록과 총 건수를 조회하고, 코드 한 건의 상세 조회 및 등록·수정·삭제 업무를 각각의 작업으로 정의한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 39,
+              "snippet": "\tList<CmmnDetailCodeVO> selectCmmnDetailCodeList(CmmnDetailCodeVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 47,
+              "snippet": "\tCmmnDetailCode selectCmmnDetailCodeDetail(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 61,
+              "snippet": "\tvoid insertCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 68,
+              "snippet": "\tvoid updateCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 54,
+              "snippet": "\tvoid deleteCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCode.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "name": "공통상세코드 관리 화면 처리",
+      "summary": {
+        "text": "공통상세코드 수정 처리에서 공통상세코드의 목록·상세·등록·수정·삭제 요청을 받아 검증한 뒤 관리 서비스에 위임하고 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 256,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCode.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 수정 요청을 받아 화면 입력값을 담아 공통상세코드 관리 서비스에 처리를 위임하고, 결과에 따라 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 256,
+              "snippet": "\t@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCode.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "화면에서 넘어온 검색조건·페이지 정보와 코드 입력값을 값 객체로 받아 처리하며, 등록·수정 요청은 입력값 검증 결과를 먼저 확인하고 로그인 사용자 정보를 함께 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 195,
+              "snippet": "\tpublic String insertCmmnDetailCode(@Valid @ModelAttribute(\"cmmnDetailCodeVO\") CmmnDetailCodeVO cmmnDetailCodeVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 200,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 198,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+      "name": "공통상세코드 관리 서비스",
+      "summary": {
+        "text": "공통상세코드 수정 화면 조회 처리에서 공통상세코드의 총 건수·목록·상세 조회와 등록·수정·삭제 업무를 제공하는 서비스 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+            "line": 25,
+            "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 237,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드에 대한 조회와 등록·수정·삭제 업무를 한 곳에 모아 화면 계층에 제공하는 서비스 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 25,
+              "snippet": "public interface EgovCcmCmmnDetailCodeManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "검색조건에 맞는 상세코드 목록과 총 건수를 조회하고, 코드 한 건의 상세 조회 및 등록·수정·삭제 업무를 각각의 작업으로 정의한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 39,
+              "snippet": "\tList<CmmnDetailCodeVO> selectCmmnDetailCodeList(CmmnDetailCodeVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 47,
+              "snippet": "\tCmmnDetailCode selectCmmnDetailCodeDetail(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 61,
+              "snippet": "\tvoid insertCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 68,
+              "snippet": "\tvoid updateCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/service/EgovCcmCmmnDetailCodeManageService.java",
+              "line": 54,
+              "snippet": "\tvoid deleteCmmnDetailCode(CmmnDetailCodeVO cmmnDetailCodeVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do:src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+      "name": "공통상세코드 관리 화면 처리",
+      "summary": {
+        "text": "공통상세코드 수정 화면 조회 처리에서 공통상세코드의 목록·상세·등록·수정·삭제 요청을 받아 검증한 뒤 관리 서비스에 위임하고 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 194,
+            "snippet": "@RequestMapping(\"/sym/ccm/cde/RegistCcmCmmnDetailCode.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+            "line": 237,
+            "snippet": "\t@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통상세코드 수정 화면 조회 요청을 받아 화면 입력값을 담아 공통상세코드 관리 서비스에 처리를 위임하고, 결과에 따라 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 237,
+              "snippet": "\t@RequestMapping(\"/sym/ccm/cde/UpdateCcmCmmnDetailCodeView.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "화면에서 넘어온 검색조건·페이지 정보와 코드 입력값을 값 객체로 받아 처리하며, 등록·수정 요청은 입력값 검증 결과를 먼저 확인하고 로그인 사용자 정보를 함께 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 195,
+              "snippet": "\tpublic String insertCmmnDetailCode(@Valid @ModelAttribute(\"cmmnDetailCodeVO\") CmmnDetailCodeVO cmmnDetailCodeVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 200,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/cde/web/EgovCcmCmmnDetailCodeManageController.java",
+              "line": 198,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

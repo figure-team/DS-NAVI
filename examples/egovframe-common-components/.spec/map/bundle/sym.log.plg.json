@@ -1,0 +1,172 @@
+{
+  "domainId": "domain:sym.log.plg",
+  "files": [
+    {
+      "className": "EgovPrivacyLogService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/log/plg/service/EgovPrivacyLogService.java — java 파일",
+        "tags": []
+      },
+      "line": 17,
+      "relPath": "src/main/java/egovframework/com/sym/log/plg/service/EgovPrivacyLogService.java",
+      "slice": {
+        "endLine": 42,
+        "startLine": 7,
+        "text": " * @Description : 개인정보 조회 이력 관리를 위한 인터페이스\n * @Modification Information\n *\n *    수정일         수정자         수정내용\n *    -------        -------     -------------------\n *    2014.09.11\t표준프레임워크\t\t최초생성\n* @author Vincent Han\n * @since 2014.09.11\n * @version 3.5\n */\npublic interface EgovPrivacyLogService {\n\t\n\t/**\n\t * 개인정보 조회 로그정보를 생성한다.\n\t *\n\t * @param privacyLog\n\t */\n\tpublic void innerInsertPrivacyLog(PrivacyLog privacyLog) throws Exception;\n\t\n\t/**\n\t * 개인정보 조회 로그정보 목록을 조회한다.\n\t *\n\t * @param privacyLog\n\t */\n\tpublic Map<String, Object> selectPrivacyLogList(PrivacyLog privacyLog) throws Exception;\n\t\n\t/**\n\t * 개인정보 조회 로그 상세정보를 조회한다.\n\t *\n\t * @param privacyLog\n\t * @return privacyLog\n\t * @throws Exception\n\t */\n\tpublic PrivacyLog selectPrivacyLog(PrivacyLog privacyLog) throws Exception;\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "PrivacyLog",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/log/plg/service/PrivacyLog.java — java 파일",
+        "tags": []
+      },
+      "line": 17,
+      "relPath": "src/main/java/egovframework/com/sym/log/plg/service/PrivacyLog.java",
+      "slice": {
+        "endLine": 86,
+        "startLine": 7,
+        "text": " * @Description : 개인정보 조회 이력 관리를 위한 VO 클래스\n * @Modification Information\n *\n *    수정일         수정자         수정내용\n *    -------        -------     -------------------\n *    2014.09.11\t표준프레임워크\t\t최초생성\n* @author Vincent Han\n * @since 2014.09.11\n * @version 3.5\n */\npublic class PrivacyLog implements Serializable {\n\n\t/**\n\t * Default Serial Version UID\n\t */\n\tprivate static final long serialVersionUID = 1L;\n\t\n\t/** 요청 ID (REQUST_ID) */\n\tprivate String requestId = \"\";\n\t\n\t/** 조회일시 (INQIRE_DT) */\n\tprivate String inquiryDatetime = \"\";\n\n\t/** 서비스 명 (SRVC_NM) */\n\tprivate String serviceName = \"\";\n\t\n\t/** 조회 정보 명 (INQIRE_INFO) */\n\tprivate String inquiryInfo = \"\";\n\n\t/** 요청자아이디 (RQESTER_ID) */\n\tprivate String requesterId = \"\";\t\n\n\t/** 요청자 이름 (RQESTER_NM) */\n\tprivate String requesterName = \"\";\n\n\t/** 요청아이피 (RQESTER_IP) */\n\tprivate String requesterIp = \"\";\n\t\n\t/** 검색조건 */\n\tprivate String searchCondition = \"\";\t\n\n\t/** 검색시작일 */\n\tprivate String searchBeginDate = \"\";\n\n\t/** 검색종료일 */\n\tprivate String searchEndDate = \"\";\n\t\n\t/** 검색시작일 (화면용) */\n\tprivate String searchBeginDateView = \"\";\t// ex: 2014.09.14\n\t\n\t/** 검색종료일 (화면용) */\n\tprivate String searchEndDateView = \"\";\t// ex: 2014.09.14\t\n\n\t/** 검색단어 */\n\tprivate String searchWord = \"\";\n\n\t/** 정렬순서 (DESC, ASC) */\n\tprivate String sortOrder = \"\";\n\t\n\t/** 검색사용여부 */\n    private String searchUseYn = \"\";\n    \n    /** 현재페이지 */\n    private int pageIndex = 1;\n    \n    /** 페이지개수 */\n    private int pageUnit = 10;\n    \n    /** 페이지사이즈 */\n    private int pageSize = 10;\n\n    /** firstIndex */\n    private int firstIndex = 1;\n\n    /** lastIndex */\n    private int lastIndex = 1;\n\n    /** recordCountPerPage */\n    private int recordCountPerPage = 10;\t\n\t\t",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovPrivacyLogController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/log/plg/web/EgovPrivacyLogController.java — java 파일",
+        "tags": []
+      },
+      "line": 82,
+      "relPath": "src/main/java/egovframework/com/sym/log/plg/web/EgovPrivacyLogController.java",
+      "slice": {
+        "endLine": 92,
+        "startLine": 72,
+        "text": "\t}\n\n\t/**\n\t * 개인정보조회 로그 상세 조회\n\t *\n\t * @param privacyLog\n\t * @param model\n\t * @return sym/log/plg/EgovPrivacyLogInqire\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/sym/log/plg/SelectPrivacyLogDetail.do\")\n\tpublic String selectWebLog(@ModelAttribute(\"searchVO\") PrivacyLog privacyLog,\n\t\t\tModelMap model) throws Exception{\n\n\t\tmodel.addAttribute(\"result\", privacyLogService.selectPrivacyLog(privacyLog));\n\n\t\treturn \"egovframework/com/sym/log/plg/EgovPrivacyLogDetail\";\n\t}\n\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovPrivacyLogController#selectWebLog",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/log/plg/web/EgovPrivacyLogController.java",
+      "flowId": "flow:ANY /sym/log/plg/SelectPrivacyLogDetail.do",
+      "line": 82,
+      "stepIds": [
+        "step:ANY /sym/log/plg/SelectPrivacyLogDetail.do:src/main/java/egovframework/com/sym/log/plg/web/EgovPrivacyLogController.java",
+        "step:ANY /sym/log/plg/SelectPrivacyLogDetail.do:src/main/java/egovframework/com/sym/log/plg/service/EgovPrivacyLogService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovPrivacyLogController#selectPrivacyLogList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/log/plg/web/EgovPrivacyLogController.java",
+      "flowId": "flow:ANY /sym/log/plg/SelectPrivacyLogList.do",
+      "line": 46,
+      "stepIds": [
+        "step:ANY /sym/log/plg/SelectPrivacyLogList.do:src/main/java/egovframework/com/sym/log/plg/web/EgovPrivacyLogController.java",
+        "step:ANY /sym/log/plg/SelectPrivacyLogList.do:src/main/java/egovframework/com/sym/log/plg/service/PrivacyLog.java",
+        "step:ANY /sym/log/plg/SelectPrivacyLogList.do:src/main/java/egovframework/com/sym/log/plg/service/EgovPrivacyLogService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "sym.log.plg",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/log/plg/service/EgovPrivacyLogService.java",
+      "stepId": "step:ANY /sym/log/plg/SelectPrivacyLogDetail.do:src/main/java/egovframework/com/sym/log/plg/service/EgovPrivacyLogService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/log/plg/web/EgovPrivacyLogController.java",
+      "stepId": "step:ANY /sym/log/plg/SelectPrivacyLogDetail.do:src/main/java/egovframework/com/sym/log/plg/web/EgovPrivacyLogController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/log/plg/service/EgovPrivacyLogService.java",
+      "stepId": "step:ANY /sym/log/plg/SelectPrivacyLogList.do:src/main/java/egovframework/com/sym/log/plg/service/EgovPrivacyLogService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/log/plg/service/PrivacyLog.java",
+      "stepId": "step:ANY /sym/log/plg/SelectPrivacyLogList.do:src/main/java/egovframework/com/sym/log/plg/service/PrivacyLog.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/log/plg/web/EgovPrivacyLogController.java",
+      "stepId": "step:ANY /sym/log/plg/SelectPrivacyLogList.do:src/main/java/egovframework/com/sym/log/plg/web/EgovPrivacyLogController.java"
+    }
+  ]
+}

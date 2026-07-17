@@ -1,0 +1,1274 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "s1",
+          "to": "a1"
+        },
+        {
+          "from": "a1",
+          "to": "a2"
+        },
+        {
+          "from": "a2",
+          "to": "a3"
+        },
+        {
+          "from": "a3",
+          "to": "a4"
+        },
+        {
+          "from": "a4",
+          "to": "e1"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s1",
+          "kind": "start",
+          "label": "이미지 등록 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 82,
+              "snippet": "@RequestMapping(value = \"/utl/wed/insertImage.do\", method = RequestMethod.GET)"
+            }
+          ],
+          "flowRef": "flow:GET /utl/wed/insertImage.do",
+          "id": "a1",
+          "kind": "activity",
+          "label": "이미지 등록 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 97,
+              "snippet": "@RequestMapping(value = \"/utl/wed/insertImage.do\", method = RequestMethod.POST)"
+            }
+          ],
+          "flowRef": "flow:POST /utl/wed/insertImage.do",
+          "id": "a2",
+          "kind": "activity",
+          "label": "이미지 파일 업로드 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+              "line": 75,
+              "snippet": "vo.setPhysicalName(getPhysicalFileName());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+              "line": 87,
+              "snippet": "saveFile(is, new File(EgovWebUtil.filePathBlackList("
+            }
+          ],
+          "id": "a3",
+          "kind": "activity",
+          "label": "새 이름 부여 후 저장"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            }
+          ],
+          "id": "a4",
+          "kind": "activity",
+          "label": "결과 안내 문구 전달"
+        },
+        {
+          "id": "e1",
+          "kind": "end",
+          "label": "이미지 등록 완료"
+        }
+      ],
+      "title": "웹에디터 이미지 업로드"
+    },
+    {
+      "edges": [
+        {
+          "from": "s1",
+          "to": "a1"
+        },
+        {
+          "from": "a1",
+          "to": "a2"
+        },
+        {
+          "from": "a2",
+          "to": "a3"
+        },
+        {
+          "from": "a3",
+          "to": "e1"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s1",
+          "kind": "start",
+          "label": "본문 편집 중 이미지 첨부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 114,
+              "snippet": "@RequestMapping(value = \"/utl/wed/insertImageCk.do\", method = RequestMethod.POST)"
+            }
+          ],
+          "flowRef": "flow:POST /utl/wed/insertImageCk.do",
+          "id": "a1",
+          "kind": "activity",
+          "label": "이미지 업로드 요청 접수"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+              "line": 36,
+              "snippet": "public class EgovFileUploadUtil extends EgovFormBasedFileUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+              "line": 87,
+              "snippet": "saveFile(is, new File(EgovWebUtil.filePathBlackList("
+            }
+          ],
+          "id": "a2",
+          "kind": "activity",
+          "label": "이미지 저장소에 보관"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+              "line": 35,
+              "snippet": "private String physicalName = \"\";"
+            }
+          ],
+          "id": "a3",
+          "kind": "activity",
+          "label": "본문 삽입용 주소 회신"
+        },
+        {
+          "id": "e1",
+          "kind": "end",
+          "label": "본문에 이미지 반영"
+        }
+      ],
+      "title": "CK에디터 이미지 업로드"
+    },
+    {
+      "edges": [
+        {
+          "from": "s1",
+          "to": "a1"
+        },
+        {
+          "from": "a1",
+          "to": "a2"
+        },
+        {
+          "from": "a2",
+          "to": "d1"
+        },
+        {
+          "from": "d1",
+          "label": "포함",
+          "to": "e2"
+        },
+        {
+          "from": "d1",
+          "label": "미포함",
+          "to": "d2"
+        },
+        {
+          "from": "d2",
+          "label": "허용",
+          "to": "a3"
+        },
+        {
+          "from": "d2",
+          "label": "미허용",
+          "to": "e3"
+        },
+        {
+          "from": "a3",
+          "to": "e1"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s1",
+          "kind": "start",
+          "label": "본문 이미지 표시 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 161,
+              "snippet": "@RequestMapping(value = \"/utl/web/imageSrc.do\",method = RequestMethod.GET)"
+            }
+          ],
+          "flowRef": "flow:GET /utl/web/imageSrc.do",
+          "id": "a1",
+          "kind": "activity",
+          "label": "조회 요청 접수"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 165,
+              "snippet": "String subPath = this.decrypt(EgovStringUtil.isNullToString(request.getParameter(\"path\")));"
+            }
+          ],
+          "id": "a2",
+          "kind": "activity",
+          "label": "감춰진 경로 정보 해석"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 169,
+              "snippet": "if ((subPath.indexOf(\"..\") >= 0) || (physical.indexOf(\"..\") >= 0) ) {"
+            }
+          ],
+          "id": "d1",
+          "kind": "decision",
+          "label": "상위 경로 표기 포함 여부"
+        },
+        {
+          "id": "e2",
+          "kind": "end",
+          "label": "잘못된 호출로 거부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 181,
+              "snippet": "if ( extWhiteList.indexOf(ext) >= 0 ) {"
+            }
+          ],
+          "id": "d2",
+          "kind": "decision",
+          "label": "허용 확장자 여부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 182,
+              "snippet": "EgovFormBasedFileUtil.viewFile(response, uploadDir, subPath, physical, mimeType);"
+            }
+          ],
+          "id": "a3",
+          "kind": "activity",
+          "label": "이미지 내려주기"
+        },
+        {
+          "id": "e1",
+          "kind": "end",
+          "label": "이미지 표시 완료"
+        },
+        {
+          "id": "e3",
+          "kind": "end",
+          "label": "파일 없음으로 처리"
+        }
+      ],
+      "title": "이미지 조회"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+          "line": 181,
+          "snippet": "if ( extWhiteList.indexOf(ext) >= 0 ) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+          "line": 182,
+          "snippet": "EgovFormBasedFileUtil.viewFile(response, uploadDir, subPath, physical, mimeType);"
+        }
+      ],
+      "text": "허용 확장자 규칙: 이미지 조회 시 요청된 파일의 확장자가 허용 목록에 들어 있을 때에만 실제 이미지를 내려주고, 목록에 없으면 파일 없음으로 처리한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+          "line": 169,
+          "snippet": "if ((subPath.indexOf(\"..\") >= 0) || (physical.indexOf(\"..\") >= 0) ) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 79,
+          "snippet": "public static String filePathBlackList(String value) {"
+        }
+      ],
+      "text": "상위 경로 차단 규칙: 조회 요청의 보관 경로나 파일 이름에 상위 디렉터리 이동 표기가 섞여 있으면 잘못된 호출로 보고 즉시 거부한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+          "line": 165,
+          "snippet": "String subPath = this.decrypt(EgovStringUtil.isNullToString(request.getParameter(\"path\")));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+          "line": 167,
+          "snippet": "String mimeType = this.decrypt(EgovStringUtil.isNullToString(request.getParameter(\"contentType\")));"
+        }
+      ],
+      "text": "경로 정보 감춤 규칙: 이미지 조회 주소에 담기는 보관 경로·실제 파일 이름·내용 유형은 그대로 노출하지 않고 암호화해 전달하며, 조회 시 되돌려 해석한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+          "line": 75,
+          "snippet": "vo.setPhysicalName(getPhysicalFileName());"
+        }
+      ],
+      "text": "실제 이름 재부여 규칙: 업로드된 이미지는 이용자가 준 이름을 그대로 쓰지 않고 중복되지 않는 새 이름을 만들어 저장한다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+          "line": 36,
+          "snippet": "public class EgovFileUploadUtil extends EgovFormBasedFileUtil {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+          "line": 182,
+          "snippet": "EgovFormBasedFileUtil.viewFile(response, uploadDir, subPath, physical, mimeType);"
+        }
+      ],
+      "text": "파일 처리 공통 영역에 업로드 저장과 이미지 내려주기를 위임한다. 요청에서 이미지를 꺼내 저장소에 기록하는 일과 저장된 이미지를 응답으로 내보내는 일은 모두 공통 파일 유틸이 담당한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 25,
+          "snippet": "public class EgovWebUtil {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+          "line": 87,
+          "snippet": "saveFile(is, new File(EgovWebUtil.filePathBlackList("
+        }
+      ],
+      "text": "공통 보안 처리 영역에 저장 경로 정화를 맡긴다. 저장 위치를 만들 때 상위 경로 표기를 제거하는 처리를 거친 뒤 기록한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        }
+      ],
+      "text": "공통 안내 문구 영역에서 업로드 결과 메시지를 받아 이용자 화면에 전달한다."
+    }
+  ],
+  "domainId": "domain:utl.wed",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+          "line": 29,
+          "snippet": "private String fileName = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+          "line": 35,
+          "snippet": "private String physicalName = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+          "line": 37,
+          "snippet": "private long size = 0L;"
+        }
+      ],
+      "text": "업로드 파일 정보: 올려진 이미지 한 건의 원래 이름, 내용 유형, 하위 보관 경로, 서버에 저장된 실제 이름, 크기를 담는 기본 단위이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+          "line": 69,
+          "snippet": "public static String getPhysicalFileName() {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+          "line": 58,
+          "snippet": "public static String getTodayString() {"
+        }
+      ],
+      "text": "저장 이미지: 이용자가 올린 원래 이름 대신 중복되지 않는 새 이름을 부여받아 날짜별 하위 보관함에 놓이는 실제 이미지 자원이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 52,
+          "snippet": "public String getMessage(String code) {"
+        }
+      ],
+      "text": "안내 문구: 업로드 성공과 실패를 이용자에게 알리기 위해 코드로 조회해 오는 다국어 안내 메시지이다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:GET /utl/web/imageSrc.do",
+      "name": "웹에디터 이미지 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+            "line": 161,
+            "snippet": "@RequestMapping(value = \"/utl/web/imageSrc.do\",method = RequestMethod.GET)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+            "line": 169,
+            "snippet": "if ((subPath.indexOf(\"..\") >= 0) || (physical.indexOf(\"..\") >= 0) ) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+            "line": 181,
+            "snippet": "if ( extWhiteList.indexOf(ext) >= 0 ) {"
+          }
+        ],
+        "text": "본문에 삽입된 이미지를 화면에 표시하기 위해 저장된 이미지를 내려주는 창구이다. 감춰진 형태로 전달된 보관 경로·실제 파일 이름·내용 유형을 되돌려 해석한 뒤, 상위 경로 표기가 섞여 있으면 잘못된 호출로 거부하고, 확장자가 허용 목록에 있는 경우에만 실제 이미지를 응답으로 내보낸다."
+      }
+    },
+    {
+      "flowId": "flow:GET /utl/wed/insertImage.do",
+      "name": "이미지 등록 화면 열기",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+            "line": 82,
+            "snippet": "@RequestMapping(value = \"/utl/wed/insertImage.do\", method = RequestMethod.GET)"
+          }
+        ],
+        "text": "이용자가 웹에디터에서 이미지를 올릴 수 있도록 이미지 등록 화면을 제공한다. 별도의 자료 조회 없이 등록 화면만 내보내며, 실제 업로드는 같은 주소의 등록 요청으로 이어진다."
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/wed/insertImage.do",
+      "name": "웹에디터 이미지 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(value = \"/utl/wed/insertImage.do\", method = RequestMethod.POST)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+            "line": 75,
+            "snippet": "vo.setPhysicalName(getPhysicalFileName());"
+          }
+        ],
+        "text": "이용자가 선택한 이미지를 서버 저장소에 보관하는 업무이다. 요청에서 이미지를 꺼내 허용 확장자 여부를 확인하고, 중복되지 않는 새 이름을 부여해 날짜별 보관함에 기록한 뒤, 본문에서 다시 볼 수 있는 조회 주소와 결과 안내 문구를 화면에 돌려준다."
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/wed/insertImageCk.do",
+      "name": "CK에디터 이미지 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+            "line": 114,
+            "snippet": "@RequestMapping(value = \"/utl/wed/insertImageCk.do\", method = RequestMethod.POST)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+            "line": 36,
+            "snippet": "public class EgovFileUploadUtil extends EgovFormBasedFileUtil {"
+          }
+        ],
+        "text": "CK에디터 본문 편집 중 첨부한 이미지를 서버 저장소에 보관하는 업무이다. 업로드 저장 처리는 일반 이미지 등록과 같지만, 편집기가 본문에 이미지를 자동으로 끼워 넣을 수 있도록 완료 화면으로 결과를 회신한다는 점이 다르다."
+      }
+    }
+  ],
+  "name": "웹에디터 이미지",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "public static String filePathBlackList(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "public static String clearXSSMinimum(String value) {"
+            }
+          ],
+          "text": "상태를 갖지 않고 문자열 하나를 받아 정화된 문자열을 돌려주는 형태이다. 지켜야 할 불변식은 빈 값이나 공백만 있는 값이 들어오면 빈 문자열을 돌려주고, 돌려주는 값에는 상위 디렉터리 이동 표기가 남지 않는다는 것이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "public static String filePathBlackList(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 62,
+              "snippet": "public static String clearXSS(String value) {"
+            }
+          ],
+          "text": "이 흐름에서 협력 객체로서 경로·입력값 정화를 맡는다. 이미지 조회가 다루는 보관 경로와 파일 이름이 저장소 밖을 가리키지 못하도록, 상위 디렉터리 표기를 제거하는 공통 규칙을 제공한다. 화면 출력에 섞일 수 있는 위험 문자도 함께 무해한 형태로 바꾼다."
+        }
+      },
+      "name": "공통 보안 처리",
+      "stepId": "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ],
+        "text": "요청으로 들어온 값에서 위험한 표기를 걷어내는 공통 보안 처리 묶음이다. 이미지 조회 흐름에서는 저장 경로에 상위 디렉터리 이동 표기가 남지 않도록 하는 정화 규칙의 근거가 된다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+              "line": 92,
+              "snippet": "public static long saveFile(InputStream is, File file) throws IOException {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+              "line": 45,
+              "snippet": "public class EgovFormBasedFileUtil {"
+            }
+          ],
+          "text": "상태 없이 정적 처리로만 이루어지며, 전달용 버퍼 크기와 경로 구분자를 공용 상수로 갖는다. 지켜야 할 불변식은 저장 대상의 상위 보관함이 없으면 만들어 두고, 상위 보관함을 확인할 수 없으면 저장을 진행하지 않는다는 것이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+              "line": 58,
+              "snippet": "public static String getTodayString() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+              "line": 69,
+              "snippet": "public static String getPhysicalFileName() {"
+            }
+          ],
+          "text": "이 흐름에서 협력 객체로서 저장소 접근을 도맡는다. 보관 기준 위치와 하위 경로, 실제 파일 이름, 내용 유형을 받아 해당 이미지를 응답으로 내보낸다. 저장 쪽에서는 날짜 문자열로 하위 보관함을 정하고 중복되지 않는 실제 파일 이름을 만들어 준다."
+        }
+      },
+      "name": "공통 파일 처리",
+      "stepId": "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+            "line": 45,
+            "snippet": "public class EgovFormBasedFileUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+            "line": 182,
+            "snippet": "EgovFormBasedFileUtil.viewFile(response, uploadDir, subPath, physical, mimeType);"
+          }
+        ],
+        "text": "저장된 파일을 응답으로 내보내고 파일을 저장소에 기록하는 공통 파일 처리 묶음이다. 이미지 조회 흐름에서 허용 확장자 확인을 통과한 이미지를 실제로 이용자에게 내려주는 일을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "public static String cutString(String source, int slength) {"
+            }
+          ],
+          "text": "상태 없이 정적 처리로 구성되며 빈 문자열을 공용 상수로 갖는다. 길이 제한을 넘는 문자열을 잘라 내는 처리도 함께 제공한다. 지켜야 할 불변식은 원본이 없으면 결과도 값 없이 다루지 않고 빈 문자열 기준으로 맞춘다는 것이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 166,
+              "snippet": "String physical = this.decrypt(EgovStringUtil.isNullToString(request.getParameter(\"physical\")));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "이 흐름에서 협력 객체로서 입력값 정규화를 맡는다. 조회 요청의 각 파라미터를 해석하기 전에 값이 없는 경우를 빈 문자열로 바꿔, 뒤따르는 상위 경로 검사와 확장자 검사가 일관된 문자열을 대상으로 이뤄지게 한다."
+        }
+      },
+      "name": "공통 문자열 처리",
+      "stepId": "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+            "line": 165,
+            "snippet": "String subPath = this.decrypt(EgovStringUtil.isNullToString(request.getParameter(\"path\")));"
+          }
+        ],
+        "text": "문자열을 다루는 공통 보조 묶음이다. 이미지 조회 흐름에서는 요청으로 들어온 경로·파일 이름·내용 유형 값이 비어 있을 때 빈 문자열로 맞춰 주어, 이후 검증이 값 없음으로 실패하지 않도록 한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 165,
+              "snippet": "String subPath = this.decrypt(EgovStringUtil.isNullToString(request.getParameter(\"path\")));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 169,
+              "snippet": "if ((subPath.indexOf(\"..\") >= 0) || (physical.indexOf(\"..\") >= 0) ) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 181,
+              "snippet": "if ( extWhiteList.indexOf(ext) >= 0 ) {"
+            }
+          ],
+          "text": "보관 경로·실제 파일 이름·내용 유형 세 가지를 요청 값으로 받으며, 모두 감춰진 형태여서 되돌려 해석한 뒤 사용한다. 검증은 두 단계로, 먼저 경로나 파일 이름에 상위 디렉터리 이동 표기가 있으면 잘못된 호출로 거부하고, 이어서 파일 이름 끝의 확장자가 허용 목록에 있는지 확인해 없으면 파일 없음으로 처리한다. 별도의 로그인·권한 확인 절차는 두지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 162,
+              "snippet": "public void download(HttpServletRequest request, HttpServletResponse response) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 182,
+              "snippet": "EgovFormBasedFileUtil.viewFile(response, uploadDir, subPath, physical, mimeType);"
+            }
+          ],
+          "text": "이 흐름에서 조회 창구 역할을 맡는다. 이용자 화면이 보낸 이미지 표시 요청을 받아, 어떤 이미지를 가리키는지 해석하고 안전한 요청인지 판정한 다음, 실제로 이미지를 내보내는 일은 공통 파일 처리에 위임한다. 스스로 자료를 조회하거나 저장하지는 않는다."
+        }
+      },
+      "name": "이미지 조회 접수",
+      "stepId": "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+            "line": 161,
+            "snippet": "@RequestMapping(value = \"/utl/web/imageSrc.do\",method = RequestMethod.GET)"
+          }
+        ],
+        "text": "본문 이미지 표시 요청을 받아 저장된 이미지를 내려주는 창구이다. 감춰진 경로 정보를 되돌려 해석하고 상위 경로 표기와 허용 확장자를 차례로 확인한 뒤 이미지를 응답으로 내보낸다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 83,
+              "snippet": "public String goInsertImage(Model model) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 82,
+              "snippet": "@RequestMapping(value = \"/utl/wed/insertImage.do\", method = RequestMethod.GET)"
+            }
+          ],
+          "text": "화면 전달용 그릇 하나만 받고 별도의 요청 파라미터는 받지 않는다. 받는 값이 없으므로 검증 처리도 두지 않으며, 로그인·권한 확인도 이 창구에서는 수행하지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 83,
+              "snippet": "public String goInsertImage(Model model) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 85,
+              "snippet": "return \"egovframework/com/utl/wed/EgovInsertImage\";"
+            }
+          ],
+          "text": "이 흐름에서 화면 진입 창구 역할만 맡는다. 요청을 받아 이미지 등록 화면을 지정해 돌려줄 뿐, 어떤 업무 처리나 위임도 하지 않는다. 이용자가 이 화면에서 파일을 선택해 보내면 같은 주소의 등록 처리로 넘어간다."
+        }
+      },
+      "name": "이미지 등록 화면 제공",
+      "stepId": "step:GET /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+            "line": 82,
+            "snippet": "@RequestMapping(value = \"/utl/wed/insertImage.do\", method = RequestMethod.GET)"
+          }
+        ],
+        "text": "이용자가 이미지를 선택해 올릴 수 있는 등록 화면을 내보내는 창구이다. 자료 조회나 저장 없이 화면만 제공하며, 실제 업로드는 같은 주소의 등록 요청으로 이어진다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "return getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "public String getMessageArgs(String code, Object[] args) {"
+            }
+          ],
+          "text": "핵심 규칙은 문구 조회 기준의 결정이다. 지역 정보를 주지 않으면 시스템 기본 지역으로 문구를 찾고, 지역을 지정하면 그 지역 문구를 찾는다. 문구에 값을 끼워 넣어야 하면 매개변수를 함께 넘겨 완성한다. 자료 변경이 없으므로 별도의 트랜잭션 경계는 두지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 28,
+              "snippet": "private ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;"
+            }
+          ],
+          "text": "이 흐름에서 이용자 안내를 조율한다. 업로드 결과에 해당하는 문구 코드를 받아 실제 문장으로 바꿔 돌려주며, 등록 처리는 그 문장을 화면 전달용 그릇에 담아 이용자에게 보여 준다. 문구 원본은 다시 읽어들일 수 있는 자원 묶음으로 관리한다."
+        }
+      },
+      "name": "안내 문구 조회",
+      "stepId": "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "코드로 다국어 안내 문구를 찾아 주는 공통 서비스이다. 이미지 등록 흐름에서 업로드 성공과 실패에 맞는 안내 문구를 조회해 화면에 전달하는 데 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "public static String filePathBlackList(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 62,
+              "snippet": "public static String clearXSS(String value) {"
+            }
+          ],
+          "text": "상태 없이 문자열 하나를 받아 정화된 문자열을 돌려주는 형태이다. 지켜야 할 불변식은 값이 없거나 공백만 있으면 빈 문자열을 돌려주고, 결과 경로에는 상위 디렉터리 이동 표기가 남지 않는다는 것이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "public static String filePathBlackList(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+              "line": 87,
+              "snippet": "saveFile(is, new File(EgovWebUtil.filePathBlackList("
+            }
+          ],
+          "text": "이 흐름에서 협력 객체로서 저장 경로 정화를 맡는다. 보관 기준 위치와 하위 보관함, 실제 파일 이름을 이어 붙여 만든 저장 경로에서 상위 디렉터리 이동 표기를 걷어낸 뒤 저장이 이뤄지게 한다."
+        }
+      },
+      "name": "공통 보안 처리",
+      "stepId": "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+            "line": 87,
+            "snippet": "saveFile(is, new File(EgovWebUtil.filePathBlackList("
+          }
+        ],
+        "text": "요청 값에서 위험한 표기를 걷어내는 공통 보안 처리 묶음이다. 이미지 등록 흐름에서는 저장 위치를 만들 때 상위 디렉터리 이동 표기를 제거해 저장소 밖에 파일이 기록되지 않도록 한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+              "line": 75,
+              "snippet": "vo.setPhysicalName(getPhysicalFileName());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+              "line": 46,
+              "snippet": "public static List<EgovFormBasedFileVo> uploadFiles(HttpServletRequest request, String where, long maxFileSize) throws Exception {"
+            }
+          ],
+          "text": "상태 없이 정적 처리로 구성되며, 결과는 업로드 파일 정보의 목록으로 표현한다. 지켜야 할 불변식은 이름이 비어 있는 항목은 건너뛰고, 크기가 0보다 큰 이미지만 목록에 담으며, 저장 이름은 이용자가 준 이름 대신 새로 부여한 실제 이름을 쓴다는 것이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+              "line": 46,
+              "snippet": "public static List<EgovFormBasedFileVo> uploadFiles(HttpServletRequest request, String where, long maxFileSize) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+              "line": 87,
+              "snippet": "saveFile(is, new File(EgovWebUtil.filePathBlackList("
+            }
+          ],
+          "text": "이 흐름에서 협력 객체로서 업로드 저장을 도맡는다. 요청에 담긴 이미지들을 차례로 꺼내 각각의 이름·내용 유형·크기를 정리하고, 보관 위치를 정한 뒤 저장소에 기록한다. 저장이 끝나면 각 이미지의 보관 정보 목록을 돌려주어, 등록 창구가 본문 삽입용 조회 주소를 만들 수 있게 한다."
+        }
+      },
+      "name": "업로드 저장 처리",
+      "stepId": "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+            "line": 36,
+            "snippet": "public class EgovFileUploadUtil extends EgovFormBasedFileUtil {"
+          }
+        ],
+        "text": "요청에 실려 온 이미지를 꺼내 서버 저장소에 기록하는 공통 업로드 처리이다. 이미지 등록 흐름에서 허용 확장자 확인과 실제 저장, 그리고 저장 결과 목록 반환을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+              "line": 29,
+              "snippet": "private String fileName = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+              "line": 35,
+              "snippet": "private String physicalName = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+              "line": 37,
+              "snippet": "private long size = 0L;"
+            }
+          ],
+          "text": "이용자가 올린 원래 이름, 내용 유형, 하위 보관 경로, 서버에 저장된 실제 이름, 크기 다섯 가지를 필드로 갖는다. 지켜야 할 불변식은 문자열 필드가 모두 빈 문자열로, 크기는 0으로 시작해 값 없음 상태를 만들지 않는다는 것이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+              "line": 27,
+              "snippet": "public class EgovFormBasedFileVo implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+              "line": 33,
+              "snippet": "private String serverSubPath = \"\";"
+            }
+          ],
+          "text": "이 흐름에서 계층 사이를 오가는 자료 구조 역할을 한다. 저장 처리가 이미지를 기록하면서 채운 보관 정보를 등록 창구까지 전달하며, 등록 창구는 그중 하위 보관 경로·실제 파일 이름·내용 유형을 꺼내 감춘 뒤 조회 주소로 엮는다."
+        }
+      },
+      "name": "업로드 파일 정보",
+      "stepId": "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+            "line": 26,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "업로드된 이미지 한 건의 보관 정보를 담아 나르는 자료 구조이다. 이미지 등록 흐름에서 저장 처리가 만들어 돌려주고, 등록 창구가 이 값으로 본문 삽입용 조회 주소를 구성한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 98,
+              "snippet": "public String imageUpload(MultipartHttpServletRequest request, Model model) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 146,
+              "snippet": "model.addAttribute(\"msg\",egovMessageSource.getMessage(\"errors.file.extension\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 150,
+              "snippet": "model.addAttribute(\"msg\",egovMessageSource.getMessage(\"errors.file.transfer\"));"
+            }
+          ],
+          "text": "이미지가 실린 업로드 요청을 통째로 받으며 개별 파라미터를 따로 선언하지 않는다. 검증은 공통 업로드 저장에 위임하고, 허용되지 않는 확장자로 거부되면 확장자 오류 안내를, 그 밖의 실패에는 전송 오류 안내를 담아 조회 주소를 비운 채 화면에 돌려준다. 별도의 로그인·권한 확인은 두지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 98,
+              "snippet": "public String imageUpload(MultipartHttpServletRequest request, Model model) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 100,
+              "snippet": "uploadImageFiles(request, model);"
+            }
+          ],
+          "text": "이 흐름에서 등록 창구 역할을 맡는다. 이미지가 실린 요청을 받아 공통 업로드 저장에 위임하고, 돌아온 보관 정보 중 첫 번째 이미지로 조회 주소를 엮어 화면 전달용 그릇에 담는다. 저장 자체나 확장자 판정은 직접 하지 않고 공통 처리에 맡긴다."
+        }
+      },
+      "name": "이미지 등록 접수",
+      "stepId": "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(value = \"/utl/wed/insertImage.do\", method = RequestMethod.POST)"
+          }
+        ],
+        "text": "이용자가 선택한 이미지의 업로드 요청을 받아 저장을 맡기고, 저장 결과로 본문 삽입용 조회 주소와 안내 문구를 만들어 등록 화면에 돌려주는 창구이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "public String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "public String getMessageArgs(String code, Object[] args) {"
+            }
+          ],
+          "text": "핵심 규칙은 문구 조회 기준의 결정이다. 지역 정보를 주지 않으면 시스템 기본 지역 문구를, 지역을 지정하면 그 지역 문구를 찾는다. 값 끼워 넣기가 필요한 문구는 매개변수를 함께 넘겨 완성한다. 자료 변경이 없어 트랜잭션 경계는 두지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 142,
+              "snippet": "model.addAttribute(\"msg\",egovMessageSource.getMessage(\"success.file.transfer\"));"
+            }
+          ],
+          "text": "이 흐름에서 이용자 안내를 조율한다. 업로드 결과에 해당하는 문구 코드를 실제 문장으로 바꿔 돌려주며, CK에디터 등록 처리는 그 문장을 완료 화면에 실어 편집기가 결과를 알릴 수 있게 한다."
+        }
+      },
+      "name": "안내 문구 조회",
+      "stepId": "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "코드로 다국어 안내 문구를 찾아 주는 공통 서비스이다. CK에디터 이미지 등록 흐름에서도 업로드 성공과 실패에 맞는 안내 문구를 조회해 완료 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "public static String filePathBlackList(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "public static String clearXSSMinimum(String value) {"
+            }
+          ],
+          "text": "상태 없이 문자열 하나를 받아 정화된 문자열을 돌려주는 형태이다. 지켜야 할 불변식은 값이 없거나 공백만 있으면 빈 문자열을 돌려주고, 결과에는 상위 디렉터리 이동 표기가 남지 않는다는 것이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "public static String filePathBlackList(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 62,
+              "snippet": "public static String clearXSS(String value) {"
+            }
+          ],
+          "text": "이 흐름에서 협력 객체로서 저장 경로 정화를 맡는다. CK에디터가 보낸 이미지를 기록하기 전에 만들어진 저장 경로에서 상위 디렉터리 이동 표기를 걷어내며, 화면에 실릴 수 있는 위험 문자를 무해한 형태로 바꾸는 처리도 함께 제공한다."
+        }
+      },
+      "name": "공통 보안 처리",
+      "stepId": "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ],
+        "text": "요청 값에서 위험한 표기를 걷어내는 공통 보안 처리 묶음이다. CK에디터 이미지 등록 흐름에서도 저장 위치를 만들 때 상위 디렉터리 이동 표기를 제거해 저장소 밖 기록을 막는다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+              "line": 75,
+              "snippet": "vo.setPhysicalName(getPhysicalFileName());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+              "line": 36,
+              "snippet": "public class EgovFileUploadUtil extends EgovFormBasedFileUtil {"
+            }
+          ],
+          "text": "상태 없이 정적 처리로 구성되며, 결과는 업로드 파일 정보의 목록이다. 지켜야 할 불변식은 이름이 비어 있는 항목을 건너뛰고, 크기가 0보다 큰 이미지만 목록에 담으며, 저장 이름은 새로 부여한 실제 이름을 쓴다는 것이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+              "line": 46,
+              "snippet": "public static List<EgovFormBasedFileVo> uploadFiles(HttpServletRequest request, String where, long maxFileSize) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+              "line": 87,
+              "snippet": "saveFile(is, new File(EgovWebUtil.filePathBlackList("
+            }
+          ],
+          "text": "이 흐름에서 협력 객체로서 업로드 저장을 도맡는다. CK에디터가 보낸 이미지를 차례로 꺼내 이름·내용 유형·크기를 정리하고 보관 위치를 정해 저장소에 기록한 뒤, 보관 정보 목록을 돌려주어 완료 화면이 본문 삽입용 주소를 만들 수 있게 한다."
+        }
+      },
+      "name": "업로드 저장 처리",
+      "stepId": "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+            "line": 36,
+            "snippet": "public class EgovFileUploadUtil extends EgovFormBasedFileUtil {"
+          }
+        ],
+        "text": "요청에 실려 온 이미지를 꺼내 서버 저장소에 기록하는 공통 업로드 처리이다. CK에디터 이미지 등록 흐름에서도 동일하게 확장자 확인과 저장, 보관 정보 목록 반환을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+              "line": 33,
+              "snippet": "private String serverSubPath = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+              "line": 35,
+              "snippet": "private String physicalName = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+              "line": 37,
+              "snippet": "private long size = 0L;"
+            }
+          ],
+          "text": "원래 이름, 내용 유형, 하위 보관 경로, 저장된 실제 이름, 크기 다섯 가지를 필드로 갖는다. 지켜야 할 불변식은 문자열 필드가 빈 문자열로, 크기는 0으로 시작해 값 없음 상태를 만들지 않는다는 것이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+              "line": 27,
+              "snippet": "public class EgovFormBasedFileVo implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+              "line": 31,
+              "snippet": "private String contentType = \"\";"
+            }
+          ],
+          "text": "이 흐름에서 계층 사이를 오가는 자료 구조 역할을 한다. 저장 처리가 기록하며 채운 보관 정보를 등록 창구로 전달하고, 창구는 하위 보관 경로·실제 파일 이름·내용 유형을 꺼내 감춘 뒤 조회 주소로 엮어 완료 화면에 싣는다."
+        }
+      },
+      "name": "업로드 파일 정보",
+      "stepId": "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+            "line": 26,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "업로드된 이미지 한 건의 보관 정보를 담아 나르는 자료 구조이다. CK에디터 이미지 등록 흐름에서 저장 처리가 채워 돌려주고, 완료 화면이 이 값으로 본문 삽입용 조회 주소를 구성한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 115,
+              "snippet": "public String imageUploadCk(@RequestParam(value = \"CKEditorFuncNum\", required=false) String ckEditorFuncNum, MultipartHttpServletRequest mRequest, HttpServletResponse response, Model model) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 119,
+              "snippet": "uploadImageFiles(mRequest, model);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 146,
+              "snippet": "model.addAttribute(\"msg\",egovMessageSource.getMessage(\"errors.file.extension\"));"
+            }
+          ],
+          "text": "편집기 식별 값과 이미지가 실린 업로드 요청을 받으며, 편집기 식별 값은 필수가 아니어서 없으면 없는 대로 화면에 전달한다. 이미지 검증은 공통 업로드 저장에 위임하고, 허용되지 않는 확장자면 확장자 오류 안내를, 그 밖의 실패에는 전송 오류 안내를 담아 조회 주소를 비운 채 회신한다. 별도의 로그인·권한 확인은 두지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 118,
+              "snippet": "model.addAttribute(\"ckEditorFuncNum\", ckEditorFuncNum);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 120,
+              "snippet": "return \"egovframework/com/utl/wed/EgovUploadImageComplete\";"
+            }
+          ],
+          "text": "이 흐름에서 등록 창구 역할을 맡는다. 저장 위임과 조회 주소 구성은 일반 이미지 등록과 같은 처리를 공유하지만, 편집기가 어느 자리에 이미지를 넣어야 하는지 알 수 있도록 편집기 식별 값을 화면 전달용 그릇에 함께 담고 완료 화면으로 회신한다는 점이 다르다."
+        }
+      },
+      "name": "CK에디터 이미지 등록 접수",
+      "stepId": "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+            "line": 114,
+            "snippet": "@RequestMapping(value = \"/utl/wed/insertImageCk.do\", method = RequestMethod.POST)"
+          }
+        ],
+        "text": "CK에디터가 보낸 이미지 업로드 요청을 받아 저장을 맡기고, 편집기가 본문에 이미지를 끼워 넣을 수 있도록 조회 주소와 편집기 식별 값을 완료 화면에 담아 돌려주는 창구이다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "line": 161,
+        "snippet": "@RequestMapping(value = \"/utl/web/imageSrc.do\",method = RequestMethod.GET)"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "line": 97,
+        "snippet": "@RequestMapping(value = \"/utl/wed/insertImage.do\", method = RequestMethod.POST)"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "line": 114,
+        "snippet": "@RequestMapping(value = \"/utl/wed/insertImageCk.do\", method = RequestMethod.POST)"
+      }
+    ],
+    "text": "게시물 본문을 작성하는 웹에디터에서 사용하는 이미지의 업로드와 조회를 담당하는 영역이다. 이용자가 에디터 화면에서 이미지를 올리면 허용된 확장자인지 확인한 뒤 서버 저장소에 보관하고, 본문에서 그 이미지를 다시 볼 수 있도록 조회 주소를 돌려준다. 일반 에디터용 화면과 CK에디터용 처리, 그리고 저장된 이미지를 내려주는 조회 창구를 하나의 컨트롤러가 함께 제공한다."
+  }
+}

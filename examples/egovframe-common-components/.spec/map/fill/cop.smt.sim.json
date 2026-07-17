@@ -1,0 +1,4064 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "main"
+        },
+        {
+          "from": "main",
+          "to": "d"
+        },
+        {
+          "from": "d",
+          "label": "일별",
+          "to": "day"
+        },
+        {
+          "from": "d",
+          "label": "주간",
+          "to": "week"
+        },
+        {
+          "from": "d",
+          "label": "월별",
+          "to": "month"
+        },
+        {
+          "from": "d",
+          "label": "전체 목록",
+          "to": "list"
+        },
+        {
+          "from": "day",
+          "to": "detail"
+        },
+        {
+          "from": "week",
+          "to": "detail"
+        },
+        {
+          "from": "month",
+          "to": "detail"
+        },
+        {
+          "from": "list",
+          "to": "detail"
+        },
+        {
+          "from": "detail",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "일정 조회 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 96,
+              "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageMainList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageMainList.do",
+          "id": "main",
+          "kind": "activity",
+          "label": "메인 화면 일정 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 172,
+              "snippet": "\t\tcommandMap.put(\"searchMode\", \"DAILY\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 154,
+              "snippet": "\t\tString strYear = commandMap.get(\"year\");"
+            }
+          ],
+          "id": "d",
+          "kind": "decision",
+          "label": "조회할 화면 선택"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 131,
+              "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageDailyList.do",
+          "id": "day",
+          "kind": "activity",
+          "label": "일별 일정 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 196,
+              "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageWeekList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageWeekList.do",
+          "id": "week",
+          "kind": "activity",
+          "label": "주간 일정 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 331,
+              "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageMonthList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageMonthList.do",
+          "id": "month",
+          "kind": "activity",
+          "label": "월별 일정 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 392,
+              "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageList.do",
+          "id": "list",
+          "kind": "activity",
+          "label": "일정 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 413,
+              "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDetail.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageDetail.do",
+          "id": "detail",
+          "kind": "activity",
+          "label": "일정 상세 조회"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "조회 결과 화면 표시"
+        }
+      ],
+      "title": "일정 조회"
+    },
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "form"
+        },
+        {
+          "from": "form",
+          "to": "submit"
+        },
+        {
+          "from": "submit",
+          "to": "auth"
+        },
+        {
+          "from": "auth",
+          "to": "file"
+        },
+        {
+          "from": "file",
+          "to": "save"
+        },
+        {
+          "from": "save",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "일정 등록 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 647,
+              "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageRegist.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegist.do",
+          "id": "form",
+          "kind": "activity",
+          "label": "등록 화면과 코드 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 703,
+              "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageRegistActor.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegistActor.do",
+          "id": "submit",
+          "kind": "activity",
+          "label": "일정 정보 입력 후 저장 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ],
+          "id": "auth",
+          "kind": "activity",
+          "label": "인증 사용자 확인"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 76,
+              "snippet": "\tpublic List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 124,
+              "snippet": "\t\t\tfile.transferTo(new File(EgovWebUtil.filePathBlackList(filePath)));"
+            }
+          ],
+          "id": "file",
+          "kind": "activity",
+          "label": "첨부파일 저장"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 82,
+              "snippet": "\tvoid  insertIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "id": "save",
+          "kind": "activity",
+          "label": "일정 등록"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "등록 완료"
+        }
+      ],
+      "title": "일정 등록"
+    },
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "form"
+        },
+        {
+          "from": "form",
+          "to": "submit"
+        },
+        {
+          "from": "submit",
+          "to": "auth"
+        },
+        {
+          "from": "auth",
+          "to": "save"
+        },
+        {
+          "from": "save",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "일정 수정 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 473,
+              "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageModify.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageModify.do",
+          "id": "form",
+          "kind": "activity",
+          "label": "수정 화면과 현재 내용 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 541,
+              "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageModifyActor.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageModifyActor.do",
+          "id": "submit",
+          "kind": "activity",
+          "label": "변경 내용 저장 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "id": "auth",
+          "kind": "activity",
+          "label": "인증 사용자 확인"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 89,
+              "snippet": "\tvoid  updateIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "id": "save",
+          "kind": "activity",
+          "label": "일정 수정 반영"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "수정 완료"
+        }
+      ],
+      "title": "일정 수정"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+          "line": 36,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+          "line": 52,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+          "line": 57,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+          "line": 65,
+          "snippet": "\t@EgovNullCheck"
+        }
+      ],
+      "text": "일정 등록·수정 시 일정구분, 일정명, 일정내용, 일정중요도코드는 반드시 입력해야 한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+          "line": 53,
+          "snippet": "\t@Size(max=255)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+          "line": 58,
+          "snippet": "\t@Size(max=2500)"
+        }
+      ],
+      "text": "일정명은 255자, 일정내용은 2500자를 넘을 수 없다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+          "line": 152,
+          "snippet": "\t\tCalendar calNow = Calendar.getInstance();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+          "line": 158,
+          "snippet": "\t\tint iNowYear = calNow.get(Calendar.YEAR);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+          "line": 162,
+          "snippet": "\t\tif (strYear != null) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+          "line": 168,
+          "snippet": "\t\tstrSearchDay = Integer.toString(iNowYear);"
+        }
+      ],
+      "text": "달력 조회 시 연·월·일이 지정되지 않으면 오늘 날짜를 기준 조회일자로 사용한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+          "line": 172,
+          "snippet": "\t\tcommandMap.put(\"searchMode\", \"DAILY\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+          "line": 173,
+          "snippet": "\t\tcommandMap.put(\"searchDay\", strSearchDay);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+          "line": 179,
+          "snippet": "\t\tList<EgovMap> resultList = egovIndvdlSchdulManageService.selectIndvdlSchdulManageRetrieve(commandMap);"
+        }
+      ],
+      "text": "일별 조회는 조회 모드를 일별로 지정하고 기준 일자를 조회 조건에 담아 일정 목록을 조회한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 41,
+          "snippet": "\tpublic static Object getAuthenticatedUser() {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 58,
+          "snippet": "\tpublic static Boolean isAuthenticated() {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 24,
+          "snippet": "\tpublic Boolean isAuthenticated(); "
+        }
+      ],
+      "text": "일정 등록·수정 처리는 인증된 사용자 여부와 사용자 정보를 확인한 뒤 진행한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+          "line": 83,
+          "snippet": "\t\tif (storePath == null || \"\".equals(storePath)) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+          "line": 89,
+          "snippet": "\t\tif (atchFileId == null || \"\".equals(atchFileId)) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+          "line": 95,
+          "snippet": "\t\tFile saveFolder = new File(EgovWebUtil.filePathBlackList(storePathString));"
+        }
+      ],
+      "text": "첨부파일은 지정된 저장 경로에 보관하되 저장 경로가 없으면 기본 경로를 쓰고, 첨부파일ID가 없으면 새로 채번한다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+          "line": 145,
+          "snippet": "\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 34,
+          "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 31,
+          "snippet": "    private String codeId = \"\";"
+        }
+      ],
+      "text": "공통코드 영역 — 일정종류·일정구분·중요도 선택 목록을 공통코드 조회 서비스에서 받아 화면에 제공한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 41,
+          "snippet": "\tpublic static Object getAuthenticatedUser() {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 11,
+          "snippet": "\tpublic Object getAuthenticatedUser();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        }
+      ],
+      "text": "사용자 인증 영역 — 인증 사용자 확인 도우미를 통해 인증 여부와 로그인 사용자 정보를 받아 일정 처리 주체를 확정한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+          "line": 76,
+          "snippet": "\tpublic List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+          "line": 38,
+          "snippet": "    public String insertFileInf(FileVO fvo) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+          "line": 72,
+          "snippet": "\tprivate String atchFileId;"
+        }
+      ],
+      "text": "첨부파일 영역 — 일정 등록 시 업로드 파일을 저장 도우미로 보관하고 파일 정보 관리 서비스로 등록한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 52,
+          "snippet": "\tpublic String getMessage(String code) {"
+        }
+      ],
+      "text": "메시지 영역 — 화면 안내·오류 문구를 메시지 코드로 공통 메시지 서비스에서 조회한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+          "line": 29,
+          "snippet": "@Service(\"egovUtil\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+          "line": 48,
+          "snippet": "\tpublic static boolean hasComponent(String componentName){"
+        }
+      ],
+      "text": "공통 컴포넌트 확인 — 일정 상세 화면에서 선택적 공통 컴포넌트의 설치 여부를 확인해 노출을 결정한다."
+    }
+  ],
+  "domainId": "domain:cop.smt.sim",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+          "line": 28,
+          "snippet": "public class IndvdlSchdulManageVO implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+          "line": 33,
+          "snippet": "\tprivate String schdulId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+          "line": 37,
+          "snippet": "\tprivate String schdulSe;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+          "line": 54,
+          "snippet": "\tprivate String schdulNm;"
+        }
+      ],
+      "text": "일정 — 일정ID로 식별되며 일정구분·일정명·일정내용·기간·장소·중요도·담당자·첨부파일·반복 구분을 갖는 개인일정 한 건이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 31,
+          "snippet": "    private String codeId = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 34,
+          "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+          "line": 144,
+          "snippet": "\t\tvoComCode.setCodeId(\"COM030\");"
+        }
+      ],
+      "text": "공통코드 — 일정종류·일정구분·중요도처럼 화면에서 선택하는 코드 값으로, 코드 ID를 기준으로 상세 코드 목록을 조회한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 41,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 67,
+          "snippet": "\tprivate String uniqId;"
+        }
+      ],
+      "text": "로그인 사용자 — 아이디·이름·소속 조직·고유아이디를 갖는 인증된 사용자로, 일정의 등록자와 조회 주체가 된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+          "line": 72,
+          "snippet": "\tprivate String atchFileId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+          "line": 21,
+          "snippet": "public interface EgovFileMngService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+          "line": 76,
+          "snippet": "\tpublic List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+        }
+      ],
+      "text": "첨부파일 — 일정에 함께 등록되는 파일로, 첨부파일ID로 일정과 연결되며 파일 정보로 별도 관리된다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageDailyList.do",
+      "name": "일별 일정 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 131,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+          }
+        ],
+        "text": "요청된 연·월·일 또는 오늘 날짜를 기준으로 하루치 일정 목록과 일정종류 공통코드를 조회해 일별 달력 화면에 전달하는 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageDetail.do",
+      "name": "일정 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 413,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDetail.do\")"
+          }
+        ],
+        "text": "선택한 일정의 상세 정보와 관련 공통코드를 조회하고 첨부파일 컴포넌트 사용 여부를 확인해 상세 화면에 전달하는 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageList.do",
+      "name": "일정 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 392,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageList.do\")"
+          }
+        ],
+        "text": "검색 조건에 따라 개인일정 목록을 조회해 목록 화면에 전달하는 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageMainList.do",
+      "name": "메인 화면 개인일정 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 96,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageMainList.do\")"
+          }
+        ],
+        "text": "로그인 사용자의 인증 정보를 확인해 메인 화면에 표시할 개인일정 목록을 조회하고 화면에 전달하는 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageModify.do",
+      "name": "일정 수정 화면 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 473,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageModify.do\")"
+          }
+        ],
+        "text": "수정 대상 일정의 현재 내용과 일정구분·중요도 공통코드를 조회해 수정 입력 화면에 전달하는 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageModifyActor.do",
+      "name": "일정 수정 처리",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 541,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageModifyActor.do\")"
+          }
+        ],
+        "text": "인증된 사용자가 입력한 일정 변경 내용을 검증하고 일정관리 서비스로 수정을 반영하는 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageMonthList.do",
+      "name": "월별 일정 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 331,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageMonthList.do\")"
+          }
+        ],
+        "text": "기준 연·월을 대상으로 일정 목록과 일정종류 공통코드를 조회해 월별 달력 화면에 전달하는 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegist.do",
+      "name": "일정 등록 화면 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 647,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageRegist.do\")"
+          }
+        ],
+        "text": "인증된 사용자에게 일정 등록 입력 화면을 제공하기 위해 일정구분·중요도 공통코드를 조회하는 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegistActor.do",
+      "name": "일정 등록 처리",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 703,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageRegistActor.do\")"
+          }
+        ],
+        "text": "입력된 일정 정보와 첨부파일을 검증·저장하고 새 개인일정을 등록하는 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/sim/EgovIndvdlSchdulManageWeekList.do",
+      "name": "주간 일정 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 196,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageWeekList.do\")"
+          }
+        ],
+        "text": "기준 일자가 속한 주를 대상으로 일정 목록과 일정종류 공통코드를 조회해 주간 달력 화면에 전달하는 흐름이다."
+      }
+    }
+  ],
+  "name": "개인일정관리",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID와 상세코드, 코드명, 코드설명을 기본 필드로 갖고, 특정 테이블에서 코드 정보를 뽑을 때 쓰는 테이블명과 상세 조건 여부·상세 조건 값을 함께 담는다. 상세 조건 여부는 기본값이 미사용이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "개인일정 화면이 일정종류·일정구분 등의 코드 목록을 요청할 때 어떤 코드를 어떤 조건으로 가져올지 지정해 공통코드 서비스에 전달하는 조회 조건 데이터 역할을 한다."
+        }
+      },
+      "name": "공통코드 조회 조건 정보",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageDailyList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "조회할 코드 ID와 상세코드, 코드명, 특정 테이블명, 상세 조건 여부 등 공통코드 조회에 필요한 조건을 담는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 58,
+              "snippet": "\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회 조건 정보를 받아 단건 공통코드 상세 목록을 조회하고, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 돌려주며, 조직 정보와 그룹 정보도 코드 형태로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "개인일정 화면이 필요로 하는 일정종류·일정구분·중요도 등의 선택 목록을 공통코드 형태로 제공해, 일정 업무가 코드 값을 직접 관리하지 않아도 되게 하는 역할을 맡는다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageDailyList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "일정구분·일정종류·중요도처럼 화면에서 선택하는 코드 목록을 조회 조건에 맞게 돌려주는 공통코드 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 34,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageMainList(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 42,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageRetrieve(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 59,
+              "snippet": "\tpublic List<IndvdlSchdulManageVO> selectIndvdlSchdulManageList(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 82,
+              "snippet": "\tvoid  insertIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 89,
+              "snippet": "\tvoid  updateIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "text": "메인 화면 일정 조회와 조건별 일정 목록 조회, 일정 상세 조회, 일정 등록과 수정 작업을 각각의 업무 단위로 제공하며, 조회는 조회 조건 정보를 받아 목록을 돌려주고 등록·수정은 일정 정보를 받아 반영한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 25,
+              "snippet": "public interface EgovIndvdlSchdulManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 34,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageMainList(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 42,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageRetrieve(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 67,
+              "snippet": "\tpublic List<IndvdlSchdulManageVO> selectIndvdlSchdulManageDetail(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "text": "개인일정 업무의 핵심 서비스로, 메인 화면 목록과 기간별 일정 조회, 일정 상세 조회, 일정 등록과 수정 등 일정 관리 업무 전반의 처리 계약을 제공한다."
+        }
+      },
+      "name": "개인일정 관리 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageDailyList.do:src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+            "line": 25,
+            "snippet": "public interface EgovIndvdlSchdulManageService {"
+          }
+        ],
+        "text": "개인일정의 메인 목록·기간별 조회·상세 조회·등록·수정·삭제 업무를 정의하는 일정관리 업무 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 137,
+              "snippet": "\t\tmodel.addAttribute(\"searchKeyword\", commandMap.get(\"searchKeyword\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 154,
+              "snippet": "\t\tString strYear = commandMap.get(\"year\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 162,
+              "snippet": "\t\tif (strYear != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 172,
+              "snippet": "\t\tcommandMap.put(\"searchMode\", \"DAILY\");"
+            }
+          ],
+          "text": "검색어와 검색 조건을 화면 유지용으로 모델에 담고, 연·월·일 파라미터가 넘어오면 그 값을, 없으면 오늘 날짜를 기준 조회일자로 삼아 조회 모드와 조회일자를 요청 정보에 설정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 131,
+              "snippet": "\t@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 145,
+              "snippet": "\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 179,
+              "snippet": "\t\tList<EgovMap> resultList = egovIndvdlSchdulManageService.selectIndvdlSchdulManageRetrieve(commandMap);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 182,
+              "snippet": "\t\treturn \"egovframework/com/cop/smt/sim/EgovIndvdlSchdulManageDailyList\";"
+            }
+          ],
+          "text": "개인일정관리의 모든 화면 요청이 들어오는 진입 지점으로, 요청 파라미터를 정리해 공통코드 조회와 일정관리 업무 처리를 각 서비스에 위임하고 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "개인일정관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageDailyList.do:src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 131,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+          }
+        ],
+        "text": "개인일정 화면 요청을 받아 검색 조건과 달력 기준일자를 정리하고 공통코드·일정 조회를 위임한 뒤 결과를 화면 모델에 담아 반환한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID와 상세코드, 코드명, 코드설명을 기본 필드로 갖고, 특정 테이블에서 코드 정보를 뽑을 때 쓰는 테이블명과 상세 조건 여부·상세 조건 값을 함께 담는다. 상세 조건 여부는 기본값이 미사용이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "개인일정 화면이 일정종류·일정구분 등의 코드 목록을 요청할 때 어떤 코드를 어떤 조건으로 가져올지 지정해 공통코드 서비스에 전달하는 조회 조건 데이터 역할을 한다."
+        }
+      },
+      "name": "공통코드 조회 조건 정보",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageDetail.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "조회할 코드 ID와 상세코드, 코드명, 특정 테이블명, 상세 조건 여부 등 공통코드 조회에 필요한 조건을 담는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+              "line": 48,
+              "snippet": "\tpublic static boolean hasComponent(String componentName){"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+              "line": 51,
+              "snippet": "\t\t\tObject component = context.getBean(componentName);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+              "line": 54,
+              "snippet": "\t\t\tif(ObjectUtils.isEmpty(component)){"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+              "line": 60,
+              "snippet": "\t\t}catch(NoSuchBeanDefinitionException ex){// 해당 컴포넌트를 찾을 수없을 경우 false반환"
+            }
+          ],
+          "text": "컴포넌트 이름으로 해당 구성 요소를 찾아 존재하면 사용 가능으로, 비어 있거나 정의를 찾지 못하면 사용 불가로 판정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+              "line": 29,
+              "snippet": "@Service(\"egovUtil\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+              "line": 48,
+              "snippet": "\tpublic static boolean hasComponent(String componentName){"
+            }
+          ],
+          "text": "일정 상세 화면에서 첨부파일 같은 선택적 공통 컴포넌트를 쓸 수 있는지 미리 확인해, 설치되지 않은 기능은 화면에서 제외할 수 있게 하는 역할을 한다."
+        }
+      },
+      "name": "컴포넌트 사용 여부 확인",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageDetail.do:src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+            "line": 29,
+            "snippet": "@Service(\"egovUtil\")"
+          }
+        ],
+        "text": "특정 공통 컴포넌트가 현재 시스템에 설치·설정되어 있는지 확인해 주는 공통 확인 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 58,
+              "snippet": "\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회 조건 정보를 받아 단건 공통코드 상세 목록을 조회하고, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 돌려주며, 조직 정보와 그룹 정보도 코드 형태로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "개인일정 화면이 필요로 하는 일정종류·일정구분·중요도 등의 선택 목록을 공통코드 형태로 제공해, 일정 업무가 코드 값을 직접 관리하지 않아도 되게 하는 역할을 맡는다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageDetail.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "일정구분·일정종류·중요도처럼 화면에서 선택하는 코드 목록을 조회 조건에 맞게 돌려주는 공통코드 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 34,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageMainList(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 42,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageRetrieve(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 59,
+              "snippet": "\tpublic List<IndvdlSchdulManageVO> selectIndvdlSchdulManageList(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 82,
+              "snippet": "\tvoid  insertIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 89,
+              "snippet": "\tvoid  updateIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "text": "메인 화면 일정 조회와 조건별 일정 목록 조회, 일정 상세 조회, 일정 등록과 수정 작업을 각각의 업무 단위로 제공하며, 조회는 조회 조건 정보를 받아 목록을 돌려주고 등록·수정은 일정 정보를 받아 반영한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 25,
+              "snippet": "public interface EgovIndvdlSchdulManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 34,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageMainList(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 42,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageRetrieve(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 67,
+              "snippet": "\tpublic List<IndvdlSchdulManageVO> selectIndvdlSchdulManageDetail(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "text": "개인일정 업무의 핵심 서비스로, 메인 화면 목록과 기간별 일정 조회, 일정 상세 조회, 일정 등록과 수정 등 일정 관리 업무 전반의 처리 계약을 제공한다."
+        }
+      },
+      "name": "개인일정 관리 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageDetail.do:src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+            "line": 25,
+            "snippet": "public interface EgovIndvdlSchdulManageService {"
+          }
+        ],
+        "text": "개인일정의 메인 목록·기간별 조회·상세 조회·등록·수정·삭제 업무를 정의하는 일정관리 업무 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 137,
+              "snippet": "\t\tmodel.addAttribute(\"searchKeyword\", commandMap.get(\"searchKeyword\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 154,
+              "snippet": "\t\tString strYear = commandMap.get(\"year\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 162,
+              "snippet": "\t\tif (strYear != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 172,
+              "snippet": "\t\tcommandMap.put(\"searchMode\", \"DAILY\");"
+            }
+          ],
+          "text": "검색어와 검색 조건을 화면 유지용으로 모델에 담고, 연·월·일 파라미터가 넘어오면 그 값을, 없으면 오늘 날짜를 기준 조회일자로 삼아 조회 모드와 조회일자를 요청 정보에 설정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 131,
+              "snippet": "\t@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 145,
+              "snippet": "\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 179,
+              "snippet": "\t\tList<EgovMap> resultList = egovIndvdlSchdulManageService.selectIndvdlSchdulManageRetrieve(commandMap);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 182,
+              "snippet": "\t\treturn \"egovframework/com/cop/smt/sim/EgovIndvdlSchdulManageDailyList\";"
+            }
+          ],
+          "text": "개인일정관리의 모든 화면 요청이 들어오는 진입 지점으로, 요청 파라미터를 정리해 공통코드 조회와 일정관리 업무 처리를 각 서비스에 위임하고 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "개인일정관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageDetail.do:src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 131,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+          }
+        ],
+        "text": "개인일정 화면 요청을 받아 검색 조건과 달력 기준일자를 정리하고 공통코드·일정 조회를 위임한 뒤 결과를 화면 모델에 담아 반환한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 34,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageMainList(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 42,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageRetrieve(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 59,
+              "snippet": "\tpublic List<IndvdlSchdulManageVO> selectIndvdlSchdulManageList(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 82,
+              "snippet": "\tvoid  insertIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 89,
+              "snippet": "\tvoid  updateIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "text": "메인 화면 일정 조회와 조건별 일정 목록 조회, 일정 상세 조회, 일정 등록과 수정 작업을 각각의 업무 단위로 제공하며, 조회는 조회 조건 정보를 받아 목록을 돌려주고 등록·수정은 일정 정보를 받아 반영한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 25,
+              "snippet": "public interface EgovIndvdlSchdulManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 34,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageMainList(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 42,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageRetrieve(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 67,
+              "snippet": "\tpublic List<IndvdlSchdulManageVO> selectIndvdlSchdulManageDetail(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "text": "개인일정 업무의 핵심 서비스로, 메인 화면 목록과 기간별 일정 조회, 일정 상세 조회, 일정 등록과 수정 등 일정 관리 업무 전반의 처리 계약을 제공한다."
+        }
+      },
+      "name": "개인일정 관리 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageList.do:src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+            "line": 25,
+            "snippet": "public interface EgovIndvdlSchdulManageService {"
+          }
+        ],
+        "text": "개인일정의 메인 목록·기간별 조회·상세 조회·등록·수정·삭제 업무를 정의하는 일정관리 업무 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 137,
+              "snippet": "\t\tmodel.addAttribute(\"searchKeyword\", commandMap.get(\"searchKeyword\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 154,
+              "snippet": "\t\tString strYear = commandMap.get(\"year\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 162,
+              "snippet": "\t\tif (strYear != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 172,
+              "snippet": "\t\tcommandMap.put(\"searchMode\", \"DAILY\");"
+            }
+          ],
+          "text": "검색어와 검색 조건을 화면 유지용으로 모델에 담고, 연·월·일 파라미터가 넘어오면 그 값을, 없으면 오늘 날짜를 기준 조회일자로 삼아 조회 모드와 조회일자를 요청 정보에 설정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 131,
+              "snippet": "\t@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 145,
+              "snippet": "\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 179,
+              "snippet": "\t\tList<EgovMap> resultList = egovIndvdlSchdulManageService.selectIndvdlSchdulManageRetrieve(commandMap);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 182,
+              "snippet": "\t\treturn \"egovframework/com/cop/smt/sim/EgovIndvdlSchdulManageDailyList\";"
+            }
+          ],
+          "text": "개인일정관리의 모든 화면 요청이 들어오는 진입 지점으로, 요청 파라미터를 정리해 공통코드 조회와 일정관리 업무 처리를 각 서비스에 위임하고 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "개인일정관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageList.do:src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 131,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+          }
+        ],
+        "text": "개인일정 화면 요청을 받아 검색 조건과 달력 기준일자를 정리하고 공통코드·일정 조회를 위임한 뒤 결과를 화면 모델에 담아 반환한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드만으로 기본 언어 설정의 메시지를 조회하고, 언어를 지정하거나 치환할 매개변수를 함께 넘겨 메시지를 조회하는 방법도 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "개인일정 화면이 사용자에게 보여줄 문구를 코드로 요청하면 설정된 메시지 자원에서 해당 문구를 찾아 돌려주는 역할을 한다."
+        }
+      },
+      "name": "메시지 조회 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageMainList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "화면에 표시할 안내·오류 메시지를 메시지 코드로 조회해 주는 공통 메시지 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "\tprivate String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 61,
+              "snippet": "\tprivate String userSe;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 63,
+              "snippet": "\tprivate String orgnztId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디와 이름, 이메일은 반드시 값이 있어야 하며, 사용자구분과 소속 조직ID·조직명, 사용자별 고유아이디, 접속 IP 정보를 함께 갖는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            }
+          ],
+          "text": "인증된 사용자가 누구인지를 개인일정 업무에 전달하는 데이터로, 본인 일정을 조회하거나 등록·수정할 때 사용자 식별 값의 근거가 된다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageMainList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "아이디와 이름, 소속 조직, 고유아이디 등 로그인한 사용자의 신원 정보를 담는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 15,
+              "snippet": "\t * 예) [ROLE_ADMIN, ROLE_USER, ROLE_A, ROLE_B, ROLE_RESTRICTED, IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED_ANONYMOUSLY]"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자를 사용자 정보 형태로 돌려주고, 관리자·일반 사용자 등의 권한 정보 목록을 제공하며, 인증된 사용자 여부를 참·거짓으로 확인해 준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "개인일정 업무가 요청자를 신뢰할 수 있는지 판단할 근거를 제공하는 서비스로, 인증된 사용자 정보와 권한, 인증 여부를 알려준다."
+        }
+      },
+      "name": "사용자 인증 정보 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageMainList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증된 사용자 정보와 권한 목록, 인증 여부 확인을 제공하는 사용자 인증 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "사용자 인증 서비스 하나를 보관하고 이를 통해 인증된 사용자 정보, 사용자 권한 목록, 인증 여부를 각각 제공한다. 인증 서비스가 설정되어 있어야 정상 동작한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "개인일정 화면이 로그인 여부와 사용자 정보를 확인할 때 사용하는 창구로, 실제 확인 작업은 사용자 인증 서비스에 넘기고 결과만 돌려주는 역할을 한다."
+        }
+      },
+      "name": "인증 사용자 확인 도우미",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageMainList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "현재 인증된 사용자 정보와 권한 목록, 인증 여부를 업무 화면에서 간편하게 확인하도록 돕는 공통 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 34,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageMainList(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 42,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageRetrieve(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 59,
+              "snippet": "\tpublic List<IndvdlSchdulManageVO> selectIndvdlSchdulManageList(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 82,
+              "snippet": "\tvoid  insertIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 89,
+              "snippet": "\tvoid  updateIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "text": "메인 화면 일정 조회와 조건별 일정 목록 조회, 일정 상세 조회, 일정 등록과 수정 작업을 각각의 업무 단위로 제공하며, 조회는 조회 조건 정보를 받아 목록을 돌려주고 등록·수정은 일정 정보를 받아 반영한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 25,
+              "snippet": "public interface EgovIndvdlSchdulManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 34,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageMainList(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 42,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageRetrieve(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 67,
+              "snippet": "\tpublic List<IndvdlSchdulManageVO> selectIndvdlSchdulManageDetail(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "text": "개인일정 업무의 핵심 서비스로, 메인 화면 목록과 기간별 일정 조회, 일정 상세 조회, 일정 등록과 수정 등 일정 관리 업무 전반의 처리 계약을 제공한다."
+        }
+      },
+      "name": "개인일정 관리 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageMainList.do:src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+            "line": 25,
+            "snippet": "public interface EgovIndvdlSchdulManageService {"
+          }
+        ],
+        "text": "개인일정의 메인 목록·기간별 조회·상세 조회·등록·수정·삭제 업무를 정의하는 일정관리 업무 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 137,
+              "snippet": "\t\tmodel.addAttribute(\"searchKeyword\", commandMap.get(\"searchKeyword\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 154,
+              "snippet": "\t\tString strYear = commandMap.get(\"year\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 162,
+              "snippet": "\t\tif (strYear != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 172,
+              "snippet": "\t\tcommandMap.put(\"searchMode\", \"DAILY\");"
+            }
+          ],
+          "text": "검색어와 검색 조건을 화면 유지용으로 모델에 담고, 연·월·일 파라미터가 넘어오면 그 값을, 없으면 오늘 날짜를 기준 조회일자로 삼아 조회 모드와 조회일자를 요청 정보에 설정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 131,
+              "snippet": "\t@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 145,
+              "snippet": "\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 179,
+              "snippet": "\t\tList<EgovMap> resultList = egovIndvdlSchdulManageService.selectIndvdlSchdulManageRetrieve(commandMap);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 182,
+              "snippet": "\t\treturn \"egovframework/com/cop/smt/sim/EgovIndvdlSchdulManageDailyList\";"
+            }
+          ],
+          "text": "개인일정관리의 모든 화면 요청이 들어오는 진입 지점으로, 요청 파라미터를 정리해 공통코드 조회와 일정관리 업무 처리를 각 서비스에 위임하고 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "개인일정관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageMainList.do:src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 131,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+          }
+        ],
+        "text": "개인일정 화면 요청을 받아 검색 조건과 달력 기준일자를 정리하고 공통코드·일정 조회를 위임한 뒤 결과를 화면 모델에 담아 반환한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID와 상세코드, 코드명, 코드설명을 기본 필드로 갖고, 특정 테이블에서 코드 정보를 뽑을 때 쓰는 테이블명과 상세 조건 여부·상세 조건 값을 함께 담는다. 상세 조건 여부는 기본값이 미사용이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "개인일정 화면이 일정종류·일정구분 등의 코드 목록을 요청할 때 어떤 코드를 어떤 조건으로 가져올지 지정해 공통코드 서비스에 전달하는 조회 조건 데이터 역할을 한다."
+        }
+      },
+      "name": "공통코드 조회 조건 정보",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageModify.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "조회할 코드 ID와 상세코드, 코드명, 특정 테이블명, 상세 조건 여부 등 공통코드 조회에 필요한 조건을 담는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 58,
+              "snippet": "\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회 조건 정보를 받아 단건 공통코드 상세 목록을 조회하고, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 돌려주며, 조직 정보와 그룹 정보도 코드 형태로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "개인일정 화면이 필요로 하는 일정종류·일정구분·중요도 등의 선택 목록을 공통코드 형태로 제공해, 일정 업무가 코드 값을 직접 관리하지 않아도 되게 하는 역할을 맡는다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageModify.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "일정구분·일정종류·중요도처럼 화면에서 선택하는 코드 목록을 조회 조건에 맞게 돌려주는 공통코드 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 34,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageMainList(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 42,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageRetrieve(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 59,
+              "snippet": "\tpublic List<IndvdlSchdulManageVO> selectIndvdlSchdulManageList(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 82,
+              "snippet": "\tvoid  insertIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 89,
+              "snippet": "\tvoid  updateIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "text": "메인 화면 일정 조회와 조건별 일정 목록 조회, 일정 상세 조회, 일정 등록과 수정 작업을 각각의 업무 단위로 제공하며, 조회는 조회 조건 정보를 받아 목록을 돌려주고 등록·수정은 일정 정보를 받아 반영한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 25,
+              "snippet": "public interface EgovIndvdlSchdulManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 34,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageMainList(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 42,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageRetrieve(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 67,
+              "snippet": "\tpublic List<IndvdlSchdulManageVO> selectIndvdlSchdulManageDetail(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "text": "개인일정 업무의 핵심 서비스로, 메인 화면 목록과 기간별 일정 조회, 일정 상세 조회, 일정 등록과 수정 등 일정 관리 업무 전반의 처리 계약을 제공한다."
+        }
+      },
+      "name": "개인일정 관리 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageModify.do:src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+            "line": 25,
+            "snippet": "public interface EgovIndvdlSchdulManageService {"
+          }
+        ],
+        "text": "개인일정의 메인 목록·기간별 조회·상세 조회·등록·수정·삭제 업무를 정의하는 일정관리 업무 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 33,
+              "snippet": "\tprivate String schdulId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 36,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 53,
+              "snippet": "\t@Size(max=255)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 58,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 66,
+              "snippet": "\tprivate String schdulIpcrCode;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 72,
+              "snippet": "\tprivate String atchFileId;"
+            }
+          ],
+          "text": "일정ID를 식별자로 하고 일정구분·일정명·일정내용·일정중요도코드를 필수 입력으로 지키며, 일정명은 255자, 일정내용은 2500자를 넘을 수 없다. 그 밖에 일정 시작·종료 일자와 장소, 담당자, 첨부파일ID, 반복 구분과 등록·수정 이력 정보를 함께 담는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 28,
+              "snippet": "public class IndvdlSchdulManageVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 33,
+              "snippet": "\tprivate String schdulId;"
+            }
+          ],
+          "text": "개인일정 한 건을 화면과 업무 서비스 사이에서 주고받는 데이터로, 등록·수정 시 입력 값을 담고 조회 시 일정 내용을 화면으로 전달하는 역할을 한다."
+        }
+      },
+      "name": "일정 정보",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageModify.do:src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+            "line": 28,
+            "snippet": "public class IndvdlSchdulManageVO implements Serializable {"
+          }
+        ],
+        "text": "일정ID와 일정구분, 일정명, 일정내용, 기간, 장소, 중요도, 첨부파일, 반복 구분 등 개인일정 한 건의 정보를 담는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 137,
+              "snippet": "\t\tmodel.addAttribute(\"searchKeyword\", commandMap.get(\"searchKeyword\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 154,
+              "snippet": "\t\tString strYear = commandMap.get(\"year\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 162,
+              "snippet": "\t\tif (strYear != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 172,
+              "snippet": "\t\tcommandMap.put(\"searchMode\", \"DAILY\");"
+            }
+          ],
+          "text": "검색어와 검색 조건을 화면 유지용으로 모델에 담고, 연·월·일 파라미터가 넘어오면 그 값을, 없으면 오늘 날짜를 기준 조회일자로 삼아 조회 모드와 조회일자를 요청 정보에 설정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 131,
+              "snippet": "\t@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 145,
+              "snippet": "\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 179,
+              "snippet": "\t\tList<EgovMap> resultList = egovIndvdlSchdulManageService.selectIndvdlSchdulManageRetrieve(commandMap);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 182,
+              "snippet": "\t\treturn \"egovframework/com/cop/smt/sim/EgovIndvdlSchdulManageDailyList\";"
+            }
+          ],
+          "text": "개인일정관리의 모든 화면 요청이 들어오는 진입 지점으로, 요청 파라미터를 정리해 공통코드 조회와 일정관리 업무 처리를 각 서비스에 위임하고 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "개인일정관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageModify.do:src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 131,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+          }
+        ],
+        "text": "개인일정 화면 요청을 받아 검색 조건과 달력 기준일자를 정리하고 공통코드·일정 조회를 위임한 뒤 결과를 화면 모델에 담아 반환한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID와 상세코드, 코드명, 코드설명을 기본 필드로 갖고, 특정 테이블에서 코드 정보를 뽑을 때 쓰는 테이블명과 상세 조건 여부·상세 조건 값을 함께 담는다. 상세 조건 여부는 기본값이 미사용이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "개인일정 화면이 일정종류·일정구분 등의 코드 목록을 요청할 때 어떤 코드를 어떤 조건으로 가져올지 지정해 공통코드 서비스에 전달하는 조회 조건 데이터 역할을 한다."
+        }
+      },
+      "name": "공통코드 조회 조건 정보",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageModifyActor.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "조회할 코드 ID와 상세코드, 코드명, 특정 테이블명, 상세 조건 여부 등 공통코드 조회에 필요한 조건을 담는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드만으로 기본 언어 설정의 메시지를 조회하고, 언어를 지정하거나 치환할 매개변수를 함께 넘겨 메시지를 조회하는 방법도 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "개인일정 화면이 사용자에게 보여줄 문구를 코드로 요청하면 설정된 메시지 자원에서 해당 문구를 찾아 돌려주는 역할을 한다."
+        }
+      },
+      "name": "메시지 조회 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageModifyActor.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "화면에 표시할 안내·오류 메시지를 메시지 코드로 조회해 주는 공통 메시지 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "\tprivate String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 61,
+              "snippet": "\tprivate String userSe;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 63,
+              "snippet": "\tprivate String orgnztId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디와 이름, 이메일은 반드시 값이 있어야 하며, 사용자구분과 소속 조직ID·조직명, 사용자별 고유아이디, 접속 IP 정보를 함께 갖는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            }
+          ],
+          "text": "인증된 사용자가 누구인지를 개인일정 업무에 전달하는 데이터로, 본인 일정을 조회하거나 등록·수정할 때 사용자 식별 값의 근거가 된다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageModifyActor.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "아이디와 이름, 소속 조직, 고유아이디 등 로그인한 사용자의 신원 정보를 담는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 58,
+              "snippet": "\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회 조건 정보를 받아 단건 공통코드 상세 목록을 조회하고, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 돌려주며, 조직 정보와 그룹 정보도 코드 형태로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "개인일정 화면이 필요로 하는 일정종류·일정구분·중요도 등의 선택 목록을 공통코드 형태로 제공해, 일정 업무가 코드 값을 직접 관리하지 않아도 되게 하는 역할을 맡는다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageModifyActor.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "일정구분·일정종류·중요도처럼 화면에서 선택하는 코드 목록을 조회 조건에 맞게 돌려주는 공통코드 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "사용자 인증 서비스 하나를 보관하고 이를 통해 인증된 사용자 정보, 사용자 권한 목록, 인증 여부를 각각 제공한다. 인증 서비스가 설정되어 있어야 정상 동작한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "개인일정 화면이 로그인 여부와 사용자 정보를 확인할 때 사용하는 창구로, 실제 확인 작업은 사용자 인증 서비스에 넘기고 결과만 돌려주는 역할을 한다."
+        }
+      },
+      "name": "인증 사용자 확인 도우미",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageModifyActor.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "현재 인증된 사용자 정보와 권한 목록, 인증 여부를 업무 화면에서 간편하게 확인하도록 돕는 공통 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 33,
+              "snippet": "\tprivate String schdulId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 36,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 53,
+              "snippet": "\t@Size(max=255)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 58,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 66,
+              "snippet": "\tprivate String schdulIpcrCode;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 72,
+              "snippet": "\tprivate String atchFileId;"
+            }
+          ],
+          "text": "일정ID를 식별자로 하고 일정구분·일정명·일정내용·일정중요도코드를 필수 입력으로 지키며, 일정명은 255자, 일정내용은 2500자를 넘을 수 없다. 그 밖에 일정 시작·종료 일자와 장소, 담당자, 첨부파일ID, 반복 구분과 등록·수정 이력 정보를 함께 담는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 28,
+              "snippet": "public class IndvdlSchdulManageVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 33,
+              "snippet": "\tprivate String schdulId;"
+            }
+          ],
+          "text": "개인일정 한 건을 화면과 업무 서비스 사이에서 주고받는 데이터로, 등록·수정 시 입력 값을 담고 조회 시 일정 내용을 화면으로 전달하는 역할을 한다."
+        }
+      },
+      "name": "일정 정보",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageModifyActor.do:src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+            "line": 28,
+            "snippet": "public class IndvdlSchdulManageVO implements Serializable {"
+          }
+        ],
+        "text": "일정ID와 일정구분, 일정명, 일정내용, 기간, 장소, 중요도, 첨부파일, 반복 구분 등 개인일정 한 건의 정보를 담는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 137,
+              "snippet": "\t\tmodel.addAttribute(\"searchKeyword\", commandMap.get(\"searchKeyword\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 154,
+              "snippet": "\t\tString strYear = commandMap.get(\"year\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 162,
+              "snippet": "\t\tif (strYear != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 172,
+              "snippet": "\t\tcommandMap.put(\"searchMode\", \"DAILY\");"
+            }
+          ],
+          "text": "검색어와 검색 조건을 화면 유지용으로 모델에 담고, 연·월·일 파라미터가 넘어오면 그 값을, 없으면 오늘 날짜를 기준 조회일자로 삼아 조회 모드와 조회일자를 요청 정보에 설정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 131,
+              "snippet": "\t@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 145,
+              "snippet": "\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 179,
+              "snippet": "\t\tList<EgovMap> resultList = egovIndvdlSchdulManageService.selectIndvdlSchdulManageRetrieve(commandMap);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 182,
+              "snippet": "\t\treturn \"egovframework/com/cop/smt/sim/EgovIndvdlSchdulManageDailyList\";"
+            }
+          ],
+          "text": "개인일정관리의 모든 화면 요청이 들어오는 진입 지점으로, 요청 파라미터를 정리해 공통코드 조회와 일정관리 업무 처리를 각 서비스에 위임하고 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "개인일정관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageModifyActor.do:src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 131,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+          }
+        ],
+        "text": "개인일정 화면 요청을 받아 검색 조건과 달력 기준일자를 정리하고 공통코드·일정 조회를 위임한 뒤 결과를 화면 모델에 담아 반환한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 79,
+              "snippet": "\t\tif (source != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 98,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            }
+          ],
+          "text": "상태를 갖지 않는 도우미로 빈 문자열 상수를 제공하고, 원본 문자열이 지정 길이를 넘으면 잘라 낸 뒤 지정 문구를 덧붙이거나 그냥 잘라 내며, 원본이 없으면 결과도 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            }
+          ],
+          "text": "일정 수정 처리 과정에서 입력 문자열을 화면·업무 규격에 맞게 다듬는 보조 역할을 하며, 길이 초과 문자열을 잘라 주는 기능을 제공한다."
+        }
+      },
+      "name": "문자열 처리 도우미",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageModifyActor.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "문자열이 지정한 길이를 넘을 때 잘라 내는 등 화면 표시용 문자열 가공을 담당하는 공통 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID와 상세코드, 코드명, 코드설명을 기본 필드로 갖고, 특정 테이블에서 코드 정보를 뽑을 때 쓰는 테이블명과 상세 조건 여부·상세 조건 값을 함께 담는다. 상세 조건 여부는 기본값이 미사용이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "개인일정 화면이 일정종류·일정구분 등의 코드 목록을 요청할 때 어떤 코드를 어떤 조건으로 가져올지 지정해 공통코드 서비스에 전달하는 조회 조건 데이터 역할을 한다."
+        }
+      },
+      "name": "공통코드 조회 조건 정보",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageMonthList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "조회할 코드 ID와 상세코드, 코드명, 특정 테이블명, 상세 조건 여부 등 공통코드 조회에 필요한 조건을 담는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 58,
+              "snippet": "\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회 조건 정보를 받아 단건 공통코드 상세 목록을 조회하고, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 돌려주며, 조직 정보와 그룹 정보도 코드 형태로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "개인일정 화면이 필요로 하는 일정종류·일정구분·중요도 등의 선택 목록을 공통코드 형태로 제공해, 일정 업무가 코드 값을 직접 관리하지 않아도 되게 하는 역할을 맡는다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageMonthList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "일정구분·일정종류·중요도처럼 화면에서 선택하는 코드 목록을 조회 조건에 맞게 돌려주는 공통코드 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 34,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageMainList(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 42,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageRetrieve(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 59,
+              "snippet": "\tpublic List<IndvdlSchdulManageVO> selectIndvdlSchdulManageList(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 82,
+              "snippet": "\tvoid  insertIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 89,
+              "snippet": "\tvoid  updateIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "text": "메인 화면 일정 조회와 조건별 일정 목록 조회, 일정 상세 조회, 일정 등록과 수정 작업을 각각의 업무 단위로 제공하며, 조회는 조회 조건 정보를 받아 목록을 돌려주고 등록·수정은 일정 정보를 받아 반영한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 25,
+              "snippet": "public interface EgovIndvdlSchdulManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 34,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageMainList(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 42,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageRetrieve(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 67,
+              "snippet": "\tpublic List<IndvdlSchdulManageVO> selectIndvdlSchdulManageDetail(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "text": "개인일정 업무의 핵심 서비스로, 메인 화면 목록과 기간별 일정 조회, 일정 상세 조회, 일정 등록과 수정 등 일정 관리 업무 전반의 처리 계약을 제공한다."
+        }
+      },
+      "name": "개인일정 관리 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageMonthList.do:src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+            "line": 25,
+            "snippet": "public interface EgovIndvdlSchdulManageService {"
+          }
+        ],
+        "text": "개인일정의 메인 목록·기간별 조회·상세 조회·등록·수정·삭제 업무를 정의하는 일정관리 업무 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 137,
+              "snippet": "\t\tmodel.addAttribute(\"searchKeyword\", commandMap.get(\"searchKeyword\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 154,
+              "snippet": "\t\tString strYear = commandMap.get(\"year\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 162,
+              "snippet": "\t\tif (strYear != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 172,
+              "snippet": "\t\tcommandMap.put(\"searchMode\", \"DAILY\");"
+            }
+          ],
+          "text": "검색어와 검색 조건을 화면 유지용으로 모델에 담고, 연·월·일 파라미터가 넘어오면 그 값을, 없으면 오늘 날짜를 기준 조회일자로 삼아 조회 모드와 조회일자를 요청 정보에 설정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 131,
+              "snippet": "\t@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 145,
+              "snippet": "\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 179,
+              "snippet": "\t\tList<EgovMap> resultList = egovIndvdlSchdulManageService.selectIndvdlSchdulManageRetrieve(commandMap);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 182,
+              "snippet": "\t\treturn \"egovframework/com/cop/smt/sim/EgovIndvdlSchdulManageDailyList\";"
+            }
+          ],
+          "text": "개인일정관리의 모든 화면 요청이 들어오는 진입 지점으로, 요청 파라미터를 정리해 공통코드 조회와 일정관리 업무 처리를 각 서비스에 위임하고 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "개인일정관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageMonthList.do:src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 131,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+          }
+        ],
+        "text": "개인일정 화면 요청을 받아 검색 조건과 달력 기준일자를 정리하고 공통코드·일정 조회를 위임한 뒤 결과를 화면 모델에 담아 반환한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID와 상세코드, 코드명, 코드설명을 기본 필드로 갖고, 특정 테이블에서 코드 정보를 뽑을 때 쓰는 테이블명과 상세 조건 여부·상세 조건 값을 함께 담는다. 상세 조건 여부는 기본값이 미사용이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "개인일정 화면이 일정종류·일정구분 등의 코드 목록을 요청할 때 어떤 코드를 어떤 조건으로 가져올지 지정해 공통코드 서비스에 전달하는 조회 조건 데이터 역할을 한다."
+        }
+      },
+      "name": "공통코드 조회 조건 정보",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "조회할 코드 ID와 상세코드, 코드명, 특정 테이블명, 상세 조건 여부 등 공통코드 조회에 필요한 조건을 담는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드만으로 기본 언어 설정의 메시지를 조회하고, 언어를 지정하거나 치환할 매개변수를 함께 넘겨 메시지를 조회하는 방법도 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "개인일정 화면이 사용자에게 보여줄 문구를 코드로 요청하면 설정된 메시지 자원에서 해당 문구를 찾아 돌려주는 역할을 한다."
+        }
+      },
+      "name": "메시지 조회 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "화면에 표시할 안내·오류 메시지를 메시지 코드로 조회해 주는 공통 메시지 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 58,
+              "snippet": "\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회 조건 정보를 받아 단건 공통코드 상세 목록을 조회하고, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 돌려주며, 조직 정보와 그룹 정보도 코드 형태로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "개인일정 화면이 필요로 하는 일정종류·일정구분·중요도 등의 선택 목록을 공통코드 형태로 제공해, 일정 업무가 코드 값을 직접 관리하지 않아도 되게 하는 역할을 맡는다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "일정구분·일정종류·중요도처럼 화면에서 선택하는 코드 목록을 조회 조건에 맞게 돌려주는 공통코드 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 15,
+              "snippet": "\t * 예) [ROLE_ADMIN, ROLE_USER, ROLE_A, ROLE_B, ROLE_RESTRICTED, IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED_ANONYMOUSLY]"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자를 사용자 정보 형태로 돌려주고, 관리자·일반 사용자 등의 권한 정보 목록을 제공하며, 인증된 사용자 여부를 참·거짓으로 확인해 준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "개인일정 업무가 요청자를 신뢰할 수 있는지 판단할 근거를 제공하는 서비스로, 인증된 사용자 정보와 권한, 인증 여부를 알려준다."
+        }
+      },
+      "name": "사용자 인증 정보 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증된 사용자 정보와 권한 목록, 인증 여부 확인을 제공하는 사용자 인증 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "사용자 인증 서비스 하나를 보관하고 이를 통해 인증된 사용자 정보, 사용자 권한 목록, 인증 여부를 각각 제공한다. 인증 서비스가 설정되어 있어야 정상 동작한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "개인일정 화면이 로그인 여부와 사용자 정보를 확인할 때 사용하는 창구로, 실제 확인 작업은 사용자 인증 서비스에 넘기고 결과만 돌려주는 역할을 한다."
+        }
+      },
+      "name": "인증 사용자 확인 도우미",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "현재 인증된 사용자 정보와 권한 목록, 인증 여부를 업무 화면에서 간편하게 확인하도록 돕는 공통 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 137,
+              "snippet": "\t\tmodel.addAttribute(\"searchKeyword\", commandMap.get(\"searchKeyword\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 154,
+              "snippet": "\t\tString strYear = commandMap.get(\"year\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 162,
+              "snippet": "\t\tif (strYear != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 172,
+              "snippet": "\t\tcommandMap.put(\"searchMode\", \"DAILY\");"
+            }
+          ],
+          "text": "검색어와 검색 조건을 화면 유지용으로 모델에 담고, 연·월·일 파라미터가 넘어오면 그 값을, 없으면 오늘 날짜를 기준 조회일자로 삼아 조회 모드와 조회일자를 요청 정보에 설정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 131,
+              "snippet": "\t@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 145,
+              "snippet": "\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 179,
+              "snippet": "\t\tList<EgovMap> resultList = egovIndvdlSchdulManageService.selectIndvdlSchdulManageRetrieve(commandMap);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 182,
+              "snippet": "\t\treturn \"egovframework/com/cop/smt/sim/EgovIndvdlSchdulManageDailyList\";"
+            }
+          ],
+          "text": "개인일정관리의 모든 화면 요청이 들어오는 진입 지점으로, 요청 파라미터를 정리해 공통코드 조회와 일정관리 업무 처리를 각 서비스에 위임하고 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "개인일정관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegist.do:src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 131,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+          }
+        ],
+        "text": "개인일정 화면 요청을 받아 검색 조건과 달력 기준일자를 정리하고 공통코드·일정 조회를 위임한 뒤 결과를 화면 모델에 담아 반환한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID와 상세코드, 코드명, 코드설명을 기본 필드로 갖고, 특정 테이블에서 코드 정보를 뽑을 때 쓰는 테이블명과 상세 조건 여부·상세 조건 값을 함께 담는다. 상세 조건 여부는 기본값이 미사용이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "개인일정 화면이 일정종류·일정구분 등의 코드 목록을 요청할 때 어떤 코드를 어떤 조건으로 가져올지 지정해 공통코드 서비스에 전달하는 조회 조건 데이터 역할을 한다."
+        }
+      },
+      "name": "공통코드 조회 조건 정보",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegistActor.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "조회할 코드 ID와 상세코드, 코드명, 특정 테이블명, 상세 조건 여부 등 공통코드 조회에 필요한 조건을 담는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드만으로 기본 언어 설정의 메시지를 조회하고, 언어를 지정하거나 치환할 매개변수를 함께 넘겨 메시지를 조회하는 방법도 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "개인일정 화면이 사용자에게 보여줄 문구를 코드로 요청하면 설정된 메시지 자원에서 해당 문구를 찾아 돌려주는 역할을 한다."
+        }
+      },
+      "name": "메시지 조회 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegistActor.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "화면에 표시할 안내·오류 메시지를 메시지 코드로 조회해 주는 공통 메시지 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 58,
+              "snippet": "\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회 조건 정보를 받아 단건 공통코드 상세 목록을 조회하고, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 돌려주며, 조직 정보와 그룹 정보도 코드 형태로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "개인일정 화면이 필요로 하는 일정종류·일정구분·중요도 등의 선택 목록을 공통코드 형태로 제공해, 일정 업무가 코드 값을 직접 관리하지 않아도 되게 하는 역할을 맡는다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegistActor.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "일정구분·일정종류·중요도처럼 화면에서 선택하는 코드 목록을 조회 조건에 맞게 돌려주는 공통코드 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 30,
+              "snippet": "    public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 38,
+              "snippet": "    public String insertFileInf(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 46,
+              "snippet": "    public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 62,
+              "snippet": "    public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 79,
+              "snippet": "    public FileVO selectFileInf(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 88,
+              "snippet": "    public int getMaxFileSN(FileVO fvo) throws Exception;"
+            }
+          ],
+          "text": "파일 정보를 한 건 또는 여러 건 등록하고 수정·삭제하며, 파일 목록과 상세 정보를 조회하고 파일 구분자의 최대값을 구하는 작업을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 38,
+              "snippet": "    public String insertFileInf(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 46,
+              "snippet": "    public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+            }
+          ],
+          "text": "일정 등록 시 함께 올라온 첨부파일의 정보를 보관·조회할 수 있게 하는 서비스로, 일정 업무는 파일 정보 관리 자체를 이 서비스에 맡긴다."
+        }
+      },
+      "name": "첨부파일 정보 관리 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegistActor.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ],
+        "text": "첨부파일의 목록 조회와 상세 조회, 등록, 수정, 삭제 등 파일 정보 관리를 담당하는 공통 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 83,
+              "snippet": "\t\tif (storePath == null || \"\".equals(storePath)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 89,
+              "snippet": "\t\tif (atchFileId == null || \"\".equals(atchFileId)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 97,
+              "snippet": "\t\tif (!saveFolder.exists() || saveFolder.isFile()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 115,
+              "snippet": "\t\t\tif (StringUtils.isEmpty(orginFileName)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 120,
+              "snippet": "\t\t\tString fileExt = FilenameUtils.getExtension(orginFileName).toUpperCase();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 127,
+              "snippet": "\t\t\tfvo.setFileExtsn(fileExt);"
+            }
+          ],
+          "text": "저장 경로가 지정되지 않으면 기본 파일 저장 경로를 쓰고, 첨부파일ID가 없으면 새 ID를 채번한다. 저장 폴더가 없으면 만들고, 파일명이 비어 있는 항목은 건너뛰며, 확장자·저장 경로·파일 크기를 파일 정보에 기록한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 60,
+              "snippet": "@Component(\"EgovFileMngUtil\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 76,
+              "snippet": "\tpublic List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 124,
+              "snippet": "\t\t\tfile.transferTo(new File(EgovWebUtil.filePathBlackList(filePath)));"
+            }
+          ],
+          "text": "일정 등록 처리에서 함께 전송된 업로드 파일을 실제 저장소에 옮기고, 이후 첨부파일 정보로 등록할 수 있는 목록 형태로 만들어 주는 역할을 한다."
+        }
+      },
+      "name": "첨부파일 저장 도우미",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegistActor.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          }
+        ],
+        "text": "업로드된 첨부파일을 저장 경로에 보관하고 파일 정보 목록으로 만들어 주는 공통 파일 처리 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "사용자 인증 서비스 하나를 보관하고 이를 통해 인증된 사용자 정보, 사용자 권한 목록, 인증 여부를 각각 제공한다. 인증 서비스가 설정되어 있어야 정상 동작한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "개인일정 화면이 로그인 여부와 사용자 정보를 확인할 때 사용하는 창구로, 실제 확인 작업은 사용자 인증 서비스에 넘기고 결과만 돌려주는 역할을 한다."
+        }
+      },
+      "name": "인증 사용자 확인 도우미",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegistActor.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "현재 인증된 사용자 정보와 권한 목록, 인증 여부를 업무 화면에서 간편하게 확인하도록 돕는 공통 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 33,
+              "snippet": "\tprivate String schdulId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 36,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 53,
+              "snippet": "\t@Size(max=255)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 58,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 66,
+              "snippet": "\tprivate String schdulIpcrCode;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 72,
+              "snippet": "\tprivate String atchFileId;"
+            }
+          ],
+          "text": "일정ID를 식별자로 하고 일정구분·일정명·일정내용·일정중요도코드를 필수 입력으로 지키며, 일정명은 255자, 일정내용은 2500자를 넘을 수 없다. 그 밖에 일정 시작·종료 일자와 장소, 담당자, 첨부파일ID, 반복 구분과 등록·수정 이력 정보를 함께 담는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 28,
+              "snippet": "public class IndvdlSchdulManageVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+              "line": 33,
+              "snippet": "\tprivate String schdulId;"
+            }
+          ],
+          "text": "개인일정 한 건을 화면과 업무 서비스 사이에서 주고받는 데이터로, 등록·수정 시 입력 값을 담고 조회 시 일정 내용을 화면으로 전달하는 역할을 한다."
+        }
+      },
+      "name": "일정 정보",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegistActor.do:src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/IndvdlSchdulManageVO.java",
+            "line": 28,
+            "snippet": "public class IndvdlSchdulManageVO implements Serializable {"
+          }
+        ],
+        "text": "일정ID와 일정구분, 일정명, 일정내용, 기간, 장소, 중요도, 첨부파일, 반복 구분 등 개인일정 한 건의 정보를 담는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 137,
+              "snippet": "\t\tmodel.addAttribute(\"searchKeyword\", commandMap.get(\"searchKeyword\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 154,
+              "snippet": "\t\tString strYear = commandMap.get(\"year\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 162,
+              "snippet": "\t\tif (strYear != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 172,
+              "snippet": "\t\tcommandMap.put(\"searchMode\", \"DAILY\");"
+            }
+          ],
+          "text": "검색어와 검색 조건을 화면 유지용으로 모델에 담고, 연·월·일 파라미터가 넘어오면 그 값을, 없으면 오늘 날짜를 기준 조회일자로 삼아 조회 모드와 조회일자를 요청 정보에 설정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 131,
+              "snippet": "\t@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 145,
+              "snippet": "\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 179,
+              "snippet": "\t\tList<EgovMap> resultList = egovIndvdlSchdulManageService.selectIndvdlSchdulManageRetrieve(commandMap);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 182,
+              "snippet": "\t\treturn \"egovframework/com/cop/smt/sim/EgovIndvdlSchdulManageDailyList\";"
+            }
+          ],
+          "text": "개인일정관리의 모든 화면 요청이 들어오는 진입 지점으로, 요청 파라미터를 정리해 공통코드 조회와 일정관리 업무 처리를 각 서비스에 위임하고 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "개인일정관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageRegistActor.do:src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 131,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+          }
+        ],
+        "text": "개인일정 화면 요청을 받아 검색 조건과 달력 기준일자를 정리하고 공통코드·일정 조회를 위임한 뒤 결과를 화면 모델에 담아 반환한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID와 상세코드, 코드명, 코드설명을 기본 필드로 갖고, 특정 테이블에서 코드 정보를 뽑을 때 쓰는 테이블명과 상세 조건 여부·상세 조건 값을 함께 담는다. 상세 조건 여부는 기본값이 미사용이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "개인일정 화면이 일정종류·일정구분 등의 코드 목록을 요청할 때 어떤 코드를 어떤 조건으로 가져올지 지정해 공통코드 서비스에 전달하는 조회 조건 데이터 역할을 한다."
+        }
+      },
+      "name": "공통코드 조회 조건 정보",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageWeekList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "조회할 코드 ID와 상세코드, 코드명, 특정 테이블명, 상세 조건 여부 등 공통코드 조회에 필요한 조건을 담는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 58,
+              "snippet": "\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회 조건 정보를 받아 단건 공통코드 상세 목록을 조회하고, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 돌려주며, 조직 정보와 그룹 정보도 코드 형태로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "개인일정 화면이 필요로 하는 일정종류·일정구분·중요도 등의 선택 목록을 공통코드 형태로 제공해, 일정 업무가 코드 값을 직접 관리하지 않아도 되게 하는 역할을 맡는다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageWeekList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "일정구분·일정종류·중요도처럼 화면에서 선택하는 코드 목록을 조회 조건에 맞게 돌려주는 공통코드 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 34,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageMainList(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 42,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageRetrieve(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 59,
+              "snippet": "\tpublic List<IndvdlSchdulManageVO> selectIndvdlSchdulManageList(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 82,
+              "snippet": "\tvoid  insertIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 89,
+              "snippet": "\tvoid  updateIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "text": "메인 화면 일정 조회와 조건별 일정 목록 조회, 일정 상세 조회, 일정 등록과 수정 작업을 각각의 업무 단위로 제공하며, 조회는 조회 조건 정보를 받아 목록을 돌려주고 등록·수정은 일정 정보를 받아 반영한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 25,
+              "snippet": "public interface EgovIndvdlSchdulManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 34,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageMainList(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 42,
+              "snippet": "\tpublic List<EgovMap> selectIndvdlSchdulManageRetrieve(Map<String, String> map) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+              "line": 67,
+              "snippet": "\tpublic List<IndvdlSchdulManageVO> selectIndvdlSchdulManageDetail(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+            }
+          ],
+          "text": "개인일정 업무의 핵심 서비스로, 메인 화면 목록과 기간별 일정 조회, 일정 상세 조회, 일정 등록과 수정 등 일정 관리 업무 전반의 처리 계약을 제공한다."
+        }
+      },
+      "name": "개인일정 관리 서비스",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageWeekList.do:src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+            "line": 25,
+            "snippet": "public interface EgovIndvdlSchdulManageService {"
+          }
+        ],
+        "text": "개인일정의 메인 목록·기간별 조회·상세 조회·등록·수정·삭제 업무를 정의하는 일정관리 업무 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 137,
+              "snippet": "\t\tmodel.addAttribute(\"searchKeyword\", commandMap.get(\"searchKeyword\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 154,
+              "snippet": "\t\tString strYear = commandMap.get(\"year\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 162,
+              "snippet": "\t\tif (strYear != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 172,
+              "snippet": "\t\tcommandMap.put(\"searchMode\", \"DAILY\");"
+            }
+          ],
+          "text": "검색어와 검색 조건을 화면 유지용으로 모델에 담고, 연·월·일 파라미터가 넘어오면 그 값을, 없으면 오늘 날짜를 기준 조회일자로 삼아 조회 모드와 조회일자를 요청 정보에 설정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 131,
+              "snippet": "\t@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 145,
+              "snippet": "\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 179,
+              "snippet": "\t\tList<EgovMap> resultList = egovIndvdlSchdulManageService.selectIndvdlSchdulManageRetrieve(commandMap);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+              "line": 182,
+              "snippet": "\t\treturn \"egovframework/com/cop/smt/sim/EgovIndvdlSchdulManageDailyList\";"
+            }
+          ],
+          "text": "개인일정관리의 모든 화면 요청이 들어오는 진입 지점으로, 요청 파라미터를 정리해 공통코드 조회와 일정관리 업무 처리를 각 서비스에 위임하고 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "개인일정관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/smt/sim/EgovIndvdlSchdulManageWeekList.do:src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+            "line": 131,
+            "snippet": "@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+          }
+        ],
+        "text": "개인일정 화면 요청을 받아 검색 조건과 달력 기준일자를 정리하고 공통코드·일정 조회를 위임한 뒤 결과를 화면 모델에 담아 반환한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/cop/smt/sim/web/EgovIndvdlSchdulManageController.java",
+        "line": 131,
+        "snippet": "\t@RequestMapping(value = \"/cop/smt/sim/EgovIndvdlSchdulManageDailyList.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovIndvdlSchdulManageService {"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/cop/smt/sim/service/EgovIndvdlSchdulManageService.java",
+        "line": 82,
+        "snippet": "\tvoid  insertIndvdlSchdulManage(IndvdlSchdulManageVO indvdlSchdulManageVO) throws Exception;"
+      }
+    ],
+    "text": "공무원 개인이 자신의 일정을 등록·수정하고 메인 화면과 일별·주간·월별 달력, 목록·상세 화면으로 조회하는 개인일정관리 업무 영역이다."
+  }
+}

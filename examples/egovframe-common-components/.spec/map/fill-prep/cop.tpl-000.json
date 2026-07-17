@@ -1,0 +1,787 @@
+{
+  "chunkId": "cop.tpl-000",
+  "domainId": "domain:cop.tpl",
+  "domainName": "",
+  "files": [
+    {
+      "className": "ComDefaultCodeVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "slice": {
+        "endLine": 58,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------       --------    ---------------------------\n *   2009.3.11   이삼섭          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class ComDefaultCodeVO implements Serializable {\n    /** 코드 ID */\n    private String codeId = \"\";\n\n    /** 상세코드 */\n    private String code = \"\";\n\n    /** 코드명 */\n    private String codeNm = \"\";\n\n    /** 코드설명 */\n    private String codeDc = \"\";\n\n    /** 특정테이블명 */\n    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용\n\n    /** 상세 조건 여부 */\n    private String haveDetailCondition = \"N\";\n\n    /** 상세 조건 */\n    private String detailCondition = \"\";\n\n    /**\n     * toString 메소드를 대치한다.\n     */\n    public String toString() {\n    \treturn ToStringBuilder.reflectionToString(this);\n    }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "LoginVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/LoginVO.java — java 파일",
+        "tags": []
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 21,
+        "text": " *   2009.03.03     박지욱     최초 생성\n *   2021.05.30     정진오     디지털원패스 사용자키/세션값 추가\n *</pre>\n *\n *  @author 공통서비스 개발팀 박지욱\n *  @since 2009.03.03\n *  @version 1.0\n *  @see\n *\n */\n@Getter\n@Setter\npublic class LoginVO implements Serializable{\n\n\t/**\n\t *\n\t */\n\tprivate static final long serialVersionUID = -8274004534207618049L;\n\n\t/** 아이디 */\n\t@EgovNullCheck\n\tprivate String id;\n\t/** 이름 */\n\t@EgovNullCheck\n\tprivate String name;\n\t/** 주민등록번호 */\n\tprivate String ihidNum;\n\t/** 이메일주소 */\n\t@EgovNullCheck\n\t@EgovEmailCheck\n\tprivate String email;\n\t/** 비밀번호 */\n\tprivate String password;\n\t/** 비밀번호 힌트 */\n\t@EgovNullCheck\n\tprivate String passwordHint;\n\t/** 비밀번호 정답 */\n\t@EgovNullCheck\n\tprivate String passwordCnsr;\n\t/** 사용자구분 */\n\tprivate String userSe;\n\t/** 조직(부서)ID */\n\tprivate String orgnztId;\n\t/** 조직(부서)명 */\n\tprivate String orgnztNm;\n\t/** 고유아이디 */\n\tprivate String uniqId;\n\t/** 로그인 후 이동할 페이지 */\n\tprivate String url;\n\t/** 사용자 IP정보 */\n\tprivate String ip;\n\t/** GPKI인증 DN */\n\tprivate String dn;\n\t/** 디지털원패스 사용자키 */\n\tprivate String onepassUserkey;\n\t/** 디지털원패스 사용자세션값 */\n\tprivate String onepassIntfToken;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCmmUseService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "slice": {
+        "endLine": 60,
+        "startLine": 16,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이삼섭          최초 생성\n *   2025.07.16  이백행          2025년 컨트리뷰션 `throws Exception` 제거\n *\n *      </pre>\n */\npublic interface EgovCmmUseService {\n\n\t/**\n\t * 공통코드를 조회한다.\n\t *\n\t * @param comDefaultCodeVO\n\t * @return List(코드)\n\t */\n\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * ComDefaultCodeVO의 리스트를 받아서 여러개의 코드 리스트를 맵에 담아서 리턴한다.\n\t *\n\t * @param comDefaultCodeVOs\n\t * @return Map(코드)\n\t */\n\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);\n\n\t/**\n\t * 조직정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 조직정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * 그룹정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 그룹정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "slice": {
+        "endLine": 27,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.service;\n\nimport java.util.List;\n\npublic interface EgovUserDetailsService {\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic Object getAuthenticatedUser();\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t * 예) [ROLE_ADMIN, ROLE_USER, ROLE_A, ROLE_B, ROLE_RESTRICTED, IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED_ANONYMOUSLY]\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic List<String> getAuthorities();\n\t\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\t\n\t */\n\tpublic Boolean isAuthenticated(); \n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovUserDetailsHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "slice": {
+        "endLine": 62,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n *   2009.03.10  sjyoon         최초 생성\n *   2011.07.01\t 서준식          interface 생성후 상세 로직의 분리\n * </pre>\n */\n\npublic class EgovUserDetailsHelper {\n\n\tstatic EgovUserDetailsService egovUserDetailsService;\n\n\tpublic EgovUserDetailsService getEgovUserDetailsService() {\n\t\treturn egovUserDetailsService;\n\t}\n\n\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {\n\t\tEgovUserDetailsHelper.egovUserDetailsService = egovUserDetailsService;\n\t}\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic static Object getAuthenticatedUser() {\n\t\treturn egovUserDetailsService.getAuthenticatedUser();\n\t}\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t *\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic static List<String> getAuthorities() {\n\t\treturn egovUserDetailsService.getAuthorities();\n\t}\n\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\n\t */\n\tpublic static Boolean isAuthenticated() {\n\t\treturn egovUserDetailsService.isAuthenticated();\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovTemplateManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 24,
+      "relPath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "slice": {
+        "endLine": 93,
+        "startLine": 14,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *   \n *   수정일              수정자           수정내용\n *  ----------   --------   ---------------------------\n *  2009.05.17   이삼섭           최초 생성\n *  2019.05.17   신용호           selectTemplateWhiteList() 추가\n *\n * </pre>\n */\npublic interface EgovTemplateManageService {\n\n    /**\n     * 템플릿 정보를 삭제한다.\n     * \n     * @param tmplatInf\n     * @throws Exception\n     */\n    public void deleteTemplateInf(TemplateInf tmplatInf) throws Exception;\n\n    /**\n     * 템플릿 정보를 등록한다.\n     * \n     * @param tmplatInf\n     * @throws Exception\n     */\n    public void insertTemplateInf(TemplateInf tmplatInf) throws Exception;\n\n    /**\n     * 템플릿 정보를 수정한다.\n     * \n     * @param tmplatInf\n     * @throws Exception\n     */\n    public void updateTemplateInf(TemplateInf tmplatInf) throws Exception;\n\n    /**\n     * 템플릿에 대한 화이트리스트 목록을 조회한다.\n     * \n     * @param tmplatInfVO\n     * @return\n     * @throws Exception\n     */\n    public List<TemplateInfVO> selectTemplateWhiteList() throws Exception;\n    \n    /**\n     * 템플릿에 대한 목록를 조회한다.\n     * \n     * @param tmplatInfVO\n     * @return\n     * @throws Exception\n     */\n    public Map<String, Object> selectTemplateInfs(TemplateInfVO tmplatInfVO) throws Exception;\n\n    /**\n     * 템플릿에 대한 상세정보를 조회한다.\n     * \n     * @param tmplatInfVO\n     * @return\n     * @throws Exception\n     */\n    public TemplateInfVO selectTemplateInf(TemplateInfVO tmplatInfVO) throws Exception;\n\n    /**\n     * 템플릿에 대한 미리보기 정보를 조회한다.\n     * \n     * @param tmplatInfVO\n     * @return\n     * @throws Exception\n     */\n    public TemplateInfVO selectTemplatePreview(TemplateInfVO tmplatInfVO) throws Exception;\n\n    /**\n     * 템플릿 구분에 따른 목록을 조회한다.\n     * \n     * @param tmplatInfVO\n     * @return\n     * @throws Exception\n     */\n    public List<TemplateInfVO> selectTemplateInfsByCode(TemplateInfVO tmplatInfVO) throws Exception;",
+        "truncated": true
+      }
+    },
+    {
+      "className": "TemplateInf",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+      "slice": {
+        "endLine": 95,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.3.17  이삼섭          최초 생성\n *\n * </pre>\n */\n@SuppressWarnings(\"serial\")\npublic class TemplateInf implements Serializable {\n\n    /** 최초등록자 아이디 */\n    private String frstRegisterId = \"\";\n    \n    /** 최초등록시점 */\n    private String frstRegisterPnttm = \"\";\n    \n    /** 최종수정자 아이디 */\n    private String lastUpdusrId = \"\";\n    \n    /** 최종수정시점 */\n    private String lastUpdusrPnttm = \"\";\n    \n    /** 템플릿 경로 */\n    @EgovNullCheck\n    @Size(max=2000)\n    private String tmplatCours = \"\";\n    \n    /** 템플릿 아이디 */\n    private String tmplatId = \"\";\n    \n    /** 템플릿 명 */\n    @EgovNullCheck\n    @Size(max=120)\n    private String tmplatNm = \"\";\n    \n    /** 탬플릿 구분코드 */\n    @EgovNullCheck\n    private String tmplatSeCode = \"\";\n    \n    /** 사용여부 */\n    private String useAt = \"\";\n\n    /**\n     * frstRegisterId attribute를 리턴한다.\n     * \n     * @return the frstRegisterId\n     */\n    public String getFrstRegisterId() {\n\treturn frstRegisterId;\n    }\n\n    /**\n     * frstRegisterId attribute 값을 설정한다.\n     * \n     * @param frstRegisterId\n     *            the frstRegisterId to set\n     */\n    public void setFrstRegisterId(String frstRegisterId) {\n\tthis.frstRegisterId = frstRegisterId;\n    }\n\n    /**\n     * frstRegisterPnttm attribute를 리턴한다.\n     * \n     * @return the frstRegisterPnttm\n     */\n    public String getFrstRegisterPnttm() {\n\treturn frstRegisterPnttm;\n    }\n\n    /**\n     * frstRegisterPnttm attribute 값을 설정한다.\n     * \n     * @param frstRegisterPnttm\n     *            the frstRegisterPnttm to set\n     */\n    public void setFrstRegisterPnttm(String frstRegisterPnttm) {",
+        "truncated": true
+      }
+    },
+    {
+      "className": "TemplateInfVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java — java 파일",
+        "tags": []
+      },
+      "line": 24,
+      "relPath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 14,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.3.17  이삼섭          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class TemplateInfVO extends TemplateInf implements Serializable {\n\n    /** 최초 등록자명 */\n    private String frstRegisterNm = \"\";\n\n    /** 최종 수정자명 */\n    private String lastUpdusrNm = \"\";\n\n    /** 템플릿 구분 코드명 */\n    private String tmplatSeCodeNm = \"\";\n\n    /** 검색시작일 */\n    private String searchBgnDe = \"\";\n\n    /** 검색조건 */\n    private String searchCnd = \"\";\n\n    /** 검색종료일 */\n    private String searchEndDe = \"\";\n\n    /** 검색단어 */\n    private String searchWrd = \"\";\n\n    /** 정렬순서(DESC,ASC) */\n    private String sortOrdr = \"\";\n\n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n\n    /** 현재페이지 */\n    private int pageIndex = 1;\n\n    /** 페이지개수 */\n    private int pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private int pageSize = 10;\n\n    /** 첫페이지 인덱스 */\n    private int firstIndex = 1;\n\n    /** 마지막페이지 인덱스 */\n    private int lastIndex = 1;\n\n    /** 페이지당 레코드 개수 */\n    private int recordCountPerPage = 10;\n\n    /** 레코드 번호 */\n    private int rowNo = 0;\n\n    /** 구분 유형 */\n    private String typeFlag = \"\";\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovTemplateManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 226,
+      "relPath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "slice": {
+        "endLine": 292,
+        "startLine": 216,
+        "text": "\n\t/**\n\t * 템플릿 정보를 삭제한다.\n\t *\n\t * @param searchVO\n\t * @param tmplatInfo\n\t * @param model\n\t * @return\n\t * @throws Exception\n\t */\n\t@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")\n\tpublic String deleteTemplateInf(@ModelAttribute(\"searchVO\") TemplateInfVO searchVO, @ModelAttribute(\"tmplatInf\") TemplateInf tmplatInf, SessionStatus status, ModelMap model)\n\t\t\tthrows Exception {\n\n\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\n\t\tif (isAuthenticated) {\n\t\t\ttmplatInf.setLastUpdusrId(user.getUniqId());\n\t\t\ttmplatService.deleteTemplateInf(tmplatInf);\n\t\t}\n\n\t\treturn \"forward:/cop/tpl/selectTemplateInfs.do\";\n\t}\n\n\t/**\n\t * 팝업을 위한 템플릿 목록을 조회한다.\n\t *\n\t * @param searchVO\n\t * @param model\n\t * @return\n\t * @throws Exception\n\t */\n\t@RequestMapping(\"/cop/tpl/selectTemplateInfsPop.do\")\n\tpublic String selectTemplateInfsPop(@ModelAttribute(\"searchVO\") TemplateInfVO tmplatInfVO, @RequestParam Map<String, Object> commandMap, ModelMap model) throws Exception {\n\n\t\tString typeFlag = (String) commandMap.get(\"typeFlag\");\n\n\t\tif (\"CLB\".equals(typeFlag)) {\n\t\t\ttmplatInfVO.setTypeFlag(typeFlag);\n\t\t\ttmplatInfVO.setTmplatSeCode(\"TMPT03\");\n\t\t} else if (\"CMY\".equals(typeFlag)) {\n\t\t\ttmplatInfVO.setTypeFlag(typeFlag);\n\t\t\ttmplatInfVO.setTmplatSeCode(\"TMPT02\");\n\t\t} else {\n\t\t\ttmplatInfVO.setTypeFlag(typeFlag);\n\t\t\ttmplatInfVO.setTmplatSeCode(\"TMPT01\");\n\t\t}\n\n\t\ttmplatInfVO.setPageUnit(propertyService.getInt(\"pageUnit\"));\n\t\ttmplatInfVO.setPageSize(propertyService.getInt(\"pageSize\"));\n\t\t//CMY, CLB\n\n\t\tPaginationInfo paginationInfo = new PaginationInfo();\n\n\t\tpaginationInfo.setCurrentPageNo(tmplatInfVO.getPageIndex());\n\t\tpaginationInfo.setRecordCountPerPage(tmplatInfVO.getPageUnit());\n\t\tpaginationInfo.setPageSize(tmplatInfVO.getPageSize());\n\n\t\ttmplatInfVO.setFirstIndex(paginationInfo.getFirstRecordIndex());\n\t\ttmplatInfVO.setLastIndex(paginationInfo.getLastRecordIndex());\n\t\ttmplatInfVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());\n\n\t\tMap<String, Object> map = tmplatService.selectTemplateInfs(tmplatInfVO);\n\t\tint totCnt = Integer.parseInt((String) map.get(\"resultCnt\"));\n\n\t\tpaginationInfo.setTotalRecordCount(totCnt);\n\n\t\tmodel.addAttribute(\"resultList\", map.get(\"resultList\"));\n\t\tmodel.addAttribute(\"resultCnt\", map.get(\"resultCnt\"));\n\t\tmodel.addAttribute(\"typeFlag\", typeFlag);\n\t\tmodel.addAttribute(\"paginationInfo\", paginationInfo);\n\n\t\treturn \"egovframework/com/cop/tpl/EgovTemplateInqirePopup\";\n\t}\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovTemplateManageController#deleteTemplateInf",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "flowId": "flow:ANY /cop/bbs/deleteTemplateInf.do",
+      "line": 226,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 226,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+        "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+        "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovTemplateManageController#addTemplateInf",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "flowId": "flow:ANY /cop/tpl/addTemplateInf.do",
+      "line": 164,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 164,
+        "snippet": "@RequestMapping(\"/cop/tpl/addTemplateInf.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/tpl/addTemplateInf.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "step:ANY /cop/tpl/addTemplateInf.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /cop/tpl/addTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovTemplateManageController#insertTemplateInf",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "flowId": "flow:ANY /cop/tpl/insertTemplateInf.do",
+      "line": 128,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 128,
+        "snippet": "@RequestMapping(\"/cop/tpl/insertTemplateInf.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+        "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+        "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovTemplateManageController#selectTemplateInf",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "flowId": "flow:ANY /cop/tpl/selectTemplateInf.do",
+      "line": 103,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 103,
+        "snippet": "@RequestMapping(\"/cop/tpl/selectTemplateInf.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/tpl/selectTemplateInf.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "step:ANY /cop/tpl/selectTemplateInf.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /cop/tpl/selectTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /cop/tpl/selectTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovTemplateManageController#selectTemplateInfs",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "flowId": "flow:ANY /cop/tpl/selectTemplateInfs.do",
+      "line": 68,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 68,
+        "snippet": "@RequestMapping(\"/cop/tpl/selectTemplateInfs.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/tpl/selectTemplateInfs.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "step:ANY /cop/tpl/selectTemplateInfs.do:src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+        "step:ANY /cop/tpl/selectTemplateInfs.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovTemplateManageController#selectTemplateInfsPop",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "flowId": "flow:ANY /cop/tpl/selectTemplateInfsPop.do",
+      "line": 249,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 249,
+        "snippet": "@RequestMapping(\"/cop/tpl/selectTemplateInfsPop.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/tpl/selectTemplateInfsPop.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "step:ANY /cop/tpl/selectTemplateInfsPop.do:src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+        "step:ANY /cop/tpl/selectTemplateInfsPop.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovTemplateManageController#updateTemplateInf",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "flowId": "flow:ANY /cop/tpl/updateTemplateInf.do",
+      "line": 186,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 186,
+        "snippet": "@RequestMapping(\"/cop/tpl/updateTemplateInf.do\")"
+      },
+      "stepIds": [
+        "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+        "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+        "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "header": {
+    "flowIndex": [
+      {
+        "entryPoint": "EgovTemplateManageController#deleteTemplateInf",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "flowId": "flow:ANY /cop/bbs/deleteTemplateInf.do",
+        "line": 226,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 226,
+          "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovTemplateManageController#addTemplateInf",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "flowId": "flow:ANY /cop/tpl/addTemplateInf.do",
+        "line": 164,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 164,
+          "snippet": "@RequestMapping(\"/cop/tpl/addTemplateInf.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovTemplateManageController#insertTemplateInf",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "flowId": "flow:ANY /cop/tpl/insertTemplateInf.do",
+        "line": 128,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 128,
+          "snippet": "@RequestMapping(\"/cop/tpl/insertTemplateInf.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovTemplateManageController#selectTemplateInf",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "flowId": "flow:ANY /cop/tpl/selectTemplateInf.do",
+        "line": 103,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 103,
+          "snippet": "@RequestMapping(\"/cop/tpl/selectTemplateInf.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovTemplateManageController#selectTemplateInfs",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "flowId": "flow:ANY /cop/tpl/selectTemplateInfs.do",
+        "line": 68,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 68,
+          "snippet": "@RequestMapping(\"/cop/tpl/selectTemplateInfs.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovTemplateManageController#selectTemplateInfsPop",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "flowId": "flow:ANY /cop/tpl/selectTemplateInfsPop.do",
+        "line": 249,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 249,
+          "snippet": "@RequestMapping(\"/cop/tpl/selectTemplateInfsPop.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovTemplateManageController#updateTemplateInf",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "flowId": "flow:ANY /cop/tpl/updateTemplateInf.do",
+        "line": 186,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 186,
+          "snippet": "@RequestMapping(\"/cop/tpl/updateTemplateInf.do\")"
+        }
+      }
+    ]
+  },
+  "isHeaderChunk": true,
+  "key": "cop.tpl",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovTemplateManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "stepId": "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+        "line": 26,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+      "stepId": "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 226,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "stepId": "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /cop/tpl/addTemplateInf.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /cop/tpl/addTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 226,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "stepId": "step:ANY /cop/tpl/addTemplateInf.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovTemplateManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+        "line": 26,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 226,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInf.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovTemplateManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 226,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInf.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovTemplateManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInfs.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+        "line": 26,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInfs.do:src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 226,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInfs.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovTemplateManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInfsPop.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+        "line": 26,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInfsPop.do:src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 226,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInfsPop.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovTemplateManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+        "line": 26,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 226,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java"
+    }
+  ]
+}

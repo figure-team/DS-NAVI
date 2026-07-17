@@ -1,0 +1,4567 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "uss.ion.msi-000",
+  "domainId": "domain:uss.ion.msi",
+  "header": {
+    "name": "메인화면 이미지 관리",
+    "summary": {
+      "text": "포털 메인화면에 노출할 이미지를 운영자가 등록·수정·삭제·조회하고, 실제 메인화면에 반영된 이미지를 확인하는 업무 영역이다. 이미지 파일은 공통 첨부파일 처리를 통해 서버 저장소에 보관되고 첨부파일 아이디로 이미지 정보에 연결되며, 등록·수정 시 로그인 사용자가 등록자로 기록된다. 모든 처리는 메인화면 이미지 목록 조회를 기준 화면으로 삼아 되돌아온다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+          "line": 10,
+          "snippet": "* - 메인화면이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+          "line": 57,
+          "snippet": "@RequestMapping(\"/uss/ion/msi/selectMainImageList.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+          "line": 105,
+          "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+          "line": 124,
+          "snippet": "atchFileId = fileMngService.insertFileInfs(result);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+          "line": 138,
+          "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+          "line": 143,
+          "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "메인화면 이미지 — 메인화면에 노출할 이미지 한 건으로, 이미지 아이디로 식별하고 이미지명·메인 이미지·이미지 파일·이미지 설명·반영여부·사용자 아이디·등록일자를 갖는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 36,
+            "snippet": "public class MainImageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 41,
+            "snippet": "private String imageId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 46,
+            "snippet": "private String imageNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 50,
+            "snippet": "private String image;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 53,
+            "snippet": "private String imageFile;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 56,
+            "snippet": "private String imageDc;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 59,
+            "snippet": "private String reflctAt;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 62,
+            "snippet": "private String userId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 65,
+            "snippet": "private String regDate;"
+          }
+        ]
+      },
+      {
+        "text": "첨부 이미지 파일 — 메인화면 이미지에 첨부된 실제 파일로, 첨부파일 아이디·원파일명·저장파일명·확장자·파일크기·파일저장경로를 갖고 첨부파일 아이디로 이미지 정보에 연결된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 21,
+            "snippet": "public class FileVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 26,
+            "snippet": "public String atchFileId = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 38,
+            "snippet": "public String fileExtsn = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 42,
+            "snippet": "public String fileMg = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 50,
+            "snippet": "public String fileStreCours = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 54,
+            "snippet": "public String orignlFileNm = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 58,
+            "snippet": "public String streFileNm = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 124,
+            "snippet": "atchFileId = fileMngService.insertFileInfs(result);"
+          }
+        ]
+      },
+      {
+        "text": "등록자(로그인 사용자) — 메인화면 이미지를 등록·수정한 사용자로, 로그인 사용자 정보의 아이디가 이미지의 사용자 아이디로 기록된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 42,
+            "snippet": "private String id;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 133,
+            "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 138,
+            "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 62,
+            "snippet": "private String userId;"
+          }
+        ]
+      },
+      {
+        "text": "삭제대상 목록 — 목록 화면에서 일괄 삭제를 위해 선택한 이미지들의 식별자 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 74,
+            "snippet": "private String[] delYn;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 211,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/removeMainImageList.do\")"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "이미지명은 반드시 입력해야 하며 최대 10자를 넘을 수 없다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 45,
+            "snippet": "@Size(max = 10)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 46,
+            "snippet": "private String imageNm;"
+          }
+        ]
+      },
+      {
+        "text": "메인 이미지는 공백일 수 없으며, 값이 없으면 등록 화면에 이미지 필수 안내 메시지가 표시된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 49,
+            "snippet": "@NotBlank(message = \"{uss.ion.msi.mainImageRegist.ImageReq}\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 50,
+            "snippet": "private String image;"
+          }
+        ]
+      },
+      {
+        "text": "등록·수정 요청에서 입력값 검증에 오류가 있으면 저장하지 않고 각각 등록 화면과 수정 화면으로 되돌아간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 110,
+            "snippet": "if (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 112,
+            "snippet": "return \"egovframework/com/uss/ion/msi/EgovMainImageRegist\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 155,
+            "snippet": "if (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 157,
+            "snippet": "return \"egovframework/com/uss/ion/msi/EgovMainImageUpdt\";"
+          }
+        ]
+      },
+      {
+        "text": "첨부된 이미지 파일이 있는 경우에만 파일 저장과 첨부파일 정보 등록을 수행하고, 발급된 첨부파일 아이디를 이미지 정보의 이미지 파일 항목에 연결한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 122,
+            "snippet": "if (!files.isEmpty()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 123,
+            "snippet": "result = fileUtil.parseFileInf(files, \"MSI_\", 0, \"\", uploadFolder);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 124,
+            "snippet": "atchFileId = fileMngService.insertFileInfs(result);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 53,
+            "snippet": "private String imageFile;"
+          }
+        ]
+      },
+      {
+        "text": "메인화면 이미지의 이미지 아이디는 등록 시 채번 서비스로 새로 발급한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 135,
+            "snippet": "mainImageVO.setImageId(egovMainImageIdGnrService.getNextStringId());"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 41,
+            "snippet": "private String imageId;"
+          }
+        ]
+      },
+      {
+        "text": "등록 시 로그인 사용자의 아이디를 등록자로 기록하되, 로그인 사용자가 없으면 빈 값으로 기록한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 133,
+            "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 138,
+            "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+          }
+        ]
+      },
+      {
+        "text": "저장 파일명은 접두어와 저장 시각·일련번호를 조합해 만들고, 파일 저장 경로는 위험 문자를 걸러 낸 뒤 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 121,
+            "snippet": "String newName = keyStr + getTimeStamp() + fileKey;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 124,
+            "snippet": "file.transferTo(new File(EgovWebUtil.filePathBlackList(filePath)));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 123,
+            "snippet": "result = fileUtil.parseFileInf(files, \"MSI_\", 0, \"\", uploadFolder);"
+          }
+        ]
+      },
+      {
+        "text": "등록·수정 처리가 끝나면 처리 결과 메시지를 화면에 담아 메인화면 이미지 목록 조회로 넘긴다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 141,
+            "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 143,
+            "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 57,
+            "snippet": "@RequestMapping(\"/uss/ion/msi/selectMainImageList.do\")"
+          }
+        ]
+      },
+      {
+        "text": "메인화면 반영 여부는 이미지의 반영여부 항목으로 관리하며, 반영확인 조회로 반영된 이미지 목록을 확인한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 59,
+            "snippet": "private String reflctAt;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 31,
+            "snippet": "public List<MainImageVO> selectMainImageResult(MainImageVO mainImageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 231,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/getMainImageResult.do\")"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "공통 첨부파일 처리 — 이미지 파일 저장과 첨부파일 정보 등록을 공통 파일 관리 기능에 위임하고 첨부파일 아이디를 돌려받는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 76,
+            "snippet": "public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 46,
+            "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 123,
+            "snippet": "result = fileUtil.parseFileInf(files, \"MSI_\", 0, \"\", uploadFolder);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 124,
+            "snippet": "atchFileId = fileMngService.insertFileInfs(result);"
+          }
+        ]
+      },
+      {
+        "text": "공통 사용자 인증 — 로그인 사용자 정보를 인증 도우미에서 가져와 이미지 등록자로 기록한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "public static Object getAuthenticatedUser() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 133,
+            "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      {
+        "text": "공통 메시지 관리 — 등록·수정·삭제 처리 결과 안내 문구를 공통 메시지 제공 기능에서 메시지 코드로 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "public String getMessage(String code) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 141,
+            "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+          }
+        ]
+      },
+      {
+        "text": "공통 아이디 채번 — 메인화면 이미지 아이디와 첨부파일 아이디를 공통 채번 서비스로 발급받는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 135,
+            "snippet": "mainImageVO.setImageId(egovMainImageIdGnrService.getNextStringId());"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 90,
+            "snippet": "atchFileIdString = idgenService.getNextStringId();"
+          }
+        ]
+      },
+      {
+        "text": "공통 문자열 처리 — 로그인 사용자 아이디가 없을 때 빈 문자열로 정리하는 데 공통 문자열 도우미를 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 138,
+            "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "메인이미지 목록 조회",
+        "nodes": [
+          {
+            "id": "lv_s",
+            "kind": "start",
+            "label": "이미지 관리 메뉴 진입"
+          },
+          {
+            "id": "lv_a1",
+            "kind": "activity",
+            "label": "목록 화면 요청",
+            "flowRef": "flow:ANY /uss/ion/msi/selectMainImageListView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 51,
+                "snippet": "@RequestMapping(\"/uss/ion/msi/selectMainImageListView.do\")"
+              }
+            ]
+          },
+          {
+            "id": "lv_a2",
+            "kind": "activity",
+            "label": "목록·전체 건수 조회",
+            "flowRef": "flow:ANY /uss/ion/msi/selectMainImageList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 57,
+                "snippet": "@RequestMapping(\"/uss/ion/msi/selectMainImageList.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+                "line": 17,
+                "snippet": "public List<MainImageVO> selectMainImageList(MainImageVO mainImageVO) throws Exception;"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+                "line": 19,
+                "snippet": "public int selectMainImageListTotCnt(MainImageVO mainImageVO) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "lv_e",
+            "kind": "end",
+            "label": "이미지 목록 화면 표시"
+          }
+        ],
+        "edges": [
+          {
+            "from": "lv_s",
+            "to": "lv_a1"
+          },
+          {
+            "from": "lv_a1",
+            "to": "lv_a2"
+          },
+          {
+            "from": "lv_a2",
+            "to": "lv_e"
+          }
+        ]
+      },
+      {
+        "title": "메인이미지 등록",
+        "nodes": [
+          {
+            "id": "ad_s",
+            "kind": "start",
+            "label": "이미지 등록 시작"
+          },
+          {
+            "id": "ad_a1",
+            "kind": "activity",
+            "label": "등록 화면 열기",
+            "flowRef": "flow:ANY /uss/ion/msi/addViewMainImage.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 95,
+                "snippet": "@RequestMapping(value = \"/uss/ion/msi/addViewMainImage.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 98,
+                "snippet": "return \"egovframework/com/uss/ion/msi/EgovMainImageRegist\";"
+              }
+            ]
+          },
+          {
+            "id": "ad_a2",
+            "kind": "activity",
+            "label": "등록 요청 접수",
+            "flowRef": "flow:ANY /uss/ion/msi/addMainImage.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 105,
+                "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 106,
+                "snippet": "public String insertMainImage(final MultipartHttpServletRequest multiRequest,"
+              }
+            ]
+          },
+          {
+            "id": "ad_d1",
+            "kind": "decision",
+            "label": "입력값 검증 통과?",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 110,
+                "snippet": "if (bindingResult.hasErrors()) {"
+              }
+            ]
+          },
+          {
+            "id": "ad_a3",
+            "kind": "activity",
+            "label": "등록 화면 재표시",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 112,
+                "snippet": "return \"egovframework/com/uss/ion/msi/EgovMainImageRegist\";"
+              }
+            ]
+          },
+          {
+            "id": "ad_d2",
+            "kind": "decision",
+            "label": "첨부 이미지 파일 있음?",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 120,
+                "snippet": "final Map<String, MultipartFile> files = multiRequest.getFileMap();"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 122,
+                "snippet": "if (!files.isEmpty()) {"
+              }
+            ]
+          },
+          {
+            "id": "ad_a4",
+            "kind": "activity",
+            "label": "파일 저장·첨부 아이디 발급",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 123,
+                "snippet": "result = fileUtil.parseFileInf(files, \"MSI_\", 0, \"\", uploadFolder);"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 124,
+                "snippet": "atchFileId = fileMngService.insertFileInfs(result);"
+              }
+            ]
+          },
+          {
+            "id": "ad_a5",
+            "kind": "activity",
+            "label": "이미지 아이디 채번·등록자 기록",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 135,
+                "snippet": "mainImageVO.setImageId(egovMainImageIdGnrService.getNextStringId());"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 138,
+                "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+              }
+            ]
+          },
+          {
+            "id": "ad_a6",
+            "kind": "activity",
+            "label": "메인이미지 정보 등록",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 142,
+                "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+                "line": 23,
+                "snippet": "public MainImageVO insertMainImage(MainImageVO mainImageVO) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "ad_a7",
+            "kind": "activity",
+            "label": "등록 성공 메시지 설정",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 141,
+                "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+              }
+            ]
+          },
+          {
+            "id": "ad_e1",
+            "kind": "end",
+            "label": "목록 조회로 이동",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 143,
+                "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+              }
+            ]
+          },
+          {
+            "id": "ad_e2",
+            "kind": "end",
+            "label": "입력 오류 안내"
+          }
+        ],
+        "edges": [
+          {
+            "from": "ad_s",
+            "to": "ad_a1"
+          },
+          {
+            "from": "ad_a1",
+            "to": "ad_a2"
+          },
+          {
+            "from": "ad_a2",
+            "to": "ad_d1"
+          },
+          {
+            "from": "ad_d1",
+            "to": "ad_a3",
+            "label": "NO"
+          },
+          {
+            "from": "ad_d1",
+            "to": "ad_d2",
+            "label": "YES"
+          },
+          {
+            "from": "ad_a3",
+            "to": "ad_e2"
+          },
+          {
+            "from": "ad_d2",
+            "to": "ad_a4",
+            "label": "첨부 있음"
+          },
+          {
+            "from": "ad_d2",
+            "to": "ad_a5",
+            "label": "첨부 없음"
+          },
+          {
+            "from": "ad_a4",
+            "to": "ad_a5"
+          },
+          {
+            "from": "ad_a5",
+            "to": "ad_a6"
+          },
+          {
+            "from": "ad_a6",
+            "to": "ad_a7"
+          },
+          {
+            "from": "ad_a7",
+            "to": "ad_e1"
+          }
+        ]
+      },
+      {
+        "title": "메인이미지 수정",
+        "nodes": [
+          {
+            "id": "up_s",
+            "kind": "start",
+            "label": "목록에서 이미지 선택"
+          },
+          {
+            "id": "up_a1",
+            "kind": "activity",
+            "label": "이미지 상세 조회",
+            "flowRef": "flow:ANY /uss/ion/msi/getMainImage.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 83,
+                "snippet": "@RequestMapping(value = \"/uss/ion/msi/getMainImage.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+                "line": 21,
+                "snippet": "public MainImageVO selectMainImage(MainImageVO mainImageVO) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "up_a2",
+            "kind": "activity",
+            "label": "수정 요청 접수",
+            "flowRef": "flow:ANY /uss/ion/msi/updtMainImage.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 150,
+                "snippet": "@RequestMapping(value = \"/uss/ion/msi/updtMainImage.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 151,
+                "snippet": "public String updateMainImage(final MultipartHttpServletRequest multiRequest,"
+              }
+            ]
+          },
+          {
+            "id": "up_d1",
+            "kind": "decision",
+            "label": "입력값 검증 통과?",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 155,
+                "snippet": "if (bindingResult.hasErrors()) {"
+              }
+            ]
+          },
+          {
+            "id": "up_a3",
+            "kind": "activity",
+            "label": "수정 화면 재표시",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 157,
+                "snippet": "return \"egovframework/com/uss/ion/msi/EgovMainImageUpdt\";"
+              }
+            ]
+          },
+          {
+            "id": "up_d2",
+            "kind": "decision",
+            "label": "이미지 파일 재첨부?",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 165,
+                "snippet": "final Map<String, MultipartFile> files = multiRequest.getFileMap();"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 167,
+                "snippet": "if (!files.isEmpty()) {"
+              }
+            ]
+          },
+          {
+            "id": "up_a4",
+            "kind": "activity",
+            "label": "새 이미지 파일 저장",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 168,
+                "snippet": "result = fileUtil.parseFileInf(files, \"MSI_\", 0, \"\", uploadFolder);"
+              }
+            ]
+          },
+          {
+            "id": "up_a5",
+            "kind": "activity",
+            "label": "메인이미지 정보 수정",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+                "line": 25,
+                "snippet": "public void updateMainImage(MainImageVO mainImageVO) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "up_e1",
+            "kind": "end",
+            "label": "목록 조회로 이동",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 57,
+                "snippet": "@RequestMapping(\"/uss/ion/msi/selectMainImageList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "up_e2",
+            "kind": "end",
+            "label": "입력 오류 안내"
+          }
+        ],
+        "edges": [
+          {
+            "from": "up_s",
+            "to": "up_a1"
+          },
+          {
+            "from": "up_a1",
+            "to": "up_a2"
+          },
+          {
+            "from": "up_a2",
+            "to": "up_d1"
+          },
+          {
+            "from": "up_d1",
+            "to": "up_a3",
+            "label": "NO"
+          },
+          {
+            "from": "up_d1",
+            "to": "up_d2",
+            "label": "YES"
+          },
+          {
+            "from": "up_a3",
+            "to": "up_e2"
+          },
+          {
+            "from": "up_d2",
+            "to": "up_a4",
+            "label": "재첨부 있음"
+          },
+          {
+            "from": "up_d2",
+            "to": "up_a5",
+            "label": "재첨부 없음"
+          },
+          {
+            "from": "up_a4",
+            "to": "up_a5"
+          },
+          {
+            "from": "up_a5",
+            "to": "up_e1"
+          }
+        ]
+      },
+      {
+        "title": "메인이미지 삭제",
+        "nodes": [
+          {
+            "id": "rm_s",
+            "kind": "start",
+            "label": "삭제 대상 선택"
+          },
+          {
+            "id": "rm_d1",
+            "kind": "decision",
+            "label": "단건 삭제 / 일괄 삭제",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 198,
+                "snippet": "@RequestMapping(value = \"/uss/ion/msi/removeMainImage.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 211,
+                "snippet": "@RequestMapping(value = \"/uss/ion/msi/removeMainImageList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "rm_a1",
+            "kind": "activity",
+            "label": "이미지 단건 삭제 요청",
+            "flowRef": "flow:ANY /uss/ion/msi/removeMainImage.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 198,
+                "snippet": "@RequestMapping(value = \"/uss/ion/msi/removeMainImage.do\")"
+              }
+            ]
+          },
+          {
+            "id": "rm_a2",
+            "kind": "activity",
+            "label": "삭제대상 목록 일괄 삭제",
+            "flowRef": "flow:ANY /uss/ion/msi/removeMainImageList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 211,
+                "snippet": "@RequestMapping(value = \"/uss/ion/msi/removeMainImageList.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+                "line": 74,
+                "snippet": "private String[] delYn;"
+              }
+            ]
+          },
+          {
+            "id": "rm_a3",
+            "kind": "activity",
+            "label": "메인이미지 정보 삭제",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+                "line": 27,
+                "snippet": "public void deleteMainImage(MainImageVO mainImageVO) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "rm_a4",
+            "kind": "activity",
+            "label": "처리 결과 메시지 설정",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+                "line": 52,
+                "snippet": "public String getMessage(String code) {"
+              }
+            ]
+          },
+          {
+            "id": "rm_e",
+            "kind": "end",
+            "label": "목록 조회로 이동",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 57,
+                "snippet": "@RequestMapping(\"/uss/ion/msi/selectMainImageList.do\")"
+              }
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "from": "rm_s",
+            "to": "rm_d1"
+          },
+          {
+            "from": "rm_d1",
+            "to": "rm_a1",
+            "label": "단건"
+          },
+          {
+            "from": "rm_d1",
+            "to": "rm_a2",
+            "label": "일괄"
+          },
+          {
+            "from": "rm_a1",
+            "to": "rm_a3"
+          },
+          {
+            "from": "rm_a2",
+            "to": "rm_a3"
+          },
+          {
+            "from": "rm_a3",
+            "to": "rm_a4"
+          },
+          {
+            "from": "rm_a4",
+            "to": "rm_e"
+          }
+        ]
+      },
+      {
+        "title": "메인이미지 반영확인",
+        "nodes": [
+          {
+            "id": "rs_s",
+            "kind": "start",
+            "label": "반영확인 요청"
+          },
+          {
+            "id": "rs_a1",
+            "kind": "activity",
+            "label": "반영확인 조회 접수",
+            "flowRef": "flow:ANY /uss/ion/msi/getMainImageResult.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+                "line": 231,
+                "snippet": "@RequestMapping(value = \"/uss/ion/msi/getMainImageResult.do\")"
+              }
+            ]
+          },
+          {
+            "id": "rs_a2",
+            "kind": "activity",
+            "label": "반영된 이미지 목록 조회",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+                "line": 31,
+                "snippet": "public List<MainImageVO> selectMainImageResult(MainImageVO mainImageVO) throws Exception;"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+                "line": 59,
+                "snippet": "private String reflctAt;"
+              }
+            ]
+          },
+          {
+            "id": "rs_e",
+            "kind": "end",
+            "label": "반영확인 화면 표시"
+          }
+        ],
+        "edges": [
+          {
+            "from": "rs_s",
+            "to": "rs_a1"
+          },
+          {
+            "from": "rs_a1",
+            "to": "rs_a2"
+          },
+          {
+            "from": "rs_a2",
+            "to": "rs_e"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/ion/msi/addMainImage.do",
+      "name": "메인이미지 등록",
+      "summary": {
+        "text": "운영자가 메인화면 이미지 등록 화면에서 입력한 이미지명·설명과 첨부한 이미지 파일을 받아 신규 메인화면 이미지를 등록하는 흐름이다. 입력값 검증에 실패하면 등록 화면으로 되돌리고, 첨부파일이 있으면 파일을 저장소에 보관한 뒤 첨부파일 아이디를 발급받아 이미지 정보에 연결한다. 이미지 아이디를 채번하고 로그인 사용자를 등록자로 기록한 다음 등록 성공 메시지와 함께 목록 조회로 넘긴다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 110,
+            "snippet": "if (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 122,
+            "snippet": "if (!files.isEmpty()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 124,
+            "snippet": "atchFileId = fileMngService.insertFileInfs(result);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 135,
+            "snippet": "mainImageVO.setImageId(egovMainImageIdGnrService.getNextStringId());"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 142,
+            "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 143,
+            "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/msi/addViewMainImage.do",
+      "name": "메인이미지 등록 화면",
+      "summary": {
+        "text": "메인화면 이미지를 새로 등록하기 위한 입력 화면을 열어 주는 흐름이다. 별도의 조회나 저장 없이 빈 이미지 정보를 화면 모델에 담아 등록 화면을 그대로 보여 준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 95,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addViewMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 96,
+            "snippet": "public String insertViewMainImage(@ModelAttribute(\"mainImageVO\") MainImageVO mainImageVO, ModelMap model) throws Exception {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 98,
+            "snippet": "return \"egovframework/com/uss/ion/msi/EgovMainImageRegist\";"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/msi/getMainImage.do",
+      "name": "메인이미지 상세 조회",
+      "summary": {
+        "text": "목록에서 선택한 메인화면 이미지 한 건의 상세 정보를 조회해 수정 화면에 보여 주는 흐름이다. 이미지 아이디를 조건으로 등록된 이미지 정보를 읽어 오며, 조회 결과와 함께 안내 메시지를 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 83,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/getMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 21,
+            "snippet": "public MainImageVO selectMainImage(MainImageVO mainImageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 41,
+            "snippet": "private String imageId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "public String getMessage(String code) {"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/msi/getMainImageResult.do",
+      "name": "메인이미지 반영확인 조회",
+      "summary": {
+        "text": "등록된 메인화면 이미지 중 실제 메인화면에 반영된 이미지를 확인하는 흐름이다. 반영 여부를 기준으로 이미지 목록을 조회해 반영확인 화면에 보여 준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 231,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/getMainImageResult.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 31,
+            "snippet": "public List<MainImageVO> selectMainImageResult(MainImageVO mainImageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 59,
+            "snippet": "private String reflctAt;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/msi/removeMainImage.do",
+      "name": "메인이미지 삭제",
+      "summary": {
+        "text": "선택한 메인화면 이미지 한 건을 삭제하는 흐름이다. 이미지 아이디로 대상 이미지 정보를 삭제하고, 처리 결과 메시지를 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 198,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/removeMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 27,
+            "snippet": "public void deleteMainImage(MainImageVO mainImageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 41,
+            "snippet": "private String imageId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "public String getMessage(String code) {"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/msi/removeMainImageList.do",
+      "name": "메인이미지 일괄 삭제",
+      "summary": {
+        "text": "목록 화면에서 체크한 여러 건의 메인화면 이미지를 한 번에 삭제하는 흐름이다. 삭제대상 목록으로 넘어온 이미지들을 차례로 삭제하고 처리 결과 메시지를 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 211,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/removeMainImageList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 74,
+            "snippet": "private String[] delYn;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 27,
+            "snippet": "public void deleteMainImage(MainImageVO mainImageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "public String getMessage(String code) {"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/msi/selectMainImageList.do",
+      "name": "메인이미지 목록 조회",
+      "summary": {
+        "text": "등록된 메인화면 이미지를 목록으로 조회하는 흐름이다. 검색 조건에 맞는 이미지 목록과 전체 건수를 함께 조회해 페이징된 목록 화면을 구성하며, 등록·수정·삭제 처리 후 결과 메시지와 함께 되돌아오는 기본 화면이기도 하다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 57,
+            "snippet": "@RequestMapping(\"/uss/ion/msi/selectMainImageList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 17,
+            "snippet": "public List<MainImageVO> selectMainImageList(MainImageVO mainImageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 19,
+            "snippet": "public int selectMainImageListTotCnt(MainImageVO mainImageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 71,
+            "snippet": "private List<MainImageVO> mainImageList;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/msi/selectMainImageListView.do",
+      "name": "메인이미지 목록 화면",
+      "summary": {
+        "text": "메인화면 이미지 관리의 목록 화면으로 진입하는 흐름이다. 별도 처리 없이 목록 조회로 넘겨 초기 목록 화면을 보여 준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 51,
+            "snippet": "@RequestMapping(\"/uss/ion/msi/selectMainImageListView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 57,
+            "snippet": "@RequestMapping(\"/uss/ion/msi/selectMainImageList.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/msi/updtMainImage.do",
+      "name": "메인이미지 수정",
+      "summary": {
+        "text": "기 등록된 메인화면 이미지 정보를 수정하는 흐름이다. 입력값 검증에 실패하면 수정 화면으로 되돌리고, 이미지 파일을 새로 첨부한 경우 파일을 저장한 뒤 새 첨부파일 아이디로 교체한다. 수정 내용을 반영하고 결과 메시지와 함께 목록 조회로 넘긴다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 150,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/updtMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 155,
+            "snippet": "if (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 167,
+            "snippet": "if (!files.isEmpty()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 168,
+            "snippet": "result = fileUtil.parseFileInf(files, \"MSI_\", 0, \"\", uploadFolder);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 25,
+            "snippet": "public void updateMainImage(MainImageVO mainImageVO) throws Exception;"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /uss/ion/msi/addMainImage.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "메인이미지 등록 로그인 사용자 정보 항목",
+      "summary": {
+        "text": "메인이미지 등록 시 등록자를 기록하기 위해 사용하는 로그인 사용자 한 명의 아이디·이름·소속 등을 담은 정보 항목이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 42,
+            "snippet": "private String id;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "로그인한 사용자 한 명의 정보를 담아 나르는 데이터 구조다. 메인화면 이미지 등록·수정 흐름에서는 인증 도우미가 돌려준 사용자 객체를 이 항목으로 변환해 사용자 아이디를 꺼내 이미지의 등록자로 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 133,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일주소·비밀번호 힌트와 정답은 값이 반드시 있어야 하는 항목으로 지정되어 있고, 그 밖에 사용자구분·조직 아이디와 조직명·고유아이디·사용자 아이피·인증 정보 등을 갖는다. 세션에 담겨 오가므로 직렬화 가능한 형태를 유지한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "private String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "private String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "private String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/addMainImage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "메인이미지 등록 첨부파일 정보 관리",
+      "summary": {
+        "text": "메인이미지 등록 시 저장된 이미지 파일들의 속성·상세 정보를 등록하고 첨부파일 아이디를 돌려주는 공통 첨부파일 정보 관리 업무를 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 46,
+            "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지에 딸린 첨부파일의 정보를 관리하는 공통 업무 서비스다. 파일 저장 처리가 만들어 준 파일 정보 목록을 받아 첨부파일 정보로 등록하고, 이미지 정보에 연결할 첨부파일 아이디를 돌려준다. 첨부파일 목록 조회와 상세 조회, 삭제도 함께 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 46,
+              "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 79,
+              "snippet": "public FileVO selectFileInf(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 124,
+              "snippet": "atchFileId = fileMngService.insertFileInfs(result);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "여러 개의 파일 정보를 한 번에 등록하고 그 묶음을 대표하는 첨부파일 아이디를 돌려주는 방식과, 파일 한 건씩 등록하는 방식을 모두 제공한다. 삭제 또한 여러 건 일괄 삭제와 단건 삭제로 나뉘어 있고, 상세 조회는 파일 한 건의 정보를 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 38,
+              "snippet": "public String insertFileInf(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 46,
+              "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 62,
+              "snippet": "public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 79,
+              "snippet": "public FileVO selectFileInf(FileVO fvo) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/addMainImage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "name": "메인이미지 등록 첨부 이미지 파일 저장",
+      "summary": {
+        "text": "메인이미지 등록 시 화면에서 올라온 이미지 파일을 서버 저장소에 보관하고, 저장된 파일의 정보 목록을 만들어 돌려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 76,
+            "snippet": "public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지에 첨부된 이미지 파일을 실제 파일 저장소에 보관하는 공통 파일 처리 역할을 한다. 화면 요청에 담긴 파일들을 받아 저장 경로를 정하고 첨부파일 아이디를 채번한 뒤, 각 파일의 확장자·크기·저장경로·원파일명 등을 담은 파일 정보 목록을 만들어 첨부파일 정보 관리 서비스로 넘길 수 있게 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 60,
+              "snippet": "@Component(\"EgovFileMngUtil\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 64,
+              "snippet": "private static final String FILE_STORE_PATH = EgovProperties.getProperty(\"Globals.fileStorePath\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 76,
+              "snippet": "public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 90,
+              "snippet": "atchFileIdString = idgenService.getNextStringId();"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "저장 경로가 지정되지 않으면 전역 설정의 기본 파일 저장 경로를 사용하고, 첨부파일 아이디가 없으면 새로 채번한다. 원본 파일명이 비어 있는 항목은 건너뛰며, 확장자는 대문자로 정규화하고 저장 파일명은 접두어와 시각·일련번호를 조합해 만든 뒤 경로 위험 문자를 걸러 낸 경로로 파일을 옮겨 저장한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 64,
+              "snippet": "private static final String FILE_STORE_PATH = EgovProperties.getProperty(\"Globals.fileStorePath\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 90,
+              "snippet": "atchFileIdString = idgenService.getNextStringId();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 115,
+              "snippet": "if (StringUtils.isEmpty(orginFileName)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 120,
+              "snippet": "String fileExt = FilenameUtils.getExtension(orginFileName).toUpperCase();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 121,
+              "snippet": "String newName = keyStr + getTimeStamp() + fileKey;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 124,
+              "snippet": "file.transferTo(new File(EgovWebUtil.filePathBlackList(filePath)));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/addMainImage.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "name": "메인이미지 등록 첨부파일 정보 항목",
+      "summary": {
+        "text": "메인이미지 등록 과정에서 저장된 이미지 파일 한 건의 첨부파일 아이디·원파일명·확장자·크기·저장경로 등을 담아 나르는 정보 항목이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 21,
+            "snippet": "public class FileVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 26,
+            "snippet": "public String atchFileId = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 54,
+            "snippet": "public String orignlFileNm = \"\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지에 첨부된 파일 한 건의 정보를 담아 파일 저장 처리와 첨부파일 정보 관리 사이를 오가는 데이터 구조다. 등록 흐름에서는 저장된 파일의 원파일명을 꺼내 메인화면 이미지의 표시용 이미지 값으로 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 21,
+              "snippet": "public class FileVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 54,
+              "snippet": "public String orignlFileNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 129,
+              "snippet": "image = vo.getOrignlFileNm();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "첨부파일 아이디와 파일연번으로 파일을 식별하고, 원파일명·저장파일명·확장자·파일크기·파일저장경로·생성일자·파일내용을 항목으로 갖는다. 모든 항목은 빈 문자열로 초기화되어 값이 설정되지 않아도 널이 되지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 26,
+              "snippet": "public String atchFileId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 38,
+              "snippet": "public String fileExtsn = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 42,
+              "snippet": "public String fileMg = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 50,
+              "snippet": "public String fileStreCours = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 54,
+              "snippet": "public String orignlFileNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 58,
+              "snippet": "public String streFileNm = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/addMainImage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "메인이미지 등록 로그인 사용자 확인",
+      "summary": {
+        "text": "메인이미지 등록 시 현재 로그인한 사용자 정보를 가져와 등록자를 기록하는 데 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "public static Object getAuthenticatedUser() {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "현재 인증된 사용자의 정보를 흐름 어디서나 꺼내 쓸 수 있게 해 주는 공통 도우미다. 메인화면 이미지 등록·수정 시 이 도우미로 로그인 사용자를 확인해 이미지의 등록자 아이디로 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 133,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인의 세 가지를 제공하며 모두 사용자 인증 서비스에 위임한다. 사용자 객체는 형식이 정해지지 않은 채로 반환되므로 사용하는 쪽에서 로그인 사용자 정보로 변환해 쓰며, 로그인되지 않은 경우를 대비해 값이 없을 수 있음을 전제로 다뤄야 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "public static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 133,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/addMainImage.do:src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+      "name": "메인이미지 등록 메인화면 이미지 정보 항목",
+      "summary": {
+        "text": "메인이미지 등록 요청과 결과를 오가며 이미지 아이디·이미지명·이미지 파일·설명·반영여부·등록자 등 메인화면 이미지 한 건의 정보를 담아 나르는 항목이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 36,
+            "snippet": "public class MainImageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 36,
+            "snippet": "public class MainImageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 41,
+            "snippet": "private String imageId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 46,
+            "snippet": "private String imageNm;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 한 건의 업무 정보를 담아 화면 요청 창구와 이미지 업무 서비스 사이를 오가는 데이터 구조다. 화면 검색 조건과 페이징을 담은 공통 조회 항목을 물려받아 목록 조회 조건으로도 쓰이고, 조회 결과 목록과 삭제 대상 목록도 함께 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 36,
+              "snippet": "public class MainImageVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 71,
+              "snippet": "private List<MainImageVO> mainImageList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 74,
+              "snippet": "private String[] delYn;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "이미지 아이디로 이미지를 식별하고 이미지명·메인 이미지·이미지 파일·이미지 설명·반영여부·사용자 아이디·등록일자를 항목으로 갖는다. 이미지명은 값이 반드시 있어야 하고 최대 10자로 제한되며, 메인 이미지는 공백일 수 없도록 지정되어 등록 시 검증 대상이 된다. 목록 조회 결과와 일괄 삭제 대상 목록, 파일첨부 여부도 같은 항목 안에 담긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 41,
+              "snippet": "private String imageId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 45,
+              "snippet": "@Size(max = 10)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 46,
+              "snippet": "private String imageNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 49,
+              "snippet": "@NotBlank(message = \"{uss.ion.msi.mainImageRegist.ImageReq}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 50,
+              "snippet": "private String image;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 53,
+              "snippet": "private String imageFile;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 56,
+              "snippet": "private String imageDc;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 59,
+              "snippet": "private String reflctAt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 62,
+              "snippet": "private String userId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 65,
+              "snippet": "private String regDate;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 68,
+              "snippet": "private boolean isAtchFile;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 71,
+              "snippet": "private List<MainImageVO> mainImageList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 74,
+              "snippet": "private String[] delYn;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/addMainImage.do:src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+      "name": "메인이미지 등록 요청 접수",
+      "summary": {
+        "text": "메인화면 이미지 관리 화면에서 들어온 메인이미지 등록 요청을 받아 화면 입력값을 이미지 정보로 묶고, 실제 처리는 메인화면 이미지 서비스와 첨부파일 처리에 위임한 뒤 처리 결과와 메시지를 화면 모델에 담아 돌려주는 창구 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 142,
+            "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 143,
+            "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 관리의 모든 화면 요청을 받는 단일 창구다. 목록·상세·등록·수정·삭제·반영확인 요청별로 화면 입력값을 이미지 정보로 받아 메인화면 이미지 서비스에 위임하고, 첨부 이미지가 있으면 파일 저장 처리를 거친 뒤 결과와 안내 메시지를 화면 모델에 담아 해당 화면 또는 목록 조회로 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 105,
+              "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 141,
+              "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 142,
+              "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 143,
+              "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "등록·수정 요청은 첨부파일을 담은 화면 요청과 이미지 정보를 함께 받으며, 이미지 정보는 검증 대상으로 지정되어 검증 결과가 함께 넘어온다. 검증 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록 시에는 로그인 사용자 정보를 확인해 등록자로 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 106,
+              "snippet": "public String insertMainImage(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 107,
+              "snippet": "@Valid @ModelAttribute(\"mainImageVO\") MainImageVO mainImageVO, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 110,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 112,
+              "snippet": "return \"egovframework/com/uss/ion/msi/EgovMainImageRegist\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 133,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/addMainImage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "메인이미지 등록 문자열 처리 도우미",
+      "summary": {
+        "text": "메인이미지 등록 시 로그인 사용자 아이디가 없을 때 빈 문자열로 바꾸는 등 값 정리를 담당하는 공통 문자열 도우미다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 138,
+            "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "문자열 값을 안전하게 다루기 위한 공통 도우미다. 메인화면 이미지 등록·수정 흐름에서는 로그인 사용자의 아이디가 없을 때 널 대신 빈 문자열로 바꿔 등록자 항목에 기록되도록 하는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 상수를 기준값으로 두고, 지정 길이를 넘는 문자열을 잘라 내거나 잘린 자리에 표시 문자열을 붙이는 등 화면 표시용 문자열 정리 기능을 제공한다. 모든 기능은 원본 값이 없을 때를 전제로 값 유무를 먼저 확인한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "public static String cutString(String source, int slength) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/addViewMainImage.do:src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+      "name": "메인이미지 등록 화면 요청 접수",
+      "summary": {
+        "text": "메인화면 이미지 관리 화면에서 들어온 메인이미지 등록 화면 요청을 받아 화면 입력값을 이미지 정보로 묶고, 실제 처리는 메인화면 이미지 서비스와 첨부파일 처리에 위임한 뒤 처리 결과와 메시지를 화면 모델에 담아 돌려주는 창구 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 142,
+            "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 143,
+            "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 관리의 모든 화면 요청을 받는 단일 창구다. 목록·상세·등록·수정·삭제·반영확인 요청별로 화면 입력값을 이미지 정보로 받아 메인화면 이미지 서비스에 위임하고, 첨부 이미지가 있으면 파일 저장 처리를 거친 뒤 결과와 안내 메시지를 화면 모델에 담아 해당 화면 또는 목록 조회로 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 105,
+              "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 141,
+              "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 142,
+              "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 143,
+              "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "등록·수정 요청은 첨부파일을 담은 화면 요청과 이미지 정보를 함께 받으며, 이미지 정보는 검증 대상으로 지정되어 검증 결과가 함께 넘어온다. 검증 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록 시에는 로그인 사용자 정보를 확인해 등록자로 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 106,
+              "snippet": "public String insertMainImage(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 107,
+              "snippet": "@Valid @ModelAttribute(\"mainImageVO\") MainImageVO mainImageVO, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 110,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 112,
+              "snippet": "return \"egovframework/com/uss/ion/msi/EgovMainImageRegist\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 133,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/getMainImage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "메인이미지 상세 조회 처리 결과 메시지 조회",
+      "summary": {
+        "text": "메인이미지 상세 조회 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "public String getMessage(String code) {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 처리 결과를 사용자에게 보여 줄 안내 문구를 메시지 코드 기준으로 찾아 주는 공통 메시지 제공 역할을 한다. 화면 요청 창구는 등록·수정·삭제 성공 시 이 메시지를 화면 모델에 담아 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 141,
+              "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드를 받아 기본 로케일 기준의 정의된 메시지를 조회해 돌려주며, 로케일이나 매개변수를 함께 받는 조회 방식도 제공해 다국어와 값 치환을 지원한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "return getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/getMainImage.do:src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+      "name": "메인이미지 상세 조회 이미지 업무 처리",
+      "summary": {
+        "text": "메인화면 이미지에 대한 등록·수정·삭제·조회·반영확인 업무를 정의한 서비스로, 메인이미지 상세 조회 요청에서 필요한 이미지 정보 처리를 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 15,
+            "snippet": "public interface EgovMainImageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 15,
+            "snippet": "public interface EgovMainImageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 10,
+            "snippet": "* - 메인화면이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 한데 모아 제공하는 업무 서비스다. 화면 요청 창구는 이 서비스에만 이미지 관련 처리를 위임하며, 목록 조회·전체 건수 조회·단건 상세 조회·등록·수정·삭제·반영확인 조회가 각각의 업무 단위로 정의되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 10,
+              "snippet": "* - 메인화면이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 15,
+              "snippet": "public interface EgovMainImageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 17,
+              "snippet": "public List<MainImageVO> selectMainImageList(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 21,
+              "snippet": "public MainImageVO selectMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 23,
+              "snippet": "public MainImageVO insertMainImage(MainImageVO mainImageVO) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록 조회는 검색 조건에 맞는 이미지 목록과 전체 건수를 각각 제공해 페이징을 구성하고, 등록은 이미지 정보를 저장한 뒤 등록된 정보를 되돌려 준다. 수정과 삭제는 이미지 정보를 받아 반영하며, 이미지에 딸린 첨부파일 삭제는 별도 업무로 분리되어 있다. 반영확인은 메인화면에 반영된 이미지 목록을 별도로 조회한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 17,
+              "snippet": "public List<MainImageVO> selectMainImageList(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 19,
+              "snippet": "public int selectMainImageListTotCnt(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 23,
+              "snippet": "public MainImageVO insertMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 25,
+              "snippet": "public void updateMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 27,
+              "snippet": "public void deleteMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 29,
+              "snippet": "public void deleteMainImageFile(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 31,
+              "snippet": "public List<MainImageVO> selectMainImageResult(MainImageVO mainImageVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/getMainImage.do:src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+      "name": "메인이미지 상세 조회 메인화면 이미지 정보 항목",
+      "summary": {
+        "text": "메인이미지 상세 조회 요청과 결과를 오가며 이미지 아이디·이미지명·이미지 파일·설명·반영여부·등록자 등 메인화면 이미지 한 건의 정보를 담아 나르는 항목이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 36,
+            "snippet": "public class MainImageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 36,
+            "snippet": "public class MainImageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 41,
+            "snippet": "private String imageId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 46,
+            "snippet": "private String imageNm;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 한 건의 업무 정보를 담아 화면 요청 창구와 이미지 업무 서비스 사이를 오가는 데이터 구조다. 화면 검색 조건과 페이징을 담은 공통 조회 항목을 물려받아 목록 조회 조건으로도 쓰이고, 조회 결과 목록과 삭제 대상 목록도 함께 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 36,
+              "snippet": "public class MainImageVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 71,
+              "snippet": "private List<MainImageVO> mainImageList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 74,
+              "snippet": "private String[] delYn;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "이미지 아이디로 이미지를 식별하고 이미지명·메인 이미지·이미지 파일·이미지 설명·반영여부·사용자 아이디·등록일자를 항목으로 갖는다. 이미지명은 값이 반드시 있어야 하고 최대 10자로 제한되며, 메인 이미지는 공백일 수 없도록 지정되어 등록 시 검증 대상이 된다. 목록 조회 결과와 일괄 삭제 대상 목록, 파일첨부 여부도 같은 항목 안에 담긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 41,
+              "snippet": "private String imageId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 45,
+              "snippet": "@Size(max = 10)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 46,
+              "snippet": "private String imageNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 49,
+              "snippet": "@NotBlank(message = \"{uss.ion.msi.mainImageRegist.ImageReq}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 50,
+              "snippet": "private String image;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 53,
+              "snippet": "private String imageFile;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 56,
+              "snippet": "private String imageDc;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 59,
+              "snippet": "private String reflctAt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 62,
+              "snippet": "private String userId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 65,
+              "snippet": "private String regDate;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 68,
+              "snippet": "private boolean isAtchFile;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 71,
+              "snippet": "private List<MainImageVO> mainImageList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 74,
+              "snippet": "private String[] delYn;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/getMainImage.do:src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+      "name": "메인이미지 상세 조회 요청 접수",
+      "summary": {
+        "text": "메인화면 이미지 관리 화면에서 들어온 메인이미지 상세 조회 요청을 받아 화면 입력값을 이미지 정보로 묶고, 실제 처리는 메인화면 이미지 서비스와 첨부파일 처리에 위임한 뒤 처리 결과와 메시지를 화면 모델에 담아 돌려주는 창구 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 142,
+            "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 143,
+            "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 관리의 모든 화면 요청을 받는 단일 창구다. 목록·상세·등록·수정·삭제·반영확인 요청별로 화면 입력값을 이미지 정보로 받아 메인화면 이미지 서비스에 위임하고, 첨부 이미지가 있으면 파일 저장 처리를 거친 뒤 결과와 안내 메시지를 화면 모델에 담아 해당 화면 또는 목록 조회로 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 105,
+              "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 141,
+              "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 142,
+              "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 143,
+              "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "등록·수정 요청은 첨부파일을 담은 화면 요청과 이미지 정보를 함께 받으며, 이미지 정보는 검증 대상으로 지정되어 검증 결과가 함께 넘어온다. 검증 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록 시에는 로그인 사용자 정보를 확인해 등록자로 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 106,
+              "snippet": "public String insertMainImage(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 107,
+              "snippet": "@Valid @ModelAttribute(\"mainImageVO\") MainImageVO mainImageVO, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 110,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 112,
+              "snippet": "return \"egovframework/com/uss/ion/msi/EgovMainImageRegist\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 133,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/getMainImageResult.do:src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+      "name": "메인이미지 반영확인 조회 이미지 업무 처리",
+      "summary": {
+        "text": "메인화면 이미지에 대한 등록·수정·삭제·조회·반영확인 업무를 정의한 서비스로, 메인이미지 반영확인 조회 요청에서 필요한 이미지 정보 처리를 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 15,
+            "snippet": "public interface EgovMainImageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 15,
+            "snippet": "public interface EgovMainImageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 10,
+            "snippet": "* - 메인화면이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 한데 모아 제공하는 업무 서비스다. 화면 요청 창구는 이 서비스에만 이미지 관련 처리를 위임하며, 목록 조회·전체 건수 조회·단건 상세 조회·등록·수정·삭제·반영확인 조회가 각각의 업무 단위로 정의되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 10,
+              "snippet": "* - 메인화면이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 15,
+              "snippet": "public interface EgovMainImageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 17,
+              "snippet": "public List<MainImageVO> selectMainImageList(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 21,
+              "snippet": "public MainImageVO selectMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 23,
+              "snippet": "public MainImageVO insertMainImage(MainImageVO mainImageVO) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록 조회는 검색 조건에 맞는 이미지 목록과 전체 건수를 각각 제공해 페이징을 구성하고, 등록은 이미지 정보를 저장한 뒤 등록된 정보를 되돌려 준다. 수정과 삭제는 이미지 정보를 받아 반영하며, 이미지에 딸린 첨부파일 삭제는 별도 업무로 분리되어 있다. 반영확인은 메인화면에 반영된 이미지 목록을 별도로 조회한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 17,
+              "snippet": "public List<MainImageVO> selectMainImageList(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 19,
+              "snippet": "public int selectMainImageListTotCnt(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 23,
+              "snippet": "public MainImageVO insertMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 25,
+              "snippet": "public void updateMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 27,
+              "snippet": "public void deleteMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 29,
+              "snippet": "public void deleteMainImageFile(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 31,
+              "snippet": "public List<MainImageVO> selectMainImageResult(MainImageVO mainImageVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/getMainImageResult.do:src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+      "name": "메인이미지 반영확인 조회 요청 접수",
+      "summary": {
+        "text": "메인화면 이미지 관리 화면에서 들어온 메인이미지 반영확인 조회 요청을 받아 화면 입력값을 이미지 정보로 묶고, 실제 처리는 메인화면 이미지 서비스와 첨부파일 처리에 위임한 뒤 처리 결과와 메시지를 화면 모델에 담아 돌려주는 창구 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 142,
+            "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 143,
+            "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 관리의 모든 화면 요청을 받는 단일 창구다. 목록·상세·등록·수정·삭제·반영확인 요청별로 화면 입력값을 이미지 정보로 받아 메인화면 이미지 서비스에 위임하고, 첨부 이미지가 있으면 파일 저장 처리를 거친 뒤 결과와 안내 메시지를 화면 모델에 담아 해당 화면 또는 목록 조회로 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 105,
+              "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 141,
+              "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 142,
+              "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 143,
+              "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "등록·수정 요청은 첨부파일을 담은 화면 요청과 이미지 정보를 함께 받으며, 이미지 정보는 검증 대상으로 지정되어 검증 결과가 함께 넘어온다. 검증 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록 시에는 로그인 사용자 정보를 확인해 등록자로 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 106,
+              "snippet": "public String insertMainImage(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 107,
+              "snippet": "@Valid @ModelAttribute(\"mainImageVO\") MainImageVO mainImageVO, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 110,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 112,
+              "snippet": "return \"egovframework/com/uss/ion/msi/EgovMainImageRegist\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 133,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/removeMainImage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "메인이미지 삭제 처리 결과 메시지 조회",
+      "summary": {
+        "text": "메인이미지 삭제 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "public String getMessage(String code) {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 처리 결과를 사용자에게 보여 줄 안내 문구를 메시지 코드 기준으로 찾아 주는 공통 메시지 제공 역할을 한다. 화면 요청 창구는 등록·수정·삭제 성공 시 이 메시지를 화면 모델에 담아 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 141,
+              "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드를 받아 기본 로케일 기준의 정의된 메시지를 조회해 돌려주며, 로케일이나 매개변수를 함께 받는 조회 방식도 제공해 다국어와 값 치환을 지원한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "return getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/removeMainImage.do:src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+      "name": "메인이미지 삭제 이미지 업무 처리",
+      "summary": {
+        "text": "메인화면 이미지에 대한 등록·수정·삭제·조회·반영확인 업무를 정의한 서비스로, 메인이미지 삭제 요청에서 필요한 이미지 정보 처리를 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 15,
+            "snippet": "public interface EgovMainImageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 15,
+            "snippet": "public interface EgovMainImageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 10,
+            "snippet": "* - 메인화면이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 한데 모아 제공하는 업무 서비스다. 화면 요청 창구는 이 서비스에만 이미지 관련 처리를 위임하며, 목록 조회·전체 건수 조회·단건 상세 조회·등록·수정·삭제·반영확인 조회가 각각의 업무 단위로 정의되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 10,
+              "snippet": "* - 메인화면이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 15,
+              "snippet": "public interface EgovMainImageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 17,
+              "snippet": "public List<MainImageVO> selectMainImageList(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 21,
+              "snippet": "public MainImageVO selectMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 23,
+              "snippet": "public MainImageVO insertMainImage(MainImageVO mainImageVO) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록 조회는 검색 조건에 맞는 이미지 목록과 전체 건수를 각각 제공해 페이징을 구성하고, 등록은 이미지 정보를 저장한 뒤 등록된 정보를 되돌려 준다. 수정과 삭제는 이미지 정보를 받아 반영하며, 이미지에 딸린 첨부파일 삭제는 별도 업무로 분리되어 있다. 반영확인은 메인화면에 반영된 이미지 목록을 별도로 조회한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 17,
+              "snippet": "public List<MainImageVO> selectMainImageList(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 19,
+              "snippet": "public int selectMainImageListTotCnt(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 23,
+              "snippet": "public MainImageVO insertMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 25,
+              "snippet": "public void updateMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 27,
+              "snippet": "public void deleteMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 29,
+              "snippet": "public void deleteMainImageFile(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 31,
+              "snippet": "public List<MainImageVO> selectMainImageResult(MainImageVO mainImageVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/removeMainImage.do:src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+      "name": "메인이미지 삭제 메인화면 이미지 정보 항목",
+      "summary": {
+        "text": "메인이미지 삭제 요청과 결과를 오가며 이미지 아이디·이미지명·이미지 파일·설명·반영여부·등록자 등 메인화면 이미지 한 건의 정보를 담아 나르는 항목이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 36,
+            "snippet": "public class MainImageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 36,
+            "snippet": "public class MainImageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 41,
+            "snippet": "private String imageId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 46,
+            "snippet": "private String imageNm;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 한 건의 업무 정보를 담아 화면 요청 창구와 이미지 업무 서비스 사이를 오가는 데이터 구조다. 화면 검색 조건과 페이징을 담은 공통 조회 항목을 물려받아 목록 조회 조건으로도 쓰이고, 조회 결과 목록과 삭제 대상 목록도 함께 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 36,
+              "snippet": "public class MainImageVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 71,
+              "snippet": "private List<MainImageVO> mainImageList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 74,
+              "snippet": "private String[] delYn;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "이미지 아이디로 이미지를 식별하고 이미지명·메인 이미지·이미지 파일·이미지 설명·반영여부·사용자 아이디·등록일자를 항목으로 갖는다. 이미지명은 값이 반드시 있어야 하고 최대 10자로 제한되며, 메인 이미지는 공백일 수 없도록 지정되어 등록 시 검증 대상이 된다. 목록 조회 결과와 일괄 삭제 대상 목록, 파일첨부 여부도 같은 항목 안에 담긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 41,
+              "snippet": "private String imageId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 45,
+              "snippet": "@Size(max = 10)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 46,
+              "snippet": "private String imageNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 49,
+              "snippet": "@NotBlank(message = \"{uss.ion.msi.mainImageRegist.ImageReq}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 50,
+              "snippet": "private String image;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 53,
+              "snippet": "private String imageFile;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 56,
+              "snippet": "private String imageDc;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 59,
+              "snippet": "private String reflctAt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 62,
+              "snippet": "private String userId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 65,
+              "snippet": "private String regDate;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 68,
+              "snippet": "private boolean isAtchFile;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 71,
+              "snippet": "private List<MainImageVO> mainImageList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 74,
+              "snippet": "private String[] delYn;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/removeMainImage.do:src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+      "name": "메인이미지 삭제 요청 접수",
+      "summary": {
+        "text": "메인화면 이미지 관리 화면에서 들어온 메인이미지 삭제 요청을 받아 화면 입력값을 이미지 정보로 묶고, 실제 처리는 메인화면 이미지 서비스와 첨부파일 처리에 위임한 뒤 처리 결과와 메시지를 화면 모델에 담아 돌려주는 창구 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 142,
+            "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 143,
+            "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 관리의 모든 화면 요청을 받는 단일 창구다. 목록·상세·등록·수정·삭제·반영확인 요청별로 화면 입력값을 이미지 정보로 받아 메인화면 이미지 서비스에 위임하고, 첨부 이미지가 있으면 파일 저장 처리를 거친 뒤 결과와 안내 메시지를 화면 모델에 담아 해당 화면 또는 목록 조회로 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 105,
+              "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 141,
+              "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 142,
+              "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 143,
+              "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "등록·수정 요청은 첨부파일을 담은 화면 요청과 이미지 정보를 함께 받으며, 이미지 정보는 검증 대상으로 지정되어 검증 결과가 함께 넘어온다. 검증 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록 시에는 로그인 사용자 정보를 확인해 등록자로 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 106,
+              "snippet": "public String insertMainImage(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 107,
+              "snippet": "@Valid @ModelAttribute(\"mainImageVO\") MainImageVO mainImageVO, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 110,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 112,
+              "snippet": "return \"egovframework/com/uss/ion/msi/EgovMainImageRegist\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 133,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/removeMainImageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "메인이미지 일괄 삭제 처리 결과 메시지 조회",
+      "summary": {
+        "text": "메인이미지 일괄 삭제 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "public String getMessage(String code) {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 처리 결과를 사용자에게 보여 줄 안내 문구를 메시지 코드 기준으로 찾아 주는 공통 메시지 제공 역할을 한다. 화면 요청 창구는 등록·수정·삭제 성공 시 이 메시지를 화면 모델에 담아 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 141,
+              "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드를 받아 기본 로케일 기준의 정의된 메시지를 조회해 돌려주며, 로케일이나 매개변수를 함께 받는 조회 방식도 제공해 다국어와 값 치환을 지원한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "return getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/removeMainImageList.do:src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+      "name": "메인이미지 일괄 삭제 이미지 업무 처리",
+      "summary": {
+        "text": "메인화면 이미지에 대한 등록·수정·삭제·조회·반영확인 업무를 정의한 서비스로, 메인이미지 일괄 삭제 요청에서 필요한 이미지 정보 처리를 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 15,
+            "snippet": "public interface EgovMainImageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 15,
+            "snippet": "public interface EgovMainImageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 10,
+            "snippet": "* - 메인화면이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 한데 모아 제공하는 업무 서비스다. 화면 요청 창구는 이 서비스에만 이미지 관련 처리를 위임하며, 목록 조회·전체 건수 조회·단건 상세 조회·등록·수정·삭제·반영확인 조회가 각각의 업무 단위로 정의되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 10,
+              "snippet": "* - 메인화면이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 15,
+              "snippet": "public interface EgovMainImageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 17,
+              "snippet": "public List<MainImageVO> selectMainImageList(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 21,
+              "snippet": "public MainImageVO selectMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 23,
+              "snippet": "public MainImageVO insertMainImage(MainImageVO mainImageVO) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록 조회는 검색 조건에 맞는 이미지 목록과 전체 건수를 각각 제공해 페이징을 구성하고, 등록은 이미지 정보를 저장한 뒤 등록된 정보를 되돌려 준다. 수정과 삭제는 이미지 정보를 받아 반영하며, 이미지에 딸린 첨부파일 삭제는 별도 업무로 분리되어 있다. 반영확인은 메인화면에 반영된 이미지 목록을 별도로 조회한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 17,
+              "snippet": "public List<MainImageVO> selectMainImageList(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 19,
+              "snippet": "public int selectMainImageListTotCnt(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 23,
+              "snippet": "public MainImageVO insertMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 25,
+              "snippet": "public void updateMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 27,
+              "snippet": "public void deleteMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 29,
+              "snippet": "public void deleteMainImageFile(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 31,
+              "snippet": "public List<MainImageVO> selectMainImageResult(MainImageVO mainImageVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/removeMainImageList.do:src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+      "name": "메인이미지 일괄 삭제 메인화면 이미지 정보 항목",
+      "summary": {
+        "text": "메인이미지 일괄 삭제 요청과 결과를 오가며 이미지 아이디·이미지명·이미지 파일·설명·반영여부·등록자 등 메인화면 이미지 한 건의 정보를 담아 나르는 항목이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 36,
+            "snippet": "public class MainImageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 36,
+            "snippet": "public class MainImageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 41,
+            "snippet": "private String imageId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 46,
+            "snippet": "private String imageNm;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 한 건의 업무 정보를 담아 화면 요청 창구와 이미지 업무 서비스 사이를 오가는 데이터 구조다. 화면 검색 조건과 페이징을 담은 공통 조회 항목을 물려받아 목록 조회 조건으로도 쓰이고, 조회 결과 목록과 삭제 대상 목록도 함께 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 36,
+              "snippet": "public class MainImageVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 71,
+              "snippet": "private List<MainImageVO> mainImageList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 74,
+              "snippet": "private String[] delYn;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "이미지 아이디로 이미지를 식별하고 이미지명·메인 이미지·이미지 파일·이미지 설명·반영여부·사용자 아이디·등록일자를 항목으로 갖는다. 이미지명은 값이 반드시 있어야 하고 최대 10자로 제한되며, 메인 이미지는 공백일 수 없도록 지정되어 등록 시 검증 대상이 된다. 목록 조회 결과와 일괄 삭제 대상 목록, 파일첨부 여부도 같은 항목 안에 담긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 41,
+              "snippet": "private String imageId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 45,
+              "snippet": "@Size(max = 10)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 46,
+              "snippet": "private String imageNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 49,
+              "snippet": "@NotBlank(message = \"{uss.ion.msi.mainImageRegist.ImageReq}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 50,
+              "snippet": "private String image;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 53,
+              "snippet": "private String imageFile;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 56,
+              "snippet": "private String imageDc;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 59,
+              "snippet": "private String reflctAt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 62,
+              "snippet": "private String userId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 65,
+              "snippet": "private String regDate;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 68,
+              "snippet": "private boolean isAtchFile;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 71,
+              "snippet": "private List<MainImageVO> mainImageList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 74,
+              "snippet": "private String[] delYn;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/removeMainImageList.do:src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+      "name": "메인이미지 일괄 삭제 요청 접수",
+      "summary": {
+        "text": "메인화면 이미지 관리 화면에서 들어온 메인이미지 일괄 삭제 요청을 받아 화면 입력값을 이미지 정보로 묶고, 실제 처리는 메인화면 이미지 서비스와 첨부파일 처리에 위임한 뒤 처리 결과와 메시지를 화면 모델에 담아 돌려주는 창구 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 142,
+            "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 143,
+            "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 관리의 모든 화면 요청을 받는 단일 창구다. 목록·상세·등록·수정·삭제·반영확인 요청별로 화면 입력값을 이미지 정보로 받아 메인화면 이미지 서비스에 위임하고, 첨부 이미지가 있으면 파일 저장 처리를 거친 뒤 결과와 안내 메시지를 화면 모델에 담아 해당 화면 또는 목록 조회로 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 105,
+              "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 141,
+              "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 142,
+              "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 143,
+              "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "등록·수정 요청은 첨부파일을 담은 화면 요청과 이미지 정보를 함께 받으며, 이미지 정보는 검증 대상으로 지정되어 검증 결과가 함께 넘어온다. 검증 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록 시에는 로그인 사용자 정보를 확인해 등록자로 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 106,
+              "snippet": "public String insertMainImage(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 107,
+              "snippet": "@Valid @ModelAttribute(\"mainImageVO\") MainImageVO mainImageVO, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 110,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 112,
+              "snippet": "return \"egovframework/com/uss/ion/msi/EgovMainImageRegist\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 133,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/selectMainImageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "메인이미지 목록 조회 처리 결과 메시지 조회",
+      "summary": {
+        "text": "메인이미지 목록 조회 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "public String getMessage(String code) {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 처리 결과를 사용자에게 보여 줄 안내 문구를 메시지 코드 기준으로 찾아 주는 공통 메시지 제공 역할을 한다. 화면 요청 창구는 등록·수정·삭제 성공 시 이 메시지를 화면 모델에 담아 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 141,
+              "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드를 받아 기본 로케일 기준의 정의된 메시지를 조회해 돌려주며, 로케일이나 매개변수를 함께 받는 조회 방식도 제공해 다국어와 값 치환을 지원한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "return getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/selectMainImageList.do:src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+      "name": "메인이미지 목록 조회 이미지 업무 처리",
+      "summary": {
+        "text": "메인화면 이미지에 대한 등록·수정·삭제·조회·반영확인 업무를 정의한 서비스로, 메인이미지 목록 조회 요청에서 필요한 이미지 정보 처리를 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 15,
+            "snippet": "public interface EgovMainImageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 15,
+            "snippet": "public interface EgovMainImageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+            "line": 10,
+            "snippet": "* - 메인화면이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 한데 모아 제공하는 업무 서비스다. 화면 요청 창구는 이 서비스에만 이미지 관련 처리를 위임하며, 목록 조회·전체 건수 조회·단건 상세 조회·등록·수정·삭제·반영확인 조회가 각각의 업무 단위로 정의되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 10,
+              "snippet": "* - 메인화면이미지에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 15,
+              "snippet": "public interface EgovMainImageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 17,
+              "snippet": "public List<MainImageVO> selectMainImageList(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 21,
+              "snippet": "public MainImageVO selectMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 23,
+              "snippet": "public MainImageVO insertMainImage(MainImageVO mainImageVO) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록 조회는 검색 조건에 맞는 이미지 목록과 전체 건수를 각각 제공해 페이징을 구성하고, 등록은 이미지 정보를 저장한 뒤 등록된 정보를 되돌려 준다. 수정과 삭제는 이미지 정보를 받아 반영하며, 이미지에 딸린 첨부파일 삭제는 별도 업무로 분리되어 있다. 반영확인은 메인화면에 반영된 이미지 목록을 별도로 조회한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 17,
+              "snippet": "public List<MainImageVO> selectMainImageList(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 19,
+              "snippet": "public int selectMainImageListTotCnt(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 23,
+              "snippet": "public MainImageVO insertMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 25,
+              "snippet": "public void updateMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 27,
+              "snippet": "public void deleteMainImage(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 29,
+              "snippet": "public void deleteMainImageFile(MainImageVO mainImageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/EgovMainImageService.java",
+              "line": 31,
+              "snippet": "public List<MainImageVO> selectMainImageResult(MainImageVO mainImageVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/selectMainImageList.do:src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+      "name": "메인이미지 목록 조회 메인화면 이미지 정보 항목",
+      "summary": {
+        "text": "메인이미지 목록 조회 요청과 결과를 오가며 이미지 아이디·이미지명·이미지 파일·설명·반영여부·등록자 등 메인화면 이미지 한 건의 정보를 담아 나르는 항목이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 36,
+            "snippet": "public class MainImageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 36,
+            "snippet": "public class MainImageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 41,
+            "snippet": "private String imageId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 46,
+            "snippet": "private String imageNm;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 한 건의 업무 정보를 담아 화면 요청 창구와 이미지 업무 서비스 사이를 오가는 데이터 구조다. 화면 검색 조건과 페이징을 담은 공통 조회 항목을 물려받아 목록 조회 조건으로도 쓰이고, 조회 결과 목록과 삭제 대상 목록도 함께 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 36,
+              "snippet": "public class MainImageVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 71,
+              "snippet": "private List<MainImageVO> mainImageList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 74,
+              "snippet": "private String[] delYn;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "이미지 아이디로 이미지를 식별하고 이미지명·메인 이미지·이미지 파일·이미지 설명·반영여부·사용자 아이디·등록일자를 항목으로 갖는다. 이미지명은 값이 반드시 있어야 하고 최대 10자로 제한되며, 메인 이미지는 공백일 수 없도록 지정되어 등록 시 검증 대상이 된다. 목록 조회 결과와 일괄 삭제 대상 목록, 파일첨부 여부도 같은 항목 안에 담긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 41,
+              "snippet": "private String imageId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 45,
+              "snippet": "@Size(max = 10)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 46,
+              "snippet": "private String imageNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 49,
+              "snippet": "@NotBlank(message = \"{uss.ion.msi.mainImageRegist.ImageReq}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 50,
+              "snippet": "private String image;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 53,
+              "snippet": "private String imageFile;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 56,
+              "snippet": "private String imageDc;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 59,
+              "snippet": "private String reflctAt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 62,
+              "snippet": "private String userId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 65,
+              "snippet": "private String regDate;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 68,
+              "snippet": "private boolean isAtchFile;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 71,
+              "snippet": "private List<MainImageVO> mainImageList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 74,
+              "snippet": "private String[] delYn;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/selectMainImageList.do:src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+      "name": "메인이미지 목록 조회 요청 접수",
+      "summary": {
+        "text": "메인화면 이미지 관리 화면에서 들어온 메인이미지 목록 조회 요청을 받아 화면 입력값을 이미지 정보로 묶고, 실제 처리는 메인화면 이미지 서비스와 첨부파일 처리에 위임한 뒤 처리 결과와 메시지를 화면 모델에 담아 돌려주는 창구 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 142,
+            "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 143,
+            "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 관리의 모든 화면 요청을 받는 단일 창구다. 목록·상세·등록·수정·삭제·반영확인 요청별로 화면 입력값을 이미지 정보로 받아 메인화면 이미지 서비스에 위임하고, 첨부 이미지가 있으면 파일 저장 처리를 거친 뒤 결과와 안내 메시지를 화면 모델에 담아 해당 화면 또는 목록 조회로 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 105,
+              "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 141,
+              "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 142,
+              "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 143,
+              "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "등록·수정 요청은 첨부파일을 담은 화면 요청과 이미지 정보를 함께 받으며, 이미지 정보는 검증 대상으로 지정되어 검증 결과가 함께 넘어온다. 검증 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록 시에는 로그인 사용자 정보를 확인해 등록자로 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 106,
+              "snippet": "public String insertMainImage(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 107,
+              "snippet": "@Valid @ModelAttribute(\"mainImageVO\") MainImageVO mainImageVO, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 110,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 112,
+              "snippet": "return \"egovframework/com/uss/ion/msi/EgovMainImageRegist\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 133,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/selectMainImageListView.do:src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+      "name": "메인이미지 목록 화면 요청 접수",
+      "summary": {
+        "text": "메인화면 이미지 관리 화면에서 들어온 메인이미지 목록 화면 요청을 받아 화면 입력값을 이미지 정보로 묶고, 실제 처리는 메인화면 이미지 서비스와 첨부파일 처리에 위임한 뒤 처리 결과와 메시지를 화면 모델에 담아 돌려주는 창구 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 142,
+            "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 143,
+            "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 관리의 모든 화면 요청을 받는 단일 창구다. 목록·상세·등록·수정·삭제·반영확인 요청별로 화면 입력값을 이미지 정보로 받아 메인화면 이미지 서비스에 위임하고, 첨부 이미지가 있으면 파일 저장 처리를 거친 뒤 결과와 안내 메시지를 화면 모델에 담아 해당 화면 또는 목록 조회로 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 105,
+              "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 141,
+              "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 142,
+              "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 143,
+              "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "등록·수정 요청은 첨부파일을 담은 화면 요청과 이미지 정보를 함께 받으며, 이미지 정보는 검증 대상으로 지정되어 검증 결과가 함께 넘어온다. 검증 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록 시에는 로그인 사용자 정보를 확인해 등록자로 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 106,
+              "snippet": "public String insertMainImage(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 107,
+              "snippet": "@Valid @ModelAttribute(\"mainImageVO\") MainImageVO mainImageVO, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 110,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 112,
+              "snippet": "return \"egovframework/com/uss/ion/msi/EgovMainImageRegist\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 133,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/updtMainImage.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "메인이미지 수정 로그인 사용자 정보 항목",
+      "summary": {
+        "text": "메인이미지 수정 시 등록자를 기록하기 위해 사용하는 로그인 사용자 한 명의 아이디·이름·소속 등을 담은 정보 항목이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 42,
+            "snippet": "private String id;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "로그인한 사용자 한 명의 정보를 담아 나르는 데이터 구조다. 메인화면 이미지 등록·수정 흐름에서는 인증 도우미가 돌려준 사용자 객체를 이 항목으로 변환해 사용자 아이디를 꺼내 이미지의 등록자로 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 133,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일주소·비밀번호 힌트와 정답은 값이 반드시 있어야 하는 항목으로 지정되어 있고, 그 밖에 사용자구분·조직 아이디와 조직명·고유아이디·사용자 아이피·인증 정보 등을 갖는다. 세션에 담겨 오가므로 직렬화 가능한 형태를 유지한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "private String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "private String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "private String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/updtMainImage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "메인이미지 수정 첨부파일 정보 관리",
+      "summary": {
+        "text": "메인이미지 수정 시 저장된 이미지 파일들의 속성·상세 정보를 등록하고 첨부파일 아이디를 돌려주는 공통 첨부파일 정보 관리 업무를 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 46,
+            "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지에 딸린 첨부파일의 정보를 관리하는 공통 업무 서비스다. 파일 저장 처리가 만들어 준 파일 정보 목록을 받아 첨부파일 정보로 등록하고, 이미지 정보에 연결할 첨부파일 아이디를 돌려준다. 첨부파일 목록 조회와 상세 조회, 삭제도 함께 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 46,
+              "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 79,
+              "snippet": "public FileVO selectFileInf(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 124,
+              "snippet": "atchFileId = fileMngService.insertFileInfs(result);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "여러 개의 파일 정보를 한 번에 등록하고 그 묶음을 대표하는 첨부파일 아이디를 돌려주는 방식과, 파일 한 건씩 등록하는 방식을 모두 제공한다. 삭제 또한 여러 건 일괄 삭제와 단건 삭제로 나뉘어 있고, 상세 조회는 파일 한 건의 정보를 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 38,
+              "snippet": "public String insertFileInf(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 46,
+              "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 62,
+              "snippet": "public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 79,
+              "snippet": "public FileVO selectFileInf(FileVO fvo) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/updtMainImage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "name": "메인이미지 수정 첨부 이미지 파일 저장",
+      "summary": {
+        "text": "메인이미지 수정 시 화면에서 올라온 이미지 파일을 서버 저장소에 보관하고, 저장된 파일의 정보 목록을 만들어 돌려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 76,
+            "snippet": "public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지에 첨부된 이미지 파일을 실제 파일 저장소에 보관하는 공통 파일 처리 역할을 한다. 화면 요청에 담긴 파일들을 받아 저장 경로를 정하고 첨부파일 아이디를 채번한 뒤, 각 파일의 확장자·크기·저장경로·원파일명 등을 담은 파일 정보 목록을 만들어 첨부파일 정보 관리 서비스로 넘길 수 있게 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 60,
+              "snippet": "@Component(\"EgovFileMngUtil\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 64,
+              "snippet": "private static final String FILE_STORE_PATH = EgovProperties.getProperty(\"Globals.fileStorePath\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 76,
+              "snippet": "public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 90,
+              "snippet": "atchFileIdString = idgenService.getNextStringId();"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "저장 경로가 지정되지 않으면 전역 설정의 기본 파일 저장 경로를 사용하고, 첨부파일 아이디가 없으면 새로 채번한다. 원본 파일명이 비어 있는 항목은 건너뛰며, 확장자는 대문자로 정규화하고 저장 파일명은 접두어와 시각·일련번호를 조합해 만든 뒤 경로 위험 문자를 걸러 낸 경로로 파일을 옮겨 저장한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 64,
+              "snippet": "private static final String FILE_STORE_PATH = EgovProperties.getProperty(\"Globals.fileStorePath\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 90,
+              "snippet": "atchFileIdString = idgenService.getNextStringId();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 115,
+              "snippet": "if (StringUtils.isEmpty(orginFileName)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 120,
+              "snippet": "String fileExt = FilenameUtils.getExtension(orginFileName).toUpperCase();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 121,
+              "snippet": "String newName = keyStr + getTimeStamp() + fileKey;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 124,
+              "snippet": "file.transferTo(new File(EgovWebUtil.filePathBlackList(filePath)));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/updtMainImage.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "name": "메인이미지 수정 첨부파일 정보 항목",
+      "summary": {
+        "text": "메인이미지 수정 과정에서 저장된 이미지 파일 한 건의 첨부파일 아이디·원파일명·확장자·크기·저장경로 등을 담아 나르는 정보 항목이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 21,
+            "snippet": "public class FileVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 26,
+            "snippet": "public String atchFileId = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 54,
+            "snippet": "public String orignlFileNm = \"\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지에 첨부된 파일 한 건의 정보를 담아 파일 저장 처리와 첨부파일 정보 관리 사이를 오가는 데이터 구조다. 등록 흐름에서는 저장된 파일의 원파일명을 꺼내 메인화면 이미지의 표시용 이미지 값으로 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 21,
+              "snippet": "public class FileVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 54,
+              "snippet": "public String orignlFileNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 129,
+              "snippet": "image = vo.getOrignlFileNm();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "첨부파일 아이디와 파일연번으로 파일을 식별하고, 원파일명·저장파일명·확장자·파일크기·파일저장경로·생성일자·파일내용을 항목으로 갖는다. 모든 항목은 빈 문자열로 초기화되어 값이 설정되지 않아도 널이 되지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 26,
+              "snippet": "public String atchFileId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 38,
+              "snippet": "public String fileExtsn = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 42,
+              "snippet": "public String fileMg = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 50,
+              "snippet": "public String fileStreCours = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 54,
+              "snippet": "public String orignlFileNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 58,
+              "snippet": "public String streFileNm = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/updtMainImage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "메인이미지 수정 로그인 사용자 확인",
+      "summary": {
+        "text": "메인이미지 수정 시 현재 로그인한 사용자 정보를 가져와 등록자를 기록하는 데 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "public static Object getAuthenticatedUser() {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "현재 인증된 사용자의 정보를 흐름 어디서나 꺼내 쓸 수 있게 해 주는 공통 도우미다. 메인화면 이미지 등록·수정 시 이 도우미로 로그인 사용자를 확인해 이미지의 등록자 아이디로 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 133,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인의 세 가지를 제공하며 모두 사용자 인증 서비스에 위임한다. 사용자 객체는 형식이 정해지지 않은 채로 반환되므로 사용하는 쪽에서 로그인 사용자 정보로 변환해 쓰며, 로그인되지 않은 경우를 대비해 값이 없을 수 있음을 전제로 다뤄야 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "public static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 133,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/updtMainImage.do:src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+      "name": "메인이미지 수정 메인화면 이미지 정보 항목",
+      "summary": {
+        "text": "메인이미지 수정 요청과 결과를 오가며 이미지 아이디·이미지명·이미지 파일·설명·반영여부·등록자 등 메인화면 이미지 한 건의 정보를 담아 나르는 항목이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 36,
+            "snippet": "public class MainImageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 36,
+            "snippet": "public class MainImageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 41,
+            "snippet": "private String imageId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+            "line": 46,
+            "snippet": "private String imageNm;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 한 건의 업무 정보를 담아 화면 요청 창구와 이미지 업무 서비스 사이를 오가는 데이터 구조다. 화면 검색 조건과 페이징을 담은 공통 조회 항목을 물려받아 목록 조회 조건으로도 쓰이고, 조회 결과 목록과 삭제 대상 목록도 함께 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 36,
+              "snippet": "public class MainImageVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 71,
+              "snippet": "private List<MainImageVO> mainImageList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 74,
+              "snippet": "private String[] delYn;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "이미지 아이디로 이미지를 식별하고 이미지명·메인 이미지·이미지 파일·이미지 설명·반영여부·사용자 아이디·등록일자를 항목으로 갖는다. 이미지명은 값이 반드시 있어야 하고 최대 10자로 제한되며, 메인 이미지는 공백일 수 없도록 지정되어 등록 시 검증 대상이 된다. 목록 조회 결과와 일괄 삭제 대상 목록, 파일첨부 여부도 같은 항목 안에 담긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 41,
+              "snippet": "private String imageId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 45,
+              "snippet": "@Size(max = 10)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 46,
+              "snippet": "private String imageNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 49,
+              "snippet": "@NotBlank(message = \"{uss.ion.msi.mainImageRegist.ImageReq}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 50,
+              "snippet": "private String image;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 53,
+              "snippet": "private String imageFile;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 56,
+              "snippet": "private String imageDc;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 59,
+              "snippet": "private String reflctAt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 62,
+              "snippet": "private String userId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 65,
+              "snippet": "private String regDate;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 68,
+              "snippet": "private boolean isAtchFile;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 71,
+              "snippet": "private List<MainImageVO> mainImageList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/service/MainImageVO.java",
+              "line": 74,
+              "snippet": "private String[] delYn;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/updtMainImage.do:src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+      "name": "메인이미지 수정 요청 접수",
+      "summary": {
+        "text": "메인화면 이미지 관리 화면에서 들어온 메인이미지 수정 요청을 받아 화면 입력값을 이미지 정보로 묶고, 실제 처리는 메인화면 이미지 서비스와 첨부파일 처리에 위임한 뒤 처리 결과와 메시지를 화면 모델에 담아 돌려주는 창구 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 142,
+            "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 143,
+            "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "메인화면 이미지 관리의 모든 화면 요청을 받는 단일 창구다. 목록·상세·등록·수정·삭제·반영확인 요청별로 화면 입력값을 이미지 정보로 받아 메인화면 이미지 서비스에 위임하고, 첨부 이미지가 있으면 파일 저장 처리를 거친 뒤 결과와 안내 메시지를 화면 모델에 담아 해당 화면 또는 목록 조회로 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 105,
+              "snippet": "@RequestMapping(value = \"/uss/ion/msi/addMainImage.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 141,
+              "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 142,
+              "snippet": "model.addAttribute(\"mainImageVO\", egovMainImageService.insertMainImage(mainImageVO));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 143,
+              "snippet": "return \"forward:/uss/ion/msi/selectMainImageList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "등록·수정 요청은 첨부파일을 담은 화면 요청과 이미지 정보를 함께 받으며, 이미지 정보는 검증 대상으로 지정되어 검증 결과가 함께 넘어온다. 검증 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록 시에는 로그인 사용자 정보를 확인해 등록자로 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 106,
+              "snippet": "public String insertMainImage(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 107,
+              "snippet": "@Valid @ModelAttribute(\"mainImageVO\") MainImageVO mainImageVO, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 110,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 112,
+              "snippet": "return \"egovframework/com/uss/ion/msi/EgovMainImageRegist\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 133,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/msi/updtMainImage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "메인이미지 수정 문자열 처리 도우미",
+      "summary": {
+        "text": "메인이미지 수정 시 로그인 사용자 아이디가 없을 때 빈 문자열로 바꾸는 등 값 정리를 담당하는 공통 문자열 도우미다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+            "line": 138,
+            "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "문자열 값을 안전하게 다루기 위한 공통 도우미다. 메인화면 이미지 등록·수정 흐름에서는 로그인 사용자의 아이디가 없을 때 널 대신 빈 문자열로 바꿔 등록자 항목에 기록되도록 하는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/msi/web/EgovMainImageController.java",
+              "line": 138,
+              "snippet": "mainImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 상수를 기준값으로 두고, 지정 길이를 넘는 문자열을 잘라 내거나 잘린 자리에 표시 문자열을 붙이는 등 화면 표시용 문자열 정리 기능을 제공한다. 모든 기능은 원본 값이 없을 때를 전제로 값 유무를 먼저 확인한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "public static String cutString(String source, int slength) {"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,381 @@
+{
+  "chunkId": "ext.oauth-000",
+  "domainId": "domain:ext.oauth",
+  "domainName": "",
+  "files": [
+    {
+      "className": "ObjectMapper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java — java 파일",
+        "tags": []
+      },
+      "line": 57,
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+      "slice": {
+        "endLine": 126,
+        "startLine": 47,
+        "text": " *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2014.10.12  전우성          최초 생성\n *   2017-02-13  이정은          시큐어코딩(ES) - 시큐어코딩 부적절한 예외 처리[CWE-253, CWE-440, CWE-754]\n *   2025.06.21  이백행          PMD로 소프트웨어 보안약점 진단하고 제거하기-ImmutableField(불변필드), UselessParentheses(쓸모없는 괄호)\n *\n *      </pre>\n */\npublic class ObjectMapper<T> implements ContextMapper<Object> {\n\n\tprivate final Class<T> type;\n\n\tpublic ObjectMapper(Class<T> class1) {\n\t\tthis.type = class1;\n\t}\n\n\t/**\n\t * ContextAdapter에서 받아온 객체를 vo로 변환한다.\n\t */\n\t@Override\n\tpublic Object mapFromContext(Object arg0) throws NamingException {\n\t\tDirContextAdapter adapter = (DirContextAdapter) arg0;\n\t\tAttributes attrs = adapter.getAttributes();\n\n\t\tLdapObject vo = null;\n\n\t\ttry {\n\t\t\tvo = (LdapObject) type.newInstance();\n\t\t\t// 2017-02-13 이정은 시큐어코딩(ES) - 시큐어코딩 부적절한 예외 처리[CWE-253, CWE-440, CWE-754]\n\t\t} catch (InstantiationException e2) {\n\t\t\tthrow new RuntimeException(e2);\n\t\t} catch (IllegalAccessException e2) {\n\t\t\tthrow new RuntimeException(e2);\n\t\t}\n\n\t\tvo.setDn(adapter.getDn().toString());\n\n\t\tBeanInfo beanInfo;\n\t\ttry {\n\t\t\tbeanInfo = Introspector.getBeanInfo(type);\n\t\t} catch (IntrospectionException e1) {\n\t\t\tthrow new RuntimeException(e1);\n\t\t}\n\n\t\tPropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();\n\n\t\tif (propertyDescriptors != null) {\n\t\t\tfor (PropertyDescriptor descriptor : propertyDescriptors) {\n\t\t\t\tif (attrs.get(descriptor.getName()) != null) {\n\t\t\t\t\ttry {\n\t\t\t\t\t\tClass<?> o = descriptor.getPropertyType();\n\t\t\t\t\t\tif (o == int.class) {\n\t\t\t\t\t\t\t// KISA 보안약점 조치 (2018-10-29, 윤창원)\n\t\t\t\t\t\t\tPropertyUtils.setProperty(vo, descriptor.getName(), Integer\n\t\t\t\t\t\t\t\t\t.valueOf(EgovStringUtil.isNullToString(attrs.get(descriptor.getName()).get())));\n\t\t\t\t\t\t}\n\t\t\t\t\t\tif (o == String.class) {\n\t\t\t\t\t\t\t// KISA 보안약점 조치 (2018-10-29, 윤창원)\n\t\t\t\t\t\t\tPropertyUtils.setProperty(vo, descriptor.getName(),\n\t\t\t\t\t\t\t\t\tattrs.get(EgovStringUtil.isNullToString(descriptor.getName())).get());\n\t\t\t\t\t\t}\n\t\t\t\t\t\tif (o == Boolean.class) {\n\t\t\t\t\t\t\t// KISA 보안약점 조치 (2018-10-29, 윤창원)\n\t\t\t\t\t\t\tPropertyUtils.setProperty(vo, descriptor.getName(),\n\t\t\t\t\t\t\t\t\t\"Y\".equals(attrs.get(descriptor.getName()).get()));\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\t// 2017-02-13 이정은 시큐어코딩(ES) - 시큐어코딩 부적절한 예외 처리[CWE-253, CWE-440, CWE-754]\n\t\t\t\t\t} catch (IllegalAccessException e) {\n\t\t\t\t\t\tthrow new RuntimeException(e);\n\t\t\t\t\t} catch (InvocationTargetException e) {\n\t\t\t\t\t\tthrow new RuntimeException(e);\n\t\t\t\t\t} catch (NoSuchMethodException e) {\n\t\t\t\t\t\tthrow new RuntimeException(e);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "OAuthLogin",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java — java 파일",
+        "tags": []
+      },
+      "line": 33,
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+      "slice": {
+        "endLine": 102,
+        "startLine": 23,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2020.03.11  표프센          최초 생성\n *   2025.06.25  이백행          PMD로 소프트웨어 보안약점 진단하고 제거하기-ImmutableField(불변필드), FieldNamingConventions(필드 명명 규칙), CloseResource(리소스 닫기), UnusedPrivateMethod(사용되지 않는 개인 메서드)\n *\n *      </pre>\n */\npublic class OAuthLogin {\n\tprivate final OAuth20Service oauthService;\n\tprivate final OAuthVO oauthVO;\n\n\tprivate static final ObjectMapper MAPPER = new ObjectMapper(); // 매 요청마다 객체를 생성하지 않기 위함\n\n\tprivate static final Logger LOGGER = LoggerFactory.getLogger(OAuthLogin.class);\n\n\tpublic OAuthLogin(OAuthVO oauthVO) {\n\t\tthis.oauthService = new ServiceBuilder(oauthVO.getClientId()).apiSecret(oauthVO.getClientSecret())\n\t\t\t\t.callback(oauthVO.getRedirectUrl()).build(oauthVO.getApi20Instance());\n\n\t\tthis.oauthVO = oauthVO;\n\t}\n\n\t// 230825 카카오톡 scope 변경으로 인한 scope 처리 추가\n\tpublic String getOAuthURL() {\n\t\tif (oauthVO.getOrigin().equals(\"naver\")) { // naver의 경우 state가 필수 조건에 포함\n\t\t\treturn this.oauthService.getAuthorizationUrl() + \"&state=test&scope=\" + oauthVO.getScope();\n\t\t} else { // 필수, 추가 동의 항목 포함\n\t\t\treturn this.oauthService.getAuthorizationUrl() + \"&scope=\" + oauthVO.getScope();\n\t\t}\n\t}\n\n\tpublic OAuthUniversalUser getUserProfile(String code) throws Exception {\n\t\t// System.out.println(\"===>>> oauthService.getApiKey() =\n\t\t// \"+oauthService.getApiKey());\n\t\t// System.out.println(\"===>>> oauthService.getApiSecret() =\n\t\t// \"+oauthService.getApiSecret());\n\t\tOAuth2AccessToken accessToken = oauthService.getAccessToken(code);\n\n\t\tOAuthRequest request = new OAuthRequest(Verb.GET, this.oauthVO.getProfileUrl());\n\t\toauthService.signRequest(accessToken, request);\n\n\t\ttry (Response response = oauthService.execute(request);) {\n\t\t\treturn parseJson(response.getBody());\n\t\t}\n\t}\n\n\tprivate OAuthUniversalUser parseJson(String body) throws Exception {\n\t\tLOGGER.info(\"============================\\n\" + body + \"\\n==================\");\n\t\tOAuthUniversalUser user = new OAuthUniversalUser();\n\n\t\tJsonNode rootNode = MAPPER.readTree(body);\n\n\t\tif (oauthVO.getOrigin().equals(\"google\")) {\n\t\t\tuser.setServiceName(OAuthConfig.GOOGLE_SERVICE_NAME);\n\t\t\tuser.setUserId(rootNode.get(\"sub\").asText());\n\t\t\tString uname = rootNode.get(\"name\").asText();\n\t\t\tuser.setUserName(uname);\n//\t\t\tgetEmails(user, rootNode);\n\n\t\t} else if (oauthVO.getOrigin().equals(\"naver\")) {\n\t\t\tuser.setServiceName(OAuthConfig.NAVER_SERVICE_NAME);\n\t\t\tJsonNode resNode = rootNode.get(\"response\");\n\t\t\tuser.setUserId(resNode.get(\"id\").asText());\n\t\t\tuser.setNickName(resNode.get(\"nickname\").asText());\n\t\t\tuser.setEmail(resNode.get(\"email\").asText());\n\n\t\t} else if (oauthVO.getOrigin().equals(\"kakao\")) {\n\t\t\tuser.setServiceName(OAuthConfig.KAKAO_SERVICE_NAME);\n\t\t\tJsonNode resNode = rootNode.get(\"properties\");\n\t\t\tuser.setUserId(rootNode.get(\"id\").asText());\n\t\t\tuser.setNickName(resNode.get(\"nickname\").asText());\n\t\t}\n\n\t\treturn user;\n\t}\n\n//\tprivate void getEmails(OAuthUniversalUser user, JsonNode rootNode) {",
+        "truncated": true
+      }
+    },
+    {
+      "className": "OAuthUniversalUser",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 1,
+        "text": "package egovframework.com.ext.oauth.service;\n\nimport java.util.Date;\n\npublic class OAuthUniversalUser {\n\tpublic String getUid() {\n\t\treturn uid;\n\t}\n\n\tpublic void setUid(String uid) {\n\t\tthis.uid = uid;\n\t}\n\n\tpublic String getEmail() {\n\t\treturn email;\n\t}\n\n\tpublic void setEmail(String email) {\n\t\tthis.email = email;\n\t}\n\n\tpublic String getUserId() {\n\t\treturn userId;\n\t}\n\n\tpublic void setUserId(String userId) {\n\t\tthis.userId = userId;\n\t}\n\n\tpublic String getUserName() {\n\t\treturn userName;\n\t}\n\n\tpublic void setUserName(String userName) {\n\t\tthis.userName = userName;\n\t}\n\n\tpublic String getNickName() {\n\t\treturn nickName;\n\t}\n\n\tpublic void setNickName(String nickName) {\n\t\tthis.nickName = nickName;\n\t}\n\n\tpublic String getServiceName() {\n\t\treturn serviceName;\n\t}\n\n\tpublic void setServiceName(String serviceName) {\n\t\tthis.serviceName = serviceName;\n\t}\n\n\tpublic String getLoginip() {\n\t\treturn loginIp;\n\t}\n\n\tpublic void setLoginip(String loginIp) {\n\t\tthis.loginIp = loginIp;\n\t}\n\n\tpublic Date getLastlogin() {\n\t\treturn (Date)lastLogin.clone();\n\t}\n\n\tpublic void setLastlogin(Date lastLogin) {\n\t\tthis.lastLogin = (Date) lastLogin.clone();\n\t}\n\n\tprivate String uid;\n\t\n\tprivate String email;\n\tprivate String userId;\n\tprivate String userName;\n\tprivate String nickName;\n\t\n\tprivate String serviceName;\n\t\n\tprivate String loginIp;\n\tprivate Date lastLogin;",
+        "truncated": true
+      }
+    },
+    {
+      "className": "OAuthVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java — java 파일",
+        "tags": []
+      },
+      "line": 29,
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+      "slice": {
+        "endLine": 65,
+        "startLine": 19,
+        "text": " *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2020.03.11  표프센          최초 생성\n *   2025.06.25  이백행          PMD로 소프트웨어 보안약점 진단하고 제거하기-ImmutableField(불변필드)\n *   2026.05.27  기여자          Lombok @Getter/@Setter 적용\n *\n *      </pre>\n */\n@Getter\n@Setter\npublic class OAuthVO implements OAuthConfig {\n\n\tprivate String serviceName;\n\tprivate String clientId;\n\tprivate String clientSecret;\n\tprivate String redirectUrl;\n\tprivate DefaultApi20 api20Instance;\n\tprivate String profileUrl;\n\tprivate String scope;\n\n\t@Setter(lombok.AccessLevel.NONE)\n\tprivate final String origin;\n\n\tpublic OAuthVO(String serviceName, String clientId, String clientSecret, String redirectUrl, String scope) {\n\t\tthis.serviceName = serviceName;\n\t\tthis.clientId = clientId;\n\t\tthis.clientSecret = clientSecret;\n\t\tthis.redirectUrl = redirectUrl;\n\t\tthis.scope = scope;\n\t\tthis.origin = serviceName;\n\n\t\tif (origin.equals(GOOGLE_SERVICE_NAME)) {\n\t\t\tthis.api20Instance = GoogleApi20.instance();\n\t\t\tthis.profileUrl = GOOGLE_PROFILE_URL;\n\t\t} else if (origin.equals(NAVER_SERVICE_NAME)) {\n\t\t\tthis.api20Instance = NaverAPI20.instance();\n\t\t\tthis.profileUrl = NAVER_PROFILE_URL;\n\t\t} else if (origin.equals(KAKAO_SERVICE_NAME)) {\n\t\t\tthis.api20Instance = KakaoApi.instance();\n\t\t\tthis.profileUrl = KAKAO_PROFILE_URL;\n\t\t}\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovSignupController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java — java 파일",
+        "tags": []
+      },
+      "line": 89,
+      "relPath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "slice": {
+        "endLine": 129,
+        "startLine": 79,
+        "text": "\t\tLOGGER.debug(\"googleLogin.getOAuthURL() = \"+googleLogin.getOAuthURL());\n\t\tmodel.addAttribute(\"google_url\", googleLogin.getOAuthURL());\n\n\t\tOAuthLogin kakaoLogin = new OAuthLogin(kakaoAuthVO);\n\t\tLOGGER.debug(\"kakaoLogin.getOAuthURL() = \"+kakaoLogin.getOAuthURL());\n\t\tmodel.addAttribute(\"kakao_url\", kakaoLogin.getOAuthURL());\n\n\t\treturn \"egovframework/com/uat/uia/EgovLoginUsrOauth\";\n\t}\n\n\t@RequestMapping(value = \"/auth/{oauthService}/callback\", method = { RequestMethod.GET, RequestMethod.POST })\n\tpublic String oauthLoginCallback(@PathVariable String oauthService, Model model, @RequestParam String code) throws Exception {\n\n\t\tLOGGER.debug(\"oauthLoginCallback: service={}\", oauthService);\n\t\tLOGGER.debug(\"===>>> code = \"+ code);\n\n\t\tOAuthVO oauthVO = null;\n\t\tif (StringUtils.equals(OAuthConfig.GOOGLE_SERVICE_NAME, oauthService)) {\n\t\t\toauthVO = googleAuthVO;\n\t\t} else if (StringUtils.equals(OAuthConfig.NAVER_SERVICE_NAME, oauthService)) {\n\t\t\toauthVO = naverAuthVO;\n\t\t} else {\n\t\t\toauthVO = kakaoAuthVO;\n\t\t}\n\n\t\t// 1. code를 이용해서 Access Token 받기\n\t\t// 2. Access Token을 이용해서 사용자 제공정보 가져오기\n\t\tOAuthLogin oauthLogin = new OAuthLogin(oauthVO);\n\n\t\tOAuthUniversalUser oauthUser = oauthLogin.getUserProfile(code); // 1,2번 동시\n\t\tLOGGER.debug(\"Profile ===>>\" + oauthUser);\n\n\t\t// ========================================================================\n\t\t// 다음 부분은 업무의 목적에 맞게 커스텀 코드를 작성한다.\n\t\t// 3. 해당 유저가 DB에 존재하는지 체크 (google, naver, kakao에서 전달받은 ID가 존재하는지 체크)\n//\t\tString resultDBInfo = \"\"; // DB 체크 결과\n\n\t\t// 2022.11.11 시큐어코딩 처리\n\t\tif (oauthUser == null) {\n\t\t\t// 미존재시 가입페이지로!!\n\t\t\tmodel.addAttribute(\"message\", \"This user does not exist. Please sign up.\");\n\t\t} else {\n\t\t\t// 존재시 로그인 처리\n\t\t\tmodel.addAttribute(\"message\", \"OAuth Sign-in succeeded.\");\n\t\t}\n\n\t\treturn \"egovframework/com/uat/uia/EgovLoginUsrOauthResult\";\n\t}\n\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovSignupController#oauthLoginCallback",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "flowId": "flow:GET /auth/{oauthService}/callback",
+      "line": 89,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "line": 89,
+        "snippet": "@RequestMapping(value = \"/auth/{oauthService}/callback\", method = { RequestMethod.GET, RequestMethod.POST })"
+      },
+      "stepIds": [
+        "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+        "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+        "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+        "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovSignupController#login",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "flowId": "flow:GET /uat/uia/oauthLoginUsr",
+      "line": 70,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "line": 70,
+        "snippet": "@RequestMapping(value = \"/uat/uia/oauthLoginUsr\", method = RequestMethod.GET)"
+      },
+      "stepIds": [
+        "step:GET /uat/uia/oauthLoginUsr:src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "step:GET /uat/uia/oauthLoginUsr:src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+        "step:GET /uat/uia/oauthLoginUsr:src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovSignupController#oauthLoginCallback",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "flowId": "flow:POST /auth/{oauthService}/callback",
+      "line": 89,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "line": 89,
+        "snippet": "@RequestMapping(value = \"/auth/{oauthService}/callback\", method = { RequestMethod.GET, RequestMethod.POST })"
+      },
+      "stepIds": [
+        "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+        "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+        "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+        "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "header": {
+    "flowIndex": [
+      {
+        "entryPoint": "EgovSignupController#oauthLoginCallback",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "flowId": "flow:GET /auth/{oauthService}/callback",
+        "line": 89,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+          "line": 89,
+          "snippet": "@RequestMapping(value = \"/auth/{oauthService}/callback\", method = { RequestMethod.GET, RequestMethod.POST })"
+        }
+      },
+      {
+        "entryPoint": "EgovSignupController#login",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "flowId": "flow:GET /uat/uia/oauthLoginUsr",
+        "line": 70,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+          "line": 70,
+          "snippet": "@RequestMapping(value = \"/uat/uia/oauthLoginUsr\", method = RequestMethod.GET)"
+        }
+      },
+      {
+        "entryPoint": "EgovSignupController#oauthLoginCallback",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "flowId": "flow:POST /auth/{oauthService}/callback",
+        "line": 89,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+          "line": 89,
+          "snippet": "@RequestMapping(value = \"/auth/{oauthService}/callback\", method = { RequestMethod.GET, RequestMethod.POST })"
+        }
+      }
+    ]
+  },
+  "isHeaderChunk": true,
+  "key": "ext.oauth",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "dao",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+        "line": 57,
+        "snippet": "public class ObjectMapper<T> implements ContextMapper<Object> {"
+      },
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+      "stepId": "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+        "line": 33,
+        "snippet": "public class OAuthLogin {"
+      },
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+      "stepId": "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java",
+        "line": 5,
+        "snippet": "public class OAuthUniversalUser {"
+      },
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java",
+      "stepId": "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+        "line": 31,
+        "snippet": "public class OAuthVO implements OAuthConfig {"
+      },
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+      "stepId": "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "line": 89,
+        "snippet": "@RequestMapping(value = \"/auth/{oauthService}/callback\", method = { RequestMethod.GET, RequestMethod.POST })"
+      },
+      "relPath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "stepId": "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+        "line": 33,
+        "snippet": "public class OAuthLogin {"
+      },
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+      "stepId": "step:GET /uat/uia/oauthLoginUsr:src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+        "line": 31,
+        "snippet": "public class OAuthVO implements OAuthConfig {"
+      },
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+      "stepId": "step:GET /uat/uia/oauthLoginUsr:src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "line": 89,
+        "snippet": "@RequestMapping(value = \"/auth/{oauthService}/callback\", method = { RequestMethod.GET, RequestMethod.POST })"
+      },
+      "relPath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "stepId": "step:GET /uat/uia/oauthLoginUsr:src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java"
+    },
+    {
+      "layer": "dao",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+        "line": 57,
+        "snippet": "public class ObjectMapper<T> implements ContextMapper<Object> {"
+      },
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+      "stepId": "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+        "line": 33,
+        "snippet": "public class OAuthLogin {"
+      },
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+      "stepId": "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java",
+        "line": 5,
+        "snippet": "public class OAuthUniversalUser {"
+      },
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java",
+      "stepId": "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+        "line": 31,
+        "snippet": "public class OAuthVO implements OAuthConfig {"
+      },
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+      "stepId": "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "line": 89,
+        "snippet": "@RequestMapping(value = \"/auth/{oauthService}/callback\", method = { RequestMethod.GET, RequestMethod.POST })"
+      },
+      "relPath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "stepId": "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java"
+    }
+  ]
+}

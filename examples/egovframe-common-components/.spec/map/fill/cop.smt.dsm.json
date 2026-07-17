@@ -1,0 +1,2721 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "n_start",
+          "to": "n_list"
+        },
+        {
+          "from": "n_list",
+          "to": "n_detail"
+        },
+        {
+          "from": "n_detail",
+          "to": "d_del"
+        },
+        {
+          "from": "d_del",
+          "label": "삭제 요청",
+          "to": "n_del"
+        },
+        {
+          "from": "d_del",
+          "label": "조회만",
+          "to": "e_done"
+        },
+        {
+          "from": "n_del",
+          "to": "e_done"
+        },
+        {
+          "from": "n_start",
+          "to": "n_auth"
+        },
+        {
+          "from": "n_auth",
+          "to": "d_auth"
+        },
+        {
+          "from": "d_auth",
+          "label": "미인증",
+          "to": "e_login"
+        },
+        {
+          "from": "d_auth",
+          "label": "등록 요청",
+          "to": "n_regform"
+        },
+        {
+          "from": "d_auth",
+          "label": "수정 요청",
+          "to": "n_modform"
+        },
+        {
+          "from": "n_regform",
+          "to": "n_reg"
+        },
+        {
+          "from": "n_modform",
+          "to": "n_mod"
+        },
+        {
+          "from": "n_reg",
+          "to": "n_file"
+        },
+        {
+          "from": "n_mod",
+          "to": "n_file"
+        },
+        {
+          "from": "n_file",
+          "to": "e_done"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "n_start",
+          "kind": "start",
+          "label": "일지관리 화면 진입"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 91,
+              "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 32,
+              "snippet": "public List<EgovMap> selectDiaryManageList(ComDefaultVO searchVO) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/dsm/EgovDiaryManageList.do",
+          "id": "n_list",
+          "kind": "activity",
+          "label": "일지 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 141,
+              "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 40,
+              "snippet": "public DiaryManageVO selectDiaryManageDetail(DiaryManageVO diaryManageVO) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/dsm/EgovDiaryManageDetail.do",
+          "id": "n_detail",
+          "kind": "activity",
+          "label": "일지 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 149,
+              "snippet": "if (sCmd.equals(\"del\")) {"
+            }
+          ],
+          "id": "d_del",
+          "kind": "decision",
+          "label": "삭제 명령 여부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 150,
+              "snippet": "egovDiaryManageService.deleteDiaryManage(diaryManageVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 69,
+              "snippet": "void  deleteDiaryManage(DiaryManageVO diaryManageVO) throws Exception;"
+            }
+          ],
+          "id": "n_del",
+          "kind": "activity",
+          "label": "일지 삭제"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 177,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            }
+          ],
+          "id": "n_auth",
+          "kind": "activity",
+          "label": "로그인 인증 확인"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 180,
+              "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ],
+          "id": "d_auth",
+          "kind": "decision",
+          "label": "인증 및 요청 구분"
+        },
+        {
+          "id": "e_login",
+          "kind": "end",
+          "label": "로그인 화면 이동"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 302,
+              "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageRegist.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 193,
+              "snippet": "String whiteListFileUploadExtensions = EgovProperties.getProperty(\"Globals.fileUpload.Extensions\");"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/dsm/EgovDiaryManageRegist.do",
+          "id": "n_regform",
+          "kind": "activity",
+          "label": "일지 등록 화면 표시"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 341,
+              "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageRegistActor.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 55,
+              "snippet": "void  insertDiaryManage(DiaryManageVO diaryManageVO) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/dsm/EgovDiaryManageRegistActor.do",
+          "id": "n_reg",
+          "kind": "activity",
+          "label": "일지 등록 처리"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 171,
+              "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageModify.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 184,
+              "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/dsm/EgovDiaryManageModify.do",
+          "id": "n_modform",
+          "kind": "activity",
+          "label": "일지 수정 화면 표시"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 214,
+              "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageModifyActor.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 62,
+              "snippet": "void  updateDiaryManage(DiaryManageVO diaryManageVO) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/dsm/EgovDiaryManageModifyActor.do",
+          "id": "n_mod",
+          "kind": "activity",
+          "label": "일지 수정 처리"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 76,
+              "snippet": "public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 38,
+              "snippet": "public String insertFileInf(FileVO fvo) throws Exception;"
+            }
+          ],
+          "id": "n_file",
+          "kind": "activity",
+          "label": "첨부파일 저장"
+        },
+        {
+          "id": "e_done",
+          "kind": "end",
+          "label": "일지 목록 반영"
+        }
+      ],
+      "title": "일지관리"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+          "line": 177,
+          "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+          "line": 179,
+          "snippet": "redirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+          "line": 180,
+          "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+        }
+      ],
+      "text": "일지 등록·수정 요청은 로그인 인증을 먼저 확인하며, 인증되지 않은 사용자는 안내 메시지와 함께 로그인 화면으로 되돌린다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+          "line": 149,
+          "snippet": "if (sCmd.equals(\"del\")) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+          "line": 150,
+          "snippet": "egovDiaryManageService.deleteDiaryManage(diaryManageVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+          "line": 151,
+          "snippet": "sLocationUrl = \"redirect:/cop/smt/dsm/EgovDiaryManageList.do\";"
+        }
+      ],
+      "text": "상세조회 요청에 삭제 명령이 함께 들어오면 상세 표시 대신 해당 일지를 삭제하고 일지 목록 화면으로 이동한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 39,
+          "snippet": "@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 43,
+          "snippet": "@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 47,
+          "snippet": "@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 52,
+          "snippet": "@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 57,
+          "snippet": "@EgovNullCheck"
+        }
+      ],
+      "text": "일정 아이디, 진척률, 일정명, 지시사항, 특이사항은 반드시 값이 있어야 하는 필수 입력 항목이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 48,
+          "snippet": "@Size(max=255)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 53,
+          "snippet": "@Size(max=2500)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 58,
+          "snippet": "@Size(max=2500)"
+        }
+      ],
+      "text": "일정명은 255자, 지시사항과 특이사항은 각각 2500자까지만 입력할 수 있다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+          "line": 193,
+          "snippet": "String whiteListFileUploadExtensions = EgovProperties.getProperty(\"Globals.fileUpload.Extensions\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+          "line": 194,
+          "snippet": "String fileUploadMaxSize = EgovProperties.getProperty(\"Globals.fileUpload.maxSize\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+          "line": 196,
+          "snippet": "model.addAttribute(\"fileUploadExtensions\", whiteListFileUploadExtensions);"
+        }
+      ],
+      "text": "첨부파일은 운영 설정에 정의된 허용 확장자와 최대 크기 정책을 화면에 전달해 업로드를 제한한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+          "line": 95,
+          "snippet": "File saveFolder = new File(EgovWebUtil.filePathBlackList(storePathString));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+          "line": 99,
+          "snippet": "if (saveFolder.mkdirs()) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+          "line": 124,
+          "snippet": "file.transferTo(new File(EgovWebUtil.filePathBlackList(filePath)));"
+        }
+      ],
+      "text": "첨부파일 저장 경로는 상위 경로 표기를 제거한 뒤 사용하며, 저장 폴더가 없으면 새로 만들어 보관한다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 58,
+          "snippet": "public static Boolean isAuthenticated() {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 5,
+          "snippet": "public interface EgovUserDetailsService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 24,
+          "snippet": "public Boolean isAuthenticated();"
+        }
+      ],
+      "text": "인증 영역: 로그인 인증 여부와 인증 사용자 정보를 인증 사용자 정보 서비스에서 확인해 등록·수정 권한을 판정한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+          "line": 76,
+          "snippet": "public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+          "line": 21,
+          "snippet": "public interface EgovFileMngService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+          "line": 38,
+          "snippet": "public String insertFileInf(FileVO fvo) throws Exception;"
+        }
+      ],
+      "text": "첨부파일 영역: 올라온 파일을 파일 저장 처리로 보관하고 파일 정보 관리 서비스로 첨부 정보를 등록·수정한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 52,
+          "snippet": "public String getMessage(String code) {"
+        }
+      ],
+      "text": "공통 메시지 영역: 인증 실패 등 사용자 안내 문구를 메시지 코드로 조회해 화면에 전달한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+          "line": 72,
+          "snippet": "public static String getProperty(String keyName) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+          "line": 193,
+          "snippet": "String whiteListFileUploadExtensions = EgovProperties.getProperty(\"Globals.fileUpload.Extensions\");"
+        }
+      ],
+      "text": "공통 설정 영역: 첨부파일 저장 경로와 업로드 제한 정책값을 운영 설정 조회 기능에서 가져온다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 26,
+          "snippet": "public static String clearXSSMinimum(String value) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 79,
+          "snippet": "public static String filePathBlackList(String value) {"
+        }
+      ],
+      "text": "공통 보안 유틸 영역: 입력값의 위험 문자 치환과 파일 경로 상위 경로 표기 제거를 공통 보안 처리 기능에 맡긴다."
+    }
+  ],
+  "domainId": "domain:cop.smt.dsm",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 33,
+          "snippet": "private String diaryId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 36,
+          "snippet": "private String schdulCn;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 40,
+          "snippet": "private String schdulId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 44,
+          "snippet": "private String diaryProcsPte;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 49,
+          "snippet": "private String diaryNm;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 54,
+          "snippet": "private String drctMatter;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 62,
+          "snippet": "private String atchFileId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 65,
+          "snippet": "private String frstRegisterPnttm = \"\";"
+        }
+      ],
+      "text": "업무일지: 일지 아이디로 식별되며 연결된 일정, 일정명, 진척률, 지시사항, 특이사항, 첨부파일 묶음과 최초등록·최종수정 이력을 보관한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 26,
+          "snippet": "private String searchCondition = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 29,
+          "snippet": "private String searchKeyword = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 32,
+          "snippet": "private String searchUseYn = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 35,
+          "snippet": "private Integer pageIndex = 1;"
+        }
+      ],
+      "text": "조회조건: 목록 조회 시 검색조건과 검색어, 현재 페이지와 페이지 크기를 담아 전달하는 공통 조회 항목이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 42,
+          "snippet": "private String id;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 45,
+          "snippet": "private String name;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 63,
+          "snippet": "private String orgnztId;"
+        }
+      ],
+      "text": "로그인 사용자: 아이디·이름·소속 조직·고유 아이디를 담은 인증 사용자 정보로, 일지 등록자와 수정자 정보를 채우는 데 사용된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+          "line": 62,
+          "snippet": "private String atchFileId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+          "line": 38,
+          "snippet": "public String insertFileInf(FileVO fvo) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+          "line": 46,
+          "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+          "line": 62,
+          "snippet": "public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+        }
+      ],
+      "text": "첨부파일: 첨부파일 아이디로 일지와 연결되며 확장자·저장 경로·크기 같은 속성 정보를 파일 관리 서비스로 등록·수정·삭제한다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /cop/smt/dsm/EgovDiaryManageDetail.do",
+      "name": "일지 상세조회 및 삭제",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 141,
+            "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 149,
+            "snippet": "if (sCmd.equals(\"del\")) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 150,
+            "snippet": "egovDiaryManageService.deleteDiaryManage(diaryManageVO);"
+          }
+        ],
+        "text": "사용자가 선택한 업무일지 한 건의 상세 내용을 조회해 상세 화면에 표시한다. 요청에 삭제 명령이 함께 들어온 경우에는 상세 표시 대신 해당 일지를 삭제한 뒤 일지 목록 화면으로 되돌린다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/dsm/EgovDiaryManageList.do",
+      "name": "일지 목록조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 91,
+            "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+            "line": 32,
+            "snippet": "public List<EgovMap> selectDiaryManageList(ComDefaultVO searchVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+            "line": 29,
+            "snippet": "private String searchKeyword = \"\";"
+          }
+        ],
+        "text": "검색조건과 페이징 조건을 받아 업무일지 목록과 전체 건수를 조회하고 목록 화면에 표시한다. 검색어와 페이지 정보는 공통 검색조건 항목으로 전달된다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/dsm/EgovDiaryManageModify.do",
+      "name": "일지 수정화면 표시",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 171,
+            "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageModify.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 177,
+            "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 193,
+            "snippet": "String whiteListFileUploadExtensions = EgovProperties.getProperty(\"Globals.fileUpload.Extensions\");"
+          }
+        ],
+        "text": "로그인 인증을 먼저 확인한 뒤, 수정 대상 일지의 현재 내용을 상세 조회해 수정 화면에 채워 준다. 미인증 사용자는 로그인 화면으로 보내며, 첨부파일 허용 확장자와 최대 크기 정책값도 함께 화면에 전달한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/dsm/EgovDiaryManageModifyActor.do",
+      "name": "일지 수정처리",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 214,
+            "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageModifyActor.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+            "line": 62,
+            "snippet": "void  updateDiaryManage(DiaryManageVO diaryManageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 184,
+            "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          }
+        ],
+        "text": "수정 화면에서 입력한 일지 내용을 넘겨받아 로그인 인증을 확인하고, 최종수정자 정보와 첨부파일 변경분을 반영해 해당 일지를 수정 저장한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/dsm/EgovDiaryManageRegist.do",
+      "name": "일지 등록화면 표시",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 302,
+            "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageRegist.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 177,
+            "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 193,
+            "snippet": "String whiteListFileUploadExtensions = EgovProperties.getProperty(\"Globals.fileUpload.Extensions\");"
+          }
+        ],
+        "text": "로그인 인증을 확인한 뒤 새 업무일지를 작성할 등록 화면을 표시한다. 첨부파일 허용 확장자와 최대 크기 같은 업로드 정책값을 함께 화면에 전달한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/dsm/EgovDiaryManageRegistActor.do",
+      "name": "일지 등록처리",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 341,
+            "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageRegistActor.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+            "line": 55,
+            "snippet": "void  insertDiaryManage(DiaryManageVO diaryManageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 38,
+            "snippet": "public String insertFileInf(FileVO fvo) throws Exception;"
+          }
+        ],
+        "text": "등록 화면에서 입력한 일지 내용과 첨부파일을 넘겨받아 로그인 인증을 확인하고, 첨부파일을 저장한 뒤 최초등록자 정보와 함께 새 업무일지를 등록한다."
+      }
+    }
+  ],
+  "name": "일지관리",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 32,
+              "snippet": "public List<EgovMap> selectDiaryManageList(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 40,
+              "snippet": "public DiaryManageVO selectDiaryManageDetail(DiaryManageVO diaryManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 55,
+              "snippet": "void  insertDiaryManage(DiaryManageVO diaryManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 62,
+              "snippet": "void  updateDiaryManage(DiaryManageVO diaryManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 69,
+              "snippet": "void  deleteDiaryManage(DiaryManageVO diaryManageVO) throws Exception;"
+            }
+          ],
+          "text": "목록 조회는 검색·페이징 조건을 담은 공통 조회 항목을 받아 일지 목록을 돌려주고, 상세 조회는 일지 정보 항목을 받아 한 건을 돌려준다. 등록·수정·삭제는 각각 일지 정보 항목 한 건을 받아 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovDiaryManageService {"
+            }
+          ],
+          "text": "업무일지의 목록 조회, 전체 건수 조회, 상세 조회, 등록, 수정, 삭제를 하나의 업무 서비스 계약으로 묶어 화면 요청 접수 계층에 제공한다."
+        }
+      },
+      "name": "일지 상세조회 — 일지관리 업무 서비스",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageDetail.do:src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovDiaryManageService {"
+          }
+        ],
+        "text": "일지 상세조회에 필요한 일지 조회·등록·수정·삭제 업무 처리를 담당하는 일지관리 서비스 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 177,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 180,
+              "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 149,
+              "snippet": "if (sCmd.equals(\"del\")) {"
+            }
+          ],
+          "text": "요청 파라미터로 검색조건 항목과 일지 정보 항목을 함께 받으며, 처리 전에 로그인 인증 여부를 확인하고 미인증이면 로그인 화면으로 되돌린다. 삭제 등 세부 동작은 요청에 실린 명령값으로 구분한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 141,
+              "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")"
+            }
+          ],
+          "text": "일지 상세조회의 진입점으로서 화면에서 넘어온 검색조건과 일지 정보를 받아, 인증 확인과 첨부파일 정책값 조회를 거친 뒤 일지관리 업무 서비스에 실제 처리를 위임하고 반환할 화면 경로를 결정한다."
+        }
+      },
+      "name": "일지 상세조회 — 일지관리 화면 요청 접수",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageDetail.do:src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 141,
+            "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")"
+          }
+        ],
+        "text": "일지 상세조회 요청을 접수해 필요한 인증·정책 확인을 거친 뒤 일지관리 업무 서비스에 처리를 위임하고, 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 26,
+              "snippet": "private String searchCondition = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 29,
+              "snippet": "private String searchKeyword = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 32,
+              "snippet": "private String searchUseYn = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 35,
+              "snippet": "private Integer pageIndex = 1;"
+            }
+          ],
+          "text": "검색조건과 검색어는 빈 값으로, 현재 페이지는 1, 페이지 개수와 페이지 사이즈는 10으로 기본값이 정해져 있어 값이 없어도 목록 조회가 가능하다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 22,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 29,
+              "snippet": "private String searchKeyword = \"\";"
+            }
+          ],
+          "text": "검색조건, 검색어, 현재 페이지, 페이지 크기 같은 공통 조회 조건을 한 묶음으로 담아 화면과 업무 서비스 사이에서 전달하는 역할을 한다."
+        }
+      },
+      "name": "일지 목록조회 — 검색·페이징 조건 전달",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageList.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+            "line": 22,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "일지 목록조회에서 사용하는 검색조건과 페이지 정보를 담아 전달하는 공통 조회 항목이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 32,
+              "snippet": "public List<EgovMap> selectDiaryManageList(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 40,
+              "snippet": "public DiaryManageVO selectDiaryManageDetail(DiaryManageVO diaryManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 55,
+              "snippet": "void  insertDiaryManage(DiaryManageVO diaryManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 62,
+              "snippet": "void  updateDiaryManage(DiaryManageVO diaryManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 69,
+              "snippet": "void  deleteDiaryManage(DiaryManageVO diaryManageVO) throws Exception;"
+            }
+          ],
+          "text": "목록 조회는 검색·페이징 조건을 담은 공통 조회 항목을 받아 일지 목록을 돌려주고, 상세 조회는 일지 정보 항목을 받아 한 건을 돌려준다. 등록·수정·삭제는 각각 일지 정보 항목 한 건을 받아 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovDiaryManageService {"
+            }
+          ],
+          "text": "업무일지의 목록 조회, 전체 건수 조회, 상세 조회, 등록, 수정, 삭제를 하나의 업무 서비스 계약으로 묶어 화면 요청 접수 계층에 제공한다."
+        }
+      },
+      "name": "일지 목록조회 — 일지관리 업무 서비스",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageList.do:src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovDiaryManageService {"
+          }
+        ],
+        "text": "일지 목록조회에 필요한 일지 조회·등록·수정·삭제 업무 처리를 담당하는 일지관리 서비스 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 177,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 180,
+              "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 149,
+              "snippet": "if (sCmd.equals(\"del\")) {"
+            }
+          ],
+          "text": "요청 파라미터로 검색조건 항목과 일지 정보 항목을 함께 받으며, 처리 전에 로그인 인증 여부를 확인하고 미인증이면 로그인 화면으로 되돌린다. 삭제 등 세부 동작은 요청에 실린 명령값으로 구분한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 141,
+              "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")"
+            }
+          ],
+          "text": "일지 목록조회의 진입점으로서 화면에서 넘어온 검색조건과 일지 정보를 받아, 인증 확인과 첨부파일 정책값 조회를 거친 뒤 일지관리 업무 서비스에 실제 처리를 위임하고 반환할 화면 경로를 결정한다."
+        }
+      },
+      "name": "일지 목록조회 — 일지관리 화면 요청 접수",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageList.do:src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 141,
+            "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")"
+          }
+        ],
+        "text": "일지 목록조회 요청을 접수해 필요한 인증·정책 확인을 거친 뒤 일지관리 업무 서비스에 처리를 위임하고, 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "public String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "public String getMessageArgs(String code, Object[] args) {"
+            }
+          ],
+          "text": "메시지 코드만 주면 기본 로케일로 문구를 조회하고, 로케일이나 매개변수를 함께 주면 해당 언어와 치환값을 반영한 문구를 조회한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            }
+          ],
+          "text": "메시지 코드로 정의된 안내 문구를 찾아 돌려주는 역할을 하며, 로그인이 필요할 때 화면에 표시할 안내 문구를 제공한다."
+        }
+      },
+      "name": "일지 수정화면 — 안내 메시지 조회",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModify.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "일지 수정화면에서 인증 실패 등 사용자에게 보여줄 안내 메시지를 코드로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "public static String clearXSSMinimum(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "if (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 33,
+              "snippet": "returnValue = returnValue.replaceAll(\"&\", \"&amp;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "returnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ],
+          "text": "입력값이 비어 있으면 빈 문자열을 돌려주며, 앰퍼샌드·부등호·따옴표 등을 표시용 문자로 치환한다. 파일 경로에서는 상위 경로를 뜻하는 점 두 개 표기를 제거한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "public static String filePathBlackList(String value) {"
+            }
+          ],
+          "text": "화면에서 들어온 입력값의 위험 문자를 치환하고 파일 경로에 섞인 상위 경로 표기를 제거해, 일지 등록·수정 과정의 입력값과 첨부파일 경로를 안전하게 만든다."
+        }
+      },
+      "name": "일지 수정화면 — 입력값 보안 처리",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModify.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ],
+        "text": "일지 수정화면에서 다루는 입력값과 파일 경로의 위험 문자를 걸러내는 보안 처리 유틸이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "public static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "public static String getProperty(String keyName) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 85,
+              "snippet": "public static String getPathProperty(String keyName) {"
+            }
+          ],
+          "text": "설정값은 클래스 경로 기준 상대 위치의 공통 설정 파일에서 읽어오며, 키 이름을 주면 해당 값을, 경로용 키는 절대 경로로 변환해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "public static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "운영 환경 설정 파일에 정의된 값을 키 이름으로 찾아 돌려주는 역할을 하며, 첨부파일 저장 경로와 업로드 제한 정책값을 공급한다."
+        }
+      },
+      "name": "일지 수정화면 — 업로드 정책값 조회",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModify.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "일지 수정화면에서 첨부파일 허용 확장자와 최대 크기 같은 운영 설정값을 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "public List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ],
+          "text": "인증된 사용자 정보를 사용자 항목 형태로 돌려주고, 권한 정보는 권한 이름 목록으로, 인증 여부는 참·거짓 값으로 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ],
+          "text": "인증된 사용자 객체, 사용자 권한 목록, 인증 여부를 조회하는 세 가지 기능을 하나의 계약으로 제공해 화면 요청 접수 계층의 권한 확인을 뒷받침한다."
+        }
+      },
+      "name": "일지 수정화면 — 인증 사용자 정보 서비스",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModify.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "일지 수정화면에서 현재 로그인한 사용자 정보와 권한, 인증 여부를 제공하는 서비스 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "public static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증된 사용자 정보는 사용자 항목 형태로, 권한은 권한 이름 목록으로, 인증 여부는 참·거짓 값으로 돌려주며 실제 판정은 인증 사용자 정보 서비스에 위임한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스를 대신 호출해 주는 창구 역할로, 일지 등록·수정 요청을 처리하기 전에 인증 여부와 로그인 사용자 정보를 확인하는 데 쓰인다."
+        }
+      },
+      "name": "일지 수정화면 — 로그인 인증 확인",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModify.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "일지 수정화면 처리 전에 로그인 인증 여부와 인증된 사용자 정보를 확인한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 32,
+              "snippet": "public List<EgovMap> selectDiaryManageList(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 40,
+              "snippet": "public DiaryManageVO selectDiaryManageDetail(DiaryManageVO diaryManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 55,
+              "snippet": "void  insertDiaryManage(DiaryManageVO diaryManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 62,
+              "snippet": "void  updateDiaryManage(DiaryManageVO diaryManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 69,
+              "snippet": "void  deleteDiaryManage(DiaryManageVO diaryManageVO) throws Exception;"
+            }
+          ],
+          "text": "목록 조회는 검색·페이징 조건을 담은 공통 조회 항목을 받아 일지 목록을 돌려주고, 상세 조회는 일지 정보 항목을 받아 한 건을 돌려준다. 등록·수정·삭제는 각각 일지 정보 항목 한 건을 받아 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovDiaryManageService {"
+            }
+          ],
+          "text": "업무일지의 목록 조회, 전체 건수 조회, 상세 조회, 등록, 수정, 삭제를 하나의 업무 서비스 계약으로 묶어 화면 요청 접수 계층에 제공한다."
+        }
+      },
+      "name": "일지 수정화면 — 일지관리 업무 서비스",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModify.do:src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovDiaryManageService {"
+          }
+        ],
+        "text": "일지 수정화면에 필요한 일지 조회·등록·수정·삭제 업무 처리를 담당하는 일지관리 서비스 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 177,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 180,
+              "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 149,
+              "snippet": "if (sCmd.equals(\"del\")) {"
+            }
+          ],
+          "text": "요청 파라미터로 검색조건 항목과 일지 정보 항목을 함께 받으며, 처리 전에 로그인 인증 여부를 확인하고 미인증이면 로그인 화면으로 되돌린다. 삭제 등 세부 동작은 요청에 실린 명령값으로 구분한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 141,
+              "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")"
+            }
+          ],
+          "text": "일지 수정화면의 진입점으로서 화면에서 넘어온 검색조건과 일지 정보를 받아, 인증 확인과 첨부파일 정책값 조회를 거친 뒤 일지관리 업무 서비스에 실제 처리를 위임하고 반환할 화면 경로를 결정한다."
+        }
+      },
+      "name": "일지 수정화면 — 일지관리 화면 요청 접수",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModify.do:src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 141,
+            "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")"
+          }
+        ],
+        "text": "일지 수정화면 요청을 접수해 필요한 인증·정책 확인을 거친 뒤 일지관리 업무 서비스에 처리를 위임하고, 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "public static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "public static String cutString(String source, int slength) {"
+            }
+          ],
+          "text": "빈 문자열을 뜻하는 공통 기본값을 정의해 두고, 원본 문자열이 지정 길이를 넘으면 잘라내되 넘지 않으면 원본을 그대로 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "빈 문자열 판정, 지정 길이 초과 시 잘라내기 같은 공통 문자열 가공 기능을 제공해 일지 내용과 설정값을 다루는 과정에서 사용된다."
+        }
+      },
+      "name": "일지 수정화면 — 문자열 처리 유틸",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModify.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "일지 수정화면에서 일지 내용과 설정값의 빈 값 처리·길이 자르기 등 문자열 가공을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "public String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "public String getMessageArgs(String code, Object[] args) {"
+            }
+          ],
+          "text": "메시지 코드만 주면 기본 로케일로 문구를 조회하고, 로케일이나 매개변수를 함께 주면 해당 언어와 치환값을 반영한 문구를 조회한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            }
+          ],
+          "text": "메시지 코드로 정의된 안내 문구를 찾아 돌려주는 역할을 하며, 로그인이 필요할 때 화면에 표시할 안내 문구를 제공한다."
+        }
+      },
+      "name": "일지 수정처리 — 안내 메시지 조회",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModifyActor.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "일지 수정처리에서 인증 실패 등 사용자에게 보여줄 안내 메시지를 코드로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "private String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "private String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 63,
+              "snippet": "private String orgnztId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "private String uniqId;"
+            }
+          ],
+          "text": "아이디와 이름, 이메일은 필수 항목으로 표시되어 있고, 조직 아이디와 조직명, 고유 아이디, 사용자 구분 같은 소속·식별 정보를 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "private String id;"
+            }
+          ],
+          "text": "로그인한 사용자의 아이디, 이름, 소속 조직, 고유 아이디 등을 담아 일지 등록자·수정자 정보를 채우는 데 사용되는 사용자 정보 항목이다."
+        }
+      },
+      "name": "일지 수정처리 — 로그인 사용자 정보",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModifyActor.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "일지 수정처리에서 등록자·수정자 정보를 채우는 데 사용하는 로그인 사용자 정보 항목이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 84,
+              "snippet": "storePathString = EgovProperties.getProperty(\"Globals.fileStorePath\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 90,
+              "snippet": "atchFileIdString = idgenService.getNextStringId();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 99,
+              "snippet": "if (saveFolder.mkdirs()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 124,
+              "snippet": "file.transferTo(new File(EgovWebUtil.filePathBlackList(filePath)));"
+            }
+          ],
+          "text": "저장 경로가 지정되지 않으면 공통 설정의 기본 저장 경로를 쓰고, 첨부파일 아이디가 없으면 새 아이디를 채번한다. 저장 폴더가 없으면 새로 만들고, 파일 경로는 상위 경로 표기를 제거한 뒤에 저장한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 60,
+              "snippet": "@Component(\"EgovFileMngUtil\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 76,
+              "snippet": "public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+            }
+          ],
+          "text": "화면에서 올라온 첨부파일을 정해진 저장 경로에 옮겨 보관하고, 확장자·크기·저장 경로 같은 파일 속성 목록을 만들어 일지 등록·수정 처리에 넘겨준다."
+        }
+      },
+      "name": "일지 수정처리 — 첨부파일 저장 처리",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModifyActor.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          }
+        ],
+        "text": "일지 수정처리에서 올라온 첨부파일을 저장 경로에 보관하고 파일 정보 목록을 만들어 준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "public static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "public static String getProperty(String keyName) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 85,
+              "snippet": "public static String getPathProperty(String keyName) {"
+            }
+          ],
+          "text": "설정값은 클래스 경로 기준 상대 위치의 공통 설정 파일에서 읽어오며, 키 이름을 주면 해당 값을, 경로용 키는 절대 경로로 변환해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "public static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "운영 환경 설정 파일에 정의된 값을 키 이름으로 찾아 돌려주는 역할을 하며, 첨부파일 저장 경로와 업로드 제한 정책값을 공급한다."
+        }
+      },
+      "name": "일지 수정처리 — 업로드 정책값 조회",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModifyActor.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "일지 수정처리에서 첨부파일 허용 확장자와 최대 크기 같은 운영 설정값을 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "public static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증된 사용자 정보는 사용자 항목 형태로, 권한은 권한 이름 목록으로, 인증 여부는 참·거짓 값으로 돌려주며 실제 판정은 인증 사용자 정보 서비스에 위임한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스를 대신 호출해 주는 창구 역할로, 일지 등록·수정 요청을 처리하기 전에 인증 여부와 로그인 사용자 정보를 확인하는 데 쓰인다."
+        }
+      },
+      "name": "일지 수정처리 — 로그인 인증 확인",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModifyActor.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "일지 수정처리 처리 전에 로그인 인증 여부와 인증된 사용자 정보를 확인한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 40,
+              "snippet": "private String schdulId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 44,
+              "snippet": "private String diaryProcsPte;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 48,
+              "snippet": "@Size(max=255)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 49,
+              "snippet": "private String diaryNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 53,
+              "snippet": "@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 54,
+              "snippet": "private String drctMatter;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 62,
+              "snippet": "private String atchFileId;"
+            }
+          ],
+          "text": "일정 아이디, 진척률, 일정명, 지시사항, 특이사항은 값이 반드시 있어야 하는 필수 항목이며, 일정명은 255자, 지시사항과 특이사항은 각각 2500자까지만 허용한다. 첨부파일 아이디로 첨부 묶음을 연결한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 29,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 30,
+              "snippet": "public class DiaryManageVO extends ComDefaultVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 33,
+              "snippet": "private String diaryId;"
+            }
+          ],
+          "text": "업무일지 한 건의 일지 아이디, 연결된 일정, 진척률, 지시사항과 특이사항, 첨부파일, 등록·수정 이력을 담아 화면과 업무 서비스 사이에서 전달한다. 공통 조회 항목을 이어받아 검색·페이징 조건도 함께 실을 수 있다."
+        }
+      },
+      "name": "일지 수정처리 — 일지 항목 정보",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModifyActor.do:src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+            "line": 29,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "일지 수정처리에서 주고받는 업무일지 한 건의 내용을 담는 일지 정보 항목이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 177,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 180,
+              "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 149,
+              "snippet": "if (sCmd.equals(\"del\")) {"
+            }
+          ],
+          "text": "요청 파라미터로 검색조건 항목과 일지 정보 항목을 함께 받으며, 처리 전에 로그인 인증 여부를 확인하고 미인증이면 로그인 화면으로 되돌린다. 삭제 등 세부 동작은 요청에 실린 명령값으로 구분한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 141,
+              "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")"
+            }
+          ],
+          "text": "일지 수정처리의 진입점으로서 화면에서 넘어온 검색조건과 일지 정보를 받아, 인증 확인과 첨부파일 정책값 조회를 거친 뒤 일지관리 업무 서비스에 실제 처리를 위임하고 반환할 화면 경로를 결정한다."
+        }
+      },
+      "name": "일지 수정처리 — 일지관리 화면 요청 접수",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModifyActor.do:src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 141,
+            "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")"
+          }
+        ],
+        "text": "일지 수정처리 요청을 접수해 필요한 인증·정책 확인을 거친 뒤 일지관리 업무 서비스에 처리를 위임하고, 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "public static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "public static String cutString(String source, int slength) {"
+            }
+          ],
+          "text": "빈 문자열을 뜻하는 공통 기본값을 정의해 두고, 원본 문자열이 지정 길이를 넘으면 잘라내되 넘지 않으면 원본을 그대로 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "빈 문자열 판정, 지정 길이 초과 시 잘라내기 같은 공통 문자열 가공 기능을 제공해 일지 내용과 설정값을 다루는 과정에서 사용된다."
+        }
+      },
+      "name": "일지 수정처리 — 문자열 처리 유틸",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModifyActor.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "일지 수정처리에서 일지 내용과 설정값의 빈 값 처리·길이 자르기 등 문자열 가공을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "public String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "public String getMessageArgs(String code, Object[] args) {"
+            }
+          ],
+          "text": "메시지 코드만 주면 기본 로케일로 문구를 조회하고, 로케일이나 매개변수를 함께 주면 해당 언어와 치환값을 반영한 문구를 조회한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            }
+          ],
+          "text": "메시지 코드로 정의된 안내 문구를 찾아 돌려주는 역할을 하며, 로그인이 필요할 때 화면에 표시할 안내 문구를 제공한다."
+        }
+      },
+      "name": "일지 등록화면 — 안내 메시지 조회",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "일지 등록화면에서 인증 실패 등 사용자에게 보여줄 안내 메시지를 코드로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "public static String clearXSSMinimum(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "if (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 33,
+              "snippet": "returnValue = returnValue.replaceAll(\"&\", \"&amp;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "returnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ],
+          "text": "입력값이 비어 있으면 빈 문자열을 돌려주며, 앰퍼샌드·부등호·따옴표 등을 표시용 문자로 치환한다. 파일 경로에서는 상위 경로를 뜻하는 점 두 개 표기를 제거한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "public static String filePathBlackList(String value) {"
+            }
+          ],
+          "text": "화면에서 들어온 입력값의 위험 문자를 치환하고 파일 경로에 섞인 상위 경로 표기를 제거해, 일지 등록·수정 과정의 입력값과 첨부파일 경로를 안전하게 만든다."
+        }
+      },
+      "name": "일지 등록화면 — 입력값 보안 처리",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageRegist.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ],
+        "text": "일지 등록화면에서 다루는 입력값과 파일 경로의 위험 문자를 걸러내는 보안 처리 유틸이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "public static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "public static String getProperty(String keyName) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 85,
+              "snippet": "public static String getPathProperty(String keyName) {"
+            }
+          ],
+          "text": "설정값은 클래스 경로 기준 상대 위치의 공통 설정 파일에서 읽어오며, 키 이름을 주면 해당 값을, 경로용 키는 절대 경로로 변환해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "public static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "운영 환경 설정 파일에 정의된 값을 키 이름으로 찾아 돌려주는 역할을 하며, 첨부파일 저장 경로와 업로드 제한 정책값을 공급한다."
+        }
+      },
+      "name": "일지 등록화면 — 업로드 정책값 조회",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "일지 등록화면에서 첨부파일 허용 확장자와 최대 크기 같은 운영 설정값을 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "public List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ],
+          "text": "인증된 사용자 정보를 사용자 항목 형태로 돌려주고, 권한 정보는 권한 이름 목록으로, 인증 여부는 참·거짓 값으로 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ],
+          "text": "인증된 사용자 객체, 사용자 권한 목록, 인증 여부를 조회하는 세 가지 기능을 하나의 계약으로 제공해 화면 요청 접수 계층의 권한 확인을 뒷받침한다."
+        }
+      },
+      "name": "일지 등록화면 — 인증 사용자 정보 서비스",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "일지 등록화면에서 현재 로그인한 사용자 정보와 권한, 인증 여부를 제공하는 서비스 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "public static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증된 사용자 정보는 사용자 항목 형태로, 권한은 권한 이름 목록으로, 인증 여부는 참·거짓 값으로 돌려주며 실제 판정은 인증 사용자 정보 서비스에 위임한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스를 대신 호출해 주는 창구 역할로, 일지 등록·수정 요청을 처리하기 전에 인증 여부와 로그인 사용자 정보를 확인하는 데 쓰인다."
+        }
+      },
+      "name": "일지 등록화면 — 로그인 인증 확인",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "일지 등록화면 처리 전에 로그인 인증 여부와 인증된 사용자 정보를 확인한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 177,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 180,
+              "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 149,
+              "snippet": "if (sCmd.equals(\"del\")) {"
+            }
+          ],
+          "text": "요청 파라미터로 검색조건 항목과 일지 정보 항목을 함께 받으며, 처리 전에 로그인 인증 여부를 확인하고 미인증이면 로그인 화면으로 되돌린다. 삭제 등 세부 동작은 요청에 실린 명령값으로 구분한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 141,
+              "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")"
+            }
+          ],
+          "text": "일지 등록화면의 진입점으로서 화면에서 넘어온 검색조건과 일지 정보를 받아, 인증 확인과 첨부파일 정책값 조회를 거친 뒤 일지관리 업무 서비스에 실제 처리를 위임하고 반환할 화면 경로를 결정한다."
+        }
+      },
+      "name": "일지 등록화면 — 일지관리 화면 요청 접수",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageRegist.do:src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 141,
+            "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")"
+          }
+        ],
+        "text": "일지 등록화면 요청을 접수해 필요한 인증·정책 확인을 거친 뒤 일지관리 업무 서비스에 처리를 위임하고, 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "public static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "public static String cutString(String source, int slength) {"
+            }
+          ],
+          "text": "빈 문자열을 뜻하는 공통 기본값을 정의해 두고, 원본 문자열이 지정 길이를 넘으면 잘라내되 넘지 않으면 원본을 그대로 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "빈 문자열 판정, 지정 길이 초과 시 잘라내기 같은 공통 문자열 가공 기능을 제공해 일지 내용과 설정값을 다루는 과정에서 사용된다."
+        }
+      },
+      "name": "일지 등록화면 — 문자열 처리 유틸",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageRegist.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "일지 등록화면에서 일지 내용과 설정값의 빈 값 처리·길이 자르기 등 문자열 가공을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "public String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "public String getMessageArgs(String code, Object[] args) {"
+            }
+          ],
+          "text": "메시지 코드만 주면 기본 로케일로 문구를 조회하고, 로케일이나 매개변수를 함께 주면 해당 언어와 치환값을 반영한 문구를 조회한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            }
+          ],
+          "text": "메시지 코드로 정의된 안내 문구를 찾아 돌려주는 역할을 하며, 로그인이 필요할 때 화면에 표시할 안내 문구를 제공한다."
+        }
+      },
+      "name": "일지 등록처리 — 안내 메시지 조회",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageRegistActor.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "일지 등록처리에서 인증 실패 등 사용자에게 보여줄 안내 메시지를 코드로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "private String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "private String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 63,
+              "snippet": "private String orgnztId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "private String uniqId;"
+            }
+          ],
+          "text": "아이디와 이름, 이메일은 필수 항목으로 표시되어 있고, 조직 아이디와 조직명, 고유 아이디, 사용자 구분 같은 소속·식별 정보를 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "private String id;"
+            }
+          ],
+          "text": "로그인한 사용자의 아이디, 이름, 소속 조직, 고유 아이디 등을 담아 일지 등록자·수정자 정보를 채우는 데 사용되는 사용자 정보 항목이다."
+        }
+      },
+      "name": "일지 등록처리 — 로그인 사용자 정보",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageRegistActor.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "일지 등록처리에서 등록자·수정자 정보를 채우는 데 사용하는 로그인 사용자 정보 항목이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 30,
+              "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 38,
+              "snippet": "public String insertFileInf(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 46,
+              "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 54,
+              "snippet": "public void updateFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 79,
+              "snippet": "public FileVO selectFileInf(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 88,
+              "snippet": "public int getMaxFileSN(FileVO fvo) throws Exception;"
+            }
+          ],
+          "text": "파일 한 건 또는 여러 건의 정보를 한 번에 등록하고 수정·삭제할 수 있으며, 파일 목록과 상세 정보 조회, 파일 구분자 최대값 조회 기능을 함께 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 38,
+              "snippet": "public String insertFileInf(FileVO fvo) throws Exception;"
+            }
+          ],
+          "text": "첨부파일의 속성과 상세 정보를 등록·수정·삭제·조회하는 계약을 제공해, 일지에 딸린 첨부파일 정보를 일지 본문과 함께 관리할 수 있게 한다."
+        }
+      },
+      "name": "일지 등록처리 — 첨부파일 정보 관리",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageRegistActor.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ],
+        "text": "일지 등록처리에서 첨부파일의 목록·상세 정보를 등록·수정·삭제·조회하는 파일 관리 서비스 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 84,
+              "snippet": "storePathString = EgovProperties.getProperty(\"Globals.fileStorePath\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 90,
+              "snippet": "atchFileIdString = idgenService.getNextStringId();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 99,
+              "snippet": "if (saveFolder.mkdirs()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 124,
+              "snippet": "file.transferTo(new File(EgovWebUtil.filePathBlackList(filePath)));"
+            }
+          ],
+          "text": "저장 경로가 지정되지 않으면 공통 설정의 기본 저장 경로를 쓰고, 첨부파일 아이디가 없으면 새 아이디를 채번한다. 저장 폴더가 없으면 새로 만들고, 파일 경로는 상위 경로 표기를 제거한 뒤에 저장한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 60,
+              "snippet": "@Component(\"EgovFileMngUtil\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 76,
+              "snippet": "public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+            }
+          ],
+          "text": "화면에서 올라온 첨부파일을 정해진 저장 경로에 옮겨 보관하고, 확장자·크기·저장 경로 같은 파일 속성 목록을 만들어 일지 등록·수정 처리에 넘겨준다."
+        }
+      },
+      "name": "일지 등록처리 — 첨부파일 저장 처리",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageRegistActor.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          }
+        ],
+        "text": "일지 등록처리에서 올라온 첨부파일을 저장 경로에 보관하고 파일 정보 목록을 만들어 준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "public static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "public static String getProperty(String keyName) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 85,
+              "snippet": "public static String getPathProperty(String keyName) {"
+            }
+          ],
+          "text": "설정값은 클래스 경로 기준 상대 위치의 공통 설정 파일에서 읽어오며, 키 이름을 주면 해당 값을, 경로용 키는 절대 경로로 변환해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "public static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "운영 환경 설정 파일에 정의된 값을 키 이름으로 찾아 돌려주는 역할을 하며, 첨부파일 저장 경로와 업로드 제한 정책값을 공급한다."
+        }
+      },
+      "name": "일지 등록처리 — 업로드 정책값 조회",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageRegistActor.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "일지 등록처리에서 첨부파일 허용 확장자와 최대 크기 같은 운영 설정값을 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "public static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증된 사용자 정보는 사용자 항목 형태로, 권한은 권한 이름 목록으로, 인증 여부는 참·거짓 값으로 돌려주며 실제 판정은 인증 사용자 정보 서비스에 위임한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스를 대신 호출해 주는 창구 역할로, 일지 등록·수정 요청을 처리하기 전에 인증 여부와 로그인 사용자 정보를 확인하는 데 쓰인다."
+        }
+      },
+      "name": "일지 등록처리 — 로그인 인증 확인",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageRegistActor.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "일지 등록처리 처리 전에 로그인 인증 여부와 인증된 사용자 정보를 확인한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 40,
+              "snippet": "private String schdulId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 44,
+              "snippet": "private String diaryProcsPte;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 48,
+              "snippet": "@Size(max=255)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 49,
+              "snippet": "private String diaryNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 53,
+              "snippet": "@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 54,
+              "snippet": "private String drctMatter;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 62,
+              "snippet": "private String atchFileId;"
+            }
+          ],
+          "text": "일정 아이디, 진척률, 일정명, 지시사항, 특이사항은 값이 반드시 있어야 하는 필수 항목이며, 일정명은 255자, 지시사항과 특이사항은 각각 2500자까지만 허용한다. 첨부파일 아이디로 첨부 묶음을 연결한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 29,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 30,
+              "snippet": "public class DiaryManageVO extends ComDefaultVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+              "line": 33,
+              "snippet": "private String diaryId;"
+            }
+          ],
+          "text": "업무일지 한 건의 일지 아이디, 연결된 일정, 진척률, 지시사항과 특이사항, 첨부파일, 등록·수정 이력을 담아 화면과 업무 서비스 사이에서 전달한다. 공통 조회 항목을 이어받아 검색·페이징 조건도 함께 실을 수 있다."
+        }
+      },
+      "name": "일지 등록처리 — 일지 항목 정보",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageRegistActor.do:src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+            "line": 29,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "일지 등록처리에서 주고받는 업무일지 한 건의 내용을 담는 일지 정보 항목이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 177,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 180,
+              "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 149,
+              "snippet": "if (sCmd.equals(\"del\")) {"
+            }
+          ],
+          "text": "요청 파라미터로 검색조건 항목과 일지 정보 항목을 함께 받으며, 처리 전에 로그인 인증 여부를 확인하고 미인증이면 로그인 화면으로 되돌린다. 삭제 등 세부 동작은 요청에 실린 명령값으로 구분한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+              "line": 141,
+              "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")"
+            }
+          ],
+          "text": "일지 등록처리의 진입점으로서 화면에서 넘어온 검색조건과 일지 정보를 받아, 인증 확인과 첨부파일 정책값 조회를 거친 뒤 일지관리 업무 서비스에 실제 처리를 위임하고 반환할 화면 경로를 결정한다."
+        }
+      },
+      "name": "일지 등록처리 — 일지관리 화면 요청 접수",
+      "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageRegistActor.do:src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+            "line": 141,
+            "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")"
+          }
+        ],
+        "text": "일지 등록처리 요청을 접수해 필요한 인증·정책 확인을 거친 뒤 일지관리 업무 서비스에 처리를 위임하고, 결과를 화면에 전달한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovDiaryManageService {"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+        "line": 32,
+        "snippet": "public List<EgovMap> selectDiaryManageList(ComDefaultVO searchVO) throws Exception;"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java",
+        "line": 55,
+        "snippet": "void  insertDiaryManage(DiaryManageVO diaryManageVO) throws Exception;"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java",
+        "line": 44,
+        "snippet": "private String diaryProcsPte;"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java",
+        "line": 177,
+        "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+      }
+    ],
+    "text": "협업 지원 영역의 일지관리 업무로, 일정과 연결된 업무일지를 등록·수정·삭제하고 목록과 상세로 조회한다. 일지에는 진척률, 지시사항, 특이사항과 첨부파일을 함께 남기며, 등록·수정은 로그인한 사용자만 수행할 수 있다."
+  }
+}

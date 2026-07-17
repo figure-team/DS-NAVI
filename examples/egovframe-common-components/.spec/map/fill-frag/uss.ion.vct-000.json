@@ -1,0 +1,3079 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "uss.ion.vct-000",
+  "domainId": "domain:uss.ion.vct",
+  "header": {
+    "name": "휴가관리",
+    "summary": {
+      "text": "사용자가 휴가를 신청하고 결재자가 이를 승인 또는 반려하는 휴가관리 업무 영역이다. 휴가 신청의 등록·수정·삭제·조회와 승인 처리, 휴가일자 중복 확인 기능을 제공한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+          "line": 10,
+          "snippet": "* - 휴가관리에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+          "line": 11,
+          "snippet": "* - 휴가관리의 조회기능은 목록조회, 상세조회로 구분된다."
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "휴가 신청 정보 — 신청자ID, 휴가구분, 시작일자, 종료일자, 신청일자, 휴가사유, 발생연도, 결재자ID, 승인여부, 결재일시, 반려사유 항목을 관리한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 18,
+            "snippet": "* - 휴가관리의 신청자ID,휴가구분,시작일자,종료일자,신청일자,휴가사유,발생연도,결재자ID,승인여부,결재일시,반려사유,최초등록자ID,최초등록시점,최종수정자ID,최종수정시점 항목을 관리한다."
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 26,
+            "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      {
+        "text": "휴가구분 — 휴가의 종류를 나타내는 항목으로 공통코드로 관리된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 42,
+            "snippet": "private String vcatnSe;"
+          }
+        ]
+      },
+      {
+        "text": "결재자 — 신청된 휴가를 승인하는 사용자로 결재자ID로 식별한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 84,
+            "snippet": "private String sanctnerId;"
+          }
+        ]
+      },
+      {
+        "text": "로그인 사용자 정보 — 아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "휴가구분과 시작일자, 종료일자, 휴가사유는 반드시 입력해야 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 41,
+            "snippet": "@EgovNullCheck"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 42,
+            "snippet": "private String vcatnSe;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 49,
+            "snippet": "private String bgnde;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 56,
+            "snippet": "private String endde;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 68,
+            "snippet": "private String vcatnResn;"
+          }
+        ]
+      },
+      {
+        "text": "시작일자와 종료일자는 8자리를 넘을 수 없고, 휴가사유는 200자를 넘을 수 없다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 48,
+            "snippet": "@Size(max = 8)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 55,
+            "snippet": "@Size(max = 8)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 67,
+            "snippet": "@Size(max = 200)"
+          }
+        ]
+      },
+      {
+        "text": "결재자ID는 공백일 수 없으며 미입력 시 안내 메시지를 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 83,
+            "snippet": "@NotBlank(message = \"{comUssIonVct.vcatnManage.validate.sanctnerId.required}\")"
+          }
+        ]
+      },
+      {
+        "text": "휴가 신청 시 동일 일자에 이미 신청된 휴가가 있는지 중복 여부를 확인한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+            "line": 59,
+            "snippet": "* 휴가일자 중복여부 체크"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+            "line": 64,
+            "snippet": "public int selectVcatnManageDplctAt(VcatnManageVO vcatnManageVO) throws Exception;"
+          }
+        ]
+      },
+      {
+        "text": "인증되지 않은 사용자는 휴가 등록·수정·승인 처리를 할 수 없으며 로그인 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 640,
+            "snippet": "if (!isAuthenticated) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 641,
+            "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+          }
+        ]
+      },
+      {
+        "text": "입력값 검증에 실패하면 처리하지 않고 원래 입력 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 644,
+            "snippet": "if (bindingResult.hasErrors()) {"
+          }
+        ]
+      },
+      {
+        "text": "휴가 승인 시 결재자와 최종수정자에 인증된 사용자의 고유아이디를 기록한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 648,
+            "snippet": "vcatnManageVO.setSanctnerId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getUniqId()));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 649,
+            "snippet": "vcatnManageVO.setLastUpdusrId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getUniqId()));"
+          }
+        ]
+      },
+      {
+        "text": "휴가 신청 일자는 구분 기호를 제거한 형태로 저장·조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 606,
+            "snippet": "public String selectVcatnConfm(@ModelAttribute(\"vcatnManageVO\") VcatnManageVO vcatnManageVO, ModelMap model) throws Exception {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 607,
+            "snippet": "vcatnManageVO.setBgnde(EgovStringUtil.removeMinusChar(vcatnManageVO.getBgnde()));"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "공통코드 조회 업무를 통해 휴가구분 등 화면에 필요한 코드 목록을 가져온다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          }
+        ]
+      },
+      {
+        "text": "인증 사용자 확인 도우미를 통해 현재 로그인 사용자와 인증 여부를 확인한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 638,
+            "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+          }
+        ]
+      },
+      {
+        "text": "안내 메시지 제공 기능을 통해 처리 성공·실패 문구를 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      {
+        "text": "미인증 사용자는 로그인 업무 영역의 로그인 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 641,
+            "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "휴가 신청 관리",
+        "nodes": [
+          {
+            "id": "a_start",
+            "kind": "start",
+            "label": "휴가 신청 시작"
+          },
+          {
+            "id": "a_listview",
+            "kind": "activity",
+            "label": "휴가 목록 화면 호출",
+            "flowRef": "flow:ANY /uss/ion/vct/EgovVcatnManageListView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 77,
+                "snippet": "@RequestMapping(\"/uss/ion/vct/EgovVcatnManageListView.do\")"
+              }
+            ]
+          },
+          {
+            "id": "a_list",
+            "kind": "activity",
+            "label": "휴가 신청 목록 조회",
+            "flowRef": "flow:ANY /uss/ion/vct/EgovVcatnManageList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 90,
+                "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnManageList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "a_detail",
+            "kind": "activity",
+            "label": "휴가 신청 상세 조회",
+            "flowRef": "flow:ANY /uss/ion/vct/EgovVcatnManageDetail.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 154,
+                "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnManageDetail.do\")"
+              }
+            ]
+          },
+          {
+            "id": "a_regist",
+            "kind": "activity",
+            "label": "휴가 신청 등록 화면",
+            "flowRef": "flow:ANY /uss/ion/vct/EgovVcatnRegist.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 191,
+                "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnRegist.do\")"
+              }
+            ]
+          },
+          {
+            "id": "a_auth",
+            "kind": "decision",
+            "label": "로그인 인증 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 640,
+                "snippet": "if (!isAuthenticated) {"
+              }
+            ]
+          },
+          {
+            "id": "a_login",
+            "kind": "activity",
+            "label": "로그인 화면으로 이동",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 641,
+                "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+              }
+            ]
+          },
+          {
+            "id": "a_insert",
+            "kind": "activity",
+            "label": "휴가 신청 등록",
+            "flowRef": "flow:ANY /uss/ion/vct/insertVcatnManage.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 269,
+                "snippet": "@RequestMapping(value = \"/uss/ion/vct/insertVcatnManage.do\")"
+              }
+            ]
+          },
+          {
+            "id": "a_dup",
+            "kind": "decision",
+            "label": "휴가일자 중복 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+                "line": 64,
+                "snippet": "public int selectVcatnManageDplctAt(VcatnManageVO vcatnManageVO) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "a_update",
+            "kind": "activity",
+            "label": "휴가 신청 수정",
+            "flowRef": "flow:ANY /uss/ion/vct/updtVcatnManage.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 441,
+                "snippet": "@RequestMapping(value = \"/uss/ion/vct/updtVcatnManage.do\")"
+              }
+            ]
+          },
+          {
+            "id": "a_delete",
+            "kind": "activity",
+            "label": "휴가 신청 삭제",
+            "flowRef": "flow:ANY /uss/ion/vct/deleteVcatnManage.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 538,
+                "snippet": "@RequestMapping(value = \"/uss/ion/vct/deleteVcatnManage.do\")"
+              }
+            ]
+          },
+          {
+            "id": "a_end",
+            "kind": "end",
+            "label": "휴가 신청 처리 완료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "a_start",
+            "to": "a_listview"
+          },
+          {
+            "from": "a_listview",
+            "to": "a_list"
+          },
+          {
+            "from": "a_list",
+            "to": "a_detail"
+          },
+          {
+            "from": "a_list",
+            "to": "a_regist"
+          },
+          {
+            "from": "a_regist",
+            "to": "a_auth"
+          },
+          {
+            "from": "a_auth",
+            "to": "a_login",
+            "label": "미인증"
+          },
+          {
+            "from": "a_auth",
+            "to": "a_insert",
+            "label": "인증됨"
+          },
+          {
+            "from": "a_login",
+            "to": "a_end"
+          },
+          {
+            "from": "a_insert",
+            "to": "a_dup"
+          },
+          {
+            "from": "a_dup",
+            "to": "a_regist",
+            "label": "중복 있음"
+          },
+          {
+            "from": "a_dup",
+            "to": "a_end",
+            "label": "중복 없음"
+          },
+          {
+            "from": "a_detail",
+            "to": "a_update"
+          },
+          {
+            "from": "a_detail",
+            "to": "a_delete"
+          },
+          {
+            "from": "a_update",
+            "to": "a_end"
+          },
+          {
+            "from": "a_delete",
+            "to": "a_end"
+          }
+        ]
+      },
+      {
+        "title": "휴가 승인 처리",
+        "nodes": [
+          {
+            "id": "b_start",
+            "kind": "start",
+            "label": "휴가 승인 시작"
+          },
+          {
+            "id": "b_list",
+            "kind": "activity",
+            "label": "승인 대상 목록 조회",
+            "flowRef": "flow:ANY /uss/ion/vct/EgovVcatnConfmList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 557,
+                "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfmList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "b_detail",
+            "kind": "activity",
+            "label": "휴가 승인 상세 조회",
+            "flowRef": "flow:ANY /uss/ion/vct/EgovVcatnConfm.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 605,
+                "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+              }
+            ]
+          },
+          {
+            "id": "b_auth",
+            "kind": "decision",
+            "label": "결재자 인증 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 640,
+                "snippet": "if (!isAuthenticated) {"
+              }
+            ]
+          },
+          {
+            "id": "b_login",
+            "kind": "activity",
+            "label": "로그인 화면으로 이동",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 641,
+                "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+              }
+            ]
+          },
+          {
+            "id": "b_valid",
+            "kind": "decision",
+            "label": "입력값 검증 통과 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 644,
+                "snippet": "if (bindingResult.hasErrors()) {"
+              }
+            ]
+          },
+          {
+            "id": "b_confm",
+            "kind": "activity",
+            "label": "휴가 승인 처리",
+            "flowRef": "flow:ANY /uss/ion/vct/updtVcatnConfm.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 629,
+                "snippet": "@RequestMapping(value = \"/uss/ion/vct/updtVcatnConfm.do\")"
+              }
+            ]
+          },
+          {
+            "id": "b_return",
+            "kind": "activity",
+            "label": "휴가 반려 화면 호출",
+            "flowRef": "flow:ANY /uss/ion/vct/EgovVcatnReturn.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+                "line": 664,
+                "snippet": "@RequestMapping(\"/uss/ion/vct/EgovVcatnReturn.do\")"
+              }
+            ]
+          },
+          {
+            "id": "b_end",
+            "kind": "end",
+            "label": "휴가 승인 처리 완료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "b_start",
+            "to": "b_list"
+          },
+          {
+            "from": "b_list",
+            "to": "b_detail"
+          },
+          {
+            "from": "b_detail",
+            "to": "b_auth"
+          },
+          {
+            "from": "b_detail",
+            "to": "b_return"
+          },
+          {
+            "from": "b_auth",
+            "to": "b_login",
+            "label": "미인증"
+          },
+          {
+            "from": "b_auth",
+            "to": "b_valid",
+            "label": "인증됨"
+          },
+          {
+            "from": "b_login",
+            "to": "b_end"
+          },
+          {
+            "from": "b_valid",
+            "to": "b_detail",
+            "label": "검증 실패"
+          },
+          {
+            "from": "b_valid",
+            "to": "b_confm",
+            "label": "검증 통과"
+          },
+          {
+            "from": "b_confm",
+            "to": "b_end"
+          },
+          {
+            "from": "b_return",
+            "to": "b_end"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/ion/vct/EgovVcatnConfm.do",
+      "name": "휴가 승인 상세 조회",
+      "summary": {
+        "text": "승인 처리 대상으로 선택한 휴가 신청 건의 상세 정보를 조회하여 승인 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 605,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/vct/EgovVcatnConfmList.do",
+      "name": "휴가 승인 대상 목록 조회",
+      "summary": {
+        "text": "결재자가 처리해야 할 신청 상태의 휴가 목록을 조회하여 승인 처리 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 557,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfmList.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/vct/EgovVcatnManageDetail.do",
+      "name": "휴가 신청 상세 조회",
+      "summary": {
+        "text": "선택한 휴가 신청 건의 상세 정보와 휴가구분 공통코드를 함께 조회하여 상세 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 154,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnManageDetail.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/vct/EgovVcatnManageList.do",
+      "name": "휴가 신청 목록 조회",
+      "summary": {
+        "text": "로그인한 사용자의 휴가 신청 내역을 조회 조건에 따라 목록으로 조회하여 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 90,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnManageList.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/vct/EgovVcatnManageListView.do",
+      "name": "휴가 신청 목록 화면 호출",
+      "summary": {
+        "text": "휴가 신청 목록 화면을 최초로 열어 조회 조건 입력 화면을 사용자에게 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 77,
+            "snippet": "@RequestMapping(\"/uss/ion/vct/EgovVcatnManageListView.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/vct/EgovVcatnRegist.do",
+      "name": "휴가 신청 등록 화면 호출",
+      "summary": {
+        "text": "휴가를 신청하기 위한 등록 화면을 열고, 휴가구분 공통코드와 신청자 기본값을 화면에 준비한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 191,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnRegist.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/vct/EgovVcatnReturn.do",
+      "name": "휴가 반려 화면 호출",
+      "summary": {
+        "text": "신청된 휴가를 반려하기 위한 반려 사유 입력 화면을 호출한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 664,
+            "snippet": "@RequestMapping(\"/uss/ion/vct/EgovVcatnReturn.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/vct/deleteVcatnManage.do",
+      "name": "휴가 신청 삭제",
+      "summary": {
+        "text": "선택한 휴가 신청 건을 삭제하고 처리 결과 메시지와 함께 목록 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 538,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/deleteVcatnManage.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/vct/insertVcatnManage.do",
+      "name": "휴가 신청 등록",
+      "summary": {
+        "text": "입력된 휴가 신청 정보를 검증하고 휴가일자 중복 여부를 확인한 뒤 새로운 휴가 신청 건으로 등록한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 269,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/insertVcatnManage.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/vct/updtVcatnConfm.do",
+      "name": "휴가 승인 처리",
+      "summary": {
+        "text": "결재자 인증과 입력값 검증을 거쳐 신청된 휴가를 승인 처리하고 결재자와 최종수정자를 기록한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 629,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/updtVcatnConfm.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/vct/updtVcatnManage.do",
+      "name": "휴가 신청 수정",
+      "summary": {
+        "text": "이미 등록된 휴가 신청 건의 휴가구분, 기간, 사유 등을 검증 후 수정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 441,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/updtVcatnManage.do\")"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnConfm.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 제공",
+      "summary": {
+        "text": "휴가 승인 상세 조회 처리에서 처리 성공·실패 안내 문구를 코드와 언어 설정에 따라 조회하여 화면 메시지로 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 상세 조회 과정에서 안내 메시지 제공 역할을 맡는다. 처리 성공·실패 안내 문구를 코드와 언어 설정에 따라 조회하여 화면 메시지로 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "처리 성공·실패 안내 문구를 코드와 언어 설정에 따라 조회하여 화면 메시지로 제공한다. 휴가 승인 상세 조회 처리 결과를 사용자에게 전달하는 데 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnConfm.do:src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+      "name": "휴가관리 업무 처리",
+      "summary": {
+        "text": "휴가 승인 상세 조회 처리에서 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+            "line": 17,
+            "snippet": "public interface EgovVcatnManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 상세 조회 과정에서 휴가관리 업무 처리 역할을 맡는다. 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "휴가 신청의 등록·수정·삭제와 승인 처리를 조율한다. 등록·수정 시에는 휴가일자 중복 여부를 확인하고, 승인 처리 시에는 신청된 휴가의 승인 상태를 갱신한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnConfm.do:src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+      "name": "휴가 신청 정보",
+      "summary": {
+        "text": "휴가 승인 상세 조회 처리에서 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 26,
+            "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 상세 조회 과정에서 휴가 신청 정보 역할을 맡는다. 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "신청자ID, 휴가구분, 시작일자, 종료일자, 휴가사유, 결재자ID, 승인여부 항목을 담는다. 휴가구분과 시작·종료일자는 반드시 입력되어야 하고 시작·종료일자는 8자리, 휴가사유는 200자를 넘을 수 없으며 결재자ID는 공백일 수 없다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnConfm.do:src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+      "name": "휴가관리 요청 접수 창구",
+      "summary": {
+        "text": "휴가 승인 상세 조회 처리에서 휴가 신청과 승인 관련 화면 요청을 받아 인증을 확인하고 휴가관리 업무 처리로 위임한 뒤 결과 화면을 지정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 605,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 상세 조회 요청을 받는 창구 역할을 한다. 화면에서 전달된 휴가 신청 조건을 받아 인증 여부를 확인한 뒤 휴가관리 업무 처리로 위임하고, 처리 결과와 안내 메시지를 화면에 담아 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청으로 전달된 휴가 신청 항목을 받아 처리한다. 처리 전 로그인 인증 여부를 확인하여 미인증 사용자는 로그인 화면으로 되돌리고, 입력값 검증에 실패하면 원래 화면으로 되돌려 재입력을 유도한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnConfm.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 도우미",
+      "summary": {
+        "text": "휴가 승인 상세 조회 처리에서 일자 문자열의 구분 기호 제거, 빈 값 보정 등 휴가 정보 가공에 쓰이는 문자열 처리를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 상세 조회 과정에서 문자열 처리 도우미 역할을 맡는다. 일자 문자열의 구분 기호 제거, 빈 값 보정 등 휴가 정보 가공에 쓰이는 문자열 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "일자 문자열의 구분 기호 제거, 빈 값 보정 등 휴가 정보 가공에 쓰이는 문자열 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnConfmList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 제공",
+      "summary": {
+        "text": "휴가 승인 대상 목록 조회 처리에서 처리 성공·실패 안내 문구를 코드와 언어 설정에 따라 조회하여 화면 메시지로 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 대상 목록 조회 과정에서 안내 메시지 제공 역할을 맡는다. 처리 성공·실패 안내 문구를 코드와 언어 설정에 따라 조회하여 화면 메시지로 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "처리 성공·실패 안내 문구를 코드와 언어 설정에 따라 조회하여 화면 메시지로 제공한다. 휴가 승인 대상 목록 조회 처리 결과를 사용자에게 전달하는 데 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnConfmList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "휴가 승인 대상 목록 조회 처리에서 아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 대상 목록 조회 과정에서 로그인 사용자 정보 역할을 맡는다. 아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnConfmList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "인증 사용자 조회 업무",
+      "summary": {
+        "text": "휴가 승인 대상 목록 조회 처리에서 인증된 사용자 객체와 권한 목록, 인증 여부를 조회하는 공통 인증 업무 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 대상 목록 조회 과정에서 인증 사용자 조회 업무 역할을 맡는다. 인증된 사용자 객체와 권한 목록, 인증 여부를 조회하는 공통 인증 업무 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 객체와 권한 목록, 인증 여부를 조회하는 공통 인증 업무 규약이다. 휴가 승인 대상 목록 조회 처리 결과를 사용자에게 전달하는 데 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnConfmList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 확인 도우미",
+      "summary": {
+        "text": "휴가 승인 대상 목록 조회 처리에서 현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 대상 목록 조회 과정에서 인증 사용자 확인 도우미 역할을 맡는다. 현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnConfmList.do:src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+      "name": "휴가관리 업무 처리",
+      "summary": {
+        "text": "휴가 승인 대상 목록 조회 처리에서 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+            "line": 17,
+            "snippet": "public interface EgovVcatnManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 대상 목록 조회 과정에서 휴가관리 업무 처리 역할을 맡는다. 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "휴가 신청의 등록·수정·삭제와 승인 처리를 조율한다. 등록·수정 시에는 휴가일자 중복 여부를 확인하고, 승인 처리 시에는 신청된 휴가의 승인 상태를 갱신한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnConfmList.do:src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+      "name": "휴가 신청 정보",
+      "summary": {
+        "text": "휴가 승인 대상 목록 조회 처리에서 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 26,
+            "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 대상 목록 조회 과정에서 휴가 신청 정보 역할을 맡는다. 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "신청자ID, 휴가구분, 시작일자, 종료일자, 휴가사유, 결재자ID, 승인여부 항목을 담는다. 휴가구분과 시작·종료일자는 반드시 입력되어야 하고 시작·종료일자는 8자리, 휴가사유는 200자를 넘을 수 없으며 결재자ID는 공백일 수 없다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnConfmList.do:src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+      "name": "휴가관리 요청 접수 창구",
+      "summary": {
+        "text": "휴가 승인 대상 목록 조회 처리에서 휴가 신청과 승인 관련 화면 요청을 받아 인증을 확인하고 휴가관리 업무 처리로 위임한 뒤 결과 화면을 지정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 605,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 대상 목록 조회 요청을 받는 창구 역할을 한다. 화면에서 전달된 휴가 신청 조건을 받아 인증 여부를 확인한 뒤 휴가관리 업무 처리로 위임하고, 처리 결과와 안내 메시지를 화면에 담아 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청으로 전달된 휴가 신청 항목을 받아 처리한다. 처리 전 로그인 인증 여부를 확인하여 미인증 사용자는 로그인 화면으로 되돌리고, 입력값 검증에 실패하면 원래 화면으로 되돌려 재입력을 유도한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnManageDetail.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통코드 조회 조건 정보",
+      "summary": {
+        "text": "휴가 신청 상세 조회 처리에서 코드 ID, 상세코드, 특정테이블명 등 공통코드를 조회할 때 사용하는 조건 항목을 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 상세 조회 과정에서 공통코드 조회 조건 정보 역할을 맡는다. 코드 ID, 상세코드, 특정테이블명 등 공통코드를 조회할 때 사용하는 조건 항목을 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드 ID, 상세코드, 특정테이블명 등 공통코드를 조회할 때 사용하는 조건 항목을 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnManageDetail.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 제공",
+      "summary": {
+        "text": "휴가 신청 상세 조회 처리에서 처리 성공·실패 안내 문구를 코드와 언어 설정에 따라 조회하여 화면 메시지로 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 상세 조회 과정에서 안내 메시지 제공 역할을 맡는다. 처리 성공·실패 안내 문구를 코드와 언어 설정에 따라 조회하여 화면 메시지로 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "처리 성공·실패 안내 문구를 코드와 언어 설정에 따라 조회하여 화면 메시지로 제공한다. 휴가 신청 상세 조회 처리 결과를 사용자에게 전달하는 데 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnManageDetail.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 조회 업무",
+      "summary": {
+        "text": "휴가 신청 상세 조회 처리에서 휴가구분 등 화면에 필요한 공통코드와 조직·그룹 정보를 코드 목록 형태로 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 상세 조회 과정에서 공통코드 조회 업무 역할을 맡는다. 휴가구분 등 화면에 필요한 공통코드와 조직·그룹 정보를 코드 목록 형태로 조회한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "휴가구분 등 화면에 필요한 공통코드와 조직·그룹 정보를 코드 목록 형태로 조회한다. 휴가 신청 상세 조회 처리 결과를 사용자에게 전달하는 데 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnManageDetail.do:src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+      "name": "휴가관리 업무 처리",
+      "summary": {
+        "text": "휴가 신청 상세 조회 처리에서 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+            "line": 17,
+            "snippet": "public interface EgovVcatnManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 상세 조회 과정에서 휴가관리 업무 처리 역할을 맡는다. 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "휴가 신청의 등록·수정·삭제와 승인 처리를 조율한다. 등록·수정 시에는 휴가일자 중복 여부를 확인하고, 승인 처리 시에는 신청된 휴가의 승인 상태를 갱신한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnManageDetail.do:src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+      "name": "휴가 신청 정보",
+      "summary": {
+        "text": "휴가 신청 상세 조회 처리에서 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 26,
+            "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 상세 조회 과정에서 휴가 신청 정보 역할을 맡는다. 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "신청자ID, 휴가구분, 시작일자, 종료일자, 휴가사유, 결재자ID, 승인여부 항목을 담는다. 휴가구분과 시작·종료일자는 반드시 입력되어야 하고 시작·종료일자는 8자리, 휴가사유는 200자를 넘을 수 없으며 결재자ID는 공백일 수 없다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnManageDetail.do:src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+      "name": "휴가관리 요청 접수 창구",
+      "summary": {
+        "text": "휴가 신청 상세 조회 처리에서 휴가 신청과 승인 관련 화면 요청을 받아 인증을 확인하고 휴가관리 업무 처리로 위임한 뒤 결과 화면을 지정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 605,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 상세 조회 요청을 받는 창구 역할을 한다. 화면에서 전달된 휴가 신청 조건을 받아 인증 여부를 확인한 뒤 휴가관리 업무 처리로 위임하고, 처리 결과와 안내 메시지를 화면에 담아 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청으로 전달된 휴가 신청 항목을 받아 처리한다. 처리 전 로그인 인증 여부를 확인하여 미인증 사용자는 로그인 화면으로 되돌리고, 입력값 검증에 실패하면 원래 화면으로 되돌려 재입력을 유도한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnManageDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 도우미",
+      "summary": {
+        "text": "휴가 신청 상세 조회 처리에서 일자 문자열의 구분 기호 제거, 빈 값 보정 등 휴가 정보 가공에 쓰이는 문자열 처리를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 상세 조회 과정에서 문자열 처리 도우미 역할을 맡는다. 일자 문자열의 구분 기호 제거, 빈 값 보정 등 휴가 정보 가공에 쓰이는 문자열 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "일자 문자열의 구분 기호 제거, 빈 값 보정 등 휴가 정보 가공에 쓰이는 문자열 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 제공",
+      "summary": {
+        "text": "휴가 신청 목록 조회 처리에서 처리 성공·실패 안내 문구를 코드와 언어 설정에 따라 조회하여 화면 메시지로 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 목록 조회 과정에서 안내 메시지 제공 역할을 맡는다. 처리 성공·실패 안내 문구를 코드와 언어 설정에 따라 조회하여 화면 메시지로 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "처리 성공·실패 안내 문구를 코드와 언어 설정에 따라 조회하여 화면 메시지로 제공한다. 휴가 신청 목록 조회 처리 결과를 사용자에게 전달하는 데 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnManageList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "휴가 신청 목록 조회 처리에서 아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 목록 조회 과정에서 로그인 사용자 정보 역할을 맡는다. 아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnManageList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "인증 사용자 조회 업무",
+      "summary": {
+        "text": "휴가 신청 목록 조회 처리에서 인증된 사용자 객체와 권한 목록, 인증 여부를 조회하는 공통 인증 업무 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 목록 조회 과정에서 인증 사용자 조회 업무 역할을 맡는다. 인증된 사용자 객체와 권한 목록, 인증 여부를 조회하는 공통 인증 업무 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 객체와 권한 목록, 인증 여부를 조회하는 공통 인증 업무 규약이다. 휴가 신청 목록 조회 처리 결과를 사용자에게 전달하는 데 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnManageList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 확인 도우미",
+      "summary": {
+        "text": "휴가 신청 목록 조회 처리에서 현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 목록 조회 과정에서 인증 사용자 확인 도우미 역할을 맡는다. 현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnManageList.do:src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+      "name": "휴가관리 업무 처리",
+      "summary": {
+        "text": "휴가 신청 목록 조회 처리에서 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+            "line": 17,
+            "snippet": "public interface EgovVcatnManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 목록 조회 과정에서 휴가관리 업무 처리 역할을 맡는다. 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "휴가 신청의 등록·수정·삭제와 승인 처리를 조율한다. 등록·수정 시에는 휴가일자 중복 여부를 확인하고, 승인 처리 시에는 신청된 휴가의 승인 상태를 갱신한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnManageList.do:src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+      "name": "휴가 신청 정보",
+      "summary": {
+        "text": "휴가 신청 목록 조회 처리에서 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 26,
+            "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 목록 조회 과정에서 휴가 신청 정보 역할을 맡는다. 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "신청자ID, 휴가구분, 시작일자, 종료일자, 휴가사유, 결재자ID, 승인여부 항목을 담는다. 휴가구분과 시작·종료일자는 반드시 입력되어야 하고 시작·종료일자는 8자리, 휴가사유는 200자를 넘을 수 없으며 결재자ID는 공백일 수 없다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnManageList.do:src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+      "name": "휴가관리 요청 접수 창구",
+      "summary": {
+        "text": "휴가 신청 목록 조회 처리에서 휴가 신청과 승인 관련 화면 요청을 받아 인증을 확인하고 휴가관리 업무 처리로 위임한 뒤 결과 화면을 지정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 605,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 목록 조회 요청을 받는 창구 역할을 한다. 화면에서 전달된 휴가 신청 조건을 받아 인증 여부를 확인한 뒤 휴가관리 업무 처리로 위임하고, 처리 결과와 안내 메시지를 화면에 담아 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청으로 전달된 휴가 신청 항목을 받아 처리한다. 처리 전 로그인 인증 여부를 확인하여 미인증 사용자는 로그인 화면으로 되돌리고, 입력값 검증에 실패하면 원래 화면으로 되돌려 재입력을 유도한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnManageListView.do:src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+      "name": "휴가관리 요청 접수 창구",
+      "summary": {
+        "text": "휴가 신청 목록 화면 호출 처리에서 휴가 신청과 승인 관련 화면 요청을 받아 인증을 확인하고 휴가관리 업무 처리로 위임한 뒤 결과 화면을 지정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 605,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 목록 화면 호출 요청을 받는 창구 역할을 한다. 화면에서 전달된 휴가 신청 조건을 받아 인증 여부를 확인한 뒤 휴가관리 업무 처리로 위임하고, 처리 결과와 안내 메시지를 화면에 담아 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청으로 전달된 휴가 신청 항목을 받아 처리한다. 처리 전 로그인 인증 여부를 확인하여 미인증 사용자는 로그인 화면으로 되돌리고, 입력값 검증에 실패하면 원래 화면으로 되돌려 재입력을 유도한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통코드 조회 조건 정보",
+      "summary": {
+        "text": "휴가 신청 등록 화면 호출 처리에서 코드 ID, 상세코드, 특정테이블명 등 공통코드를 조회할 때 사용하는 조건 항목을 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 화면 호출 과정에서 공통코드 조회 조건 정보 역할을 맡는다. 코드 ID, 상세코드, 특정테이블명 등 공통코드를 조회할 때 사용하는 조건 항목을 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드 ID, 상세코드, 특정테이블명 등 공통코드를 조회할 때 사용하는 조건 항목을 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "휴가 신청 등록 화면 호출 처리에서 아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 화면 호출 과정에서 로그인 사용자 정보 역할을 맡는다. 아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 조회 업무",
+      "summary": {
+        "text": "휴가 신청 등록 화면 호출 처리에서 휴가구분 등 화면에 필요한 공통코드와 조직·그룹 정보를 코드 목록 형태로 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 화면 호출 과정에서 공통코드 조회 업무 역할을 맡는다. 휴가구분 등 화면에 필요한 공통코드와 조직·그룹 정보를 코드 목록 형태로 조회한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "휴가구분 등 화면에 필요한 공통코드와 조직·그룹 정보를 코드 목록 형태로 조회한다. 휴가 신청 등록 화면 호출 처리 결과를 사용자에게 전달하는 데 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 확인 도우미",
+      "summary": {
+        "text": "휴가 신청 등록 화면 호출 처리에서 현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 화면 호출 과정에서 인증 사용자 확인 도우미 역할을 맡는다. 현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnRegist.do:src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+      "name": "휴가관리 업무 처리",
+      "summary": {
+        "text": "휴가 신청 등록 화면 호출 처리에서 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+            "line": 17,
+            "snippet": "public interface EgovVcatnManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 화면 호출 과정에서 휴가관리 업무 처리 역할을 맡는다. 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "휴가 신청의 등록·수정·삭제와 승인 처리를 조율한다. 등록·수정 시에는 휴가일자 중복 여부를 확인하고, 승인 처리 시에는 신청된 휴가의 승인 상태를 갱신한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnRegist.do:src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+      "name": "휴가 신청 정보",
+      "summary": {
+        "text": "휴가 신청 등록 화면 호출 처리에서 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 26,
+            "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 화면 호출 과정에서 휴가 신청 정보 역할을 맡는다. 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "신청자ID, 휴가구분, 시작일자, 종료일자, 휴가사유, 결재자ID, 승인여부 항목을 담는다. 휴가구분과 시작·종료일자는 반드시 입력되어야 하고 시작·종료일자는 8자리, 휴가사유는 200자를 넘을 수 없으며 결재자ID는 공백일 수 없다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnRegist.do:src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+      "name": "휴가관리 요청 접수 창구",
+      "summary": {
+        "text": "휴가 신청 등록 화면 호출 처리에서 휴가 신청과 승인 관련 화면 요청을 받아 인증을 확인하고 휴가관리 업무 처리로 위임한 뒤 결과 화면을 지정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 605,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 화면 호출 요청을 받는 창구 역할을 한다. 화면에서 전달된 휴가 신청 조건을 받아 인증 여부를 확인한 뒤 휴가관리 업무 처리로 위임하고, 처리 결과와 안내 메시지를 화면에 담아 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청으로 전달된 휴가 신청 항목을 받아 처리한다. 처리 전 로그인 인증 여부를 확인하여 미인증 사용자는 로그인 화면으로 되돌리고, 입력값 검증에 실패하면 원래 화면으로 되돌려 재입력을 유도한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnRegist.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "name": "일자 계산 도우미",
+      "summary": {
+        "text": "휴가 신청 등록 화면 호출 처리에서 휴가 기간 산정에 필요한 년·월·일 가감과 일자 형식 검증을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+            "line": 36,
+            "snippet": "public class EgovDateUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 화면 호출 과정에서 일자 계산 도우미 역할을 맡는다. 휴가 기간 산정에 필요한 년·월·일 가감과 일자 형식 검증을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "휴가 기간 산정에 필요한 년·월·일 가감과 일자 형식 검증을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/EgovVcatnReturn.do:src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+      "name": "휴가관리 요청 접수 창구",
+      "summary": {
+        "text": "휴가 반려 화면 호출 처리에서 휴가 신청과 승인 관련 화면 요청을 받아 인증을 확인하고 휴가관리 업무 처리로 위임한 뒤 결과 화면을 지정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 605,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 반려 화면 호출 요청을 받는 창구 역할을 한다. 화면에서 전달된 휴가 신청 조건을 받아 인증 여부를 확인한 뒤 휴가관리 업무 처리로 위임하고, 처리 결과와 안내 메시지를 화면에 담아 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청으로 전달된 휴가 신청 항목을 받아 처리한다. 처리 전 로그인 인증 여부를 확인하여 미인증 사용자는 로그인 화면으로 되돌리고, 입력값 검증에 실패하면 원래 화면으로 되돌려 재입력을 유도한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/deleteVcatnManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 제공",
+      "summary": {
+        "text": "휴가 신청 삭제 처리에서 처리 성공·실패 안내 문구를 코드와 언어 설정에 따라 조회하여 화면 메시지로 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 삭제 과정에서 안내 메시지 제공 역할을 맡는다. 처리 성공·실패 안내 문구를 코드와 언어 설정에 따라 조회하여 화면 메시지로 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "처리 성공·실패 안내 문구를 코드와 언어 설정에 따라 조회하여 화면 메시지로 제공한다. 휴가 신청 삭제 처리 결과를 사용자에게 전달하는 데 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/deleteVcatnManage.do:src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+      "name": "휴가관리 업무 처리",
+      "summary": {
+        "text": "휴가 신청 삭제 처리에서 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+            "line": 17,
+            "snippet": "public interface EgovVcatnManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 삭제 과정에서 휴가관리 업무 처리 역할을 맡는다. 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "휴가 신청의 등록·수정·삭제와 승인 처리를 조율한다. 등록·수정 시에는 휴가일자 중복 여부를 확인하고, 승인 처리 시에는 신청된 휴가의 승인 상태를 갱신한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/deleteVcatnManage.do:src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+      "name": "휴가 신청 정보",
+      "summary": {
+        "text": "휴가 신청 삭제 처리에서 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 26,
+            "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 삭제 과정에서 휴가 신청 정보 역할을 맡는다. 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "신청자ID, 휴가구분, 시작일자, 종료일자, 휴가사유, 결재자ID, 승인여부 항목을 담는다. 휴가구분과 시작·종료일자는 반드시 입력되어야 하고 시작·종료일자는 8자리, 휴가사유는 200자를 넘을 수 없으며 결재자ID는 공백일 수 없다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/deleteVcatnManage.do:src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+      "name": "휴가관리 요청 접수 창구",
+      "summary": {
+        "text": "휴가 신청 삭제 처리에서 휴가 신청과 승인 관련 화면 요청을 받아 인증을 확인하고 휴가관리 업무 처리로 위임한 뒤 결과 화면을 지정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 605,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 삭제 요청을 받는 창구 역할을 한다. 화면에서 전달된 휴가 신청 조건을 받아 인증 여부를 확인한 뒤 휴가관리 업무 처리로 위임하고, 처리 결과와 안내 메시지를 화면에 담아 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청으로 전달된 휴가 신청 항목을 받아 처리한다. 처리 전 로그인 인증 여부를 확인하여 미인증 사용자는 로그인 화면으로 되돌리고, 입력값 검증에 실패하면 원래 화면으로 되돌려 재입력을 유도한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/deleteVcatnManage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 도우미",
+      "summary": {
+        "text": "휴가 신청 삭제 처리에서 일자 문자열의 구분 기호 제거, 빈 값 보정 등 휴가 정보 가공에 쓰이는 문자열 처리를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 삭제 과정에서 문자열 처리 도우미 역할을 맡는다. 일자 문자열의 구분 기호 제거, 빈 값 보정 등 휴가 정보 가공에 쓰이는 문자열 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "일자 문자열의 구분 기호 제거, 빈 값 보정 등 휴가 정보 가공에 쓰이는 문자열 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/insertVcatnManage.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통코드 조회 조건 정보",
+      "summary": {
+        "text": "휴가 신청 등록 처리에서 코드 ID, 상세코드, 특정테이블명 등 공통코드를 조회할 때 사용하는 조건 항목을 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 과정에서 공통코드 조회 조건 정보 역할을 맡는다. 코드 ID, 상세코드, 특정테이블명 등 공통코드를 조회할 때 사용하는 조건 항목을 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드 ID, 상세코드, 특정테이블명 등 공통코드를 조회할 때 사용하는 조건 항목을 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/insertVcatnManage.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "휴가 신청 등록 처리에서 아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 과정에서 로그인 사용자 정보 역할을 맡는다. 아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/insertVcatnManage.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 조회 업무",
+      "summary": {
+        "text": "휴가 신청 등록 처리에서 휴가구분 등 화면에 필요한 공통코드와 조직·그룹 정보를 코드 목록 형태로 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 과정에서 공통코드 조회 업무 역할을 맡는다. 휴가구분 등 화면에 필요한 공통코드와 조직·그룹 정보를 코드 목록 형태로 조회한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "휴가구분 등 화면에 필요한 공통코드와 조직·그룹 정보를 코드 목록 형태로 조회한다. 휴가 신청 등록 처리 결과를 사용자에게 전달하는 데 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/insertVcatnManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 확인 도우미",
+      "summary": {
+        "text": "휴가 신청 등록 처리에서 현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 과정에서 인증 사용자 확인 도우미 역할을 맡는다. 현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/insertVcatnManage.do:src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+      "name": "휴가관리 업무 처리",
+      "summary": {
+        "text": "휴가 신청 등록 처리에서 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+            "line": 17,
+            "snippet": "public interface EgovVcatnManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 과정에서 휴가관리 업무 처리 역할을 맡는다. 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "휴가 신청의 등록·수정·삭제와 승인 처리를 조율한다. 등록·수정 시에는 휴가일자 중복 여부를 확인하고, 승인 처리 시에는 신청된 휴가의 승인 상태를 갱신한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/insertVcatnManage.do:src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+      "name": "휴가 신청 정보",
+      "summary": {
+        "text": "휴가 신청 등록 처리에서 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 26,
+            "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 과정에서 휴가 신청 정보 역할을 맡는다. 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "신청자ID, 휴가구분, 시작일자, 종료일자, 휴가사유, 결재자ID, 승인여부 항목을 담는다. 휴가구분과 시작·종료일자는 반드시 입력되어야 하고 시작·종료일자는 8자리, 휴가사유는 200자를 넘을 수 없으며 결재자ID는 공백일 수 없다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/insertVcatnManage.do:src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+      "name": "휴가관리 요청 접수 창구",
+      "summary": {
+        "text": "휴가 신청 등록 처리에서 휴가 신청과 승인 관련 화면 요청을 받아 인증을 확인하고 휴가관리 업무 처리로 위임한 뒤 결과 화면을 지정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 605,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 요청을 받는 창구 역할을 한다. 화면에서 전달된 휴가 신청 조건을 받아 인증 여부를 확인한 뒤 휴가관리 업무 처리로 위임하고, 처리 결과와 안내 메시지를 화면에 담아 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청으로 전달된 휴가 신청 항목을 받아 처리한다. 처리 전 로그인 인증 여부를 확인하여 미인증 사용자는 로그인 화면으로 되돌리고, 입력값 검증에 실패하면 원래 화면으로 되돌려 재입력을 유도한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/insertVcatnManage.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "name": "일자 계산 도우미",
+      "summary": {
+        "text": "휴가 신청 등록 처리에서 휴가 기간 산정에 필요한 년·월·일 가감과 일자 형식 검증을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+            "line": 36,
+            "snippet": "public class EgovDateUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 등록 과정에서 일자 계산 도우미 역할을 맡는다. 휴가 기간 산정에 필요한 년·월·일 가감과 일자 형식 검증을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "휴가 기간 산정에 필요한 년·월·일 가감과 일자 형식 검증을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/updtVcatnConfm.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "휴가 승인 처리 처리에서 아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 처리 과정에서 로그인 사용자 정보 역할을 맡는다. 아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디, 이름, 조직, 고유아이디 등 인증된 사용자 정보를 담아 신청자·결재자 식별에 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/updtVcatnConfm.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "인증 사용자 조회 업무",
+      "summary": {
+        "text": "휴가 승인 처리 처리에서 인증된 사용자 객체와 권한 목록, 인증 여부를 조회하는 공통 인증 업무 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 처리 과정에서 인증 사용자 조회 업무 역할을 맡는다. 인증된 사용자 객체와 권한 목록, 인증 여부를 조회하는 공통 인증 업무 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 객체와 권한 목록, 인증 여부를 조회하는 공통 인증 업무 규약이다. 휴가 승인 처리 처리 결과를 사용자에게 전달하는 데 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/updtVcatnConfm.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 확인 도우미",
+      "summary": {
+        "text": "휴가 승인 처리 처리에서 현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 처리 과정에서 인증 사용자 확인 도우미 역할을 맡는다. 현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/updtVcatnConfm.do:src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+      "name": "휴가관리 업무 처리",
+      "summary": {
+        "text": "휴가 승인 처리 처리에서 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+            "line": 17,
+            "snippet": "public interface EgovVcatnManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 처리 과정에서 휴가관리 업무 처리 역할을 맡는다. 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "휴가 신청의 등록·수정·삭제와 승인 처리를 조율한다. 등록·수정 시에는 휴가일자 중복 여부를 확인하고, 승인 처리 시에는 신청된 휴가의 승인 상태를 갱신한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/updtVcatnConfm.do:src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+      "name": "휴가 신청 정보",
+      "summary": {
+        "text": "휴가 승인 처리 처리에서 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 26,
+            "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 처리 과정에서 휴가 신청 정보 역할을 맡는다. 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "신청자ID, 휴가구분, 시작일자, 종료일자, 휴가사유, 결재자ID, 승인여부 항목을 담는다. 휴가구분과 시작·종료일자는 반드시 입력되어야 하고 시작·종료일자는 8자리, 휴가사유는 200자를 넘을 수 없으며 결재자ID는 공백일 수 없다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/updtVcatnConfm.do:src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+      "name": "휴가관리 요청 접수 창구",
+      "summary": {
+        "text": "휴가 승인 처리 처리에서 휴가 신청과 승인 관련 화면 요청을 받아 인증을 확인하고 휴가관리 업무 처리로 위임한 뒤 결과 화면을 지정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 605,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 처리 요청을 받는 창구 역할을 한다. 화면에서 전달된 휴가 신청 조건을 받아 인증 여부를 확인한 뒤 휴가관리 업무 처리로 위임하고, 처리 결과와 안내 메시지를 화면에 담아 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청으로 전달된 휴가 신청 항목을 받아 처리한다. 처리 전 로그인 인증 여부를 확인하여 미인증 사용자는 로그인 화면으로 되돌리고, 입력값 검증에 실패하면 원래 화면으로 되돌려 재입력을 유도한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/updtVcatnConfm.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 도우미",
+      "summary": {
+        "text": "휴가 승인 처리 처리에서 일자 문자열의 구분 기호 제거, 빈 값 보정 등 휴가 정보 가공에 쓰이는 문자열 처리를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 승인 처리 과정에서 문자열 처리 도우미 역할을 맡는다. 일자 문자열의 구분 기호 제거, 빈 값 보정 등 휴가 정보 가공에 쓰이는 문자열 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "일자 문자열의 구분 기호 제거, 빈 값 보정 등 휴가 정보 가공에 쓰이는 문자열 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/updtVcatnManage.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통코드 조회 조건 정보",
+      "summary": {
+        "text": "휴가 신청 수정 처리에서 코드 ID, 상세코드, 특정테이블명 등 공통코드를 조회할 때 사용하는 조건 항목을 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 수정 과정에서 공통코드 조회 조건 정보 역할을 맡는다. 코드 ID, 상세코드, 특정테이블명 등 공통코드를 조회할 때 사용하는 조건 항목을 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드 ID, 상세코드, 특정테이블명 등 공통코드를 조회할 때 사용하는 조건 항목을 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/updtVcatnManage.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 조회 업무",
+      "summary": {
+        "text": "휴가 신청 수정 처리에서 휴가구분 등 화면에 필요한 공통코드와 조직·그룹 정보를 코드 목록 형태로 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 수정 과정에서 공통코드 조회 업무 역할을 맡는다. 휴가구분 등 화면에 필요한 공통코드와 조직·그룹 정보를 코드 목록 형태로 조회한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "휴가구분 등 화면에 필요한 공통코드와 조직·그룹 정보를 코드 목록 형태로 조회한다. 휴가 신청 수정 처리 결과를 사용자에게 전달하는 데 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/updtVcatnManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 확인 도우미",
+      "summary": {
+        "text": "휴가 신청 수정 처리에서 현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 수정 과정에서 인증 사용자 확인 도우미 역할을 맡는다. 현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "현재 로그인한 사용자 정보와 인증 여부, 권한 목록을 휴가관리 처리 과정에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/updtVcatnManage.do:src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+      "name": "휴가관리 업무 처리",
+      "summary": {
+        "text": "휴가 신청 수정 처리에서 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+            "line": 17,
+            "snippet": "public interface EgovVcatnManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 수정 과정에서 휴가관리 업무 처리 역할을 맡는다. 휴가 신청의 등록·수정·삭제·조회와 승인 처리를 담당하는 휴가관리 업무 규약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "휴가 신청의 등록·수정·삭제와 승인 처리를 조율한다. 등록·수정 시에는 휴가일자 중복 여부를 확인하고, 승인 처리 시에는 신청된 휴가의 승인 상태를 갱신한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/EgovVcatnManageService.java",
+              "line": 17,
+              "snippet": "public interface EgovVcatnManageService {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/updtVcatnManage.do:src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+      "name": "휴가 신청 정보",
+      "summary": {
+        "text": "휴가 신청 수정 처리에서 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+            "line": 26,
+            "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 수정 과정에서 휴가 신청 정보 역할을 맡는다. 신청자, 휴가구분, 시작·종료일자, 휴가사유, 결재자, 승인여부 등 휴가 신청 한 건의 항목을 담는 정보 묶음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "신청자ID, 휴가구분, 시작일자, 종료일자, 휴가사유, 결재자ID, 승인여부 항목을 담는다. 휴가구분과 시작·종료일자는 반드시 입력되어야 하고 시작·종료일자는 8자리, 휴가사유는 200자를 넘을 수 없으며 결재자ID는 공백일 수 없다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/service/VcatnManageVO.java",
+              "line": 26,
+              "snippet": "public class VcatnManageVO extends ComDefaultVO {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/updtVcatnManage.do:src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+      "name": "휴가관리 요청 접수 창구",
+      "summary": {
+        "text": "휴가 신청 수정 처리에서 휴가 신청과 승인 관련 화면 요청을 받아 인증을 확인하고 휴가관리 업무 처리로 위임한 뒤 결과 화면을 지정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+            "line": 605,
+            "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 수정 요청을 받는 창구 역할을 한다. 화면에서 전달된 휴가 신청 조건을 받아 인증 여부를 확인한 뒤 휴가관리 업무 처리로 위임하고, 처리 결과와 안내 메시지를 화면에 담아 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청으로 전달된 휴가 신청 항목을 받아 처리한다. 처리 전 로그인 인증 여부를 확인하여 미인증 사용자는 로그인 화면으로 되돌리고, 입력값 검증에 실패하면 원래 화면으로 되돌려 재입력을 유도한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/vct/web/EgovVcatnManageController.java",
+              "line": 605,
+              "snippet": "@RequestMapping(value = \"/uss/ion/vct/EgovVcatnConfm.do\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/updtVcatnManage.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "name": "일자 계산 도우미",
+      "summary": {
+        "text": "휴가 신청 수정 처리에서 휴가 기간 산정에 필요한 년·월·일 가감과 일자 형식 검증을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+            "line": 36,
+            "snippet": "public class EgovDateUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 수정 과정에서 일자 계산 도우미 역할을 맡는다. 휴가 기간 산정에 필요한 년·월·일 가감과 일자 형식 검증을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "휴가 기간 산정에 필요한 년·월·일 가감과 일자 형식 검증을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/vct/updtVcatnManage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 도우미",
+      "summary": {
+        "text": "휴가 신청 수정 처리에서 일자 문자열의 구분 기호 제거, 빈 값 보정 등 휴가 정보 가공에 쓰이는 문자열 처리를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "휴가 신청 수정 과정에서 문자열 처리 도우미 역할을 맡는다. 일자 문자열의 구분 기호 제거, 빈 값 보정 등 휴가 정보 가공에 쓰이는 문자열 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "일자 문자열의 구분 기호 제거, 빈 값 보정 등 휴가 정보 가공에 쓰이는 문자열 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

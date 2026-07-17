@@ -1,0 +1,2052 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "n_start",
+          "to": "n_list"
+        },
+        {
+          "from": "n_list",
+          "to": "n_choice"
+        },
+        {
+          "from": "n_choice",
+          "label": "상세 보기",
+          "to": "n_detail"
+        },
+        {
+          "from": "n_choice",
+          "label": "신규 등록",
+          "to": "n_insview"
+        },
+        {
+          "from": "n_choice",
+          "label": "수정",
+          "to": "n_updview"
+        },
+        {
+          "from": "n_choice",
+          "label": "삭제",
+          "to": "n_del"
+        },
+        {
+          "from": "n_choice",
+          "label": "작업 없음",
+          "to": "n_end"
+        },
+        {
+          "from": "n_detail",
+          "to": "n_end"
+        },
+        {
+          "from": "n_insview",
+          "to": "n_ins"
+        },
+        {
+          "from": "n_ins",
+          "to": "n_back"
+        },
+        {
+          "from": "n_updview",
+          "to": "n_upd"
+        },
+        {
+          "from": "n_upd",
+          "to": "n_back"
+        },
+        {
+          "from": "n_del",
+          "to": "n_back"
+        },
+        {
+          "from": "n_back",
+          "to": "n_end"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "n_start",
+          "kind": "start",
+          "label": "도움말 관리 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 75,
+              "snippet": "@RequestMapping(value = \"/uss/olh/hpc/selectHpcmList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/hpc/selectHpcmList.do",
+          "id": "n_list",
+          "kind": "activity",
+          "label": "도움말 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 155,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/insertHpcm.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 213,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/updateHpcm.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            }
+          ],
+          "id": "n_choice",
+          "kind": "decision",
+          "label": "수행할 작업 선택"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 111,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/selectHpcmDetail.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/hpc/selectHpcmDetail.do",
+          "id": "n_detail",
+          "kind": "activity",
+          "label": "도움말 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 130,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/insertHpcmView.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/hpc/insertHpcmView.do",
+          "id": "n_insview",
+          "kind": "activity",
+          "label": "등록 화면 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 155,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/insertHpcm.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/hpc/insertHpcm.do",
+          "id": "n_ins",
+          "kind": "activity",
+          "label": "도움말 등록"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 185,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/updateHpcmView.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/hpc/updateHpcmView.do",
+          "id": "n_updview",
+          "kind": "activity",
+          "label": "수정 화면 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 213,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/updateHpcm.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/hpc/updateHpcm.do",
+          "id": "n_upd",
+          "kind": "activity",
+          "label": "도움말 수정"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/hpc/deleteHpcm.do",
+          "id": "n_del",
+          "kind": "activity",
+          "label": "도움말 삭제"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 244,
+              "snippet": "\t\treturn \"forward:/uss/olh/hpc/selectHpcmList.do\";"
+            }
+          ],
+          "id": "n_back",
+          "kind": "activity",
+          "label": "목록 화면으로 복귀"
+        },
+        {
+          "id": "n_end",
+          "kind": "end",
+          "label": "도움말 관리 종료"
+        }
+      ],
+      "title": "도움말 관리"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+          "line": 38,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+          "line": 39,
+          "snippet": "\tprivate String hpcmSeCode;"
+        }
+      ],
+      "text": "도움말구분코드·도움말정의·도움말 설명은 값이 반드시 있어야 하는 필수 입력 항목이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+          "line": 46,
+          "snippet": "\t@Size(max=1000)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+          "line": 51,
+          "snippet": "\t@Size(max=2500)"
+        }
+      ],
+      "text": "도움말정의는 최대 1000자, 도움말 설명은 최대 2500자까지만 입력할 수 있다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+          "line": 244,
+          "snippet": "\t\treturn \"forward:/uss/olh/hpc/selectHpcmList.do\";"
+        }
+      ],
+      "text": "도움말 삭제 처리는 완료 후 도움말 목록 조회로 넘겨 갱신된 목록을 다시 보여준다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+          "line": 9,
+          "snippet": "\tList<HpcmVO> selectHpcmList(HpcmDefaultVO searchVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+          "line": 11,
+          "snippet": "\tint selectHpcmListCnt(HpcmDefaultVO searchVO);"
+        }
+      ],
+      "text": "도움말 목록 조회는 목록과 전체 건수를 각각 산출해 페이지 표시에 사용한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 41,
+          "snippet": "\tpublic static Object getAuthenticatedUser() {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+          "line": 58,
+          "snippet": "\tprivate String frstRegisterId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+          "line": 64,
+          "snippet": "\tprivate String lastUpdusrId;"
+        }
+      ],
+      "text": "도움말 등록·수정 작업자는 인증된 사용자 정보에서 확인하며, 등록자ID·수정자ID로 이력에 남는다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 26,
+          "snippet": "public interface EgovCmmUseService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 31,
+          "snippet": "    private String codeId = \"\";"
+        }
+      ],
+      "text": "공통코드 업무와 연계한다. 도움말 등록·수정 화면의 도움말구분코드 선택 목록을 공통코드 서비스에서 조회조건을 넘겨 받아온다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 5,
+          "snippet": "public interface EgovUserDetailsService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 58,
+          "snippet": "\tpublic static Boolean isAuthenticated() {"
+        }
+      ],
+      "text": "사용자 인증·권한 업무와 연계한다. 도움말 등록·수정 시 인증된 사용자 객체와 권한 목록, 인증 여부를 사용자 상세정보 서비스에서 확인한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 43,
+          "snippet": "public class EgovStringUtil {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 95,
+          "snippet": "\tpublic static String cutString(String source, int slength) {"
+        }
+      ],
+      "text": "공통 문자열 유틸리티 업무와 연계한다. 도움말 입력값의 빈 값 검증과 길이 초과 문자열 처리에 공통 문자열 도구를 사용한다."
+    }
+  ],
+  "domainId": "domain:uss.olh.hpc",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+          "line": 30,
+          "snippet": "public class HpcmVO extends HpcmDefaultVO {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+          "line": 35,
+          "snippet": "\tprivate String hpcmId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+          "line": 55,
+          "snippet": "\tprivate String frstRegisterPnttm;"
+        }
+      ],
+      "text": "도움말: 도움말 ID로 식별되는 온라인 도움말 한 건으로, 도움말구분코드·도움말정의·도움말 설명과 최초등록·최종수정 이력을 가진다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+          "line": 39,
+          "snippet": "\tprivate String hpcmSeCode;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 34,
+          "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+        }
+      ],
+      "text": "도움말구분코드: 도움말을 분류하는 코드로, 등록·수정 화면의 선택 목록은 공통코드 서비스에서 코드 형태로 공급된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 67,
+          "snippet": "\tprivate String uniqId;"
+        }
+      ],
+      "text": "로그인 사용자: 도움말을 등록·수정하는 작업자로, 고유아이디와 아이디·이름·소속 조직(부서) 정보를 가진다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/olh/hpc/deleteHpcm.do",
+      "name": "도움말 삭제",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+            "line": 239,
+            "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+          }
+        ],
+        "text": "선택된 도움말을 삭제한 뒤 도움말 목록 조회로 되돌려 결과 목록을 다시 보여주는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/hpc/insertHpcm.do",
+      "name": "도움말 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+            "line": 155,
+            "snippet": "@RequestMapping(\"/uss/olh/hpc/insertHpcm.do\")"
+          }
+        ],
+        "text": "입력된 도움말구분코드·도움말정의·도움말설명을 검증하고 인증된 사용자 정보를 최초등록자로 기록해 도움말을 새로 등록하는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/hpc/insertHpcmView.do",
+      "name": "도움말 등록 화면 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+            "line": 130,
+            "snippet": "@RequestMapping(\"/uss/olh/hpc/insertHpcmView.do\")"
+          }
+        ],
+        "text": "도움말 등록 화면을 열기 위해 도움말구분코드 등 공통코드 목록을 조회해 입력 화면에 전달하는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/hpc/selectHpcmDetail.do",
+      "name": "도움말 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+            "line": 111,
+            "snippet": "@RequestMapping(\"/uss/olh/hpc/selectHpcmDetail.do\")"
+          }
+        ],
+        "text": "목록에서 선택한 도움말 한 건의 상세 내용을 조회해 상세 화면에 전달하는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/hpc/selectHpcmList.do",
+      "name": "도움말 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+            "line": 75,
+            "snippet": "@RequestMapping(value = \"/uss/olh/hpc/selectHpcmList.do\")"
+          }
+        ],
+        "text": "도움말 목록 화면 요청을 받아 검색조건과 페이지 정보로 도움말 목록과 전체 건수를 조회해 화면에 전달하는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/hpc/updateHpcm.do",
+      "name": "도움말 수정",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+            "line": 213,
+            "snippet": "@RequestMapping(\"/uss/olh/hpc/updateHpcm.do\")"
+          }
+        ],
+        "text": "수정된 도움말 내용을 검증하고 인증된 사용자 정보를 최종수정자로 기록해 기존 도움말을 갱신하는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/hpc/updateHpcmView.do",
+      "name": "도움말 수정 화면 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+            "line": 185,
+            "snippet": "@RequestMapping(\"/uss/olh/hpc/updateHpcmView.do\")"
+          }
+        ],
+        "text": "수정 대상 도움말의 기존 내용과 도움말구분코드 목록을 함께 조회해 수정 입력 화면에 전달하는 업무 흐름이다."
+      }
+    }
+  ],
+  "name": "온라인 도움말 관리",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 7,
+              "snippet": "public interface EgovHpcmService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 9,
+              "snippet": "\tList<HpcmVO> selectHpcmList(HpcmDefaultVO searchVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 11,
+              "snippet": "\tint selectHpcmListCnt(HpcmDefaultVO searchVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 15,
+              "snippet": "\tvoid insertHpcm(HpcmVO hpcmVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 19,
+              "snippet": "\tvoid deleteHpcmCn(HpcmVO hpcmVO);"
+            }
+          ],
+          "text": "도움말 목록 조회는 검색조건을 받아 도움말 목록과 전체 건수를 각각 산출하고, 등록은 도움말 정보를 받아 신규 도움말을 만들며, 수정과 삭제는 대상 도움말 정보를 받아 각각 갱신과 제거를 수행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 7,
+              "snippet": "public interface EgovHpcmService {"
+            }
+          ],
+          "text": "도움말 업무의 핵심 서비스 규약으로서 도움말 삭제 처리를 조율한다. 목록 조회, 목록 건수 조회, 상세 조회, 등록, 수정, 삭제의 여섯 가지 도움말 업무 작업을 정의해 웹 진입점이 세부 구현을 알지 않아도 도움말 업무를 수행할 수 있게 한다."
+        }
+      },
+      "name": "도움말 삭제 업무 처리",
+      "stepId": "step:ANY /uss/olh/hpc/deleteHpcm.do:src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+            "line": 7,
+            "snippet": "public interface EgovHpcmService {"
+          }
+        ],
+        "text": "도움말 업무 서비스로서 도움말 삭제 처리를 담당하며, 도움말의 목록·건수 조회와 상세 조회, 등록·수정·삭제 작업을 업무 규약으로 규정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 240,
+              "snippet": "\tpublic String deleteHpcmCn(HpcmVO hpcmVO, @ModelAttribute(\"searchVO\") HpcmVO searchVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 244,
+              "snippet": "\t\treturn \"forward:/uss/olh/hpc/selectHpcmList.do\";"
+            }
+          ],
+          "text": "요청 파라미터로 도움말 정보와 검색조건을 각각 받아 처리하며, 삭제 처리는 도움말 정보를 서비스에 넘긴 뒤 도움말 목록 조회로 요청을 넘겨 결과 목록을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            }
+          ],
+          "text": "도움말 업무의 웹 진입점으로서 도움말 삭제 요청을 받아 화면에서 넘어온 도움말 정보와 검색조건을 도움말 서비스에 위임하고, 처리 결과에 따라 이동할 화면 이름 또는 목록 조회로의 전달 경로를 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "도움말 삭제 요청 접수",
+      "stepId": "step:ANY /uss/olh/hpc/deleteHpcm.do:src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+            "line": 239,
+            "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+          }
+        ],
+        "text": "도움말 삭제 요청을 접수해 화면 파라미터를 받아 도움말 서비스에 처리를 위임하고, 처리 후 이동할 화면 또는 목록 조회로 연결한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 40,
+              "snippet": "\t/** 아이디 */"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 63,
+              "snippet": "\tprivate String orgnztId;"
+            }
+          ],
+          "text": "아이디와 이름, 이메일주소는 값이 반드시 있어야 하는 항목이며, 사용자를 시스템 전체에서 유일하게 가리키는 고유아이디와 소속 조직(부서)ID·조직(부서)명, 사용자구분, 사용자 IP정보를 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "도움말 등록 흐름에서 현재 로그인한 사용자를 표현하는 데이터 구조 역할을 한다. 도움말을 등록하거나 수정할 때 누가 작업했는지를 남기기 위해 이 정보에서 사용자 고유아이디를 가져다 쓴다."
+        }
+      },
+      "name": "도움말 등록 로그인 사용자 정보",
+      "stepId": "step:ANY /uss/olh/hpc/insertHpcm.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "도움말 등록 시 등록자·수정자를 기록하기 위해 참조하는 인증된 로그인 사용자 정보 구조로, 아이디·이름·고유아이디 등을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체를 값 객체 형태로 제공하고, 관리자·일반사용자 등 사용자 권한정보 목록을 제공하며, 인증된 사용자 여부를 참/거짓으로 판정해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "도움말 등록 흐름에서 현재 사용자가 누구이고 무엇을 할 수 있는지를 알려주는 공통 서비스 규약 역할을 한다. 도움말 등록·수정 작업자가 인증된 사용자인지 확인하고 작업자 식별정보를 얻는 근거가 된다."
+        }
+      },
+      "name": "도움말 등록 사용자 인증정보 서비스",
+      "stepId": "step:ANY /uss/olh/hpc/insertHpcm.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "도움말 등록 시 필요한 인증 사용자 정보·권한 목록·인증 여부를 제공하는 공통 사용자 상세정보 서비스 규약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한정보 목록 조회, 인증된 사용자 여부 확인의 세 가지 조회 창구를 제공하며, 모든 조회는 내부에 보관된 사용자 상세정보 서비스에 그대로 위임된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "도움말 등록 흐름에서 인증 정보 조회의 창구 역할을 하는 협력 객체이다. 실제 조회 로직은 사용자 상세정보 서비스가 담당하고, 이 도구는 그 서비스를 대신 호출해 어느 화면·업무에서든 동일한 방식으로 인증 사용자 정보를 얻게 해준다."
+        }
+      },
+      "name": "도움말 등록 인증 사용자 조회",
+      "stepId": "step:ANY /uss/olh/hpc/insertHpcm.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "도움말 등록 시 현재 인증된 사용자 정보와 권한, 인증 여부를 가져오기 위해 사용하는 공통 보조 도구이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 7,
+              "snippet": "public interface EgovHpcmService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 9,
+              "snippet": "\tList<HpcmVO> selectHpcmList(HpcmDefaultVO searchVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 11,
+              "snippet": "\tint selectHpcmListCnt(HpcmDefaultVO searchVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 15,
+              "snippet": "\tvoid insertHpcm(HpcmVO hpcmVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 19,
+              "snippet": "\tvoid deleteHpcmCn(HpcmVO hpcmVO);"
+            }
+          ],
+          "text": "도움말 목록 조회는 검색조건을 받아 도움말 목록과 전체 건수를 각각 산출하고, 등록은 도움말 정보를 받아 신규 도움말을 만들며, 수정과 삭제는 대상 도움말 정보를 받아 각각 갱신과 제거를 수행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 7,
+              "snippet": "public interface EgovHpcmService {"
+            }
+          ],
+          "text": "도움말 업무의 핵심 서비스 규약으로서 도움말 등록 처리를 조율한다. 목록 조회, 목록 건수 조회, 상세 조회, 등록, 수정, 삭제의 여섯 가지 도움말 업무 작업을 정의해 웹 진입점이 세부 구현을 알지 않아도 도움말 업무를 수행할 수 있게 한다."
+        }
+      },
+      "name": "도움말 등록 업무 처리",
+      "stepId": "step:ANY /uss/olh/hpc/insertHpcm.do:src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+            "line": 7,
+            "snippet": "public interface EgovHpcmService {"
+          }
+        ],
+        "text": "도움말 업무 서비스로서 도움말 등록 처리를 담당하며, 도움말의 목록·건수 조회와 상세 조회, 등록·수정·삭제 작업을 업무 규약으로 규정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 30,
+              "snippet": "public class HpcmVO extends HpcmDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 35,
+              "snippet": "\tprivate String hpcmId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 38,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 46,
+              "snippet": "\t@Size(max=1000)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 51,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 55,
+              "snippet": "\tprivate String frstRegisterPnttm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 64,
+              "snippet": "\tprivate String lastUpdusrId;"
+            }
+          ],
+          "text": "도움말 ID로 한 건을 식별하며, 도움말구분코드·도움말정의·도움말 설명은 반드시 값이 있어야 하는 필수 항목이다. 도움말정의는 최대 1000자, 도움말 설명은 최대 2500자로 길이가 제한되고, 최초등록시점·최초등록자ID·최종수정시점·최종수정자ID로 이력을 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 30,
+              "snippet": "public class HpcmVO extends HpcmDefaultVO {"
+            }
+          ],
+          "text": "도움말 등록 흐름에서 화면과 서비스 사이를 오가는 도움말 정보 전달 객체 역할을 한다. 도움말 한 건의 식별자와 분류, 본문 내용, 그리고 누가 언제 최초 등록하고 최종 수정했는지의 이력을 함께 담아 조회 결과와 등록·수정 입력값을 모두 표현한다."
+        }
+      },
+      "name": "도움말 등록 도움말 정보",
+      "stepId": "step:ANY /uss/olh/hpc/insertHpcm.do:src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+            "line": 30,
+            "snippet": "public class HpcmVO extends HpcmDefaultVO {"
+          }
+        ],
+        "text": "도움말 등록 과정에서 오가는 도움말 한 건의 정보를 담는 데이터 구조로, 도움말 ID·구분코드·정의·설명과 등록·수정 이력 항목을 보유한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 240,
+              "snippet": "\tpublic String deleteHpcmCn(HpcmVO hpcmVO, @ModelAttribute(\"searchVO\") HpcmVO searchVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 244,
+              "snippet": "\t\treturn \"forward:/uss/olh/hpc/selectHpcmList.do\";"
+            }
+          ],
+          "text": "요청 파라미터로 도움말 정보와 검색조건을 각각 받아 처리하며, 삭제 처리는 도움말 정보를 서비스에 넘긴 뒤 도움말 목록 조회로 요청을 넘겨 결과 목록을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            }
+          ],
+          "text": "도움말 업무의 웹 진입점으로서 도움말 등록 요청을 받아 화면에서 넘어온 도움말 정보와 검색조건을 도움말 서비스에 위임하고, 처리 결과에 따라 이동할 화면 이름 또는 목록 조회로의 전달 경로를 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "도움말 등록 요청 접수",
+      "stepId": "step:ANY /uss/olh/hpc/insertHpcm.do:src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+            "line": 239,
+            "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+          }
+        ],
+        "text": "도움말 등록 요청을 접수해 화면 파라미터를 받아 도움말 서비스에 처리를 위임하고, 처리 후 이동할 화면 또는 목록 조회로 연결한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 109,
+              "snippet": "\t * String이 비었거나(\"\") 혹은 null 인지 검증한다."
+            }
+          ],
+          "text": "빈 문자열을 나타내는 공통 상수를 두고, 원본 문자열이 지정길이를 초과하면 지정길이로 자른 뒤 지정한 문자열을 덧붙이거나 초과분을 그대로 잘라내며, 문자열이 비었거나 값이 없는지를 검증하는 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "도움말 등록 흐름에서 화면 입력값을 다듬고 확인하는 공통 도구 역할을 한다. 도움말 내용이 비었는지 검사하거나 지정 길이를 넘는 문자열을 잘라내는 등 값 처리에 쓰인다."
+        }
+      },
+      "name": "도움말 등록 문자열 처리 도구",
+      "stepId": "step:ANY /uss/olh/hpc/insertHpcm.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "도움말 등록 시 입력값의 빈 문자열 여부 확인과 길이 초과 문자열 처리를 담당하는 공통 문자열 도구이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID와 상세코드, 코드명, 코드설명을 항목으로 가지며, 특정테이블에서 코드정보를 추출할 때 쓰는 특정테이블명과 상세 조건 여부·상세 조건을 함께 담는다. 상세 조건 여부의 기본값은 사용하지 않음이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "도움말 등록 화면 조회 흐름에서 화면에 뿌릴 선택 목록(도움말구분코드 등)을 공통코드 서비스에서 가져오기 위한 조회조건 전달 객체 역할을 한다. 어떤 코드 ID의 코드 목록을 원하는지 지정하는 데 쓰인다."
+        }
+      },
+      "name": "도움말 등록 화면 조회 공통코드 조회조건",
+      "stepId": "step:ANY /uss/olh/hpc/insertHpcmView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "도움말 등록 화면 조회 시 도움말구분코드 목록을 가져오기 위한 공통코드 조회조건 구조로, 코드 ID와 상세조건 항목을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회조건 하나로 공통코드 상세 목록을 조회하고, 여러 조회조건을 한 번에 받아 코드 목록들을 맵에 담아 돌려주며, 조직정보와 그룹정보도 동일한 코드 형태의 목록으로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ],
+          "text": "도움말 등록 화면 조회 흐름에서 입력 화면에 필요한 선택 목록을 공급하는 공통 서비스 역할을 한다. 조회조건을 받아 해당하는 공통코드 상세 목록을 돌려주어 도움말구분코드 선택 항목을 화면에 채운다."
+        }
+      },
+      "name": "도움말 등록 화면 조회 공통코드 서비스",
+      "stepId": "step:ANY /uss/olh/hpc/insertHpcmView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "도움말 등록 화면 조회 시 도움말구분코드 등 화면 선택 목록을 코드 형태로 제공하는 공통코드 서비스 규약이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 240,
+              "snippet": "\tpublic String deleteHpcmCn(HpcmVO hpcmVO, @ModelAttribute(\"searchVO\") HpcmVO searchVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 244,
+              "snippet": "\t\treturn \"forward:/uss/olh/hpc/selectHpcmList.do\";"
+            }
+          ],
+          "text": "요청 파라미터로 도움말 정보와 검색조건을 각각 받아 처리하며, 삭제 처리는 도움말 정보를 서비스에 넘긴 뒤 도움말 목록 조회로 요청을 넘겨 결과 목록을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            }
+          ],
+          "text": "도움말 업무의 웹 진입점으로서 도움말 등록 화면 조회 요청을 받아 화면에서 넘어온 도움말 정보와 검색조건을 도움말 서비스에 위임하고, 처리 결과에 따라 이동할 화면 이름 또는 목록 조회로의 전달 경로를 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "도움말 등록 화면 조회 요청 접수",
+      "stepId": "step:ANY /uss/olh/hpc/insertHpcmView.do:src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+            "line": 239,
+            "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+          }
+        ],
+        "text": "도움말 등록 화면 조회 요청을 접수해 화면 파라미터를 받아 도움말 서비스에 처리를 위임하고, 처리 후 이동할 화면 또는 목록 조회로 연결한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 7,
+              "snippet": "public interface EgovHpcmService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 9,
+              "snippet": "\tList<HpcmVO> selectHpcmList(HpcmDefaultVO searchVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 11,
+              "snippet": "\tint selectHpcmListCnt(HpcmDefaultVO searchVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 15,
+              "snippet": "\tvoid insertHpcm(HpcmVO hpcmVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 19,
+              "snippet": "\tvoid deleteHpcmCn(HpcmVO hpcmVO);"
+            }
+          ],
+          "text": "도움말 목록 조회는 검색조건을 받아 도움말 목록과 전체 건수를 각각 산출하고, 등록은 도움말 정보를 받아 신규 도움말을 만들며, 수정과 삭제는 대상 도움말 정보를 받아 각각 갱신과 제거를 수행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 7,
+              "snippet": "public interface EgovHpcmService {"
+            }
+          ],
+          "text": "도움말 업무의 핵심 서비스 규약으로서 도움말 상세 조회 처리를 조율한다. 목록 조회, 목록 건수 조회, 상세 조회, 등록, 수정, 삭제의 여섯 가지 도움말 업무 작업을 정의해 웹 진입점이 세부 구현을 알지 않아도 도움말 업무를 수행할 수 있게 한다."
+        }
+      },
+      "name": "도움말 상세 조회 업무 처리",
+      "stepId": "step:ANY /uss/olh/hpc/selectHpcmDetail.do:src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+            "line": 7,
+            "snippet": "public interface EgovHpcmService {"
+          }
+        ],
+        "text": "도움말 업무 서비스로서 도움말 상세 조회 처리를 담당하며, 도움말의 목록·건수 조회와 상세 조회, 등록·수정·삭제 작업을 업무 규약으로 규정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 240,
+              "snippet": "\tpublic String deleteHpcmCn(HpcmVO hpcmVO, @ModelAttribute(\"searchVO\") HpcmVO searchVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 244,
+              "snippet": "\t\treturn \"forward:/uss/olh/hpc/selectHpcmList.do\";"
+            }
+          ],
+          "text": "요청 파라미터로 도움말 정보와 검색조건을 각각 받아 처리하며, 삭제 처리는 도움말 정보를 서비스에 넘긴 뒤 도움말 목록 조회로 요청을 넘겨 결과 목록을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            }
+          ],
+          "text": "도움말 업무의 웹 진입점으로서 도움말 상세 조회 요청을 받아 화면에서 넘어온 도움말 정보와 검색조건을 도움말 서비스에 위임하고, 처리 결과에 따라 이동할 화면 이름 또는 목록 조회로의 전달 경로를 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "도움말 상세 조회 요청 접수",
+      "stepId": "step:ANY /uss/olh/hpc/selectHpcmDetail.do:src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+            "line": 239,
+            "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+          }
+        ],
+        "text": "도움말 상세 조회 요청을 접수해 화면 파라미터를 받아 도움말 서비스에 처리를 위임하고, 처리 후 이동할 화면 또는 목록 조회로 연결한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 7,
+              "snippet": "public interface EgovHpcmService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 9,
+              "snippet": "\tList<HpcmVO> selectHpcmList(HpcmDefaultVO searchVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 11,
+              "snippet": "\tint selectHpcmListCnt(HpcmDefaultVO searchVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 15,
+              "snippet": "\tvoid insertHpcm(HpcmVO hpcmVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 19,
+              "snippet": "\tvoid deleteHpcmCn(HpcmVO hpcmVO);"
+            }
+          ],
+          "text": "도움말 목록 조회는 검색조건을 받아 도움말 목록과 전체 건수를 각각 산출하고, 등록은 도움말 정보를 받아 신규 도움말을 만들며, 수정과 삭제는 대상 도움말 정보를 받아 각각 갱신과 제거를 수행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 7,
+              "snippet": "public interface EgovHpcmService {"
+            }
+          ],
+          "text": "도움말 업무의 핵심 서비스 규약으로서 도움말 목록 조회 처리를 조율한다. 목록 조회, 목록 건수 조회, 상세 조회, 등록, 수정, 삭제의 여섯 가지 도움말 업무 작업을 정의해 웹 진입점이 세부 구현을 알지 않아도 도움말 업무를 수행할 수 있게 한다."
+        }
+      },
+      "name": "도움말 목록 조회 업무 처리",
+      "stepId": "step:ANY /uss/olh/hpc/selectHpcmList.do:src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+            "line": 7,
+            "snippet": "public interface EgovHpcmService {"
+          }
+        ],
+        "text": "도움말 업무 서비스로서 도움말 목록 조회 처리를 담당하며, 도움말의 목록·건수 조회와 상세 조회, 등록·수정·삭제 작업을 업무 규약으로 규정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 30,
+              "snippet": "public class HpcmVO extends HpcmDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 35,
+              "snippet": "\tprivate String hpcmId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 38,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 46,
+              "snippet": "\t@Size(max=1000)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 51,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 55,
+              "snippet": "\tprivate String frstRegisterPnttm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 64,
+              "snippet": "\tprivate String lastUpdusrId;"
+            }
+          ],
+          "text": "도움말 ID로 한 건을 식별하며, 도움말구분코드·도움말정의·도움말 설명은 반드시 값이 있어야 하는 필수 항목이다. 도움말정의는 최대 1000자, 도움말 설명은 최대 2500자로 길이가 제한되고, 최초등록시점·최초등록자ID·최종수정시점·최종수정자ID로 이력을 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 30,
+              "snippet": "public class HpcmVO extends HpcmDefaultVO {"
+            }
+          ],
+          "text": "도움말 목록 조회 흐름에서 화면과 서비스 사이를 오가는 도움말 정보 전달 객체 역할을 한다. 도움말 한 건의 식별자와 분류, 본문 내용, 그리고 누가 언제 최초 등록하고 최종 수정했는지의 이력을 함께 담아 조회 결과와 등록·수정 입력값을 모두 표현한다."
+        }
+      },
+      "name": "도움말 목록 조회 도움말 정보",
+      "stepId": "step:ANY /uss/olh/hpc/selectHpcmList.do:src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+            "line": 30,
+            "snippet": "public class HpcmVO extends HpcmDefaultVO {"
+          }
+        ],
+        "text": "도움말 목록 조회 과정에서 오가는 도움말 한 건의 정보를 담는 데이터 구조로, 도움말 ID·구분코드·정의·설명과 등록·수정 이력 항목을 보유한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 240,
+              "snippet": "\tpublic String deleteHpcmCn(HpcmVO hpcmVO, @ModelAttribute(\"searchVO\") HpcmVO searchVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 244,
+              "snippet": "\t\treturn \"forward:/uss/olh/hpc/selectHpcmList.do\";"
+            }
+          ],
+          "text": "요청 파라미터로 도움말 정보와 검색조건을 각각 받아 처리하며, 삭제 처리는 도움말 정보를 서비스에 넘긴 뒤 도움말 목록 조회로 요청을 넘겨 결과 목록을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            }
+          ],
+          "text": "도움말 업무의 웹 진입점으로서 도움말 목록 조회 요청을 받아 화면에서 넘어온 도움말 정보와 검색조건을 도움말 서비스에 위임하고, 처리 결과에 따라 이동할 화면 이름 또는 목록 조회로의 전달 경로를 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "도움말 목록 조회 요청 접수",
+      "stepId": "step:ANY /uss/olh/hpc/selectHpcmList.do:src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+            "line": 239,
+            "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+          }
+        ],
+        "text": "도움말 목록 조회 요청을 접수해 화면 파라미터를 받아 도움말 서비스에 처리를 위임하고, 처리 후 이동할 화면 또는 목록 조회로 연결한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 40,
+              "snippet": "\t/** 아이디 */"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 63,
+              "snippet": "\tprivate String orgnztId;"
+            }
+          ],
+          "text": "아이디와 이름, 이메일주소는 값이 반드시 있어야 하는 항목이며, 사용자를 시스템 전체에서 유일하게 가리키는 고유아이디와 소속 조직(부서)ID·조직(부서)명, 사용자구분, 사용자 IP정보를 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "도움말 수정 흐름에서 현재 로그인한 사용자를 표현하는 데이터 구조 역할을 한다. 도움말을 등록하거나 수정할 때 누가 작업했는지를 남기기 위해 이 정보에서 사용자 고유아이디를 가져다 쓴다."
+        }
+      },
+      "name": "도움말 수정 로그인 사용자 정보",
+      "stepId": "step:ANY /uss/olh/hpc/updateHpcm.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "도움말 수정 시 등록자·수정자를 기록하기 위해 참조하는 인증된 로그인 사용자 정보 구조로, 아이디·이름·고유아이디 등을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체를 값 객체 형태로 제공하고, 관리자·일반사용자 등 사용자 권한정보 목록을 제공하며, 인증된 사용자 여부를 참/거짓으로 판정해 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "도움말 수정 흐름에서 현재 사용자가 누구이고 무엇을 할 수 있는지를 알려주는 공통 서비스 규약 역할을 한다. 도움말 등록·수정 작업자가 인증된 사용자인지 확인하고 작업자 식별정보를 얻는 근거가 된다."
+        }
+      },
+      "name": "도움말 수정 사용자 인증정보 서비스",
+      "stepId": "step:ANY /uss/olh/hpc/updateHpcm.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "도움말 수정 시 필요한 인증 사용자 정보·권한 목록·인증 여부를 제공하는 공통 사용자 상세정보 서비스 규약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한정보 목록 조회, 인증된 사용자 여부 확인의 세 가지 조회 창구를 제공하며, 모든 조회는 내부에 보관된 사용자 상세정보 서비스에 그대로 위임된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "도움말 수정 흐름에서 인증 정보 조회의 창구 역할을 하는 협력 객체이다. 실제 조회 로직은 사용자 상세정보 서비스가 담당하고, 이 도구는 그 서비스를 대신 호출해 어느 화면·업무에서든 동일한 방식으로 인증 사용자 정보를 얻게 해준다."
+        }
+      },
+      "name": "도움말 수정 인증 사용자 조회",
+      "stepId": "step:ANY /uss/olh/hpc/updateHpcm.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "도움말 수정 시 현재 인증된 사용자 정보와 권한, 인증 여부를 가져오기 위해 사용하는 공통 보조 도구이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 7,
+              "snippet": "public interface EgovHpcmService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 9,
+              "snippet": "\tList<HpcmVO> selectHpcmList(HpcmDefaultVO searchVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 11,
+              "snippet": "\tint selectHpcmListCnt(HpcmDefaultVO searchVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 15,
+              "snippet": "\tvoid insertHpcm(HpcmVO hpcmVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 19,
+              "snippet": "\tvoid deleteHpcmCn(HpcmVO hpcmVO);"
+            }
+          ],
+          "text": "도움말 목록 조회는 검색조건을 받아 도움말 목록과 전체 건수를 각각 산출하고, 등록은 도움말 정보를 받아 신규 도움말을 만들며, 수정과 삭제는 대상 도움말 정보를 받아 각각 갱신과 제거를 수행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 7,
+              "snippet": "public interface EgovHpcmService {"
+            }
+          ],
+          "text": "도움말 업무의 핵심 서비스 규약으로서 도움말 수정 처리를 조율한다. 목록 조회, 목록 건수 조회, 상세 조회, 등록, 수정, 삭제의 여섯 가지 도움말 업무 작업을 정의해 웹 진입점이 세부 구현을 알지 않아도 도움말 업무를 수행할 수 있게 한다."
+        }
+      },
+      "name": "도움말 수정 업무 처리",
+      "stepId": "step:ANY /uss/olh/hpc/updateHpcm.do:src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+            "line": 7,
+            "snippet": "public interface EgovHpcmService {"
+          }
+        ],
+        "text": "도움말 업무 서비스로서 도움말 수정 처리를 담당하며, 도움말의 목록·건수 조회와 상세 조회, 등록·수정·삭제 작업을 업무 규약으로 규정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 30,
+              "snippet": "public class HpcmVO extends HpcmDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 35,
+              "snippet": "\tprivate String hpcmId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 38,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 46,
+              "snippet": "\t@Size(max=1000)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 51,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 55,
+              "snippet": "\tprivate String frstRegisterPnttm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 64,
+              "snippet": "\tprivate String lastUpdusrId;"
+            }
+          ],
+          "text": "도움말 ID로 한 건을 식별하며, 도움말구분코드·도움말정의·도움말 설명은 반드시 값이 있어야 하는 필수 항목이다. 도움말정의는 최대 1000자, 도움말 설명은 최대 2500자로 길이가 제한되고, 최초등록시점·최초등록자ID·최종수정시점·최종수정자ID로 이력을 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 30,
+              "snippet": "public class HpcmVO extends HpcmDefaultVO {"
+            }
+          ],
+          "text": "도움말 수정 흐름에서 화면과 서비스 사이를 오가는 도움말 정보 전달 객체 역할을 한다. 도움말 한 건의 식별자와 분류, 본문 내용, 그리고 누가 언제 최초 등록하고 최종 수정했는지의 이력을 함께 담아 조회 결과와 등록·수정 입력값을 모두 표현한다."
+        }
+      },
+      "name": "도움말 수정 도움말 정보",
+      "stepId": "step:ANY /uss/olh/hpc/updateHpcm.do:src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+            "line": 30,
+            "snippet": "public class HpcmVO extends HpcmDefaultVO {"
+          }
+        ],
+        "text": "도움말 수정 과정에서 오가는 도움말 한 건의 정보를 담는 데이터 구조로, 도움말 ID·구분코드·정의·설명과 등록·수정 이력 항목을 보유한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 240,
+              "snippet": "\tpublic String deleteHpcmCn(HpcmVO hpcmVO, @ModelAttribute(\"searchVO\") HpcmVO searchVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 244,
+              "snippet": "\t\treturn \"forward:/uss/olh/hpc/selectHpcmList.do\";"
+            }
+          ],
+          "text": "요청 파라미터로 도움말 정보와 검색조건을 각각 받아 처리하며, 삭제 처리는 도움말 정보를 서비스에 넘긴 뒤 도움말 목록 조회로 요청을 넘겨 결과 목록을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            }
+          ],
+          "text": "도움말 업무의 웹 진입점으로서 도움말 수정 요청을 받아 화면에서 넘어온 도움말 정보와 검색조건을 도움말 서비스에 위임하고, 처리 결과에 따라 이동할 화면 이름 또는 목록 조회로의 전달 경로를 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "도움말 수정 요청 접수",
+      "stepId": "step:ANY /uss/olh/hpc/updateHpcm.do:src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+            "line": 239,
+            "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+          }
+        ],
+        "text": "도움말 수정 요청을 접수해 화면 파라미터를 받아 도움말 서비스에 처리를 위임하고, 처리 후 이동할 화면 또는 목록 조회로 연결한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 109,
+              "snippet": "\t * String이 비었거나(\"\") 혹은 null 인지 검증한다."
+            }
+          ],
+          "text": "빈 문자열을 나타내는 공통 상수를 두고, 원본 문자열이 지정길이를 초과하면 지정길이로 자른 뒤 지정한 문자열을 덧붙이거나 초과분을 그대로 잘라내며, 문자열이 비었거나 값이 없는지를 검증하는 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "도움말 수정 흐름에서 화면 입력값을 다듬고 확인하는 공통 도구 역할을 한다. 도움말 내용이 비었는지 검사하거나 지정 길이를 넘는 문자열을 잘라내는 등 값 처리에 쓰인다."
+        }
+      },
+      "name": "도움말 수정 문자열 처리 도구",
+      "stepId": "step:ANY /uss/olh/hpc/updateHpcm.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "도움말 수정 시 입력값의 빈 문자열 여부 확인과 길이 초과 문자열 처리를 담당하는 공통 문자열 도구이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID와 상세코드, 코드명, 코드설명을 항목으로 가지며, 특정테이블에서 코드정보를 추출할 때 쓰는 특정테이블명과 상세 조건 여부·상세 조건을 함께 담는다. 상세 조건 여부의 기본값은 사용하지 않음이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "도움말 수정 화면 조회 흐름에서 화면에 뿌릴 선택 목록(도움말구분코드 등)을 공통코드 서비스에서 가져오기 위한 조회조건 전달 객체 역할을 한다. 어떤 코드 ID의 코드 목록을 원하는지 지정하는 데 쓰인다."
+        }
+      },
+      "name": "도움말 수정 화면 조회 공통코드 조회조건",
+      "stepId": "step:ANY /uss/olh/hpc/updateHpcmView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "도움말 수정 화면 조회 시 도움말구분코드 목록을 가져오기 위한 공통코드 조회조건 구조로, 코드 ID와 상세조건 항목을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회조건 하나로 공통코드 상세 목록을 조회하고, 여러 조회조건을 한 번에 받아 코드 목록들을 맵에 담아 돌려주며, 조직정보와 그룹정보도 동일한 코드 형태의 목록으로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ],
+          "text": "도움말 수정 화면 조회 흐름에서 입력 화면에 필요한 선택 목록을 공급하는 공통 서비스 역할을 한다. 조회조건을 받아 해당하는 공통코드 상세 목록을 돌려주어 도움말구분코드 선택 항목을 화면에 채운다."
+        }
+      },
+      "name": "도움말 수정 화면 조회 공통코드 서비스",
+      "stepId": "step:ANY /uss/olh/hpc/updateHpcmView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "도움말 수정 화면 조회 시 도움말구분코드 등 화면 선택 목록을 코드 형태로 제공하는 공통코드 서비스 규약이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 7,
+              "snippet": "public interface EgovHpcmService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 9,
+              "snippet": "\tList<HpcmVO> selectHpcmList(HpcmDefaultVO searchVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 11,
+              "snippet": "\tint selectHpcmListCnt(HpcmDefaultVO searchVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 15,
+              "snippet": "\tvoid insertHpcm(HpcmVO hpcmVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 19,
+              "snippet": "\tvoid deleteHpcmCn(HpcmVO hpcmVO);"
+            }
+          ],
+          "text": "도움말 목록 조회는 검색조건을 받아 도움말 목록과 전체 건수를 각각 산출하고, 등록은 도움말 정보를 받아 신규 도움말을 만들며, 수정과 삭제는 대상 도움말 정보를 받아 각각 갱신과 제거를 수행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+              "line": 7,
+              "snippet": "public interface EgovHpcmService {"
+            }
+          ],
+          "text": "도움말 업무의 핵심 서비스 규약으로서 도움말 수정 화면 조회 처리를 조율한다. 목록 조회, 목록 건수 조회, 상세 조회, 등록, 수정, 삭제의 여섯 가지 도움말 업무 작업을 정의해 웹 진입점이 세부 구현을 알지 않아도 도움말 업무를 수행할 수 있게 한다."
+        }
+      },
+      "name": "도움말 수정 화면 조회 업무 처리",
+      "stepId": "step:ANY /uss/olh/hpc/updateHpcmView.do:src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/EgovHpcmService.java",
+            "line": 7,
+            "snippet": "public interface EgovHpcmService {"
+          }
+        ],
+        "text": "도움말 업무 서비스로서 도움말 수정 화면 조회 처리를 담당하며, 도움말의 목록·건수 조회와 상세 조회, 등록·수정·삭제 작업을 업무 규약으로 규정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 30,
+              "snippet": "public class HpcmVO extends HpcmDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 35,
+              "snippet": "\tprivate String hpcmId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 38,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 46,
+              "snippet": "\t@Size(max=1000)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 51,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 55,
+              "snippet": "\tprivate String frstRegisterPnttm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 64,
+              "snippet": "\tprivate String lastUpdusrId;"
+            }
+          ],
+          "text": "도움말 ID로 한 건을 식별하며, 도움말구분코드·도움말정의·도움말 설명은 반드시 값이 있어야 하는 필수 항목이다. 도움말정의는 최대 1000자, 도움말 설명은 최대 2500자로 길이가 제한되고, 최초등록시점·최초등록자ID·최종수정시점·최종수정자ID로 이력을 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+              "line": 30,
+              "snippet": "public class HpcmVO extends HpcmDefaultVO {"
+            }
+          ],
+          "text": "도움말 수정 화면 조회 흐름에서 화면과 서비스 사이를 오가는 도움말 정보 전달 객체 역할을 한다. 도움말 한 건의 식별자와 분류, 본문 내용, 그리고 누가 언제 최초 등록하고 최종 수정했는지의 이력을 함께 담아 조회 결과와 등록·수정 입력값을 모두 표현한다."
+        }
+      },
+      "name": "도움말 수정 화면 조회 도움말 정보",
+      "stepId": "step:ANY /uss/olh/hpc/updateHpcmView.do:src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/service/HpcmVO.java",
+            "line": 30,
+            "snippet": "public class HpcmVO extends HpcmDefaultVO {"
+          }
+        ],
+        "text": "도움말 수정 화면 조회 과정에서 오가는 도움말 한 건의 정보를 담는 데이터 구조로, 도움말 ID·구분코드·정의·설명과 등록·수정 이력 항목을 보유한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 240,
+              "snippet": "\tpublic String deleteHpcmCn(HpcmVO hpcmVO, @ModelAttribute(\"searchVO\") HpcmVO searchVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 244,
+              "snippet": "\t\treturn \"forward:/uss/olh/hpc/selectHpcmList.do\";"
+            }
+          ],
+          "text": "요청 파라미터로 도움말 정보와 검색조건을 각각 받아 처리하며, 삭제 처리는 도움말 정보를 서비스에 넘긴 뒤 도움말 목록 조회로 요청을 넘겨 결과 목록을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+              "line": 239,
+              "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+            }
+          ],
+          "text": "도움말 업무의 웹 진입점으로서 도움말 수정 화면 조회 요청을 받아 화면에서 넘어온 도움말 정보와 검색조건을 도움말 서비스에 위임하고, 처리 결과에 따라 이동할 화면 이름 또는 목록 조회로의 전달 경로를 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "도움말 수정 화면 조회 요청 접수",
+      "stepId": "step:ANY /uss/olh/hpc/updateHpcmView.do:src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+            "line": 239,
+            "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+          }
+        ],
+        "text": "도움말 수정 화면 조회 요청을 접수해 화면 파라미터를 받아 도움말 서비스에 처리를 위임하고, 처리 후 이동할 화면 또는 목록 조회로 연결한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+        "line": 75,
+        "snippet": "@RequestMapping(value = \"/uss/olh/hpc/selectHpcmList.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+        "line": 155,
+        "snippet": "@RequestMapping(\"/uss/olh/hpc/insertHpcm.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/uss/olh/hpc/web/EgovHpcmController.java",
+        "line": 239,
+        "snippet": "@RequestMapping(\"/uss/olh/hpc/deleteHpcm.do\")"
+      }
+    ],
+    "text": "사용자에게 제공할 온라인 도움말을 구분코드별로 등록·조회·수정·삭제하는 업무 영역이다. 도움말 목록과 상세를 조회하고, 등록·수정 화면에서 도움말구분코드를 선택해 도움말정의와 설명을 입력하며, 처리 후에는 목록 화면으로 돌아간다."
+  }
+}

@@ -1,0 +1,1156 @@
+{
+  "domainId": "domain:sym.mnu.mpm",
+  "files": [
+    {
+      "className": "ComDefaultVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/ComDefaultVO.java — java 파일",
+        "tags": []
+      },
+      "line": 22,
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "slice": {
+        "endLine": 91,
+        "startLine": 12,
+        "text": " * @  수정일         수정자                   수정내용\n * @ -------    --------    ---------------------------\n * @ 2009.02.01    조재영         최초 생성\n *\n *  @author 공통서비스 개발팀 조재영\n *  @since 2009.02.01\n *  @version 1.0\n *  @see \n *  \n */\n@SuppressWarnings(\"serial\")\npublic class ComDefaultVO implements Serializable {\n\t\n\t/** 검색조건 */\n    private String searchCondition = \"\";\n    \n    /** 검색Keyword */\n    private String searchKeyword = \"\";\n    \n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n    \n    /** 현재페이지 */\n    private Integer pageIndex = 1;\n    \n    /** 페이지개수 */\n    private Integer pageUnit = 10;\n    \n    /** 페이지사이즈 */\n    private Integer pageSize = 10;\n\n    /** firstIndex */\n    private Integer firstIndex = 1;\n\n    /** lastIndex */\n    private Integer lastIndex = 1;\n\n    /** recordCountPerPage */\n    private Integer recordCountPerPage = 10;\n    \n    /** 검색KeywordFrom */\n    private String searchKeywordFrom = \"\";    \n\n\t/** 검색KeywordTo */\n    private String searchKeywordTo = \"\";  \n    \n\tpublic Integer getFirstIndex() {\n\t\treturn firstIndex == null ? 1 : firstIndex;\n\t}\n\n\tpublic void setFirstIndex(Integer firstIndex) {\n\t\tthis.firstIndex = firstIndex == null ? 1 : firstIndex;\n\t}\n\n\tpublic Integer getLastIndex() {\n\t\treturn lastIndex == null ? 1 : lastIndex;\n\t}\n\n\tpublic void setLastIndex(Integer lastIndex) {\n\t\tthis.lastIndex = lastIndex == null ? 1 : lastIndex;\n\t}\n\n\tpublic Integer getRecordCountPerPage() {\n\t\treturn recordCountPerPage == null ? 10 : recordCountPerPage;\n\t}\n\n\tpublic void setRecordCountPerPage(Integer recordCountPerPage) {\n\t\tthis.recordCountPerPage = recordCountPerPage == null ? 10 : recordCountPerPage;\n\t}\n\n\tpublic String getSearchCondition() {\n        return searchCondition;\n    }\n\n    public void setSearchCondition(String searchCondition) {\n        this.searchCondition = searchCondition;\n    }\n\n    public String getSearchKeyword() {\n        return searchKeyword;",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovMessageSource",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovMessageSource.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이문준          최초 생성\n *   2017.07.21  장동한 \t\t\targs, locale 설정\n *\n * </pre>\n */\n\npublic class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {\n\n\tprivate ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;\n\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @param reloadableResourceBundleMessageSource - resource MessageSource\n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic void setReloadableResourceBundleMessageSource(ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource) {\n\t\tthis.reloadableResourceBundleMessageSource = reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic ReloadableResourceBundleMessageSource getReloadableResourceBundleMessageSource() {\n\t\treturn reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, locale);\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @return String\n\t */\t\n\tpublic String getMessageArgs(String code, Object[] args) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, locale);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "LoginVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/LoginVO.java — java 파일",
+        "tags": []
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 21,
+        "text": " *   2009.03.03     박지욱     최초 생성\n *   2021.05.30     정진오     디지털원패스 사용자키/세션값 추가\n *</pre>\n *\n *  @author 공통서비스 개발팀 박지욱\n *  @since 2009.03.03\n *  @version 1.0\n *  @see\n *\n */\n@Getter\n@Setter\npublic class LoginVO implements Serializable{\n\n\t/**\n\t *\n\t */\n\tprivate static final long serialVersionUID = -8274004534207618049L;\n\n\t/** 아이디 */\n\t@EgovNullCheck\n\tprivate String id;\n\t/** 이름 */\n\t@EgovNullCheck\n\tprivate String name;\n\t/** 주민등록번호 */\n\tprivate String ihidNum;\n\t/** 이메일주소 */\n\t@EgovNullCheck\n\t@EgovEmailCheck\n\tprivate String email;\n\t/** 비밀번호 */\n\tprivate String password;\n\t/** 비밀번호 힌트 */\n\t@EgovNullCheck\n\tprivate String passwordHint;\n\t/** 비밀번호 정답 */\n\t@EgovNullCheck\n\tprivate String passwordCnsr;\n\t/** 사용자구분 */\n\tprivate String userSe;\n\t/** 조직(부서)ID */\n\tprivate String orgnztId;\n\t/** 조직(부서)명 */\n\tprivate String orgnztNm;\n\t/** 고유아이디 */\n\tprivate String uniqId;\n\t/** 로그인 후 이동할 페이지 */\n\tprivate String url;\n\t/** 사용자 IP정보 */\n\tprivate String ip;\n\t/** GPKI인증 DN */\n\tprivate String dn;\n\t/** 디지털원패스 사용자키 */\n\tprivate String onepassUserkey;\n\t/** 디지털원패스 사용자세션값 */\n\tprivate String onepassIntfToken;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "slice": {
+        "endLine": 27,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.service;\n\nimport java.util.List;\n\npublic interface EgovUserDetailsService {\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic Object getAuthenticatedUser();\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t * 예) [ROLE_ADMIN, ROLE_USER, ROLE_A, ROLE_B, ROLE_RESTRICTED, IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED_ANONYMOUSLY]\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic List<String> getAuthorities();\n\t\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\t\n\t */\n\tpublic Boolean isAuthenticated(); \n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovUserDetailsHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "slice": {
+        "endLine": 62,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n *   2009.03.10  sjyoon         최초 생성\n *   2011.07.01\t 서준식          interface 생성후 상세 로직의 분리\n * </pre>\n */\n\npublic class EgovUserDetailsHelper {\n\n\tstatic EgovUserDetailsService egovUserDetailsService;\n\n\tpublic EgovUserDetailsService getEgovUserDetailsService() {\n\t\treturn egovUserDetailsService;\n\t}\n\n\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {\n\t\tEgovUserDetailsHelper.egovUserDetailsService = egovUserDetailsService;\n\t}\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic static Object getAuthenticatedUser() {\n\t\treturn egovUserDetailsService.getAuthenticatedUser();\n\t}\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t *\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic static List<String> getAuthorities() {\n\t\treturn egovUserDetailsService.getAuthorities();\n\t}\n\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\n\t */\n\tpublic static Boolean isAuthenticated() {\n\t\treturn egovUserDetailsService.isAuthenticated();\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovMenuManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 29,
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "slice": {
+        "endLine": 98,
+        "startLine": 19,
+        "text": " *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.20  이  용          최초 생성\n *   2011.07.01  서준식\t\t\t자기 메뉴 정보를 상위메뉴 정보로 참조하는 메뉴정보가 있는지 조회하는\n *   \t\t\t\t\t\t\tselectUpperMenuNoByPk() 메서드 추가\n *\n * </pre>\n */\n\npublic interface EgovMenuManageService {\n\n\t/**\n\t * 메뉴 상세정보를 조회\n\t * @param vo ComDefaultVO\n\t * @return MenuManageVO\n\t * @exception Exception\n\t */\n\tMenuManageVO selectMenuManage(ComDefaultVO vo) throws Exception;\n\n\t/**\n     * 메뉴 목록을 조회\n     * \n     * @param vo ComDefaultVO\n     * @return List\n     * @exception Exception\n     */\n    List<EgovMap> selectMenuManageList(ComDefaultVO vo) throws Exception;\n\n\t/**\n\t * 메뉴목록 총건수를 조회한다.\n\t * @param vo ComDefaultVO\n\t * @return int\n\t * @exception Exception\n\t */\n\tint selectMenuManageListTotCnt(ComDefaultVO vo) throws Exception;\n\n\t/**\n\t * 메뉴번호 존재 여부를 조회한다.\n\t * @param vo ComDefaultVO\n\t * @return int\n\t * @exception Exception\n\t */\n\tint selectMenuNoByPk(MenuManageVO vo) throws Exception;\n\n\tint selectUpperMenuNoByPk(MenuManageVO vo) throws Exception;\n\n\t/**\n\t * 메뉴 정보를 등록\n\t * @param vo MenuManageVO\n\t * @exception Exception\n\t */\n\tvoid insertMenuManage(MenuManageVO vo) throws Exception;\n\n\t/**\n\t * 메뉴 정보를 수정\n\t * @param vo MenuManageVO\n\t * @exception Exception\n\t */\n\tvoid updateMenuManage(MenuManageVO vo) throws Exception;\n\n\t/**\n\t * 메뉴 정보를 삭제\n\t * @param vo MenuManageVO\n\t * @exception Exception\n\t */\n\tvoid deleteMenuManage(MenuManageVO vo) throws Exception;\n\n\t/**\n\t * 화면에 조회된 메뉴 목록 정보를 데이터베이스에서 삭제\n\t * @param checkedMenuNoForDel String\n\t * @exception Exception\n\t */\n\tvoid deleteMenuManageList(String checkedMenuNoForDel) throws Exception;\n\n\t/*  메뉴 생성 관리  */\n\n\t/**\n\t * 메뉴 목록을 조회\n\t * @return List",
+        "truncated": true
+      }
+    },
+    {
+      "className": "MenuManageVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java — java 파일",
+        "tags": []
+      },
+      "line": 27,
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+      "slice": {
+        "endLine": 90,
+        "startLine": 17,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.20  이용           최초 생성\n *   2025.07.17  이백행          2025년 컨트리뷰션 PMD로 소프트웨어 보안약점 진단하고 제거하기-FormalParameterNamingConventions(변수명에 밑줄 사용)\n *\n *      </pre>\n */\n@Getter\n@Setter\npublic class MenuManageVO {\n\n\t/** 메뉴정보 */\n\t/** 메뉴번호 */\n\t@EgovNullCheck\n\tprivate int menuNo;\n\t/** 메뉴순서 */\n\t@EgovNullCheck\n\tprivate int menuOrdr;\n\t/** 메뉴명 */\n\t@EgovNullCheck\n\t@Size(max=50)\n\tprivate String menuNm;\n\t/** 상위메뉴번호 */\n\t@EgovNullCheck\n\tprivate int upperMenuId;\n\t/** 메뉴설명 */\n\t@Size(max=100)\n\tprivate String menuDc;\n\t/** 관련이미지경로 */\n\t@Size(max=100)\n\tprivate String relateImagePath;\n\t/** 관련이미지명 */\n\t@Size(max=50)\n\tprivate String relateImageNm;\n\t/** 프로그램파일명 */\n\t@EgovNullCheck\n\t@Size(max=50)\n\tprivate String progrmFileNm;\n\n\t/** 사이트맵 */\n\t/** 생성자ID **/\n\tprivate String creatPersonId;\n\n\t/** 권한정보설정 */\n\t/** 권한코드 */\n\tprivate String authorCode;\n\n\t/** 기타VO변수 */\n\tprivate String tempValue;\n\tprivate int tempInt;\n\n\t/** Login 메뉴관련 VO변수 */\n\t/** tmp_Id */\n\tprivate String tmpId;\n\t/** tmp_Password */\n\tprivate String tmpPassword;\n\t/** tmp_Name */\n\tprivate String tmpName;\n\t/** tmp_UserSe */\n\tprivate String tmpUserSe;\n\t/** tmp_Email */\n\tprivate String tmpEmail;\n\t/** tmp_OrgnztId */\n\tprivate String tmpOrgnztId;\n\t/** tmp_UniqId */\n\tprivate String tmpUniqId;\n\t/** tmp_Cmd */\n\tprivate String tmpCmd;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovMainMenuManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 94,
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+      "slice": {
+        "endLine": 163,
+        "startLine": 84,
+        "text": "\t\treturn \"egovframework/com/menu_index\";\n\t}\n\n\t/**\n\t * Head메뉴를 조회한다.\n\t * \n\t * @param menuManageVO MenuManageVO\n\t * @return 출력페이지정보 \"head\"\n\t * @exception Exception\n\t */\n\t@RequestMapping(value = \"/sym/mnu/mpm/EgovMainMenu.do\")\n\tpublic String selectMainMenu(@ModelAttribute(\"menuManageVO\") MenuManageVO menuManageVO, ModelMap model)\n\t\t\tthrows Exception {\n\n\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();\n\n\t\tmenuManageVO.setTmpId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));\n\t\tmenuManageVO.setTmpPassword(user == null ? \"\" : EgovStringUtil.isNullToString(user.getPassword()));\n\t\tmenuManageVO.setTmpUserSe(user == null ? \"\" : EgovStringUtil.isNullToString(user.getUserSe()));\n\t\tmenuManageVO.setTmpName(user == null ? \"\" : EgovStringUtil.isNullToString(user.getName()));\n\t\tmenuManageVO.setTmpEmail(user == null ? \"\" : EgovStringUtil.isNullToString(user.getEmail()));\n\t\tmenuManageVO.setTmpOrgnztId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getOrgnztId()));\n\t\tmenuManageVO.setTmpUniqId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getUniqId()));\n\n\t\tList<?> resultList = menuManageService.selectMainMenuHead(menuManageVO);\n\t\tmodel.addAttribute(\"list_headmenu\", resultList);\n\t\tif (!(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId())).equals(\"\")) {\n\t\t\t// 메인 페이지 이동\n\t\t\treturn \"egovframework/com/EgovMainView\";\n\t\t} else {\n\t\t\t// 오류 페이지 이동\n\t\t\treturn \"egovframework/com/cmm/error/egovError\";\n\t\t}\n\t}\n\n\t/**\n\t * Head메뉴를 조회한다.\n\t * \n\t * @param menuManageVO MenuManageVO\n\t * @return 출력페이지정보 \"main_head\"\n\t * @exception Exception\n\t */\n\t@RequestMapping(value = \"/sym/mnu/mpm/EgovMainMenuHead.do\")\n\tpublic String selectMainMenuHead(@ModelAttribute(\"menuManageVO\") MenuManageVO menuManageVO, ModelMap model)\n\t\t\tthrows Exception {\n\n\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();\n\n\t\tmenuManageVO.setTmpId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));\n\t\tmenuManageVO.setTmpPassword(user == null ? \"\" : EgovStringUtil.isNullToString(user.getPassword()));\n\t\tmenuManageVO.setTmpUserSe(user == null ? \"\" : EgovStringUtil.isNullToString(user.getUserSe()));\n\t\tmenuManageVO.setTmpName(user == null ? \"\" : EgovStringUtil.isNullToString(user.getName()));\n\t\tmenuManageVO.setTmpEmail(user == null ? \"\" : EgovStringUtil.isNullToString(user.getEmail()));\n\t\tmenuManageVO.setTmpOrgnztId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getOrgnztId()));\n\t\tmenuManageVO.setTmpUniqId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getUniqId()));\n\n\t\tList<?> resultList = menuManageService.selectMainMenuHead(menuManageVO);\n\t\tmodel.addAttribute(\"list_headmenu\", resultList);\n\t\tif (!(user == null ? \"\" : EgovStringUtil.isNullToString(user.getUniqId())).equals(\"\")) {\n\t\t\t// 메인 페이지 이동\n\t\t\treturn \"egovframework/com/main_head\";\n\t\t} else {\n\t\t\t// 오류 페이지 이동\n\t\t\treturn \"egovframework/com/cmm/error/egovError\";\n\t\t}\n\t}\n\n\t/**\n\t * 좌측메뉴를 조회한다.\n\t * \n\t * @param menuManageVO MenuManageVO\n\t * @param vStartP      String\n\t * @return 출력페이지정보 \"main_left\"\n\t * @exception Exception\n\t */\n\t@RequestMapping(value = \"/sym/mnu/mpm/EgovMainMenuLeft.do\")\n\tpublic String selectMainMenuLeft(@ModelAttribute(\"menuManageVO\") MenuManageVO menuManageVO,\n\t\t\t@RequestParam(\"vStartP\") String vStartP, ModelMap model) throws Exception {\n\t\tint iMenuNo = Integer.parseInt(vStartP);\n\t\tmenuManageVO.setTempInt(iMenuNo);",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovMenuManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 491,
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "slice": {
+        "endLine": 560,
+        "startLine": 481,
+        "text": "\n\t/* ### 일괄처리 프로세스 ### */\n\n\t/**\n\t * 메뉴생성 일괄삭제프로세스\n\t * \n\t * @param menuManageVO MenuManageVO\n\t * @return 출력페이지정보 \"sym/mnu/mpm/EgovMenuBndeRegist\"\n\t * @exception Exception\n\t */\n\t@RequestMapping(value = \"/sym/mnu/mpm/EgovMenuBndeAllDelete.do\")\n\tpublic String menuBndeAllDelete(@ModelAttribute(\"menuManageVO\") MenuManageVO menuManageVO, ModelMap model)\n\t\t\tthrows Exception {\n\t\tString resultMsg = \"\";\n\t\t// 0. Spring Security 사용자권한 처리\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\t\tif (!isAuthenticated) {\n\t\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));\n\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";\n\t\t}\n\t\tmenuManageService.menuBndeAllDelete();\n\t\tresultMsg = egovMessageSource.getMessage(\"success.common.delete\");\n\t\tmodel.addAttribute(\"resultMsg\", resultMsg);\n\t\treturn \"egovframework/com/sym/mnu/mpm/EgovMenuBndeRegist\";\n\t}\n\n\t/**\n\t * 메뉴일괄등록화면 호출 및 메뉴일괄등록처리 프로세스\n\t * \n\t * @param commandMap   Map\n\t * @param menuManageVO MenuManageVO\n\t * @param request      HttpServletRequest\n\t * @return 출력페이지정보 \"sym/mnu/mpm/EgovMenuBndeRegist\"\n\t * @exception Exception\n\t */\n\t@RequestMapping(value = \"/sym/mnu/mpm/EgovMenuBndeRegist.do\")\n\tpublic String menuBndeRegist(@RequestParam Map<?, ?> commandMap, final HttpServletRequest request,\n\t\t\t@ModelAttribute(\"menuManageVO\") MenuManageVO menuManageVO, ModelMap model) throws Exception {\n\t\tString sLocationUrl = null;\n\t\tString resultMsg = \"\";\n\t\tString sMessage = \"\";\n\t\tString[] fileExtension = {\"XLS\", \"XLSX\"};\n\n\t\t// 0. Spring Security 사용자권한 처리\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\t\tif (!isAuthenticated) {\n\t\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));\n\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";\n\t\t}\n\n\t\tString sCmd = commandMap.get(\"cmd\") == null ? \"\" : (String)commandMap.get(\"cmd\");\n\n\t\tif (sCmd.equals(\"bndeInsert\")) {\n\n\t\t\tfinal MultipartHttpServletRequest multiRequest = WebUtils.getNativeRequest(request, MultipartHttpServletRequest.class);\n\n\t\t\t//2022.01 Possible null pointer dereference due to return value of called method\n\t\t\tif (multiRequest != null) {\n\n\t\t\t\tfinal Map<String, MultipartFile> files = multiRequest.getFileMap();\n\t\t\t\tfor (Entry<String, MultipartFile> entry : files.entrySet()) {\n\t\t\t\t\tMultipartFile file = entry.getValue();\n\t\t\t\t\tString originalFilename = file.getOriginalFilename();\n\t\t\t\t\tif (StringUtils.isEmpty(originalFilename)) {\n\t\t\t\t\t\tcontinue;\n\t\t\t\t\t}\n\t\t\t\t\tString fileExtensionName = FilenameUtils.getExtension(originalFilename).toUpperCase();\n\t\t\t\t\tboolean isExist = Arrays.stream(fileExtension).anyMatch(fileExtensionName::equals);\n\t\t\t\t\t// 2022.11.11 시큐어코딩 처리\n\t\t\t\t\tif (isExist) {\n\n\t\t\t\t\t\tif (menuManageService.menuBndeAllDelete()) {\n\t\t\t\t\t\t\t// KISA 보안약점 조치 - 자원해제\n\t\t\t\t\t\t\ttry (InputStream is = file.getInputStream();) {\n\t\t\t\t\t\t\t\tsMessage = menuManageService.menuBndeRegist(menuManageVO, is);\n\t\t\t\t\t\t\t} catch (IOException e) {\n\t\t\t\t\t\t\t\tthrow new IOException(e);\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\tresultMsg = sMessage;",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovProgrmManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/prm/service/EgovProgrmManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 24,
+      "relPath": "src/main/java/egovframework/com/sym/prm/service/EgovProgrmManageService.java",
+      "slice": {
+        "endLine": 93,
+        "startLine": 14,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.20  이  용          최초 생성\n *\n * </pre>\n */\n\npublic interface EgovProgrmManageService {\n\t/**\n\t * 프로그램 상세정보를 조회\n\t * @param vo ComDefaultVO\n\t * @return ProgrmManageVO\n\t * @exception Exception\n\t */\n\tProgrmManageVO selectProgrm(ProgrmManageVO vo) throws Exception;\n\t\n\t/**\n     * 프로그램 목록을 조회\n     * \n     * @param vo ComDefaultVO\n     * @return List\n     * @exception Exception\n     */\n    List<ProgrmManageVO> selectProgrmList(ComDefaultVO vo) throws Exception;\n    \n\t/**\n\t * 프로그램목록 총건수를 조회한다.\n\t * @param vo ComDefaultVO\n\t * @return int\n\t * @exception Exception\n\t */\n\tint selectProgrmListTotCnt(ComDefaultVO vo) throws Exception;\n\t/**\n\t * 프로그램 정보를 등록\n\t * @param vo ProgrmManageVO\n\t * @exception Exception\n\t */\n\tvoid insertProgrm(ProgrmManageVO vo) throws Exception;\n\n\t/**\n\t * 프로그램 정보를 수정\n\t * @param vo ProgrmManageVO\n\t * @exception Exception\n\t */\n\tvoid updateProgrm(ProgrmManageVO vo) throws Exception;\n\n\t/**\n\t * 프로그램 정보를 삭제\n\t * @param vo ProgrmManageVO\n\t * @exception Exception\n\t */\n\tvoid deleteProgrm(ProgrmManageVO vo) throws Exception;\n\n\t/**\n\t * 프로그램 파일 존재여부를 조회\n\t * @param vo ComDefaultVO\n\t * @return int\n\t * @exception Exception\n\t */\n\tint selectProgrmNMTotCnt(ComDefaultVO vo) throws Exception;\n\n\t/**\n\t * 프로그램변경요청 정보를 조회\n\t * @param vo ProgrmManageDtlVO\n\t * @return ProgrmManageDtlVO  프로그램변경요청 리스트\n\t * @exception Exception\n\t */\n\tProgrmManageDtlVO selectProgrmChangeRequst(ProgrmManageDtlVO vo) throws Exception;\n\n\t/**\n\t * 프로그램변경요청 목록을 조회\n\t * @param vo ComDefaultVO\n\t * @return List\n\t * @exception Exception\n\t */\n\tList<ProgrmManageDtlVO> selectProgrmChangeRequstList(ComDefaultVO vo) throws Exception;\n\t/**",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovStringUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 43,
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "slice": {
+        "endLine": 112,
+        "startLine": 33,
+        "text": " * See the License for the specific language governing permissions and\n * limitations under the License.\n */\nimport java.io.UnsupportedEncodingException;\nimport java.math.BigDecimal;\nimport java.security.SecureRandom;\nimport java.sql.Timestamp;\nimport java.text.SimpleDateFormat;\nimport java.util.Locale;\n\npublic class EgovStringUtil {\n\t/**\n\t * 빈 문자열 <code>\"\"</code>.\n\t */\n\tpublic static final String EMPTY = \"\";\n\n\t// 221116\t김혜준\t2022 시큐어코딩 조치\n\tprivate static SecureRandom rnd = new SecureRandom();\n\n\t/**\n\t * <p>Padding을 할 수 있는 최대 수치</p>\n\t */\n\t// private static final int PAD_LIMIT = 8192;\n\n\t/**\n\t * <p>An array of <code>String</code>s used for padding.</p>\n\t * <p>Used for efficient space padding. The length of each String expands as needed.</p>\n\t */\n\t/*\n\tprivate static final String[] PADDING = new String[Character.MAX_VALUE];\n\n\tstatic {\n\t\t// space padding is most common, start with 64 chars\n\t\tPADDING[32] = \"                                                                \";\n\t}\n\t */\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 지정한길이에다가 해당 문자열을 붙여주는 메서드.\n\t * @param source 원본 문자열 배열\n\t * @param output 더할문자열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, String output, int slength) {\n\t\tString returnVal = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\treturnVal = source.substring(0, slength) + output;\n\t\t\t} else {\n\t\t\t\treturnVal = source;\n\t\t\t}\n\t\t}\n\t\treturn returnVal;\n\t}\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 해당 문자열을 삭제하는 메서드\n\t * @param source 원본 문자열 배열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, int slength) {\n\t\tString result = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\tresult = source.substring(0, slength);\n\t\t\t} else {\n\t\t\t\tresult = source;\n\t\t\t}\n\t\t}\n\t\treturn result;\n\t}\n\n\t/**\n\t * <p>\n\t * String이 비었거나(\"\") 혹은 null 인지 검증한다.\n\t * </p>\n\t *\n\t * <pre>",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovMainMenuManageController#selectMainMenu",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMainMenu.do",
+      "line": 94,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMainMenu.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenu.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenu.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenu.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenu.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenu.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenu.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMainMenuManageController#selectMainMenuHead",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMainMenuHead.do",
+      "line": 126,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMainMenuHead.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuHead.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuHead.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuHead.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuHead.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuHead.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuHead.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMainMenuManageController#selectMainMenuHome",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMainMenuHome.do",
+      "line": 210,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMainMenuHome.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuHome.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuHome.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuHome.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuHome.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuHome.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMainMenuManageController#selectMainMenuIndex",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMainMenuIndex.do",
+      "line": 74,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMainMenuIndex.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuIndex.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMainMenuManageController#selectMainMenuLeft",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMainMenuLeft.do",
+      "line": 159,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMainMenuLeft.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuLeft.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuLeft.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuLeft.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuLeft.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuLeft.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuLeft.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMainMenuManageController#selectMainMenuRight",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMainMenuRight.do",
+      "line": 190,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMainMenuRight.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuRight.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuRight.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuRight.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuRight.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /sym/mnu/mpm/EgovMainMenuRight.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMenuManageController#menuBndeAllDelete",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMenuBndeAllDelete.do",
+      "line": 491,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMenuBndeAllDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuBndeAllDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuBndeAllDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuBndeAllDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuBndeAllDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMenuManageController#menuBndeRegist",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMenuBndeRegist.do",
+      "line": 516,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMenuBndeRegist.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuBndeRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuBndeRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuBndeRegist.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuBndeRegist.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuBndeRegist.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMenuManageController#updateMenuManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do",
+      "line": 248,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/sym/prm/service/EgovProgrmManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMenuManageController#deleteMenuList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMenuListDelete.do",
+      "line": 419,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMenuListDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMenuManageController#insertMenuList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMenuListInsert.do",
+      "line": 339,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/sym/prm/service/EgovProgrmManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMenuManageController#selectMenuList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMenuListSelect.do",
+      "line": 316,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMenuListSelect.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListSelect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListSelect.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListSelect.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListSelect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMenuManageController#selectMenuListMvmn",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMenuListSelectMvmn.do",
+      "line": 445,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmn.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmn.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmn.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmn.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmn.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMenuManageController#selectMenuListMvmnNew",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMenuListSelectMvmnNew.do",
+      "line": 467,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmnNew.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmnNew.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmnNew.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmnNew.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmnNew.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMenuManageController#updateMenuList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMenuListUpdt.do",
+      "line": 382,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/sym/prm/service/EgovProgrmManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMenuManageController#deleteMenuManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMenuManageDelete.do",
+      "line": 285,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMenuManageDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMenuManageController#deleteMenuManageList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMenuManageListDelete.do",
+      "line": 160,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMenuManageListDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageListDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageListDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageListDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageListDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageListDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMenuManageController#selectMenuManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMenuManageListDetailSelect.do",
+      "line": 94,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMenuManageListDetailSelect.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageListDetailSelect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageListDetailSelect.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageListDetailSelect.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageListDetailSelect.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageListDetailSelect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMenuManageController#selectMenuManageList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMenuManageSelect.do",
+      "line": 119,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMenuManageSelect.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageSelect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageSelect.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageSelect.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageSelect.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuManageSelect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMenuManageController#insertMenuManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "flowId": "flow:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do",
+      "line": 201,
+      "stepIds": [
+        "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/sym/prm/service/EgovProgrmManageService.java",
+        "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "sym.mnu.mpm",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenu.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenu.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenu.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenu.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenu.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenu.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenu.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuHead.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuHead.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuHead.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuHead.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuHead.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuHead.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuHead.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuHome.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuHome.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuHome.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuHome.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuHome.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuHome.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuIndex.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuIndex.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuLeft.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuLeft.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuLeft.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuLeft.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuLeft.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuLeft.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuLeft.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuRight.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuRight.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuRight.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuRight.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuRight.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMainMenuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMainMenuRight.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuBndeAllDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuBndeAllDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuBndeAllDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuBndeAllDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuBndeAllDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuBndeRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuBndeRegist.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuBndeRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuBndeRegist.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuBndeRegist.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuBndeRegist.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/prm/service/EgovProgrmManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuDetailSelectUpdt.do:src/main/java/egovframework/com/sym/prm/service/EgovProgrmManageService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/prm/service/EgovProgrmManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListInsert.do:src/main/java/egovframework/com/sym/prm/service/EgovProgrmManageService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListSelect.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListSelect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListSelect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListSelect.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListSelect.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmn.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmn.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmn.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmn.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmn.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmnNew.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmnNew.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmnNew.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmnNew.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListSelectMvmnNew.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/prm/service/EgovProgrmManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuListUpdt.do:src/main/java/egovframework/com/sym/prm/service/EgovProgrmManageService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageListDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageListDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageListDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageListDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageListDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageListDelete.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageListDetailSelect.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageListDetailSelect.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageListDetailSelect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageListDetailSelect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageListDetailSelect.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageListDetailSelect.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageSelect.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageSelect.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageSelect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageSelect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageSelect.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuManageSelect.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/sym/mnu/mpm/service/MenuManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/sym/mnu/mpm/web/EgovMenuManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/prm/service/EgovProgrmManageService.java",
+      "stepId": "step:ANY /sym/mnu/mpm/EgovMenuRegistInsert.do:src/main/java/egovframework/com/sym/prm/service/EgovProgrmManageService.java"
+    }
+  ]
+}

@@ -1,0 +1,598 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "cop.com-000",
+  "domainId": "domain:cop.com",
+  "header": {
+    "name": "협업 공통",
+    "summary": {
+      "text": "협업(커뮤니티·동호회) 업무에서 여러 화면이 함께 쓰는 공통 기능을 담당한다. 사용자 정보 목록을 조건에 따라 조회해 주고, 각 업무 화면이 필요할 때 공통 팝업 창을 열어 준다. 커뮤니티 사용자·관리자, 동호회 사용자·운영자 등 협업 참여자 목록을 한 곳에서 조회할 수 있게 제공한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/com/service/EgovUserInfManageService.java",
+          "line": 22,
+          "snippet": "public interface EgovUserInfManageService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+          "line": 38,
+          "snippet": "@RequestMapping(\"/cop/com/openPopup.do\")"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "사용자 정보 - 유일 아이디, 사용자 아이디, 사용자 명, 우편번호, 주소, 이메일을 담는 협업 참여자 정보이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/service/UserInfVO.java",
+            "line": 32,
+            "snippet": "private String uniqId = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/service/UserInfVO.java",
+            "line": 35,
+            "snippet": "private String userId = \"\";"
+          }
+        ]
+      },
+      {
+        "text": "커뮤니티 - 사용자 정보에 커뮤니티 아이디가 함께 보관되어, 특정 커뮤니티에 속한 사용자와 관리자를 구분해 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/service/UserInfVO.java",
+            "line": 95,
+            "snippet": "private String cmmntyId = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/service/EgovUserInfManageService.java",
+            "line": 40,
+            "snippet": "public Map<String, Object> selectCmmntyUserList(UserInfVO userVO) throws Exception;"
+          }
+        ]
+      },
+      {
+        "text": "동호회 - 동호회 사용자 목록과 동호회 운영자 목록을 별도로 조회하며, 동호회 전체 사용자 목록도 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/service/EgovUserInfManageService.java",
+            "line": 58,
+            "snippet": "public Map<String, Object> selectClubUserList(UserInfVO userVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/service/EgovUserInfManageService.java",
+            "line": 76,
+            "snippet": "public List<UserInfVO> selectAllClubUser(UserInfVO userVO) throws Exception;"
+          }
+        ]
+      },
+      {
+        "text": "검색·페이징 조건 - 검색조건, 검색단어, 정렬순서, 현재 페이지 등 목록 조회를 위한 조건을 사용자 정보와 함께 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/service/UserInfVO.java",
+            "line": 68,
+            "snippet": "private int pageIndex = 1;"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "사용자 목록 조회 시 팝업 여부 값이 'Y'이면 팝업 전용 목록 화면을, 그렇지 않으면 일반 목록 화면을 보여 준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+            "line": 57,
+            "snippet": "if (\"Y\".equals(popFlag)) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+            "line": 58,
+            "snippet": "returnUrl = \"egovframework/com/cop/com/EgovUserListPop\";"
+          }
+        ]
+      },
+      {
+        "text": "목록 한 페이지에 보여 줄 건수와 페이지 크기는 화면에서 받지 않고 시스템 설정값에서 가져와 적용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+            "line": 61,
+            "snippet": "userVO.setPageUnit(propertyService.getInt(\"pageUnit\"));"
+          }
+        ]
+      },
+      {
+        "text": "공통 팝업을 열 때 대상 아이디가 있으면 호출 주소에 대상 아이디를 덧붙이고, 없으면 팝업 표시 여부만 덧붙인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+            "line": 47,
+            "snippet": "if (trgetId != null && !trgetId.isEmpty()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+            "line": 41,
+            "snippet": "String requestUrl = (String) commandMap.get(\"requestUrl\");"
+          }
+        ]
+      },
+      {
+        "text": "공통 팝업으로 열리는 화면 주소에는 팝업 표시 값이 항상 붙어, 열린 화면이 스스로 팝업임을 알 수 있게 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+            "line": 63,
+            "snippet": "model.addAttribute(\"height\", height);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+            "line": 38,
+            "snippet": "@RequestMapping(\"/cop/com/openPopup.do\")"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "사용자 관리 업무와 연계 - 협업 화면에서 필요한 사용자 정보 목록을 사용자 정보 관리 서비스에 위임해 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+            "line": 74,
+            "snippet": "Map<String, Object> map = userInfService.selectUserList(userVO);"
+          }
+        ]
+      },
+      {
+        "text": "협업 하위 업무(커뮤니티·동호회) 화면과 연계 - 각 업무 화면이 요청한 주소를 받아 공통 팝업 프레임으로 감싸 열어 준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+            "line": 41,
+            "snippet": "String requestUrl = (String) commandMap.get(\"requestUrl\");"
+          }
+        ]
+      },
+      {
+        "text": "공통 설정 업무와 연계 - 목록 페이징 기준값을 시스템 공통 설정 서비스에서 읽어 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+            "line": 61,
+            "snippet": "userVO.setPageUnit(propertyService.getInt(\"pageUnit\"));"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "사용자 목록 조회",
+        "nodes": [
+          {
+            "id": "n1",
+            "kind": "start",
+            "label": "목록 조회 요청"
+          },
+          {
+            "id": "n2",
+            "kind": "activity",
+            "label": "조회 조건 접수",
+            "flowRef": "flow:ANY /cop/com/selectUserList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+                "line": 52,
+                "snippet": "@RequestMapping(\"/cop/com/selectUserList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n3",
+            "kind": "decision",
+            "label": "팝업 호출인가",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+                "line": 57,
+                "snippet": "if (\"Y\".equals(popFlag)) {"
+              }
+            ]
+          },
+          {
+            "id": "n4",
+            "kind": "activity",
+            "label": "팝업용 목록 화면 선택",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+                "line": 58,
+                "snippet": "returnUrl = \"egovframework/com/cop/com/EgovUserListPop\";"
+              }
+            ]
+          },
+          {
+            "id": "n5",
+            "kind": "activity",
+            "label": "일반 목록 화면 선택",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+                "line": 55,
+                "snippet": "String returnUrl = \"egovframework/com/cop/com/EgovUserList\";"
+              }
+            ]
+          },
+          {
+            "id": "n6",
+            "kind": "activity",
+            "label": "페이징 기준 적용",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+                "line": 64,
+                "snippet": "PaginationInfo paginationInfo = new PaginationInfo();"
+              }
+            ]
+          },
+          {
+            "id": "n7",
+            "kind": "activity",
+            "label": "사용자 목록 조회",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+                "line": 74,
+                "snippet": "Map<String, Object> map = userInfService.selectUserList(userVO);"
+              }
+            ]
+          },
+          {
+            "id": "n8",
+            "kind": "activity",
+            "label": "총 건수와 목록 화면 전달",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+                "line": 75,
+                "snippet": "int totCnt = Integer.parseInt((String) map.get(\"resultCnt\"));"
+              }
+            ]
+          },
+          {
+            "id": "n9",
+            "kind": "end",
+            "label": "목록 화면 표시"
+          }
+        ],
+        "edges": [
+          { "from": "n1", "to": "n2" },
+          { "from": "n2", "to": "n3" },
+          { "from": "n3", "to": "n4", "label": "팝업" },
+          { "from": "n3", "to": "n5", "label": "일반 화면" },
+          { "from": "n4", "to": "n6" },
+          { "from": "n5", "to": "n6" },
+          { "from": "n6", "to": "n7" },
+          { "from": "n7", "to": "n8" },
+          { "from": "n8", "to": "n9" }
+        ]
+      },
+      {
+        "title": "공통 팝업 열기",
+        "nodes": [
+          {
+            "id": "p1",
+            "kind": "start",
+            "label": "팝업 열기 요청"
+          },
+          {
+            "id": "p2",
+            "kind": "activity",
+            "label": "호출 주소와 크기 접수",
+            "flowRef": "flow:ANY /cop/com/openPopup.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+                "line": 41,
+                "snippet": "String requestUrl = (String) commandMap.get(\"requestUrl\");"
+              }
+            ]
+          },
+          {
+            "id": "p3",
+            "kind": "decision",
+            "label": "대상 아이디가 있는가",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+                "line": 47,
+                "snippet": "if (trgetId != null && !trgetId.isEmpty()) {"
+              }
+            ]
+          },
+          {
+            "id": "p4",
+            "kind": "activity",
+            "label": "대상 아이디 포함 주소 구성",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+                "line": 47,
+                "snippet": "if (trgetId != null && !trgetId.isEmpty()) {"
+              }
+            ]
+          },
+          {
+            "id": "p5",
+            "kind": "activity",
+            "label": "팝업 표시만 붙인 주소 구성",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+                "line": 53,
+                "snippet": "} else {"
+              }
+            ]
+          },
+          {
+            "id": "p6",
+            "kind": "activity",
+            "label": "팝업 프레임 화면 반환",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+                "line": 63,
+                "snippet": "model.addAttribute(\"height\", height);"
+              }
+            ]
+          },
+          {
+            "id": "p7",
+            "kind": "end",
+            "label": "팝업 창 표시"
+          }
+        ],
+        "edges": [
+          { "from": "p1", "to": "p2" },
+          { "from": "p2", "to": "p3" },
+          { "from": "p3", "to": "p4", "label": "있음" },
+          { "from": "p3", "to": "p5", "label": "없음" },
+          { "from": "p4", "to": "p6" },
+          { "from": "p5", "to": "p6" },
+          { "from": "p6", "to": "p7" }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /cop/com/openPopup.do",
+      "name": "공통 팝업 열기",
+      "summary": {
+        "text": "협업 화면이 요청한 주소와 창 크기를 받아 공통 팝업 프레임으로 감싸 열어 주는 흐름이다. 대상 아이디와 유형 값이 있으면 호출 주소에 함께 붙여, 열린 화면이 대상과 팝업 여부를 알 수 있게 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+            "line": 38,
+            "snippet": "@RequestMapping(\"/cop/com/openPopup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+            "line": 41,
+            "snippet": "String requestUrl = (String) commandMap.get(\"requestUrl\");"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/com/selectUserList.do",
+      "name": "사용자 목록 조회",
+      "summary": {
+        "text": "검색 조건과 페이지 정보를 받아 협업 참여자인 사용자 목록과 총 건수를 조회해 화면에 표시하는 흐름이다. 팝업으로 호출된 경우에는 팝업 전용 목록 화면으로 결과를 보여 준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+            "line": 52,
+            "snippet": "@RequestMapping(\"/cop/com/selectUserList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+            "line": 74,
+            "snippet": "Map<String, Object> map = userInfService.selectUserList(userVO);"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /cop/com/openPopup.do:src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+      "name": "공통 팝업 화면 요청 접수",
+      "summary": {
+        "text": "팝업 열기 요청을 받아 호출 주소, 대상 아이디, 창 너비와 높이, 유형 값을 꺼내 팝업 프레임 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+            "line": 38,
+            "snippet": "@RequestMapping(\"/cop/com/openPopup.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "협업 업무의 여러 화면이 공통으로 사용하는 팝업 진입점 역할을 한다. 화면이 보내 온 호출 주소와 창 크기를 받아, 팝업 표시 여부와 대상 아이디를 덧붙인 최종 주소를 만들고 공통 팝업 프레임 화면으로 위임한다. 실제 내용은 팝업 프레임 안에서 호출 주소의 화면이 그린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+              "line": 38,
+              "snippet": "@RequestMapping(\"/cop/com/openPopup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+              "line": 63,
+              "snippet": "model.addAttribute(\"height\", height);"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터를 하나의 묶음으로 받아 호출 주소, 대상 아이디, 너비, 높이, 유형 값을 꺼낸다. 별도의 형식 검증이나 권한 확인은 하지 않으며, 대상 아이디와 유형 값이 비어 있는지에 따라 주소 구성만 달라진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+              "line": 39,
+              "snippet": "public String openPopupWindow(@RequestParam Map<String, Object> commandMap, ModelMap model) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+              "line": 47,
+              "snippet": "if (trgetId != null && !trgetId.isEmpty()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/com/selectUserList.do:src/main/java/egovframework/com/cop/com/service/EgovUserInfManageService.java",
+      "name": "사용자 정보 관리 서비스",
+      "summary": {
+        "text": "사용자 목록, 커뮤니티 사용자·관리자 목록, 동호회 사용자·운영자 목록 등 협업 참여자 조회 업무를 규정한 서비스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/service/EgovUserInfManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovUserInfManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "협업 화면이 필요로 하는 사용자 정보 조회를 한데 모아 제공하는 서비스이다. 전체 사용자 목록 조회를 비롯해 커뮤니티 사용자와 관리자, 동호회 사용자와 운영자를 각각 구분해 조회하고, 커뮤니티·동호회 단위의 전체 사용자 목록도 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/service/EgovUserInfManageService.java",
+              "line": 31,
+              "snippet": "public Map<String, Object> selectUserList(UserInfVO userVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/service/EgovUserInfManageService.java",
+              "line": 40,
+              "snippet": "public Map<String, Object> selectCmmntyUserList(UserInfVO userVO) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "조회 조건을 담은 사용자 정보를 입력받아 목록과 총 건수를 함께 돌려주는 방식으로 페이징 조회를 지원한다. 동호회·커뮤니티 전체 사용자 조회는 페이징 없이 사용자 목록만 돌려준다. 조회 대상 구분(사용자·관리자·운영자)은 별도 업무 기능으로 나뉘어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/service/EgovUserInfManageService.java",
+              "line": 58,
+              "snippet": "public Map<String, Object> selectClubUserList(UserInfVO userVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/service/EgovUserInfManageService.java",
+              "line": 76,
+              "snippet": "public List<UserInfVO> selectAllClubUser(UserInfVO userVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/com/selectUserList.do:src/main/java/egovframework/com/cop/com/service/UserInfVO.java",
+      "name": "사용자 정보 전달 항목",
+      "summary": {
+        "text": "사용자 식별 정보와 연락처, 검색 조건, 페이징 정보를 함께 담아 화면과 서비스 사이를 오가는 데이터 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/service/UserInfVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사용자 목록 조회 요청과 결과에서 공통으로 쓰이는 데이터 구조이다. 화면이 입력한 검색 조건과 페이지 번호를 서비스로 전달하고, 조회된 사용자 한 건의 식별 정보와 연락처를 화면으로 돌려주는 두 가지 용도를 함께 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/service/UserInfVO.java",
+              "line": 29,
+              "snippet": "public class UserInfVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/service/UserInfVO.java",
+              "line": 68,
+              "snippet": "private int pageIndex = 1;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "유일 아이디와 사용자 아이디, 사용자 명, 우편번호, 주소, 이메일 등 사용자 항목과 커뮤니티 아이디, 대상 아이디, 사용 여부를 가진다. 검색 조건과 검색 단어, 정렬 순서, 현재 페이지와 페이지당 건수 같은 목록 조건도 함께 지닌다. 문자 항목은 빈 값으로, 페이지 번호는 첫 페이지로, 사용 여부는 사용함으로 초기화되어 값이 없어도 조회가 가능하다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/service/UserInfVO.java",
+              "line": 32,
+              "snippet": "private String uniqId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/service/UserInfVO.java",
+              "line": 35,
+              "snippet": "private String userId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/service/UserInfVO.java",
+              "line": 95,
+              "snippet": "private String cmmntyId = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/com/selectUserList.do:src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+      "name": "사용자 목록 조회 요청 접수",
+      "summary": {
+        "text": "사용자 목록 조회 요청을 받아 페이징 기준을 적용하고 조회 결과와 총 건수를 목록 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+            "line": 52,
+            "snippet": "@RequestMapping(\"/cop/com/selectUserList.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사용자 목록 조회 화면의 진입점 역할을 한다. 화면에서 온 검색 조건에 시스템 설정의 페이징 기준을 채워 사용자 정보 관리 서비스에 조회를 위임하고, 돌려받은 목록과 총 건수를 페이징 정보와 함께 화면에 담아 준다. 팝업 호출이면 팝업 전용 목록 화면을, 아니면 일반 목록 화면을 지정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+              "line": 74,
+              "snippet": "Map<String, Object> map = userInfService.selectUserList(userVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+              "line": 57,
+              "snippet": "if (\"Y\".equals(popFlag)) {"
+            }
+          ]
+        },
+        "request": {
+          "text": "검색 조건을 담은 사용자 정보와 팝업 여부 값을 함께 받는다. 페이지당 건수와 페이지 크기는 요청 값이 아니라 시스템 설정에서 읽어 덮어쓰며, 이를 바탕으로 조회 시작·종료 위치를 계산해 조건에 채운다. 별도의 입력 검증이나 권한 확인은 이 지점에서 수행하지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+              "line": 53,
+              "snippet": "public String selectUserList(@ModelAttribute(\"searchVO\") UserInfVO userVO, @RequestParam Map<String, Object> commandMap, ModelMap model) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+              "line": 61,
+              "snippet": "userVO.setPageUnit(propertyService.getInt(\"pageUnit\"));"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

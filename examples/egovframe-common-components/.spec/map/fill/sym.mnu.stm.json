@@ -1,0 +1,763 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "n_start",
+          "to": "n_auth"
+        },
+        {
+          "from": "n_auth",
+          "to": "n_keyword"
+        },
+        {
+          "from": "n_keyword",
+          "to": "n_author"
+        },
+        {
+          "from": "n_author",
+          "to": "n_cond"
+        },
+        {
+          "from": "n_cond",
+          "to": "n_list"
+        },
+        {
+          "from": "n_list",
+          "to": "n_model"
+        },
+        {
+          "from": "n_model",
+          "to": "n_view"
+        },
+        {
+          "from": "n_view",
+          "to": "n_end"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "n_start",
+          "kind": "start",
+          "label": "사이트맵 화면 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 77,
+              "snippet": "    \tLoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/mnu/stm/EgovSiteMapng.do",
+          "id": "n_auth",
+          "kind": "activity",
+          "label": "인증 사용자 정보 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 78,
+              "snippet": "    \tsearchVO.setSearchKeyword(user.getId());"
+            }
+          ],
+          "id": "n_keyword",
+          "kind": "activity",
+          "label": "사용자 아이디를 검색어로 설정"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 80,
+              "snippet": "\t\tMenuCreatVO menuVO = menuCreateManageService.selectAuthorByUsr(searchVO);"
+            }
+          ],
+          "id": "n_author",
+          "kind": "activity",
+          "label": "사용자 권한코드 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 83,
+              "snippet": "    \tmenuSiteMapVO.setAuthorCode(menuVO.getAuthorCode());"
+            }
+          ],
+          "id": "n_cond",
+          "kind": "activity",
+          "label": "권한코드를 조회조건에 설정"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 84,
+              "snippet": "    \tList<EgovMap> resultList = menuCreateManageService.selectMenuCreatSiteMapList(menuSiteMapVO);"
+            }
+          ],
+          "id": "n_list",
+          "kind": "activity",
+          "label": "권한별 사이트맵 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 87,
+              "snippet": "        model.addAttribute(\"resultList\", resultList);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 88,
+              "snippet": "        model.addAttribute(\"authorCode\", menuVO.getAuthorCode());"
+            }
+          ],
+          "id": "n_model",
+          "kind": "activity",
+          "label": "목록과 권한코드 화면 전달"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 90,
+              "snippet": "        return \"egovframework/com/sym/mnu/stm/EgovSiteMapng\";"
+            }
+          ],
+          "id": "n_view",
+          "kind": "activity",
+          "label": "사이트맵 화면 출력"
+        },
+        {
+          "id": "n_end",
+          "kind": "end",
+          "label": "사이트맵 조회 완료"
+        }
+      ],
+      "title": "사이트맵 조회"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+          "line": 77,
+          "snippet": "    \tLoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+          "line": 78,
+          "snippet": "    \tsearchVO.setSearchKeyword(user.getId());"
+        }
+      ],
+      "text": "사이트맵은 인증된 사용자 기준으로만 조회한다. 인증 사용자 정보를 먼저 가져와 그 아이디를 검색어로 설정한 뒤 권한 조회로 이어진다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+          "line": 80,
+          "snippet": "\t\tMenuCreatVO menuVO = menuCreateManageService.selectAuthorByUsr(searchVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+          "line": 83,
+          "snippet": "    \tmenuSiteMapVO.setAuthorCode(menuVO.getAuthorCode());"
+        }
+      ],
+      "text": "표시할 메뉴 범위는 사용자 아이디로 조회한 권한코드가 결정한다. 조회된 권한코드를 사이트맵 조회 조건에 그대로 설정해 권한별 사이트맵 내용을 얻는다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+          "line": 87,
+          "snippet": "        model.addAttribute(\"resultList\", resultList);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+          "line": 88,
+          "snippet": "        model.addAttribute(\"authorCode\", menuVO.getAuthorCode());"
+        }
+      ],
+      "text": "조회 결과 목록과 함께 적용된 권한코드도 화면 모델에 담아 전달하여, 사이트맵 화면이 어떤 권한 기준으로 구성됐는지 알 수 있게 한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuSiteMapVO.java",
+          "line": 38,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuSiteMapVO.java",
+          "line": 39,
+          "snippet": "\t@Size(max=50)"
+        }
+      ],
+      "text": "사이트맵 항목의 메뉴번호·메뉴순서·메뉴명·상위메뉴번호·프로그램파일명은 필수값이며 메뉴명과 프로그램파일명은 50자 이내여야 한다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/EgovMenuCreateManageService.java",
+          "line": 26,
+          "snippet": "public interface EgovMenuCreateManageService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/EgovMenuCreateManageService.java",
+          "line": 86,
+          "snippet": "\tList<EgovMap> selectMenuCreatSiteMapList(MenuSiteMapVO vo) throws Exception;"
+        }
+      ],
+      "text": "메뉴생성관리 업무에 사이트맵 데이터 조회를 위임한다. 사용자 권한코드 조회와 권한별 사이트맵 목록 조회를 모두 메뉴생성관리 서비스가 수행한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 41,
+          "snippet": "\tpublic static Object getAuthenticatedUser() {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 5,
+          "snippet": "public interface EgovUserDetailsService {"
+        }
+      ],
+      "text": "공통 인증 업무에 의존한다. 인증된 사용자 객체·권한 목록·인증 여부 확인을 공통 사용자 인증 도우미와 인증 서비스를 통해 제공받는다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 23,
+          "snippet": "public class ComDefaultVO implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        }
+      ],
+      "text": "공통 조회조건·로그인 사용자 등 공통 모델을 그대로 사용하여, 사이트맵 요청 파라미터와 인증 사용자 표현을 시스템 공통 규격에 맞춘다."
+    }
+  ],
+  "domainId": "domain:sym.mnu.stm",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuSiteMapVO.java",
+          "line": 29,
+          "snippet": "public class MenuSiteMapVO {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuSiteMapVO.java",
+          "line": 62,
+          "snippet": "\t/** 맵생성ID */"
+        }
+      ],
+      "text": "사이트맵 항목: 메뉴번호·메뉴순서·메뉴명·상위메뉴번호·프로그램파일명 등 메뉴 계층 정보와 맵생성ID·맵파일명·맵파일경로 같은 사이트맵 정보, 그리고 권한코드·권한명 등 권한 정보를 함께 담는다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuCreatVO.java",
+          "line": 27,
+          "snippet": "public class MenuCreatVO {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuCreatVO.java",
+          "line": 58,
+          "snippet": "\tprivate String authorCode;"
+        }
+      ],
+      "text": "메뉴생성 항목: 메뉴번호·메뉴순서·메뉴명·상위메뉴번호·프로그램파일명과 권한코드·생성자ID를 보유하며, 사용자 권한코드를 사이트맵 조회로 넘겨주는 매개 역할을 한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 42,
+          "snippet": "\tprivate String id;"
+        }
+      ],
+      "text": "로그인 사용자: 아이디·이름·이메일·사용자구분·조직ID·고유아이디 등 인증된 사용자 정보를 담으며, 사이트맵 조회의 검색 기준이 되는 아이디를 제공한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 23,
+          "snippet": "public class ComDefaultVO implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 29,
+          "snippet": "    private String searchKeyword = \"\";"
+        }
+      ],
+      "text": "공통 조회조건: 검색조건·검색어·검색사용여부와 현재페이지·페이지개수·페이지사이즈 등 목록 조회 공통 항목을 담아 사이트맵 조회 요청의 입력으로 쓰인다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /sym/mnu/stm/EgovSiteMapng.do",
+      "name": "사이트맵 화면 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+            "line": 72,
+            "snippet": "@RequestMapping(value = \"/sym/mnu/stm/EgovSiteMapng.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+            "line": 84,
+            "snippet": "    \tList<EgovMap> resultList = menuCreateManageService.selectMenuCreatSiteMapList(menuSiteMapVO);"
+          }
+        ],
+        "text": "사이트맵 화면 요청을 받아 인증된 사용자의 아이디로 권한코드를 조회하고, 해당 권한코드로 열람 가능한 메뉴생성 사이트맵 목록을 받아 화면에 전달한다."
+      }
+    }
+  ],
+  "name": "사이트맵",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 35,
+              "snippet": "    private Integer pageIndex = 1;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 59,
+              "snippet": "\t\treturn firstIndex == null ? 1 : firstIndex;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 75,
+              "snippet": "\t\treturn recordCountPerPage == null ? 10 : recordCountPerPage;"
+            }
+          ],
+          "text": "검색조건·검색어·검색사용여부·검색어시작·검색어종료와 현재페이지·페이지개수·페이지사이즈·시작인덱스·종료인덱스·페이지당 레코드수를 갖는다. 문자열 항목은 빈 값으로, 페이지 항목은 기본값으로 초기화되며, 인덱스 조회 시 값이 없으면 1을, 페이지당 레코드수는 10을 돌려주어 결코 빈 값이 되지 않는 불변식을 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 29,
+              "snippet": "    private String searchKeyword = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 80,
+              "snippet": "\t\tMenuCreatVO menuVO = menuCreateManageService.selectAuthorByUsr(searchVO);"
+            }
+          ],
+          "text": "사이트맵 조회 요청을 받을 때 화면 파라미터를 담는 공통 데이터 구조다. 이 흐름에서는 인증 사용자의 아이디가 검색어로 설정된 뒤, 권한코드 조회의 입력으로 그대로 넘겨진다."
+        }
+      },
+      "name": "공통 조회조건",
+      "stepId": "step:ANY /sym/mnu/stm/EgovSiteMapng.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+            "line": 23,
+            "snippet": "public class ComDefaultVO implements Serializable {"
+          }
+        ],
+        "text": "검색조건·검색어와 페이지 정보를 담는 공통 조회조건 모델로, 사이트맵 조회 요청의 입력 파라미터로 사용된다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 50,
+              "snippet": "\t@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디·이름·주민등록번호·이메일·비밀번호와 힌트·정답, 사용자구분·조직ID·조직명·고유아이디, 로그인 후 이동 페이지·접속IP·인증DN·디지털원패스 사용자키와 세션값을 갖는다. 아이디·이름·이메일·비밀번호 힌트·정답은 필수값이며 이메일은 형식 검증 대상이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 78,
+              "snippet": "    \tsearchVO.setSearchKeyword(user.getId());"
+            }
+          ],
+          "text": "사이트맵 조회 흐름에서 인증 도우미가 돌려준 사용자 정보를 담아 전달하는 데이터 구조다. 여기서 꺼낸 아이디가 검색어로 설정되어 권한코드 조회의 입력이 된다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /sym/mnu/stm/EgovSiteMapng.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "인증된 사용자의 아이디·이름·이메일·조직 등 로그인 정보를 담는 공통 모델로, 사이트맵 조회에서 권한 조회의 기준 아이디를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자객체를 값 객체 형식으로 가져오기, 관리자·사용자·인증완료 여부 등 사용자 권한 정보 목록 가져오기, 인증된 사용자 여부를 참·거짓으로 확인하기 세 가지 작업을 규정한다. 구현은 별도이며 규약은 이 세 조회만을 보장한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 42,
+              "snippet": "\t\treturn egovUserDetailsService.getAuthenticatedUser();"
+            }
+          ],
+          "text": "사이트맵 조회 흐름에서 인증 확인 작업의 실제 규약을 정의한다. 인증 도우미가 이 서비스에 위임해 인증된 사용자 객체를 가져오고, 사이트맵 조회는 그 결과에서 사용자 아이디를 얻는다."
+        }
+      },
+      "name": "사용자 인증 서비스",
+      "stepId": "step:ANY /sym/mnu/stm/EgovSiteMapng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증된 사용자 객체와 권한 목록, 인증 여부를 조회하는 공통 인증 서비스 규약으로, 사이트맵 조회의 사용자 확인 근거가 된다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "자체 데이터는 갖지 않고 인증 서비스 참조 하나만 보유한다. 인증된 사용자객체 조회, 권한정보 목록 조회, 인증 여부 확인 세 가지를 제공하며, 이를 쓰려면 인증 서비스가 미리 설정돼 있어야 한다는 불변식을 지닌다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 42,
+              "snippet": "\t\treturn egovUserDetailsService.getAuthenticatedUser();"
+            }
+          ],
+          "text": "사이트맵 조회 흐름에서 인증 사용자 정보의 창구 역할을 한다. 실제 인증 조회 로직은 내부에 설정된 인증 서비스가 수행하고, 이 도우미는 호출 지점에 인증된 사용자 객체를 돌려주어 사이트맵 조회가 사용자 아이디를 얻도록 한다."
+        }
+      },
+      "name": "인증 사용자 정보 제공",
+      "stepId": "step:ANY /sym/mnu/stm/EgovSiteMapng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "인증된 사용자 객체·권한 목록·인증 여부를 어디서나 꺼내 쓸 수 있게 해주는 공통 도우미로, 사이트맵 조회의 사용자 식별 기준을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/EgovMenuCreateManageService.java",
+              "line": 34,
+              "snippet": "\tint selectUsrByPk(ComDefaultVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/EgovMenuCreateManageService.java",
+              "line": 78,
+              "snippet": "\tvoid insertMenuCreatList(String checkedScrtyForInsert, String checkedMenuNoForInsert) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/EgovMenuCreateManageService.java",
+              "line": 94,
+              "snippet": "\t List<?> selectSiteMapByUser(MenuSiteMapVO vo) throws Exception;"
+            }
+          ],
+          "text": "아이디 존재여부 확인, 아이디별 권한코드 조회, 메뉴생성관리 목록과 총건수 조회, 메뉴생성 내역 조회, 화면에서 선택한 메뉴로 메뉴생성내역 입력, 메뉴생성 사이트맵 내용 조회, 사용자 권한별 사이트맵 조회를 규정한다. 사이트맵 조회는 권한코드가 담긴 사이트맵 조건 객체를 받아 열람 가능한 메뉴만 돌려주는 규칙을 따른다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/EgovMenuCreateManageService.java",
+              "line": 42,
+              "snippet": "\tMenuCreatVO selectAuthorByUsr(ComDefaultVO vo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/EgovMenuCreateManageService.java",
+              "line": 86,
+              "snippet": "\tList<EgovMap> selectMenuCreatSiteMapList(MenuSiteMapVO vo) throws Exception;"
+            }
+          ],
+          "text": "사이트맵 조회 흐름에서 데이터 조회 전반을 조율한다. 아이디로 권한코드를 조회하는 작업과 권한코드가 설정된 조건으로 메뉴생성 사이트맵 목록을 조회하는 작업 두 가지를 이 흐름에 제공한다."
+        }
+      },
+      "name": "메뉴생성관리 서비스",
+      "stepId": "step:ANY /sym/mnu/stm/EgovSiteMapng.do:src/main/java/egovframework/com/sym/mnu/mcm/service/EgovMenuCreateManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/EgovMenuCreateManageService.java",
+            "line": 26,
+            "snippet": "public interface EgovMenuCreateManageService {"
+          }
+        ],
+        "text": "메뉴생성 내역과 사이트맵 내용, 사용자 권한코드 조회를 담당하는 서비스로, 사이트맵 조회에 권한코드와 권한별 사이트맵 목록을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuCreatVO.java",
+              "line": 31,
+              "snippet": "\tprivate int menuNo;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuCreatVO.java",
+              "line": 37,
+              "snippet": "\t@Size(max=50)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuCreatVO.java",
+              "line": 47,
+              "snippet": "\t@Size(max=100)"
+            }
+          ],
+          "text": "메뉴번호·메뉴순서·메뉴명·상위메뉴번호·프로그램파일명·메뉴설명·관련이미지경로와 이름·맵생성ID·권한코드, 그리고 권한명·권한설명·권한생성일자·생성자ID를 갖는다. 메뉴번호·메뉴순서·메뉴명·상위메뉴번호·프로그램파일명은 필수값이고 메뉴명과 프로그램파일명은 50자, 메뉴설명은 100자를 넘을 수 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuCreatVO.java",
+              "line": 58,
+              "snippet": "\tprivate String authorCode;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 83,
+              "snippet": "    \tmenuSiteMapVO.setAuthorCode(menuVO.getAuthorCode());"
+            }
+          ],
+          "text": "사이트맵 조회 흐름에서 아이디로 권한코드를 조회한 결과를 담는 데이터 구조다. 여기서 꺼낸 권한코드가 사이트맵 조회조건에 설정되고 화면 모델에도 함께 전달된다."
+        }
+      },
+      "name": "메뉴생성 정보",
+      "stepId": "step:ANY /sym/mnu/stm/EgovSiteMapng.do:src/main/java/egovframework/com/sym/mnu/mcm/service/MenuCreatVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuCreatVO.java",
+            "line": 27,
+            "snippet": "public class MenuCreatVO {"
+          }
+        ],
+        "text": "메뉴번호·메뉴명·상위메뉴번호·프로그램파일명과 권한 정보를 담는 메뉴생성 모델로, 사이트맵 조회에서는 사용자 권한코드를 실어 나른다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuSiteMapVO.java",
+              "line": 33,
+              "snippet": "\tprivate int menuNo;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuSiteMapVO.java",
+              "line": 64,
+              "snippet": "\tprivate String bndeFileNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuSiteMapVO.java",
+              "line": 80,
+              "snippet": "\tprivate String tmpRootPath;"
+            }
+          ],
+          "text": "메뉴번호·메뉴순서·메뉴명·상위메뉴번호·프로그램파일명·메뉴설명·관련이미지 정보와, 생성자ID·맵생성ID·맵파일명·맵파일경로, 권한코드·권한명·권한설명·권한생성일자, 임시 루트경로 및 로그인 메뉴용 임시 항목을 갖는다. 메뉴번호·메뉴순서·메뉴명·상위메뉴번호·프로그램파일명은 필수값이고 메뉴명·프로그램파일명은 50자를 넘을 수 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuSiteMapVO.java",
+              "line": 70,
+              "snippet": "\tprivate String authorCode;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 84,
+              "snippet": "    \tList<EgovMap> resultList = menuCreateManageService.selectMenuCreatSiteMapList(menuSiteMapVO);"
+            }
+          ],
+          "text": "사이트맵 조회 흐름의 조회조건 데이터 구조다. 권한코드 조회 결과를 설정받아 메뉴생성관리 서비스의 사이트맵 목록 조회에 입력으로 전달되며, 이로써 조회 범위를 사용자 권한으로 제한한다."
+        }
+      },
+      "name": "사이트맵 조회조건",
+      "stepId": "step:ANY /sym/mnu/stm/EgovSiteMapng.do:src/main/java/egovframework/com/sym/mnu/mcm/service/MenuSiteMapVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/mnu/mcm/service/MenuSiteMapVO.java",
+            "line": 29,
+            "snippet": "public class MenuSiteMapVO {"
+          }
+        ],
+        "text": "메뉴 계층 정보와 맵 파일 정보, 권한 정보를 함께 담는 사이트맵 모델로, 권한코드를 조건으로 실어 사이트맵 목록 조회에 사용된다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 74,
+              "snippet": "    \t\t@ModelAttribute(\"searchVO\") ComDefaultVO searchVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 77,
+              "snippet": "    \tLoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 78,
+              "snippet": "    \tsearchVO.setSearchKeyword(user.getId());"
+            }
+          ],
+          "text": "공통 조회조건 객체를 요청 파라미터로 받고 화면 모델을 함께 넘겨받는다. 권한 처리는 인증된 사용자 객체를 가져와 그 아이디를 검색어로 설정하는 방식으로 이뤄지며, 이후 조회는 모두 이 아이디에서 얻은 권한코드를 기준으로 제한된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 72,
+              "snippet": "@RequestMapping(value = \"/sym/mnu/stm/EgovSiteMapng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+              "line": 90,
+              "snippet": "        return \"egovframework/com/sym/mnu/stm/EgovSiteMapng\";"
+            }
+          ],
+          "text": "사이트맵 업무의 유일한 화면 진입점이다. 사이트맵 조회 요청을 받아 인증 정보 확인은 공통 인증 도우미에, 권한코드와 사이트맵 목록 조회는 메뉴생성관리 서비스에 위임한 뒤, 조회 결과와 적용 권한코드를 사이트맵 화면으로 전달한다."
+        }
+      },
+      "name": "사이트맵 조회 요청 접수",
+      "stepId": "step:ANY /sym/mnu/stm/EgovSiteMapng.do:src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+            "line": 72,
+            "snippet": "@RequestMapping(value = \"/sym/mnu/stm/EgovSiteMapng.do\")"
+          }
+        ],
+        "text": "사이트맵 화면 주소로 들어온 요청을 받아 인증 사용자 확인, 권한코드 조회, 권한별 사이트맵 목록 조회를 차례로 수행하고 결과를 사이트맵 화면에 넘긴다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+        "line": 72,
+        "snippet": "@RequestMapping(value = \"/sym/mnu/stm/EgovSiteMapng.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/sym/mnu/stm/web/EgovSiteMapngController.java",
+        "line": 84,
+        "snippet": "    \tList<EgovMap> resultList = menuCreateManageService.selectMenuCreatSiteMapList(menuSiteMapVO);"
+      }
+    ],
+    "text": "로그인한 사용자의 권한에 맞는 메뉴 계층을 한 화면에 펼쳐 보여주는 사이트맵 업무 영역이다. 사용자 인증 정보에서 아이디를 얻어 권한코드를 조회하고, 그 권한코드로 열람 가능한 메뉴생성 사이트맵 목록을 받아 사이트맵 화면에 전달한다."
+  }
+}

@@ -1,0 +1,3251 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "a1"
+        },
+        {
+          "from": "a1",
+          "to": "a2"
+        },
+        {
+          "from": "a2",
+          "to": "a3"
+        },
+        {
+          "from": "a3",
+          "to": "a4"
+        },
+        {
+          "from": "a4",
+          "to": "e"
+        },
+        {
+          "from": "a2",
+          "to": "a5"
+        },
+        {
+          "from": "a5",
+          "to": "a6"
+        },
+        {
+          "from": "a6",
+          "to": "e"
+        },
+        {
+          "from": "a5",
+          "to": "a7"
+        },
+        {
+          "from": "a7",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "기념일 관리 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 83,
+              "snippet": "@RequestMapping(\"/uss/ion/ans/selectAnnvrsryManageListView.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/ans/selectAnnvrsryManageListView.do",
+          "id": "a1",
+          "kind": "activity",
+          "label": "기념일 목록 화면 진입"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 96,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/selectAnnvrsryManageList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/ans/selectAnnvrsryManageList.do",
+          "id": "a2",
+          "kind": "activity",
+          "label": "기념일 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 200,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/insertViewAnnvrsry.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/ans/insertViewAnnvrsry.do",
+          "id": "a3",
+          "kind": "activity",
+          "label": "기념일 등록 화면 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 229,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/insertAnnvrsry.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/ans/insertAnnvrsry.do",
+          "id": "a4",
+          "kind": "activity",
+          "label": "기념일 등록 처리"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 146,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/selectAnnvrsryManage.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/ans/selectAnnvrsryManage.do",
+          "id": "a5",
+          "kind": "activity",
+          "label": "기념일 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 275,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/updateAnnvrsryManage.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/ans/updateAnnvrsryManage.do",
+          "id": "a6",
+          "kind": "activity",
+          "label": "기념일 수정"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 320,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/deleteAnnvrsryManage.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/ans/deleteAnnvrsryManage.do",
+          "id": "a7",
+          "kind": "activity",
+          "label": "기념일 삭제"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "기념일 관리 종료"
+        }
+      ],
+      "title": "기념일 관리"
+    },
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "b1"
+        },
+        {
+          "from": "b1",
+          "to": "d1"
+        },
+        {
+          "from": "d1",
+          "label": "미인증",
+          "to": "gl"
+        },
+        {
+          "from": "gl",
+          "to": "e"
+        },
+        {
+          "from": "d1",
+          "label": "인증됨",
+          "to": "b2"
+        },
+        {
+          "from": "b2",
+          "to": "d2"
+        },
+        {
+          "from": "d2",
+          "label": "파일 있음",
+          "to": "b3"
+        },
+        {
+          "from": "d2",
+          "label": "파일 없음",
+          "to": "b4"
+        },
+        {
+          "from": "b3",
+          "to": "e"
+        },
+        {
+          "from": "b4",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "일괄등록 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/ans/EgovAnnvrsryManageListPop.do",
+          "id": "b1",
+          "kind": "activity",
+          "label": "일괄등록 화면 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 455,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            }
+          ],
+          "id": "d1",
+          "kind": "decision",
+          "label": "로그인 사용자 여부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 463,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPopAction.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/ans/EgovAnnvrsryManageListPopAction.do",
+          "id": "b2",
+          "kind": "activity",
+          "label": "업로드 파일 목록 확인"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 487,
+              "snippet": "\t\t\t\tif (!\"\".equals(file.getOriginalFilename())) {"
+            }
+          ],
+          "id": "d2",
+          "kind": "decision",
+          "label": "업로드 파일 존재 여부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 517,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/insertAnnvrsryManageBnde.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/ans/insertAnnvrsryManageBnde.do",
+          "id": "b3",
+          "kind": "activity",
+          "label": "기념일 일괄등록 처리"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 502,
+              "snippet": "\t\t\t\t\tresultMsg = egovMessageSource.getMessage(\"fail.common.msg\");"
+            }
+          ],
+          "id": "b4",
+          "kind": "activity",
+          "label": "오류 안내 메시지 표시"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 457,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ],
+          "id": "gl",
+          "kind": "activity",
+          "label": "로그인 화면으로 이동"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "일괄등록 종료"
+        }
+      ],
+      "title": "기념일 일괄등록"
+    },
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "c1"
+        },
+        {
+          "from": "c1",
+          "to": "c2"
+        },
+        {
+          "from": "c2",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "기념일 알림 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 337,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/selectAnnvrsryMainList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/ans/selectAnnvrsryMainList.do",
+          "id": "c1",
+          "kind": "activity",
+          "label": "메인 기념일 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 375,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/selectAnnvrsryGdcc.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/ans/selectAnnvrsryGdcc.do",
+          "id": "c2",
+          "kind": "activity",
+          "label": "알림 대상 기념일 조회"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "기념일 알림 종료"
+        }
+      ],
+      "title": "기념일 알림 안내"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+          "line": 54,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+          "line": 61,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+          "line": 69,
+          "snippet": "\t@EgovNullCheck"
+        }
+      ],
+      "text": "기념일명·기념일자·기념일구분·달력구분·메모는 반드시 입력되어야 한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+          "line": 63,
+          "snippet": "\t@Pattern(regexp=\"^\\\\d{4}-\\\\d{2}-\\\\d{2}$\", message=\"{validation.pattern.date}\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+          "line": 62,
+          "snippet": "\t@Size(max=10)"
+        }
+      ],
+      "text": "기념일자는 연-월-일 네 자리·두 자리·두 자리 형식이어야 하며 열 자리를 넘을 수 없다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+          "line": 47,
+          "snippet": "\t@Size(max=2)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+          "line": 55,
+          "snippet": "\t@Size(max=255)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+          "line": 91,
+          "snippet": "\t@Size(max=2500)"
+        }
+      ],
+      "text": "기념일구분은 두 자리, 기념일명은 255자, 메모는 2500자를 넘을 수 없다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+          "line": 455,
+          "snippet": "\t\tif (!isAuthenticated) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+          "line": 457,
+          "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+        }
+      ],
+      "text": "기념일 화면 요청은 로그인한 사용자만 처리하며 미인증 사용자는 로그인 화면으로 되돌린다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+          "line": 72,
+          "snippet": "\tpublic int selectAnnvrsryManageDplctAt(AnnvrsryManage annvrsryManage) throws Exception ;"
+        }
+      ],
+      "text": "기념일 등록 시 중복 여부를 확인한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+          "line": 487,
+          "snippet": "\t\t\t\tif (!\"\".equals(file.getOriginalFilename())) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+          "line": 502,
+          "snippet": "\t\t\t\t\tresultMsg = egovMessageSource.getMessage(\"fail.common.msg\");"
+        }
+      ],
+      "text": "일괄등록 시 업로드 파일이 비어 있으면 등록하지 않고 실패 안내 메시지를 표시한다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 58,
+          "snippet": "\tpublic static Boolean isAuthenticated() {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 24,
+          "snippet": "\tpublic Boolean isAuthenticated(); "
+        }
+      ],
+      "text": "인증 사용자 확인을 위해 공통 사용자 인증 기능에 로그인 여부와 사용자 정보를 요청한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 34,
+          "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+        }
+      ],
+      "text": "기념일구분·달력구분 선택 목록을 공통코드 조회 서비스에서 받아 화면에 제공한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 52,
+          "snippet": "\tpublic String getMessage(String code) {"
+        }
+      ],
+      "text": "처리 결과와 오류 안내 문구는 공통 메시지 관리 기능에서 조회한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+          "line": 457,
+          "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+        }
+      ],
+      "text": "미인증 사용자는 로그인 업무 화면으로 이동시킨다."
+    }
+  ],
+  "domainId": "domain:uss.ion.ans",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+          "line": 16,
+          "snippet": " * - 기념일관리의 사용자ID,기념일명,기념일자,달력구분,알림설정,알림시작일자,메모,최초등록자ID,최초등록시점,최종수정자ID,최종수정시점 항목을 관리한다."
+        }
+      ],
+      "text": "기념일: 사용자별 기념일 한 건으로 기념일구분·기념일명·기념일자·달력구분·알림설정·알림시작일자·메모를 관리한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+          "line": 30,
+          "snippet": "\tList<AnnvrsryManageVO> annvrsryManageList;"
+        }
+      ],
+      "text": "기념일 목록: 조회 결과 기념일들을 묶어 화면에 전달하는 목록 단위이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 42,
+          "snippet": "\tprivate String id;"
+        }
+      ],
+      "text": "로그인 사용자: 기념일의 소유자를 식별하는 인증 사용자 정보이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 31,
+          "snippet": "    private String codeId = \"\";"
+        }
+      ],
+      "text": "공통코드: 기념일구분·달력구분 등 화면 선택 항목을 제공하는 코드 정보이다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/ion/ans/EgovAnnvrsryManageListPop.do",
+      "name": "기념일 일괄등록 화면 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 445,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+          }
+        ],
+        "text": "사용자가 기념일 일괄등록 팝업 화면을 요청하면 로그인 여부를 확인한 뒤 일괄등록 화면을 보여준다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/ans/EgovAnnvrsryManageListPopAction.do",
+      "name": "기념일 일괄등록 파일 업로드 확인",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 463,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPopAction.do\")"
+          }
+        ],
+        "text": "업로드된 기념일 파일을 읽어 등록 대상 기념일 목록을 화면에 미리 보여준다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/ans/deleteAnnvrsryManage.do",
+      "name": "기념일 삭제",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 320,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/deleteAnnvrsryManage.do\")"
+          }
+        ],
+        "text": "선택된 기념일 정보를 삭제하고 처리 결과를 사용자에게 안내한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/ans/insertAnnvrsry.do",
+      "name": "기념일 등록 처리",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 229,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/insertAnnvrsry.do\")"
+          }
+        ],
+        "text": "입력된 기념일 정보를 검증한 뒤 신규 기념일로 등록한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/ans/insertAnnvrsryManageBnde.do",
+      "name": "기념일 일괄등록 처리",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 517,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/insertAnnvrsryManageBnde.do\")"
+          }
+        ],
+        "text": "미리 확인한 기념일 목록을 한 번에 일괄 등록한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/ans/insertViewAnnvrsry.do",
+      "name": "기념일 등록 화면 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 200,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/insertViewAnnvrsry.do\")"
+          }
+        ],
+        "text": "기념일 등록 화면에 필요한 공통코드와 로그인 사용자 정보를 준비해 입력 화면을 제공한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/ans/selectAnnvrsryGdcc.do",
+      "name": "기념일 알림 대상 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 375,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/selectAnnvrsryGdcc.do\")"
+          }
+        ],
+        "text": "알림 설정된 기념일 중 안내 대상 기념일을 조회해 알림 화면에 제공한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/ans/selectAnnvrsryMainList.do",
+      "name": "기념일 메인 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 337,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/selectAnnvrsryMainList.do\")"
+          }
+        ],
+        "text": "메인 화면에 표시할 로그인 사용자의 기념일 목록을 조회한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/ans/selectAnnvrsryManage.do",
+      "name": "기념일 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 146,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/selectAnnvrsryManage.do\")"
+          }
+        ],
+        "text": "선택한 기념일 한 건의 상세 정보와 관련 공통코드를 조회해 상세 화면에 제공한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/ans/selectAnnvrsryManageList.do",
+      "name": "기념일 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 96,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/selectAnnvrsryManageList.do\")"
+          }
+        ],
+        "text": "검색 조건에 맞는 기념일 목록을 조회해 목록 화면에 제공한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/ans/selectAnnvrsryManageListView.do",
+      "name": "기념일 목록 화면 이동",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 83,
+            "snippet": "@RequestMapping(\"/uss/ion/ans/selectAnnvrsryManageListView.do\")"
+          }
+        ],
+        "text": "기념일 목록 화면 진입 요청을 목록 조회로 연결한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/ans/updateAnnvrsryManage.do",
+      "name": "기념일 수정",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 275,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/updateAnnvrsryManage.do\")"
+          }
+        ],
+        "text": "기 등록된 기념일 정보를 수정하고 결과를 안내한다."
+      }
+    }
+  ],
+  "name": "기념일관리",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 로케일, 매개변수로 사전에 정의된 안내 문구를 찾아 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "기념일 일괄등록 화면 조회 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /uss/ion/ans/EgovAnnvrsryManageListPop.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "기념일 일괄등록 화면 조회 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 사용자 여부 확인 기능을 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "기념일 일괄등록 화면 조회 흐름에서 인증된 사용자 정보와 권한, 인증 여부를 실제로 판단하는 업무 계약이다."
+        }
+      },
+      "name": "인증 사용자 정보 서비스",
+      "stepId": "step:ANY /uss/ion/ans/EgovAnnvrsryManageListPop.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "기념일 일괄등록 화면 조회 흐름에서 인증된 사용자 정보와 권한, 인증 여부를 실제로 판단하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 사용자 정보 서비스에 위임해 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "기념일 일괄등록 화면 조회 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /uss/ion/ans/EgovAnnvrsryManageListPop.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "기념일 일괄등록 화면 조회 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 기념일관리 값 객체로 바인딩해 받고, 처리 전 인증 사용자 여부를 확인해 미인증이면 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "기념일 일괄등록 화면 조회 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+        }
+      },
+      "name": "기념일관리 요청 접수",
+      "stepId": "step:ANY /uss/ion/ans/EgovAnnvrsryManageListPop.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 445,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+          }
+        ],
+        "text": "기념일 일괄등록 화면 조회 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 로케일, 매개변수로 사전에 정의된 안내 문구를 찾아 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "기념일 일괄등록 파일 업로드 확인 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /uss/ion/ans/EgovAnnvrsryManageListPopAction.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "기념일 일괄등록 파일 업로드 확인 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 사용자 여부 확인 기능을 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "기념일 일괄등록 파일 업로드 확인 흐름에서 인증된 사용자 정보와 권한, 인증 여부를 실제로 판단하는 업무 계약이다."
+        }
+      },
+      "name": "인증 사용자 정보 서비스",
+      "stepId": "step:ANY /uss/ion/ans/EgovAnnvrsryManageListPopAction.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "기념일 일괄등록 파일 업로드 확인 흐름에서 인증된 사용자 정보와 권한, 인증 여부를 실제로 판단하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 사용자 정보 서비스에 위임해 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "기념일 일괄등록 파일 업로드 확인 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /uss/ion/ans/EgovAnnvrsryManageListPopAction.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "기념일 일괄등록 파일 업로드 확인 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 목록 조회, 총 건수 조회, 상세 조회, 등록, 수정, 삭제, 알림 대상 조회, 중복 여부 확인, 일괄등록을 업무 규칙으로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 일괄등록 파일 업로드 확인 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+        }
+      },
+      "name": "기념일관리 업무 서비스",
+      "stepId": "step:ANY /uss/ion/ans/EgovAnnvrsryManageListPopAction.do:src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovAnnvrsryManageService {"
+          }
+        ],
+        "text": "기념일 일괄등록 파일 업로드 확인 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 기념일관리 값 객체로 바인딩해 받고, 처리 전 인증 사용자 여부를 확인해 미인증이면 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "기념일 일괄등록 파일 업로드 확인 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+        }
+      },
+      "name": "기념일관리 요청 접수",
+      "stepId": "step:ANY /uss/ion/ans/EgovAnnvrsryManageListPopAction.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 445,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+          }
+        ],
+        "text": "기념일 일괄등록 파일 업로드 확인 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 로케일, 매개변수로 사전에 정의된 안내 문구를 찾아 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "기념일 삭제 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /uss/ion/ans/deleteAnnvrsryManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "기념일 삭제 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 목록 조회, 총 건수 조회, 상세 조회, 등록, 수정, 삭제, 알림 대상 조회, 중복 여부 확인, 일괄등록을 업무 규칙으로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 삭제 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+        }
+      },
+      "name": "기념일관리 업무 서비스",
+      "stepId": "step:ANY /uss/ion/ans/deleteAnnvrsryManage.do:src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovAnnvrsryManageService {"
+          }
+        ],
+        "text": "기념일 삭제 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 기념일관리 값 객체로 바인딩해 받고, 처리 전 인증 사용자 여부를 확인해 미인증이면 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "기념일 삭제 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+        }
+      },
+      "name": "기념일관리 요청 접수",
+      "stepId": "step:ANY /uss/ion/ans/deleteAnnvrsryManage.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 445,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+          }
+        ],
+        "text": "기념일 삭제 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "코드 ID, 상세코드, 코드명, 코드설명, 특정테이블명, 상세 조건 여부와 상세 조건 항목을 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "기념일 등록 처리 흐름에서 기념일구분·달력구분 같은 선택 항목을 채우기 위한 공통코드 조회 조건을 담는다."
+        }
+      },
+      "name": "공통코드 조회 조건",
+      "stepId": "step:ANY /uss/ion/ans/insertAnnvrsry.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "기념일 등록 처리 흐름에서 기념일구분·달력구분 같은 선택 항목을 채우기 위한 공통코드 조회 조건을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 로케일, 매개변수로 사전에 정의된 안내 문구를 찾아 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "기념일 등록 처리 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /uss/ion/ans/insertAnnvrsry.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "기념일 등록 처리 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "아이디, 이름, 이메일, 사용자구분, 조직 정보, 고유아이디를 보관하며 아이디·이름·이메일은 비어 있을 수 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "기념일 등록 처리 흐름에서 기념일의 소유자를 식별하기 위해 로그인한 사용자의 신원 정보를 담는다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /uss/ion/ans/insertAnnvrsry.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "기념일 등록 처리 흐름에서 기념일의 소유자를 식별하기 위해 로그인한 사용자의 신원 정보를 담는다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ],
+          "text": "조회 조건으로 공통코드 상세 목록, 여러 코드 목록, 조직정보, 그룹정보를 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ],
+          "text": "기념일 등록 처리 흐름에서 화면 선택 목록에 쓰이는 공통코드와 조직·그룹 정보를 코드 형태로 조회한다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /uss/ion/ans/insertAnnvrsry.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "기념일 등록 처리 흐름에서 화면 선택 목록에 쓰이는 공통코드와 조직·그룹 정보를 코드 형태로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 사용자 정보 서비스에 위임해 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "기념일 등록 처리 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /uss/ion/ans/insertAnnvrsry.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "기념일 등록 처리 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+              "line": 24,
+              "snippet": "public class AnnvrsryManage extends ComDefaultVO {"
+            }
+          ],
+          "text": "사용자, 기념일구분, 기념일명, 기념일자, 달력구분, 알림설정, 알림시작일자, 메모 항목을 가지며 필수 입력과 길이·날짜 형식 제약을 지켜야 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+              "line": 24,
+              "snippet": "public class AnnvrsryManage extends ComDefaultVO {"
+            }
+          ],
+          "text": "기념일 등록 처리 흐름에서 기념일 한 건의 업무 정보를 담아 화면과 서비스 사이를 오가는 기본 데이터이다."
+        }
+      },
+      "name": "기념일 정보",
+      "stepId": "step:ANY /uss/ion/ans/insertAnnvrsry.do:src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+            "line": 24,
+            "snippet": "public class AnnvrsryManage extends ComDefaultVO {"
+          }
+        ],
+        "text": "기념일 등록 처리 흐름에서 기념일 한 건의 업무 정보를 담아 화면과 서비스 사이를 오가는 기본 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 목록 조회, 총 건수 조회, 상세 조회, 등록, 수정, 삭제, 알림 대상 조회, 중복 여부 확인, 일괄등록을 업무 규칙으로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 등록 처리 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+        }
+      },
+      "name": "기념일관리 업무 서비스",
+      "stepId": "step:ANY /uss/ion/ans/insertAnnvrsry.do:src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovAnnvrsryManageService {"
+          }
+        ],
+        "text": "기념일 등록 처리 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 기념일관리 값 객체로 바인딩해 받고, 처리 전 인증 사용자 여부를 확인해 미인증이면 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "기념일 등록 처리 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+        }
+      },
+      "name": "기념일관리 요청 접수",
+      "stepId": "step:ANY /uss/ion/ans/insertAnnvrsry.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 445,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+          }
+        ],
+        "text": "기념일 등록 처리 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "아이디, 이름, 이메일, 사용자구분, 조직 정보, 고유아이디를 보관하며 아이디·이름·이메일은 비어 있을 수 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "기념일 일괄등록 처리 흐름에서 기념일의 소유자를 식별하기 위해 로그인한 사용자의 신원 정보를 담는다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /uss/ion/ans/insertAnnvrsryManageBnde.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "기념일 일괄등록 처리 흐름에서 기념일의 소유자를 식별하기 위해 로그인한 사용자의 신원 정보를 담는다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 사용자 여부 확인 기능을 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "기념일 일괄등록 처리 흐름에서 인증된 사용자 정보와 권한, 인증 여부를 실제로 판단하는 업무 계약이다."
+        }
+      },
+      "name": "인증 사용자 정보 서비스",
+      "stepId": "step:ANY /uss/ion/ans/insertAnnvrsryManageBnde.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "기념일 일괄등록 처리 흐름에서 인증된 사용자 정보와 권한, 인증 여부를 실제로 판단하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 사용자 정보 서비스에 위임해 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "기념일 일괄등록 처리 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /uss/ion/ans/insertAnnvrsryManageBnde.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "기념일 일괄등록 처리 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+              "line": 21,
+              "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+            }
+          ],
+          "text": "기념일 정보를 확장해 기념일관리 목록과 목록 번호, 출력 변수들을 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+              "line": 21,
+              "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+            }
+          ],
+          "text": "기념일 일괄등록 처리 흐름에서 기념일 목록 조회 조건과 조회 결과 목록을 담아 화면에 전달하는 데이터이다."
+        }
+      },
+      "name": "기념일 목록 정보",
+      "stepId": "step:ANY /uss/ion/ans/insertAnnvrsryManageBnde.do:src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+            "line": 21,
+            "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+          }
+        ],
+        "text": "기념일 일괄등록 처리 흐름에서 기념일 목록 조회 조건과 조회 결과 목록을 담아 화면에 전달하는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 목록 조회, 총 건수 조회, 상세 조회, 등록, 수정, 삭제, 알림 대상 조회, 중복 여부 확인, 일괄등록을 업무 규칙으로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 일괄등록 처리 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+        }
+      },
+      "name": "기념일관리 업무 서비스",
+      "stepId": "step:ANY /uss/ion/ans/insertAnnvrsryManageBnde.do:src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovAnnvrsryManageService {"
+          }
+        ],
+        "text": "기념일 일괄등록 처리 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 기념일관리 값 객체로 바인딩해 받고, 처리 전 인증 사용자 여부를 확인해 미인증이면 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "기념일 일괄등록 처리 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+        }
+      },
+      "name": "기념일관리 요청 접수",
+      "stepId": "step:ANY /uss/ion/ans/insertAnnvrsryManageBnde.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 445,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+          }
+        ],
+        "text": "기념일 일괄등록 처리 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "코드 ID, 상세코드, 코드명, 코드설명, 특정테이블명, 상세 조건 여부와 상세 조건 항목을 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "기념일 등록 화면 조회 흐름에서 기념일구분·달력구분 같은 선택 항목을 채우기 위한 공통코드 조회 조건을 담는다."
+        }
+      },
+      "name": "공통코드 조회 조건",
+      "stepId": "step:ANY /uss/ion/ans/insertViewAnnvrsry.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "기념일 등록 화면 조회 흐름에서 기념일구분·달력구분 같은 선택 항목을 채우기 위한 공통코드 조회 조건을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "아이디, 이름, 이메일, 사용자구분, 조직 정보, 고유아이디를 보관하며 아이디·이름·이메일은 비어 있을 수 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "기념일 등록 화면 조회 흐름에서 기념일의 소유자를 식별하기 위해 로그인한 사용자의 신원 정보를 담는다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /uss/ion/ans/insertViewAnnvrsry.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "기념일 등록 화면 조회 흐름에서 기념일의 소유자를 식별하기 위해 로그인한 사용자의 신원 정보를 담는다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ],
+          "text": "조회 조건으로 공통코드 상세 목록, 여러 코드 목록, 조직정보, 그룹정보를 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ],
+          "text": "기념일 등록 화면 조회 흐름에서 화면 선택 목록에 쓰이는 공통코드와 조직·그룹 정보를 코드 형태로 조회한다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /uss/ion/ans/insertViewAnnvrsry.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "기념일 등록 화면 조회 흐름에서 화면 선택 목록에 쓰이는 공통코드와 조직·그룹 정보를 코드 형태로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 사용자 정보 서비스에 위임해 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "기념일 등록 화면 조회 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /uss/ion/ans/insertViewAnnvrsry.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "기념일 등록 화면 조회 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+              "line": 24,
+              "snippet": "public class AnnvrsryManage extends ComDefaultVO {"
+            }
+          ],
+          "text": "사용자, 기념일구분, 기념일명, 기념일자, 달력구분, 알림설정, 알림시작일자, 메모 항목을 가지며 필수 입력과 길이·날짜 형식 제약을 지켜야 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+              "line": 24,
+              "snippet": "public class AnnvrsryManage extends ComDefaultVO {"
+            }
+          ],
+          "text": "기념일 등록 화면 조회 흐름에서 기념일 한 건의 업무 정보를 담아 화면과 서비스 사이를 오가는 기본 데이터이다."
+        }
+      },
+      "name": "기념일 정보",
+      "stepId": "step:ANY /uss/ion/ans/insertViewAnnvrsry.do:src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+            "line": 24,
+            "snippet": "public class AnnvrsryManage extends ComDefaultVO {"
+          }
+        ],
+        "text": "기념일 등록 화면 조회 흐름에서 기념일 한 건의 업무 정보를 담아 화면과 서비스 사이를 오가는 기본 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+              "line": 21,
+              "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+            }
+          ],
+          "text": "기념일 정보를 확장해 기념일관리 목록과 목록 번호, 출력 변수들을 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+              "line": 21,
+              "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+            }
+          ],
+          "text": "기념일 등록 화면 조회 흐름에서 기념일 목록 조회 조건과 조회 결과 목록을 담아 화면에 전달하는 데이터이다."
+        }
+      },
+      "name": "기념일 목록 정보",
+      "stepId": "step:ANY /uss/ion/ans/insertViewAnnvrsry.do:src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+            "line": 21,
+            "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+          }
+        ],
+        "text": "기념일 등록 화면 조회 흐름에서 기념일 목록 조회 조건과 조회 결과 목록을 담아 화면에 전달하는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 기념일관리 값 객체로 바인딩해 받고, 처리 전 인증 사용자 여부를 확인해 미인증이면 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "기념일 등록 화면 조회 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+        }
+      },
+      "name": "기념일관리 요청 접수",
+      "stepId": "step:ANY /uss/ion/ans/insertViewAnnvrsry.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 445,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+          }
+        ],
+        "text": "기념일 등록 화면 조회 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "지정 길이 초과 문자열 자르기와 빈 문자열·널 여부 검증 같은 문자열 공통 처리를 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "기념일 등록 화면 조회 흐름에서 기념일 화면 표시 값을 다듬기 위한 공통 문자열 처리를 제공한다."
+        }
+      },
+      "name": "문자열 처리 유틸리티",
+      "stepId": "step:ANY /uss/ion/ans/insertViewAnnvrsry.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "기념일 등록 화면 조회 흐름에서 기념일 화면 표시 값을 다듬기 위한 공통 문자열 처리를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 로케일, 매개변수로 사전에 정의된 안내 문구를 찾아 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "기념일 알림 대상 조회 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryGdcc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "기념일 알림 대상 조회 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+              "line": 21,
+              "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+            }
+          ],
+          "text": "기념일 정보를 확장해 기념일관리 목록과 목록 번호, 출력 변수들을 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+              "line": 21,
+              "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+            }
+          ],
+          "text": "기념일 알림 대상 조회 흐름에서 기념일 목록 조회 조건과 조회 결과 목록을 담아 화면에 전달하는 데이터이다."
+        }
+      },
+      "name": "기념일 목록 정보",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryGdcc.do:src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+            "line": 21,
+            "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+          }
+        ],
+        "text": "기념일 알림 대상 조회 흐름에서 기념일 목록 조회 조건과 조회 결과 목록을 담아 화면에 전달하는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 목록 조회, 총 건수 조회, 상세 조회, 등록, 수정, 삭제, 알림 대상 조회, 중복 여부 확인, 일괄등록을 업무 규칙으로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 알림 대상 조회 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+        }
+      },
+      "name": "기념일관리 업무 서비스",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryGdcc.do:src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovAnnvrsryManageService {"
+          }
+        ],
+        "text": "기념일 알림 대상 조회 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 기념일관리 값 객체로 바인딩해 받고, 처리 전 인증 사용자 여부를 확인해 미인증이면 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "기념일 알림 대상 조회 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+        }
+      },
+      "name": "기념일관리 요청 접수",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryGdcc.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 445,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+          }
+        ],
+        "text": "기념일 알림 대상 조회 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            }
+          ],
+          "text": "연·월·일 단위 가감 계산과 날짜 형식 검증을 제공하며 형식이 어긋나면 오류로 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            }
+          ],
+          "text": "기념일 알림 대상 조회 흐름에서 기념일 알림 시작일 등 날짜 기준을 계산하기 위한 공통 날짜 처리를 제공한다."
+        }
+      },
+      "name": "날짜 계산 유틸리티",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryGdcc.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+            "line": 36,
+            "snippet": "public class EgovDateUtil {"
+          }
+        ],
+        "text": "기념일 알림 대상 조회 흐름에서 기념일 알림 시작일 등 날짜 기준을 계산하기 위한 공통 날짜 처리를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "지정 길이 초과 문자열 자르기와 빈 문자열·널 여부 검증 같은 문자열 공통 처리를 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "기념일 알림 대상 조회 흐름에서 기념일 화면 표시 값을 다듬기 위한 공통 문자열 처리를 제공한다."
+        }
+      },
+      "name": "문자열 처리 유틸리티",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryGdcc.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "기념일 알림 대상 조회 흐름에서 기념일 화면 표시 값을 다듬기 위한 공통 문자열 처리를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 로케일, 매개변수로 사전에 정의된 안내 문구를 찾아 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "기념일 메인 목록 조회 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryMainList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "기념일 메인 목록 조회 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "아이디, 이름, 이메일, 사용자구분, 조직 정보, 고유아이디를 보관하며 아이디·이름·이메일은 비어 있을 수 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "기념일 메인 목록 조회 흐름에서 기념일의 소유자를 식별하기 위해 로그인한 사용자의 신원 정보를 담는다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryMainList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "기념일 메인 목록 조회 흐름에서 기념일의 소유자를 식별하기 위해 로그인한 사용자의 신원 정보를 담는다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 사용자 여부 확인 기능을 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "기념일 메인 목록 조회 흐름에서 인증된 사용자 정보와 권한, 인증 여부를 실제로 판단하는 업무 계약이다."
+        }
+      },
+      "name": "인증 사용자 정보 서비스",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryMainList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "기념일 메인 목록 조회 흐름에서 인증된 사용자 정보와 권한, 인증 여부를 실제로 판단하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 사용자 정보 서비스에 위임해 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "기념일 메인 목록 조회 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryMainList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "기념일 메인 목록 조회 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+              "line": 21,
+              "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+            }
+          ],
+          "text": "기념일 정보를 확장해 기념일관리 목록과 목록 번호, 출력 변수들을 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+              "line": 21,
+              "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+            }
+          ],
+          "text": "기념일 메인 목록 조회 흐름에서 기념일 목록 조회 조건과 조회 결과 목록을 담아 화면에 전달하는 데이터이다."
+        }
+      },
+      "name": "기념일 목록 정보",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryMainList.do:src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+            "line": 21,
+            "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+          }
+        ],
+        "text": "기념일 메인 목록 조회 흐름에서 기념일 목록 조회 조건과 조회 결과 목록을 담아 화면에 전달하는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 목록 조회, 총 건수 조회, 상세 조회, 등록, 수정, 삭제, 알림 대상 조회, 중복 여부 확인, 일괄등록을 업무 규칙으로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 메인 목록 조회 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+        }
+      },
+      "name": "기념일관리 업무 서비스",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryMainList.do:src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovAnnvrsryManageService {"
+          }
+        ],
+        "text": "기념일 메인 목록 조회 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 기념일관리 값 객체로 바인딩해 받고, 처리 전 인증 사용자 여부를 확인해 미인증이면 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "기념일 메인 목록 조회 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+        }
+      },
+      "name": "기념일관리 요청 접수",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryMainList.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 445,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+          }
+        ],
+        "text": "기념일 메인 목록 조회 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "코드 ID, 상세코드, 코드명, 코드설명, 특정테이블명, 상세 조건 여부와 상세 조건 항목을 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "기념일 상세 조회 흐름에서 기념일구분·달력구분 같은 선택 항목을 채우기 위한 공통코드 조회 조건을 담는다."
+        }
+      },
+      "name": "공통코드 조회 조건",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManage.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "기념일 상세 조회 흐름에서 기념일구분·달력구분 같은 선택 항목을 채우기 위한 공통코드 조회 조건을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 로케일, 매개변수로 사전에 정의된 안내 문구를 찾아 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "기념일 상세 조회 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "기념일 상세 조회 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ],
+          "text": "조회 조건으로 공통코드 상세 목록, 여러 코드 목록, 조직정보, 그룹정보를 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ],
+          "text": "기념일 상세 조회 흐름에서 화면 선택 목록에 쓰이는 공통코드와 조직·그룹 정보를 코드 형태로 조회한다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManage.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "기념일 상세 조회 흐름에서 화면 선택 목록에 쓰이는 공통코드와 조직·그룹 정보를 코드 형태로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+              "line": 24,
+              "snippet": "public class AnnvrsryManage extends ComDefaultVO {"
+            }
+          ],
+          "text": "사용자, 기념일구분, 기념일명, 기념일자, 달력구분, 알림설정, 알림시작일자, 메모 항목을 가지며 필수 입력과 길이·날짜 형식 제약을 지켜야 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+              "line": 24,
+              "snippet": "public class AnnvrsryManage extends ComDefaultVO {"
+            }
+          ],
+          "text": "기념일 상세 조회 흐름에서 기념일 한 건의 업무 정보를 담아 화면과 서비스 사이를 오가는 기본 데이터이다."
+        }
+      },
+      "name": "기념일 정보",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManage.do:src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+            "line": 24,
+            "snippet": "public class AnnvrsryManage extends ComDefaultVO {"
+          }
+        ],
+        "text": "기념일 상세 조회 흐름에서 기념일 한 건의 업무 정보를 담아 화면과 서비스 사이를 오가는 기본 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+              "line": 21,
+              "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+            }
+          ],
+          "text": "기념일 정보를 확장해 기념일관리 목록과 목록 번호, 출력 변수들을 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+              "line": 21,
+              "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+            }
+          ],
+          "text": "기념일 상세 조회 흐름에서 기념일 목록 조회 조건과 조회 결과 목록을 담아 화면에 전달하는 데이터이다."
+        }
+      },
+      "name": "기념일 목록 정보",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManage.do:src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+            "line": 21,
+            "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+          }
+        ],
+        "text": "기념일 상세 조회 흐름에서 기념일 목록 조회 조건과 조회 결과 목록을 담아 화면에 전달하는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 목록 조회, 총 건수 조회, 상세 조회, 등록, 수정, 삭제, 알림 대상 조회, 중복 여부 확인, 일괄등록을 업무 규칙으로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 상세 조회 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+        }
+      },
+      "name": "기념일관리 업무 서비스",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManage.do:src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovAnnvrsryManageService {"
+          }
+        ],
+        "text": "기념일 상세 조회 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 기념일관리 값 객체로 바인딩해 받고, 처리 전 인증 사용자 여부를 확인해 미인증이면 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "기념일 상세 조회 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+        }
+      },
+      "name": "기념일관리 요청 접수",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManage.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 445,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+          }
+        ],
+        "text": "기념일 상세 조회 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 로케일, 매개변수로 사전에 정의된 안내 문구를 찾아 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "기념일 목록 조회 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "기념일 목록 조회 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "아이디, 이름, 이메일, 사용자구분, 조직 정보, 고유아이디를 보관하며 아이디·이름·이메일은 비어 있을 수 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "기념일 목록 조회 흐름에서 기념일의 소유자를 식별하기 위해 로그인한 사용자의 신원 정보를 담는다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManageList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "기념일 목록 조회 흐름에서 기념일의 소유자를 식별하기 위해 로그인한 사용자의 신원 정보를 담는다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 사용자 여부 확인 기능을 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "기념일 목록 조회 흐름에서 인증된 사용자 정보와 권한, 인증 여부를 실제로 판단하는 업무 계약이다."
+        }
+      },
+      "name": "인증 사용자 정보 서비스",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManageList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "기념일 목록 조회 흐름에서 인증된 사용자 정보와 권한, 인증 여부를 실제로 판단하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 사용자 정보 서비스에 위임해 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "기념일 목록 조회 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManageList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "기념일 목록 조회 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+              "line": 21,
+              "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+            }
+          ],
+          "text": "기념일 정보를 확장해 기념일관리 목록과 목록 번호, 출력 변수들을 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+              "line": 21,
+              "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+            }
+          ],
+          "text": "기념일 목록 조회 흐름에서 기념일 목록 조회 조건과 조회 결과 목록을 담아 화면에 전달하는 데이터이다."
+        }
+      },
+      "name": "기념일 목록 정보",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManageList.do:src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManageVO.java",
+            "line": 21,
+            "snippet": "public class AnnvrsryManageVO extends AnnvrsryManage{"
+          }
+        ],
+        "text": "기념일 목록 조회 흐름에서 기념일 목록 조회 조건과 조회 결과 목록을 담아 화면에 전달하는 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 목록 조회, 총 건수 조회, 상세 조회, 등록, 수정, 삭제, 알림 대상 조회, 중복 여부 확인, 일괄등록을 업무 규칙으로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 목록 조회 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+        }
+      },
+      "name": "기념일관리 업무 서비스",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManageList.do:src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovAnnvrsryManageService {"
+          }
+        ],
+        "text": "기념일 목록 조회 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 기념일관리 값 객체로 바인딩해 받고, 처리 전 인증 사용자 여부를 확인해 미인증이면 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "기념일 목록 조회 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+        }
+      },
+      "name": "기념일관리 요청 접수",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManageList.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 445,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+          }
+        ],
+        "text": "기념일 목록 조회 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 기념일관리 값 객체로 바인딩해 받고, 처리 전 인증 사용자 여부를 확인해 미인증이면 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "기념일 목록 화면 이동 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+        }
+      },
+      "name": "기념일관리 요청 접수",
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManageListView.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 445,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+          }
+        ],
+        "text": "기념일 목록 화면 이동 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "코드 ID, 상세코드, 코드명, 코드설명, 특정테이블명, 상세 조건 여부와 상세 조건 항목을 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "기념일 수정 흐름에서 기념일구분·달력구분 같은 선택 항목을 채우기 위한 공통코드 조회 조건을 담는다."
+        }
+      },
+      "name": "공통코드 조회 조건",
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "기념일 수정 흐름에서 기념일구분·달력구분 같은 선택 항목을 채우기 위한 공통코드 조회 조건을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "메시지 코드와 로케일, 매개변수로 사전에 정의된 안내 문구를 찾아 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "기념일 수정 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "기념일 수정 흐름에서 처리 결과와 오류 상황을 사용자 언어로 안내하기 위한 메시지를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "아이디, 이름, 이메일, 사용자구분, 조직 정보, 고유아이디를 보관하며 아이디·이름·이메일은 비어 있을 수 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "기념일 수정 흐름에서 기념일의 소유자를 식별하기 위해 로그인한 사용자의 신원 정보를 담는다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "기념일 수정 흐름에서 기념일의 소유자를 식별하기 위해 로그인한 사용자의 신원 정보를 담는다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ],
+          "text": "조회 조건으로 공통코드 상세 목록, 여러 코드 목록, 조직정보, 그룹정보를 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ],
+          "text": "기념일 수정 흐름에서 화면 선택 목록에 쓰이는 공통코드와 조직·그룹 정보를 코드 형태로 조회한다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "기념일 수정 흐름에서 화면 선택 목록에 쓰이는 공통코드와 조직·그룹 정보를 코드 형태로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "인증 사용자 객체, 사용자 권한 목록, 인증 여부를 사용자 정보 서비스에 위임해 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "기념일 수정 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "기념일 수정 흐름에서 요청한 사용자가 로그인한 사용자인지 확인하고 사용자 정보와 권한을 꺼내 주는 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+              "line": 24,
+              "snippet": "public class AnnvrsryManage extends ComDefaultVO {"
+            }
+          ],
+          "text": "사용자, 기념일구분, 기념일명, 기념일자, 달력구분, 알림설정, 알림시작일자, 메모 항목을 가지며 필수 입력과 길이·날짜 형식 제약을 지켜야 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+              "line": 24,
+              "snippet": "public class AnnvrsryManage extends ComDefaultVO {"
+            }
+          ],
+          "text": "기념일 수정 흐름에서 기념일 한 건의 업무 정보를 담아 화면과 서비스 사이를 오가는 기본 데이터이다."
+        }
+      },
+      "name": "기념일 정보",
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+            "line": 24,
+            "snippet": "public class AnnvrsryManage extends ComDefaultVO {"
+          }
+        ],
+        "text": "기념일 수정 흐름에서 기념일 한 건의 업무 정보를 담아 화면과 서비스 사이를 오가는 기본 데이터이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 목록 조회, 총 건수 조회, 상세 조회, 등록, 수정, 삭제, 알림 대상 조회, 중복 여부 확인, 일괄등록을 업무 규칙으로 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovAnnvrsryManageService {"
+            }
+          ],
+          "text": "기념일 수정 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+        }
+      },
+      "name": "기념일관리 업무 서비스",
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovAnnvrsryManageService {"
+          }
+        ],
+        "text": "기념일 수정 흐름에서 기념일 등록·수정·삭제·조회와 일괄등록을 담당하는 업무 서비스 계약으로, 이 흐름의 실제 업무 처리를 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "요청 파라미터를 기념일관리 값 객체로 바인딩해 받고, 처리 전 인증 사용자 여부를 확인해 미인증이면 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+              "line": 445,
+              "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+            }
+          ],
+          "text": "기념일 수정 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+        }
+      },
+      "name": "기념일관리 요청 접수",
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+            "line": 445,
+            "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+          }
+        ],
+        "text": "기념일 수정 흐름에서 기념일관리 화면 요청을 받아 로그인 여부를 확인하고 업무 서비스에 처리를 위임한 뒤 결과 화면을 결정한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+        "line": 11,
+        "snippet": " * - 기념일관리에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+        "line": 12,
+        "snippet": " * - 기념일관리의 조회기능은 목록조회, 상세조회로 구분된다."
+      }
+    ],
+    "text": "사용자가 자신의 기념일을 등록·수정·삭제·조회하고 파일로 일괄 등록하며, 알림 설정된 기념일을 안내받는 업무 영역이다."
+  }
+}

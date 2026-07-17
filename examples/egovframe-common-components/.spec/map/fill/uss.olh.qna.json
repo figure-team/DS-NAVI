@@ -1,0 +1,4075 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "q_start",
+          "to": "q_list"
+        },
+        {
+          "from": "q_list",
+          "to": "q_auth"
+        },
+        {
+          "from": "q_auth",
+          "label": "인증됨",
+          "to": "q_regview"
+        },
+        {
+          "from": "q_auth",
+          "label": "미인증 열람",
+          "to": "q_detail"
+        },
+        {
+          "from": "q_regview",
+          "to": "q_reg"
+        },
+        {
+          "from": "q_reg",
+          "to": "q_end"
+        },
+        {
+          "from": "q_list",
+          "to": "q_detail"
+        },
+        {
+          "from": "q_detail",
+          "to": "q_updview"
+        },
+        {
+          "from": "q_updview",
+          "to": "q_owner"
+        },
+        {
+          "from": "q_detail",
+          "to": "q_owner"
+        },
+        {
+          "from": "q_owner",
+          "label": "본인 일치 · 수정",
+          "to": "q_upd"
+        },
+        {
+          "from": "q_owner",
+          "label": "본인 일치 · 삭제",
+          "to": "q_del"
+        },
+        {
+          "from": "q_owner",
+          "label": "본인 불일치",
+          "to": "q_deny"
+        },
+        {
+          "from": "q_upd",
+          "to": "q_end"
+        },
+        {
+          "from": "q_del",
+          "to": "q_end"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "q_start",
+          "kind": "start",
+          "label": "민원인 Q&A 진입"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 105,
+              "snippet": "@RequestMapping(value = \"/uss/olh/qna/selectQnaList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/qna/selectQnaList.do",
+          "id": "q_list",
+          "kind": "activity",
+          "label": "질문 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "id": "q_auth",
+          "kind": "decision",
+          "label": "로그인 인증 여부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 182,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/insertQnaView.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/qna/insertQnaView.do",
+          "id": "q_regview",
+          "kind": "activity",
+          "label": "질문 등록 화면 준비"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 217,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/insertQna.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/qna/insertQna.do",
+          "id": "q_reg",
+          "kind": "activity",
+          "label": "질문 등록"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/selectQnaDetail.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/qna/selectQnaDetail.do",
+          "id": "q_detail",
+          "kind": "activity",
+          "label": "질문 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 253,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/updateQnaView.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/qna/updateQnaView.do",
+          "id": "q_updview",
+          "kind": "activity",
+          "label": "질문 수정 화면 준비"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 343,
+              "snippet": "\t\tEgovXssChecker.checkerUserXss(request, vo.getFrstRegisterId());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+              "line": 68,
+              "snippet": "\t\t\tif (!sUniqId.equals(loginVO.getUniqId())) {"
+            }
+          ],
+          "id": "q_owner",
+          "kind": "decision",
+          "label": "작성자 본인 확인"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 279,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/updateQna.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/qna/updateQna.do",
+          "id": "q_upd",
+          "kind": "activity",
+          "label": "질문 수정"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 329,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/deleteQna.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/qna/deleteQna.do",
+          "id": "q_del",
+          "kind": "activity",
+          "label": "질문 삭제"
+        },
+        {
+          "id": "q_end",
+          "kind": "end",
+          "label": "질문 목록으로 복귀"
+        },
+        {
+          "id": "q_deny",
+          "kind": "end",
+          "label": "권한 오류 종료"
+        }
+      ],
+      "title": "Q&A 질문 관리"
+    },
+    {
+      "edges": [
+        {
+          "from": "a_start",
+          "to": "a_list"
+        },
+        {
+          "from": "a_list",
+          "to": "a_detail"
+        },
+        {
+          "from": "a_detail",
+          "to": "a_view"
+        },
+        {
+          "from": "a_view",
+          "to": "a_code"
+        },
+        {
+          "from": "a_code",
+          "to": "a_valid"
+        },
+        {
+          "from": "a_valid",
+          "label": "검증 통과",
+          "to": "a_save"
+        },
+        {
+          "from": "a_valid",
+          "label": "검증 실패 · 재작성",
+          "to": "a_view"
+        },
+        {
+          "from": "a_save",
+          "to": "a_end"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a_start",
+          "kind": "start",
+          "label": "담당자 답변 관리 진입"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 363,
+              "snippet": "@RequestMapping(value = \"/uss/olh/qna/selectQnaAnswerList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/qna/selectQnaAnswerList.do",
+          "id": "a_list",
+          "kind": "activity",
+          "label": "답변 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 399,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/selectQnaAnswerDetail.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/qna/selectQnaAnswerDetail.do",
+          "id": "a_detail",
+          "kind": "activity",
+          "label": "답변 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 419,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/updateQnaAnswerView.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/qna/updateQnaAnswerView.do",
+          "id": "a_view",
+          "kind": "activity",
+          "label": "답변 작성 화면 준비"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "id": "a_code",
+          "kind": "activity",
+          "label": "처리상태 공통코드 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 98,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 99,
+              "snippet": "\tprivate String answerCn;"
+            }
+          ],
+          "id": "a_valid",
+          "kind": "decision",
+          "label": "답변 입력값 검증"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 444,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/updateQnaAnswer.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 27,
+              "snippet": "\tvoid updateQnaAnswer(QnaVO qnaVO);"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olh/qna/updateQnaAnswer.do",
+          "id": "a_save",
+          "kind": "activity",
+          "label": "답변 저장"
+        },
+        {
+          "id": "a_end",
+          "kind": "end",
+          "label": "답변 목록으로 복귀"
+        }
+      ],
+      "title": "Q&A 답변 관리"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 42,
+          "snippet": "\t@Size(max=250)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 43,
+          "snippet": "\tprivate String qestnSj;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 47,
+          "snippet": "\t@Size(max=2500)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 48,
+          "snippet": "\tprivate String qestnCn;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 99,
+          "snippet": "\tprivate String answerCn;"
+        }
+      ],
+      "text": "질문 제목은 250자, 질문 내용은 2500자를 넘을 수 없으며 둘 다 필수 입력이다. 답변 내용도 필수이며 2500자 제한을 받는다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 55,
+          "snippet": "\t@Size(max=4)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 56,
+          "snippet": "\t@Pattern(regexp=\"^[0-9]*$\", message=\"{validation.pattern.integer}\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 63,
+          "snippet": "\tprivate String middleTelno;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 69,
+          "snippet": "\tprivate String endTelno;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 82,
+          "snippet": "\tprivate String wrterNm;"
+        }
+      ],
+      "text": "연락처는 지역번호·중간번호·끝번호로 나뉘어 각각 필수이며 숫자만 허용되는 4자리이고, 작성자명은 필수이며 20자를 넘을 수 없다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+          "line": 340,
+          "snippet": "\t\tQnaVO vo = egovQnaService.selectQnaDetail(qnaVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+          "line": 343,
+          "snippet": "\t\tEgovXssChecker.checkerUserXss(request, vo.getFrstRegisterId());"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+          "line": 68,
+          "snippet": "\t\t\tif (!sUniqId.equals(loginVO.getUniqId())) {"
+        }
+      ],
+      "text": "질문 수정과 삭제는 반드시 저장된 질문을 먼저 조회해 그 최초등록자와 로그인 사용자의 고유아이디가 같은지 확인한 뒤에만 수행한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+          "line": 63,
+          "snippet": "\t\t\tif (sUniqId == null || loginVO.getUniqId() == null || loginVO.getUniqId().equals(\"\")) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+          "line": 68,
+          "snippet": "\t\t\tif (!sUniqId.equals(loginVO.getUniqId())) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+          "line": 72,
+          "snippet": "\t\t\tthrow new EgovXssException(\"XSS00001\", \"errors.xss.checkerUser\");"
+        }
+      ],
+      "text": "본인 확인 시 로그인 정보가 없거나 고유아이디가 비어 있으면 요청을 권한 오류로 막고, 대상 글의 등록자와 다른 사용자의 요청도 권한 오류로 막는다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 58,
+          "snippet": "\tpublic static Boolean isAuthenticated() {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 24,
+          "snippet": "\tpublic Boolean isAuthenticated(); "
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+          "line": 105,
+          "snippet": "@RequestMapping(value = \"/uss/olh/qna/selectQnaList.do\")"
+        }
+      ],
+      "text": "질문 목록 화면은 인증 여부를 확인해 인증 사용자에게만 등록 기능을 열어 주는 표시값을 함께 내려준다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 34,
+          "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 31,
+          "snippet": "    private String codeId = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+          "line": 419,
+          "snippet": "@RequestMapping(\"/uss/olh/qna/updateQnaAnswerView.do\")"
+        }
+      ],
+      "text": "답변 작성 화면의 처리상태 선택 목록은 직접 하드코딩하지 않고 공통코드 조회 서비스에서 상세코드 목록으로 받아 채운다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+          "line": 13,
+          "snippet": "\tQnaVO selectQnaDetail(QnaVO qnaVO) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+          "line": 15,
+          "snippet": "\tvoid updateQnaInqireCo(QnaVO qnaVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 88,
+          "snippet": "\tprivate String inqireCo;"
+        }
+      ],
+      "text": "질문 상세 조회는 상세 내용을 내려주기 전에 해당 질문의 조회 횟수를 증가시켜 열람 이력을 남긴다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+          "line": 349,
+          "snippet": "\t\tegovQnaService.deleteQna(qnaVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+          "line": 351,
+          "snippet": "\t\treturn \"forward:/uss/olh/qna/selectQnaList.do\";"
+        }
+      ],
+      "text": "질문 등록·수정·삭제와 답변 저장은 처리 후 각각 질문 목록과 답변 목록으로 되돌려, 목록이 항상 최신 상태로 다시 조회되도록 한다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 41,
+          "snippet": "\tpublic static Object getAuthenticatedUser() {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 58,
+          "snippet": "\tpublic static Boolean isAuthenticated() {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 11,
+          "snippet": "\tpublic Object getAuthenticatedUser();"
+        }
+      ],
+      "text": "인증·사용자 도메인 — 로그인 여부 확인과 인증된 사용자 정보 조회를 인증 사용자 조회 도우미와 인증 사용자 정보 서비스에 의존한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 26,
+          "snippet": "public interface EgovCmmUseService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 34,
+          "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+        }
+      ],
+      "text": "공통코드 도메인 — 질의응답 처리상태 선택 목록을 공통코드 조회 서비스의 상세코드 조회로 공급받는다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+          "line": 28,
+          "snippet": "public class EgovXssChecker {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+          "line": 39,
+          "snippet": "\tpublic static boolean checkerUserXss(HttpServletRequest request, String sUniqId) throws Exception {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+          "line": 343,
+          "snippet": "\t\tEgovXssChecker.checkerUserXss(request, vo.getFrstRegisterId());"
+        }
+      ],
+      "text": "공통 보안 점검 — 작성자 본인 확인을 Q&A 자체 로직이 아니라 공통 권한 점검 모듈에 위임한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 43,
+          "snippet": "public class EgovStringUtil {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 47,
+          "snippet": "\tpublic static final String EMPTY = \"\";"
+        }
+      ],
+      "text": "공통 문자열 유틸 — 로그인 사용자의 이름·이메일·고유아이디가 없을 때 빈 문자열로 정규화하는 처리를 공통 문자열 유틸에 의존한다."
+    }
+  ],
+  "domainId": "domain:uss.olh.qna",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 33,
+          "snippet": "public class QnaVO extends QnaDefaultVO {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 38,
+          "snippet": "\tprivate String qaId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 43,
+          "snippet": "\tprivate String qestnSj;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 91,
+          "snippet": "\tprivate String qnaProcessSttusCode;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 99,
+          "snippet": "\tprivate String answerCn;"
+        }
+      ],
+      "text": "Q&A 질문 정보 — 질문 아이디, 질문 제목과 내용, 작성자명과 연락처·이메일 주소, 작성일자, 조회횟수, 질의응답 처리상태 코드, 답변 내용을 담는 이 업무의 중심 자료이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 91,
+          "snippet": "\tprivate String qnaProcessSttusCode;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+          "line": 94,
+          "snippet": "\tprivate String qnaProcessSttusCodeNm;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 34,
+          "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+        }
+      ],
+      "text": "질의응답 처리상태 코드 — 답변 진행 상태를 나타내는 값으로 질문 정보에 코드와 코드명으로 보관되며, 공통코드 조회 서비스에서 선택 목록을 받아온다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 45,
+          "snippet": "\tprivate String name;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 67,
+          "snippet": "\tprivate String uniqId;"
+        }
+      ],
+      "text": "로그인 사용자 정보 — 질문 작성자명과 이메일 주소를 채우고 최초등록자·최종수정자 아이디를 남기는 근거가 되는 인증 사용자 자료이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 29,
+          "snippet": "public class ComDefaultCodeVO implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 31,
+          "snippet": "    private String codeId = \"\";"
+        }
+      ],
+      "text": "공통코드 조회 조건 — 어떤 공통코드 묶음을 가져올지 지정하는 조회 조건으로, 답변 화면의 처리상태 목록을 요청할 때 사용한다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/olh/qna/deleteQna.do",
+      "name": "Q&A 질문 삭제",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 329,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/deleteQna.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 21,
+            "snippet": "\tvoid deleteQna(QnaVO qnaVO);"
+          }
+        ],
+        "text": "삭제 대상 질문을 먼저 조회해 최초등록자와 로그인 사용자가 같은지 본인 확인을 거친 뒤 질문을 삭제하고 목록으로 되돌린다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/qna/insertQna.do",
+      "name": "Q&A 질문 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 217,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/insertQna.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 17,
+            "snippet": "\tvoid insertQna(QnaVO qnaVO) throws FdlException;"
+          }
+        ],
+        "text": "입력한 질문 제목·내용·연락처·이메일을 검증한 뒤 새 질문을 등록한다. 로그인 사용자의 고유 아이디를 최초등록자와 최종수정자로 기록하며, 검증에 실패하면 등록 화면으로 되돌린다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/qna/insertQnaView.do",
+      "name": "Q&A 질문 등록 화면 준비",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 182,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/insertQnaView.do\")"
+          }
+        ],
+        "text": "질문 등록 화면을 열기 전 인증 여부를 확인하고, 로그인한 사용자면 이름과 이메일 주소를 등록 양식에 미리 채워 넣는다. 미인증 사용자는 빈 양식으로 등록 화면을 받는다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/qna/selectQnaAnswerDetail.do",
+      "name": "Q&A 답변 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 399,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/selectQnaAnswerDetail.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 13,
+            "snippet": "\tQnaVO selectQnaDetail(QnaVO qnaVO) throws Exception;"
+          }
+        ],
+        "text": "답변 관리 목록에서 선택한 질문의 상세 내용과 현재 답변 상태를 조회해 답변 상세 화면에 표시한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/qna/selectQnaAnswerList.do",
+      "name": "Q&A 답변 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 363,
+            "snippet": "@RequestMapping(value = \"/uss/olh/qna/selectQnaAnswerList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 23,
+            "snippet": "\tList<QnaVO> selectQnaAnswerList(QnaVO searchVO);"
+          }
+        ],
+        "text": "담당자가 처리해야 할 Q&A 답변 대상 목록을 페이지 단위로 조회해 답변 관리 목록 화면에 표시하고 전체 건수와 페이지 정보를 함께 내려준다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/qna/selectQnaDetail.do",
+      "name": "Q&A 질문 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/selectQnaDetail.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 13,
+            "snippet": "\tQnaVO selectQnaDetail(QnaVO qnaVO) throws Exception;"
+          }
+        ],
+        "text": "질문 아이디로 단일 질문의 상세 내용을 조회해 상세 화면에 표시한다. 상세를 여는 시점에 해당 질문의 조회 횟수를 증가시킨다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/qna/selectQnaList.do",
+      "name": "Q&A 질문 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/olh/qna/selectQnaList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 9,
+            "snippet": "\tList<QnaVO> selectQnaList(QnaVO searchVO);"
+          }
+        ],
+        "text": "민원인이 등록한 Q&A 질문 목록을 페이지 단위로 조회해 목록 화면에 표시하고, 조회 건수와 페이지 정보를 함께 내려준다. 로그인 인증 여부를 확인해 목록 화면에서 질문 등록 버튼 노출 여부를 결정한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/qna/updateQna.do",
+      "name": "Q&A 질문 수정",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 279,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/updateQna.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 19,
+            "snippet": "\tvoid updateQna(QnaVO qnaVO);"
+          }
+        ],
+        "text": "입력값 검증을 통과한 질문 수정 요청에 대해, 저장된 질문의 최초등록자와 로그인 사용자가 같은지 본인 확인을 거친 뒤 내용을 수정하고 최종수정자를 기록한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/qna/updateQnaAnswer.do",
+      "name": "Q&A 답변 등록·수정",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 444,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/updateQnaAnswer.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 27,
+            "snippet": "\tvoid updateQnaAnswer(QnaVO qnaVO);"
+          }
+        ],
+        "text": "담당자가 작성한 답변 내용과 처리상태를 검증한 뒤 저장하고 최종수정자를 기록한다. 검증에 실패하면 처리상태 공통코드를 다시 조회해 답변 작성 화면으로 되돌린다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/qna/updateQnaAnswerView.do",
+      "name": "Q&A 답변 등록 화면 준비",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 419,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/updateQnaAnswerView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 13,
+            "snippet": "\tQnaVO selectQnaDetail(QnaVO qnaVO) throws Exception;"
+          }
+        ],
+        "text": "답변 작성 화면을 열기 위해 질의응답 처리상태 공통코드 목록과 대상 질문의 상세 내용을 함께 조회해 화면에 제공한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olh/qna/updateQnaView.do",
+      "name": "Q&A 질문 수정 화면 준비",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 253,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/updateQnaView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 13,
+            "snippet": "\tQnaVO selectQnaDetail(QnaVO qnaVO) throws Exception;"
+          }
+        ],
+        "text": "수정 대상 질문의 현재 내용을 조회해 수정 화면 양식에 채워 제공한다."
+      }
+    }
+  ],
+  "name": "Q&A 질의응답 관리",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "\tprivate String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 51,
+              "snippet": "\tprivate String email;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디·이름·이메일 주소는 필수 값으로 표시되며 이메일은 형식 검증 대상이다. 사용자 구분과 조직 정보를 함께 보관하고, 본인 확인의 기준이 되는 고유아이디를 별도로 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "인증 세션에 보관된 사용자 정보를 담아, 질문 등록 시 작성자 이름과 이메일을 채우고 등록자·수정자 아이디를 남기는 근거로 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /uss/olh/qna/deleteQna.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "\tprivate String uniqId;"
+          }
+        ],
+        "text": "질문 삭제 과정에서 인증된 사용자의 이름·이메일·고유아이디를 제공해 작성자 정보와 본인 확인 기준으로 쓰이는 로그인 정보 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인 세 가지 계약을 제공하며, 인증 여부는 참·거짓으로만 판단해 목록 화면의 인증 표시와 등록 가능 여부를 가른다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            }
+          ],
+          "text": "인증 체계에 보관된 사용자 정보를 업무 화면이 알아볼 수 있는 형태로 돌려주는 공통 서비스로, Q&A 업무는 이 서비스를 통해서만 로그인 사용자를 확인한다."
+        }
+      },
+      "name": "인증 사용자 정보 서비스",
+      "stepId": "step:ANY /uss/olh/qna/deleteQna.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 11,
+            "snippet": "\tpublic Object getAuthenticatedUser();"
+          }
+        ],
+        "text": "질문 삭제 과정에서 인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 인증 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스 한 개를 정적으로 보유하며, 인증된 사용자 객체 조회·권한 목록 조회·인증 여부 확인 세 가지를 제공한다. 서비스가 주입되어 있어야 동작한다는 전제를 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스를 감싸, Q&A 화면 어디서나 로그인 여부와 로그인 사용자 정보를 같은 방식으로 얻게 해 주는 공통 창구 역할을 한다."
+        }
+      },
+      "name": "인증 사용자 조회 도우미",
+      "stepId": "step:ANY /uss/olh/qna/deleteQna.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "\tpublic static Object getAuthenticatedUser() {"
+          }
+        ],
+        "text": "질문 삭제 과정에서 현재 로그인 여부와 인증된 사용자 정보를 꺼내오는 공통 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+              "line": 42,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+              "line": 63,
+              "snippet": "\t\t\tif (sUniqId == null || loginVO.getUniqId() == null || loginVO.getUniqId().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+              "line": 68,
+              "snippet": "\t\t\tif (!sUniqId.equals(loginVO.getUniqId())) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+              "line": 72,
+              "snippet": "\t\t\tthrow new EgovXssException(\"XSS00001\", \"errors.xss.checkerUser\");"
+            }
+          ],
+          "text": "로그인 사용자 정보를 인증 도우미로 얻어, 로그인 정보가 없거나 고유아이디가 비어 있으면 오류로 처리하고, 대상 글의 등록자 아이디와 로그인 사용자의 고유아이디가 다르면 권한 오류를 일으킨다. 두 조건을 모두 통과할 때만 참을 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+              "line": 28,
+              "snippet": "public class EgovXssChecker {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+              "line": 39,
+              "snippet": "\tpublic static boolean checkerUserXss(HttpServletRequest request, String sUniqId) throws Exception {"
+            }
+          ],
+          "text": "질문 수정·상세조회·삭제처럼 남의 글을 건드릴 수 있는 요청에서, 요청자가 그 글의 작성자 본인인지 확인하는 공통 관문 역할을 한다."
+        }
+      },
+      "name": "작성자 본인 확인 점검",
+      "stepId": "step:ANY /uss/olh/qna/deleteQna.do:src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+            "line": 28,
+            "snippet": "public class EgovXssChecker {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+            "line": 39,
+            "snippet": "\tpublic static boolean checkerUserXss(HttpServletRequest request, String sUniqId) throws Exception {"
+          }
+        ],
+        "text": "질문 삭제 요청이 실제 작성자 본인의 요청인지 로그인 사용자의 고유아이디와 질문의 최초등록자를 대조해 확인하는 공통 점검 모듈이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 17,
+              "snippet": "\tvoid insertQna(QnaVO qnaVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 15,
+              "snippet": "\tvoid updateQnaInqireCo(QnaVO qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 27,
+              "snippet": "\tvoid updateQnaAnswer(QnaVO qnaVO);"
+            }
+          ],
+          "text": "질문 등록은 채번 실패를 별도 예외로 알리고, 상세 조회는 조회 횟수 증가와 짝을 이루며, 답변 저장은 별도 작업으로 분리되어 있어 질문 본문 수정과 답변 작성의 책임이 나뉜다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 7,
+              "snippet": "public interface EgovQnaService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 21,
+              "snippet": "\tvoid deleteQna(QnaVO qnaVO);"
+            }
+          ],
+          "text": "Q&A 도메인의 업무 계약을 정의하는 서비스로, 이 흐름에서는 질문 삭제 작업을 맡는다. 질문 목록·상세 조회, 질문 등록·수정·삭제, 답변 목록 조회와 답변 저장까지 Q&A 업무 전반을 한 곳에서 조율한다."
+        }
+      },
+      "name": "Q&A 업무 서비스 질문 삭제",
+      "stepId": "step:ANY /uss/olh/qna/deleteQna.do:src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 7,
+            "snippet": "public interface EgovQnaService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 21,
+            "snippet": "\tvoid deleteQna(QnaVO qnaVO);"
+          }
+        ],
+        "text": "Q&A 질문·답변 업무를 담당하는 서비스로서 질문 삭제 작업을 수행하고 결과를 창구로 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 42,
+              "snippet": "\t@Size(max=250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 43,
+              "snippet": "\tprivate String qestnSj;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 47,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 56,
+              "snippet": "\t@Pattern(regexp=\"^[0-9]*$\", message=\"{validation.pattern.integer}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 91,
+              "snippet": "\tprivate String qnaProcessSttusCode;"
+            }
+          ],
+          "text": "질문 제목은 250자, 질문 내용과 답변 내용은 각각 2500자를 넘을 수 없고 모두 필수 입력이다. 지역번호·중간전화번호·끝전화번호는 숫자만 허용되는 4자리이며, 이메일 주소는 형식 검증 대상이고, 질의응답 처리상태는 코드와 코드명을 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 33,
+              "snippet": "public class QnaVO extends QnaDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 38,
+              "snippet": "\tprivate String qaId;"
+            }
+          ],
+          "text": "화면 입력값과 조회 결과를 함께 담는 Q&A 질문 정보 그릇으로, 검색조건과 페이지 정보를 상속받아 목록 조회부터 등록·수정·답변 작성까지 같은 형태로 사용된다."
+        }
+      },
+      "name": "Q&A 질문 정보",
+      "stepId": "step:ANY /uss/olh/qna/deleteQna.do:src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 33,
+            "snippet": "public class QnaVO extends QnaDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 38,
+            "snippet": "\tprivate String qaId;"
+          }
+        ],
+        "text": "질문 삭제 과정에서 질문 제목·내용·작성자·연락처·답변 내용과 처리상태를 담아 화면과 업무 서비스 사이를 오가는 질문 정보 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 340,
+              "snippet": "\t\tQnaVO vo = egovQnaService.selectQnaDetail(qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 343,
+              "snippet": "\t\tEgovXssChecker.checkerUserXss(request, vo.getFrstRegisterId());"
+            }
+          ],
+          "text": "요청 파라미터는 질문 정보와 검색조건 객체로 받아 처리하며, 수정·삭제 요청은 저장된 질문의 최초등록자를 조회해 로그인 사용자와 일치하는지 공통 권한 점검 모듈로 확인한 뒤에만 다음 단계로 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 329,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/deleteQna.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 349,
+              "snippet": "\t\tegovQnaService.deleteQna(qnaVO);"
+            }
+          ],
+          "text": "Q&A 업무의 창구 역할을 맡아 질문 삭제 요청을 받는다. 화면에서 넘어온 검색조건과 질문 정보를 받아 자체 업무 판단 없이 Q&A 업무 서비스로 넘기고, 처리 결과를 화면 또는 목록 경로로 되돌리는 일만 담당한다."
+        }
+      },
+      "name": "질문 삭제 요청 접수",
+      "stepId": "step:ANY /uss/olh/qna/deleteQna.do:src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 329,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/deleteQna.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 329,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/deleteQna.do\")"
+          }
+        ],
+        "text": "Q&A 화면에서 들어온 질문 삭제 요청을 받아 화면 파라미터를 질문 정보 객체에 담고, 업무 처리를 Q&A 업무 서비스에 위임한 뒤 결과 화면 또는 목록으로 되돌린다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "\tprivate String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 51,
+              "snippet": "\tprivate String email;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디·이름·이메일 주소는 필수 값으로 표시되며 이메일은 형식 검증 대상이다. 사용자 구분과 조직 정보를 함께 보관하고, 본인 확인의 기준이 되는 고유아이디를 별도로 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "인증 세션에 보관된 사용자 정보를 담아, 질문 등록 시 작성자 이름과 이메일을 채우고 등록자·수정자 아이디를 남기는 근거로 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /uss/olh/qna/insertQna.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "\tprivate String uniqId;"
+          }
+        ],
+        "text": "질문 등록 과정에서 인증된 사용자의 이름·이메일·고유아이디를 제공해 작성자 정보와 본인 확인 기준으로 쓰이는 로그인 정보 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인 세 가지 계약을 제공하며, 인증 여부는 참·거짓으로만 판단해 목록 화면의 인증 표시와 등록 가능 여부를 가른다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            }
+          ],
+          "text": "인증 체계에 보관된 사용자 정보를 업무 화면이 알아볼 수 있는 형태로 돌려주는 공통 서비스로, Q&A 업무는 이 서비스를 통해서만 로그인 사용자를 확인한다."
+        }
+      },
+      "name": "인증 사용자 정보 서비스",
+      "stepId": "step:ANY /uss/olh/qna/insertQna.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 11,
+            "snippet": "\tpublic Object getAuthenticatedUser();"
+          }
+        ],
+        "text": "질문 등록 과정에서 인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 인증 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스 한 개를 정적으로 보유하며, 인증된 사용자 객체 조회·권한 목록 조회·인증 여부 확인 세 가지를 제공한다. 서비스가 주입되어 있어야 동작한다는 전제를 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스를 감싸, Q&A 화면 어디서나 로그인 여부와 로그인 사용자 정보를 같은 방식으로 얻게 해 주는 공통 창구 역할을 한다."
+        }
+      },
+      "name": "인증 사용자 조회 도우미",
+      "stepId": "step:ANY /uss/olh/qna/insertQna.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "\tpublic static Object getAuthenticatedUser() {"
+          }
+        ],
+        "text": "질문 등록 과정에서 현재 로그인 여부와 인증된 사용자 정보를 꺼내오는 공통 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 17,
+              "snippet": "\tvoid insertQna(QnaVO qnaVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 15,
+              "snippet": "\tvoid updateQnaInqireCo(QnaVO qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 27,
+              "snippet": "\tvoid updateQnaAnswer(QnaVO qnaVO);"
+            }
+          ],
+          "text": "질문 등록은 채번 실패를 별도 예외로 알리고, 상세 조회는 조회 횟수 증가와 짝을 이루며, 답변 저장은 별도 작업으로 분리되어 있어 질문 본문 수정과 답변 작성의 책임이 나뉜다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 7,
+              "snippet": "public interface EgovQnaService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 17,
+              "snippet": "\tvoid insertQna(QnaVO qnaVO) throws FdlException;"
+            }
+          ],
+          "text": "Q&A 도메인의 업무 계약을 정의하는 서비스로, 이 흐름에서는 질문 등록 작업을 맡는다. 질문 목록·상세 조회, 질문 등록·수정·삭제, 답변 목록 조회와 답변 저장까지 Q&A 업무 전반을 한 곳에서 조율한다."
+        }
+      },
+      "name": "Q&A 업무 서비스 질문 등록",
+      "stepId": "step:ANY /uss/olh/qna/insertQna.do:src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 7,
+            "snippet": "public interface EgovQnaService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 17,
+            "snippet": "\tvoid insertQna(QnaVO qnaVO) throws FdlException;"
+          }
+        ],
+        "text": "Q&A 질문·답변 업무를 담당하는 서비스로서 질문 등록 작업을 수행하고 결과를 창구로 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 42,
+              "snippet": "\t@Size(max=250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 43,
+              "snippet": "\tprivate String qestnSj;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 47,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 56,
+              "snippet": "\t@Pattern(regexp=\"^[0-9]*$\", message=\"{validation.pattern.integer}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 91,
+              "snippet": "\tprivate String qnaProcessSttusCode;"
+            }
+          ],
+          "text": "질문 제목은 250자, 질문 내용과 답변 내용은 각각 2500자를 넘을 수 없고 모두 필수 입력이다. 지역번호·중간전화번호·끝전화번호는 숫자만 허용되는 4자리이며, 이메일 주소는 형식 검증 대상이고, 질의응답 처리상태는 코드와 코드명을 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 33,
+              "snippet": "public class QnaVO extends QnaDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 38,
+              "snippet": "\tprivate String qaId;"
+            }
+          ],
+          "text": "화면 입력값과 조회 결과를 함께 담는 Q&A 질문 정보 그릇으로, 검색조건과 페이지 정보를 상속받아 목록 조회부터 등록·수정·답변 작성까지 같은 형태로 사용된다."
+        }
+      },
+      "name": "Q&A 질문 정보",
+      "stepId": "step:ANY /uss/olh/qna/insertQna.do:src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 33,
+            "snippet": "public class QnaVO extends QnaDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 38,
+            "snippet": "\tprivate String qaId;"
+          }
+        ],
+        "text": "질문 등록 과정에서 질문 제목·내용·작성자·연락처·답변 내용과 처리상태를 담아 화면과 업무 서비스 사이를 오가는 질문 정보 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 340,
+              "snippet": "\t\tQnaVO vo = egovQnaService.selectQnaDetail(qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 343,
+              "snippet": "\t\tEgovXssChecker.checkerUserXss(request, vo.getFrstRegisterId());"
+            }
+          ],
+          "text": "요청 파라미터는 질문 정보와 검색조건 객체로 받아 처리하며, 수정·삭제 요청은 저장된 질문의 최초등록자를 조회해 로그인 사용자와 일치하는지 공통 권한 점검 모듈로 확인한 뒤에만 다음 단계로 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 217,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/insertQna.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 349,
+              "snippet": "\t\tegovQnaService.deleteQna(qnaVO);"
+            }
+          ],
+          "text": "Q&A 업무의 창구 역할을 맡아 질문 등록 요청을 받는다. 화면에서 넘어온 검색조건과 질문 정보를 받아 자체 업무 판단 없이 Q&A 업무 서비스로 넘기고, 처리 결과를 화면 또는 목록 경로로 되돌리는 일만 담당한다."
+        }
+      },
+      "name": "질문 등록 요청 접수",
+      "stepId": "step:ANY /uss/olh/qna/insertQna.do:src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 329,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/deleteQna.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 217,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/insertQna.do\")"
+          }
+        ],
+        "text": "Q&A 화면에서 들어온 질문 등록 요청을 받아 화면 파라미터를 질문 정보 객체에 담고, 업무 처리를 Q&A 업무 서비스에 위임한 뒤 결과 화면 또는 목록으로 되돌린다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            }
+          ],
+          "text": "빈 문자열을 공용 상수로 두고 문자열을 다루는 정적 기능만 제공하며, 지정 길이를 넘는 문자열을 잘라 주는 기능처럼 원본이 없으면 아무것도 만들지 않는 방식으로 빈 값을 다룬다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "값이 없을 수 있는 로그인 사용자 항목을 빈 문자열로 정규화해, 작성자명·이메일·등록자 아이디를 채울 때 빈 값 때문에 처리가 끊기지 않게 해 주는 공통 도우미 역할을 한다."
+        }
+      },
+      "name": "문자열 처리 공통 유틸",
+      "stepId": "step:ANY /uss/olh/qna/insertQna.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 47,
+            "snippet": "\tpublic static final String EMPTY = \"\";"
+          }
+        ],
+        "text": "질문 등록 과정에서 로그인 사용자의 이름·이메일·고유아이디가 없을 때 빈 문자열로 바꿔 안전하게 담도록 돕는 문자열 공통 유틸이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "\tprivate String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 51,
+              "snippet": "\tprivate String email;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디·이름·이메일 주소는 필수 값으로 표시되며 이메일은 형식 검증 대상이다. 사용자 구분과 조직 정보를 함께 보관하고, 본인 확인의 기준이 되는 고유아이디를 별도로 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "인증 세션에 보관된 사용자 정보를 담아, 질문 등록 시 작성자 이름과 이메일을 채우고 등록자·수정자 아이디를 남기는 근거로 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /uss/olh/qna/insertQnaView.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "\tprivate String uniqId;"
+          }
+        ],
+        "text": "질문 등록 화면 준비 과정에서 인증된 사용자의 이름·이메일·고유아이디를 제공해 작성자 정보와 본인 확인 기준으로 쓰이는 로그인 정보 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인 세 가지 계약을 제공하며, 인증 여부는 참·거짓으로만 판단해 목록 화면의 인증 표시와 등록 가능 여부를 가른다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            }
+          ],
+          "text": "인증 체계에 보관된 사용자 정보를 업무 화면이 알아볼 수 있는 형태로 돌려주는 공통 서비스로, Q&A 업무는 이 서비스를 통해서만 로그인 사용자를 확인한다."
+        }
+      },
+      "name": "인증 사용자 정보 서비스",
+      "stepId": "step:ANY /uss/olh/qna/insertQnaView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 11,
+            "snippet": "\tpublic Object getAuthenticatedUser();"
+          }
+        ],
+        "text": "질문 등록 화면 준비 과정에서 인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 인증 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스 한 개를 정적으로 보유하며, 인증된 사용자 객체 조회·권한 목록 조회·인증 여부 확인 세 가지를 제공한다. 서비스가 주입되어 있어야 동작한다는 전제를 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스를 감싸, Q&A 화면 어디서나 로그인 여부와 로그인 사용자 정보를 같은 방식으로 얻게 해 주는 공통 창구 역할을 한다."
+        }
+      },
+      "name": "인증 사용자 조회 도우미",
+      "stepId": "step:ANY /uss/olh/qna/insertQnaView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "\tpublic static Object getAuthenticatedUser() {"
+          }
+        ],
+        "text": "질문 등록 화면 준비 과정에서 현재 로그인 여부와 인증된 사용자 정보를 꺼내오는 공통 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 42,
+              "snippet": "\t@Size(max=250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 43,
+              "snippet": "\tprivate String qestnSj;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 47,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 56,
+              "snippet": "\t@Pattern(regexp=\"^[0-9]*$\", message=\"{validation.pattern.integer}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 91,
+              "snippet": "\tprivate String qnaProcessSttusCode;"
+            }
+          ],
+          "text": "질문 제목은 250자, 질문 내용과 답변 내용은 각각 2500자를 넘을 수 없고 모두 필수 입력이다. 지역번호·중간전화번호·끝전화번호는 숫자만 허용되는 4자리이며, 이메일 주소는 형식 검증 대상이고, 질의응답 처리상태는 코드와 코드명을 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 33,
+              "snippet": "public class QnaVO extends QnaDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 38,
+              "snippet": "\tprivate String qaId;"
+            }
+          ],
+          "text": "화면 입력값과 조회 결과를 함께 담는 Q&A 질문 정보 그릇으로, 검색조건과 페이지 정보를 상속받아 목록 조회부터 등록·수정·답변 작성까지 같은 형태로 사용된다."
+        }
+      },
+      "name": "Q&A 질문 정보",
+      "stepId": "step:ANY /uss/olh/qna/insertQnaView.do:src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 33,
+            "snippet": "public class QnaVO extends QnaDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 38,
+            "snippet": "\tprivate String qaId;"
+          }
+        ],
+        "text": "질문 등록 화면 준비 과정에서 질문 제목·내용·작성자·연락처·답변 내용과 처리상태를 담아 화면과 업무 서비스 사이를 오가는 질문 정보 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 340,
+              "snippet": "\t\tQnaVO vo = egovQnaService.selectQnaDetail(qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 343,
+              "snippet": "\t\tEgovXssChecker.checkerUserXss(request, vo.getFrstRegisterId());"
+            }
+          ],
+          "text": "요청 파라미터는 질문 정보와 검색조건 객체로 받아 처리하며, 수정·삭제 요청은 저장된 질문의 최초등록자를 조회해 로그인 사용자와 일치하는지 공통 권한 점검 모듈로 확인한 뒤에만 다음 단계로 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 182,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/insertQnaView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 349,
+              "snippet": "\t\tegovQnaService.deleteQna(qnaVO);"
+            }
+          ],
+          "text": "Q&A 업무의 창구 역할을 맡아 질문 등록 화면 준비 요청을 받는다. 화면에서 넘어온 검색조건과 질문 정보를 받아 자체 업무 판단 없이 Q&A 업무 서비스로 넘기고, 처리 결과를 화면 또는 목록 경로로 되돌리는 일만 담당한다."
+        }
+      },
+      "name": "질문 등록 화면 준비 요청 접수",
+      "stepId": "step:ANY /uss/olh/qna/insertQnaView.do:src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 329,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/deleteQna.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 182,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/insertQnaView.do\")"
+          }
+        ],
+        "text": "Q&A 화면에서 들어온 질문 등록 화면 준비 요청을 받아 화면 파라미터를 질문 정보 객체에 담고, 업무 처리를 Q&A 업무 서비스에 위임한 뒤 결과 화면 또는 목록으로 되돌린다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            }
+          ],
+          "text": "빈 문자열을 공용 상수로 두고 문자열을 다루는 정적 기능만 제공하며, 지정 길이를 넘는 문자열을 잘라 주는 기능처럼 원본이 없으면 아무것도 만들지 않는 방식으로 빈 값을 다룬다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "값이 없을 수 있는 로그인 사용자 항목을 빈 문자열로 정규화해, 작성자명·이메일·등록자 아이디를 채울 때 빈 값 때문에 처리가 끊기지 않게 해 주는 공통 도우미 역할을 한다."
+        }
+      },
+      "name": "문자열 처리 공통 유틸",
+      "stepId": "step:ANY /uss/olh/qna/insertQnaView.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 47,
+            "snippet": "\tpublic static final String EMPTY = \"\";"
+          }
+        ],
+        "text": "질문 등록 화면 준비 과정에서 로그인 사용자의 이름·이메일·고유아이디가 없을 때 빈 문자열로 바꿔 안전하게 담도록 돕는 문자열 공통 유틸이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 17,
+              "snippet": "\tvoid insertQna(QnaVO qnaVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 15,
+              "snippet": "\tvoid updateQnaInqireCo(QnaVO qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 27,
+              "snippet": "\tvoid updateQnaAnswer(QnaVO qnaVO);"
+            }
+          ],
+          "text": "질문 등록은 채번 실패를 별도 예외로 알리고, 상세 조회는 조회 횟수 증가와 짝을 이루며, 답변 저장은 별도 작업으로 분리되어 있어 질문 본문 수정과 답변 작성의 책임이 나뉜다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 7,
+              "snippet": "public interface EgovQnaService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 13,
+              "snippet": "\tQnaVO selectQnaDetail(QnaVO qnaVO) throws Exception;"
+            }
+          ],
+          "text": "Q&A 도메인의 업무 계약을 정의하는 서비스로, 이 흐름에서는 답변 상세 조회 작업을 맡는다. 질문 목록·상세 조회, 질문 등록·수정·삭제, 답변 목록 조회와 답변 저장까지 Q&A 업무 전반을 한 곳에서 조율한다."
+        }
+      },
+      "name": "Q&A 업무 서비스 답변 상세 조회",
+      "stepId": "step:ANY /uss/olh/qna/selectQnaAnswerDetail.do:src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 7,
+            "snippet": "public interface EgovQnaService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 13,
+            "snippet": "\tQnaVO selectQnaDetail(QnaVO qnaVO) throws Exception;"
+          }
+        ],
+        "text": "Q&A 질문·답변 업무를 담당하는 서비스로서 답변 상세 조회 작업을 수행하고 결과를 창구로 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 340,
+              "snippet": "\t\tQnaVO vo = egovQnaService.selectQnaDetail(qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 343,
+              "snippet": "\t\tEgovXssChecker.checkerUserXss(request, vo.getFrstRegisterId());"
+            }
+          ],
+          "text": "요청 파라미터는 질문 정보와 검색조건 객체로 받아 처리하며, 수정·삭제 요청은 저장된 질문의 최초등록자를 조회해 로그인 사용자와 일치하는지 공통 권한 점검 모듈로 확인한 뒤에만 다음 단계로 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 399,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/selectQnaAnswerDetail.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 349,
+              "snippet": "\t\tegovQnaService.deleteQna(qnaVO);"
+            }
+          ],
+          "text": "Q&A 업무의 창구 역할을 맡아 답변 상세 조회 요청을 받는다. 화면에서 넘어온 검색조건과 질문 정보를 받아 자체 업무 판단 없이 Q&A 업무 서비스로 넘기고, 처리 결과를 화면 또는 목록 경로로 되돌리는 일만 담당한다."
+        }
+      },
+      "name": "답변 상세 조회 요청 접수",
+      "stepId": "step:ANY /uss/olh/qna/selectQnaAnswerDetail.do:src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 329,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/deleteQna.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 399,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/selectQnaAnswerDetail.do\")"
+          }
+        ],
+        "text": "Q&A 화면에서 들어온 답변 상세 조회 요청을 받아 화면 파라미터를 질문 정보 객체에 담고, 업무 처리를 Q&A 업무 서비스에 위임한 뒤 결과 화면 또는 목록으로 되돌린다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 17,
+              "snippet": "\tvoid insertQna(QnaVO qnaVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 15,
+              "snippet": "\tvoid updateQnaInqireCo(QnaVO qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 27,
+              "snippet": "\tvoid updateQnaAnswer(QnaVO qnaVO);"
+            }
+          ],
+          "text": "질문 등록은 채번 실패를 별도 예외로 알리고, 상세 조회는 조회 횟수 증가와 짝을 이루며, 답변 저장은 별도 작업으로 분리되어 있어 질문 본문 수정과 답변 작성의 책임이 나뉜다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 7,
+              "snippet": "public interface EgovQnaService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 23,
+              "snippet": "\tList<QnaVO> selectQnaAnswerList(QnaVO searchVO);"
+            }
+          ],
+          "text": "Q&A 도메인의 업무 계약을 정의하는 서비스로, 이 흐름에서는 답변 목록 조회 작업을 맡는다. 질문 목록·상세 조회, 질문 등록·수정·삭제, 답변 목록 조회와 답변 저장까지 Q&A 업무 전반을 한 곳에서 조율한다."
+        }
+      },
+      "name": "Q&A 업무 서비스 답변 목록 조회",
+      "stepId": "step:ANY /uss/olh/qna/selectQnaAnswerList.do:src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 7,
+            "snippet": "public interface EgovQnaService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 23,
+            "snippet": "\tList<QnaVO> selectQnaAnswerList(QnaVO searchVO);"
+          }
+        ],
+        "text": "Q&A 질문·답변 업무를 담당하는 서비스로서 답변 목록 조회 작업을 수행하고 결과를 창구로 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 42,
+              "snippet": "\t@Size(max=250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 43,
+              "snippet": "\tprivate String qestnSj;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 47,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 56,
+              "snippet": "\t@Pattern(regexp=\"^[0-9]*$\", message=\"{validation.pattern.integer}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 91,
+              "snippet": "\tprivate String qnaProcessSttusCode;"
+            }
+          ],
+          "text": "질문 제목은 250자, 질문 내용과 답변 내용은 각각 2500자를 넘을 수 없고 모두 필수 입력이다. 지역번호·중간전화번호·끝전화번호는 숫자만 허용되는 4자리이며, 이메일 주소는 형식 검증 대상이고, 질의응답 처리상태는 코드와 코드명을 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 33,
+              "snippet": "public class QnaVO extends QnaDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 38,
+              "snippet": "\tprivate String qaId;"
+            }
+          ],
+          "text": "화면 입력값과 조회 결과를 함께 담는 Q&A 질문 정보 그릇으로, 검색조건과 페이지 정보를 상속받아 목록 조회부터 등록·수정·답변 작성까지 같은 형태로 사용된다."
+        }
+      },
+      "name": "Q&A 질문 정보",
+      "stepId": "step:ANY /uss/olh/qna/selectQnaAnswerList.do:src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 33,
+            "snippet": "public class QnaVO extends QnaDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 38,
+            "snippet": "\tprivate String qaId;"
+          }
+        ],
+        "text": "답변 목록 조회 과정에서 질문 제목·내용·작성자·연락처·답변 내용과 처리상태를 담아 화면과 업무 서비스 사이를 오가는 질문 정보 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 340,
+              "snippet": "\t\tQnaVO vo = egovQnaService.selectQnaDetail(qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 343,
+              "snippet": "\t\tEgovXssChecker.checkerUserXss(request, vo.getFrstRegisterId());"
+            }
+          ],
+          "text": "요청 파라미터는 질문 정보와 검색조건 객체로 받아 처리하며, 수정·삭제 요청은 저장된 질문의 최초등록자를 조회해 로그인 사용자와 일치하는지 공통 권한 점검 모듈로 확인한 뒤에만 다음 단계로 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 363,
+              "snippet": "@RequestMapping(value = \"/uss/olh/qna/selectQnaAnswerList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 349,
+              "snippet": "\t\tegovQnaService.deleteQna(qnaVO);"
+            }
+          ],
+          "text": "Q&A 업무의 창구 역할을 맡아 답변 목록 조회 요청을 받는다. 화면에서 넘어온 검색조건과 질문 정보를 받아 자체 업무 판단 없이 Q&A 업무 서비스로 넘기고, 처리 결과를 화면 또는 목록 경로로 되돌리는 일만 담당한다."
+        }
+      },
+      "name": "답변 목록 조회 요청 접수",
+      "stepId": "step:ANY /uss/olh/qna/selectQnaAnswerList.do:src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 329,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/deleteQna.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 363,
+            "snippet": "@RequestMapping(value = \"/uss/olh/qna/selectQnaAnswerList.do\")"
+          }
+        ],
+        "text": "Q&A 화면에서 들어온 답변 목록 조회 요청을 받아 화면 파라미터를 질문 정보 객체에 담고, 업무 처리를 Q&A 업무 서비스에 위임한 뒤 결과 화면 또는 목록으로 되돌린다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 17,
+              "snippet": "\tvoid insertQna(QnaVO qnaVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 15,
+              "snippet": "\tvoid updateQnaInqireCo(QnaVO qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 27,
+              "snippet": "\tvoid updateQnaAnswer(QnaVO qnaVO);"
+            }
+          ],
+          "text": "질문 등록은 채번 실패를 별도 예외로 알리고, 상세 조회는 조회 횟수 증가와 짝을 이루며, 답변 저장은 별도 작업으로 분리되어 있어 질문 본문 수정과 답변 작성의 책임이 나뉜다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 7,
+              "snippet": "public interface EgovQnaService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 13,
+              "snippet": "\tQnaVO selectQnaDetail(QnaVO qnaVO) throws Exception;"
+            }
+          ],
+          "text": "Q&A 도메인의 업무 계약을 정의하는 서비스로, 이 흐름에서는 질문 상세 조회 작업을 맡는다. 질문 목록·상세 조회, 질문 등록·수정·삭제, 답변 목록 조회와 답변 저장까지 Q&A 업무 전반을 한 곳에서 조율한다."
+        }
+      },
+      "name": "Q&A 업무 서비스 질문 상세 조회",
+      "stepId": "step:ANY /uss/olh/qna/selectQnaDetail.do:src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 7,
+            "snippet": "public interface EgovQnaService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 13,
+            "snippet": "\tQnaVO selectQnaDetail(QnaVO qnaVO) throws Exception;"
+          }
+        ],
+        "text": "Q&A 질문·답변 업무를 담당하는 서비스로서 질문 상세 조회 작업을 수행하고 결과를 창구로 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 42,
+              "snippet": "\t@Size(max=250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 43,
+              "snippet": "\tprivate String qestnSj;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 47,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 56,
+              "snippet": "\t@Pattern(regexp=\"^[0-9]*$\", message=\"{validation.pattern.integer}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 91,
+              "snippet": "\tprivate String qnaProcessSttusCode;"
+            }
+          ],
+          "text": "질문 제목은 250자, 질문 내용과 답변 내용은 각각 2500자를 넘을 수 없고 모두 필수 입력이다. 지역번호·중간전화번호·끝전화번호는 숫자만 허용되는 4자리이며, 이메일 주소는 형식 검증 대상이고, 질의응답 처리상태는 코드와 코드명을 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 33,
+              "snippet": "public class QnaVO extends QnaDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 38,
+              "snippet": "\tprivate String qaId;"
+            }
+          ],
+          "text": "화면 입력값과 조회 결과를 함께 담는 Q&A 질문 정보 그릇으로, 검색조건과 페이지 정보를 상속받아 목록 조회부터 등록·수정·답변 작성까지 같은 형태로 사용된다."
+        }
+      },
+      "name": "Q&A 질문 정보",
+      "stepId": "step:ANY /uss/olh/qna/selectQnaDetail.do:src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 33,
+            "snippet": "public class QnaVO extends QnaDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 38,
+            "snippet": "\tprivate String qaId;"
+          }
+        ],
+        "text": "질문 상세 조회 과정에서 질문 제목·내용·작성자·연락처·답변 내용과 처리상태를 담아 화면과 업무 서비스 사이를 오가는 질문 정보 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 340,
+              "snippet": "\t\tQnaVO vo = egovQnaService.selectQnaDetail(qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 343,
+              "snippet": "\t\tEgovXssChecker.checkerUserXss(request, vo.getFrstRegisterId());"
+            }
+          ],
+          "text": "요청 파라미터는 질문 정보와 검색조건 객체로 받아 처리하며, 수정·삭제 요청은 저장된 질문의 최초등록자를 조회해 로그인 사용자와 일치하는지 공통 권한 점검 모듈로 확인한 뒤에만 다음 단계로 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 151,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/selectQnaDetail.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 349,
+              "snippet": "\t\tegovQnaService.deleteQna(qnaVO);"
+            }
+          ],
+          "text": "Q&A 업무의 창구 역할을 맡아 질문 상세 조회 요청을 받는다. 화면에서 넘어온 검색조건과 질문 정보를 받아 자체 업무 판단 없이 Q&A 업무 서비스로 넘기고, 처리 결과를 화면 또는 목록 경로로 되돌리는 일만 담당한다."
+        }
+      },
+      "name": "질문 상세 조회 요청 접수",
+      "stepId": "step:ANY /uss/olh/qna/selectQnaDetail.do:src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 329,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/deleteQna.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/selectQnaDetail.do\")"
+          }
+        ],
+        "text": "Q&A 화면에서 들어온 질문 상세 조회 요청을 받아 화면 파라미터를 질문 정보 객체에 담고, 업무 처리를 Q&A 업무 서비스에 위임한 뒤 결과 화면 또는 목록으로 되돌린다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인 세 가지 계약을 제공하며, 인증 여부는 참·거짓으로만 판단해 목록 화면의 인증 표시와 등록 가능 여부를 가른다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            }
+          ],
+          "text": "인증 체계에 보관된 사용자 정보를 업무 화면이 알아볼 수 있는 형태로 돌려주는 공통 서비스로, Q&A 업무는 이 서비스를 통해서만 로그인 사용자를 확인한다."
+        }
+      },
+      "name": "인증 사용자 정보 서비스",
+      "stepId": "step:ANY /uss/olh/qna/selectQnaList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 11,
+            "snippet": "\tpublic Object getAuthenticatedUser();"
+          }
+        ],
+        "text": "질문 목록 조회 과정에서 인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 인증 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스 한 개를 정적으로 보유하며, 인증된 사용자 객체 조회·권한 목록 조회·인증 여부 확인 세 가지를 제공한다. 서비스가 주입되어 있어야 동작한다는 전제를 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스를 감싸, Q&A 화면 어디서나 로그인 여부와 로그인 사용자 정보를 같은 방식으로 얻게 해 주는 공통 창구 역할을 한다."
+        }
+      },
+      "name": "인증 사용자 조회 도우미",
+      "stepId": "step:ANY /uss/olh/qna/selectQnaList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "\tpublic static Object getAuthenticatedUser() {"
+          }
+        ],
+        "text": "질문 목록 조회 과정에서 현재 로그인 여부와 인증된 사용자 정보를 꺼내오는 공통 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 17,
+              "snippet": "\tvoid insertQna(QnaVO qnaVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 15,
+              "snippet": "\tvoid updateQnaInqireCo(QnaVO qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 27,
+              "snippet": "\tvoid updateQnaAnswer(QnaVO qnaVO);"
+            }
+          ],
+          "text": "질문 등록은 채번 실패를 별도 예외로 알리고, 상세 조회는 조회 횟수 증가와 짝을 이루며, 답변 저장은 별도 작업으로 분리되어 있어 질문 본문 수정과 답변 작성의 책임이 나뉜다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 7,
+              "snippet": "public interface EgovQnaService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 9,
+              "snippet": "\tList<QnaVO> selectQnaList(QnaVO searchVO);"
+            }
+          ],
+          "text": "Q&A 도메인의 업무 계약을 정의하는 서비스로, 이 흐름에서는 질문 목록 조회 작업을 맡는다. 질문 목록·상세 조회, 질문 등록·수정·삭제, 답변 목록 조회와 답변 저장까지 Q&A 업무 전반을 한 곳에서 조율한다."
+        }
+      },
+      "name": "Q&A 업무 서비스 질문 목록 조회",
+      "stepId": "step:ANY /uss/olh/qna/selectQnaList.do:src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 7,
+            "snippet": "public interface EgovQnaService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 9,
+            "snippet": "\tList<QnaVO> selectQnaList(QnaVO searchVO);"
+          }
+        ],
+        "text": "Q&A 질문·답변 업무를 담당하는 서비스로서 질문 목록 조회 작업을 수행하고 결과를 창구로 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 42,
+              "snippet": "\t@Size(max=250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 43,
+              "snippet": "\tprivate String qestnSj;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 47,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 56,
+              "snippet": "\t@Pattern(regexp=\"^[0-9]*$\", message=\"{validation.pattern.integer}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 91,
+              "snippet": "\tprivate String qnaProcessSttusCode;"
+            }
+          ],
+          "text": "질문 제목은 250자, 질문 내용과 답변 내용은 각각 2500자를 넘을 수 없고 모두 필수 입력이다. 지역번호·중간전화번호·끝전화번호는 숫자만 허용되는 4자리이며, 이메일 주소는 형식 검증 대상이고, 질의응답 처리상태는 코드와 코드명을 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 33,
+              "snippet": "public class QnaVO extends QnaDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 38,
+              "snippet": "\tprivate String qaId;"
+            }
+          ],
+          "text": "화면 입력값과 조회 결과를 함께 담는 Q&A 질문 정보 그릇으로, 검색조건과 페이지 정보를 상속받아 목록 조회부터 등록·수정·답변 작성까지 같은 형태로 사용된다."
+        }
+      },
+      "name": "Q&A 질문 정보",
+      "stepId": "step:ANY /uss/olh/qna/selectQnaList.do:src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 33,
+            "snippet": "public class QnaVO extends QnaDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 38,
+            "snippet": "\tprivate String qaId;"
+          }
+        ],
+        "text": "질문 목록 조회 과정에서 질문 제목·내용·작성자·연락처·답변 내용과 처리상태를 담아 화면과 업무 서비스 사이를 오가는 질문 정보 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 340,
+              "snippet": "\t\tQnaVO vo = egovQnaService.selectQnaDetail(qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 343,
+              "snippet": "\t\tEgovXssChecker.checkerUserXss(request, vo.getFrstRegisterId());"
+            }
+          ],
+          "text": "요청 파라미터는 질문 정보와 검색조건 객체로 받아 처리하며, 수정·삭제 요청은 저장된 질문의 최초등록자를 조회해 로그인 사용자와 일치하는지 공통 권한 점검 모듈로 확인한 뒤에만 다음 단계로 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 105,
+              "snippet": "@RequestMapping(value = \"/uss/olh/qna/selectQnaList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 349,
+              "snippet": "\t\tegovQnaService.deleteQna(qnaVO);"
+            }
+          ],
+          "text": "Q&A 업무의 창구 역할을 맡아 질문 목록 조회 요청을 받는다. 화면에서 넘어온 검색조건과 질문 정보를 받아 자체 업무 판단 없이 Q&A 업무 서비스로 넘기고, 처리 결과를 화면 또는 목록 경로로 되돌리는 일만 담당한다."
+        }
+      },
+      "name": "질문 목록 조회 요청 접수",
+      "stepId": "step:ANY /uss/olh/qna/selectQnaList.do:src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 329,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/deleteQna.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 105,
+            "snippet": "@RequestMapping(value = \"/uss/olh/qna/selectQnaList.do\")"
+          }
+        ],
+        "text": "Q&A 화면에서 들어온 질문 목록 조회 요청을 받아 화면 파라미터를 질문 정보 객체에 담고, 업무 처리를 Q&A 업무 서비스에 위임한 뒤 결과 화면 또는 목록으로 되돌린다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "\tprivate String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 51,
+              "snippet": "\tprivate String email;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디·이름·이메일 주소는 필수 값으로 표시되며 이메일은 형식 검증 대상이다. 사용자 구분과 조직 정보를 함께 보관하고, 본인 확인의 기준이 되는 고유아이디를 별도로 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "인증 세션에 보관된 사용자 정보를 담아, 질문 등록 시 작성자 이름과 이메일을 채우고 등록자·수정자 아이디를 남기는 근거로 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /uss/olh/qna/updateQna.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "\tprivate String uniqId;"
+          }
+        ],
+        "text": "질문 수정 과정에서 인증된 사용자의 이름·이메일·고유아이디를 제공해 작성자 정보와 본인 확인 기준으로 쓰이는 로그인 정보 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인 세 가지 계약을 제공하며, 인증 여부는 참·거짓으로만 판단해 목록 화면의 인증 표시와 등록 가능 여부를 가른다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            }
+          ],
+          "text": "인증 체계에 보관된 사용자 정보를 업무 화면이 알아볼 수 있는 형태로 돌려주는 공통 서비스로, Q&A 업무는 이 서비스를 통해서만 로그인 사용자를 확인한다."
+        }
+      },
+      "name": "인증 사용자 정보 서비스",
+      "stepId": "step:ANY /uss/olh/qna/updateQna.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 11,
+            "snippet": "\tpublic Object getAuthenticatedUser();"
+          }
+        ],
+        "text": "질문 수정 과정에서 인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 인증 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스 한 개를 정적으로 보유하며, 인증된 사용자 객체 조회·권한 목록 조회·인증 여부 확인 세 가지를 제공한다. 서비스가 주입되어 있어야 동작한다는 전제를 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스를 감싸, Q&A 화면 어디서나 로그인 여부와 로그인 사용자 정보를 같은 방식으로 얻게 해 주는 공통 창구 역할을 한다."
+        }
+      },
+      "name": "인증 사용자 조회 도우미",
+      "stepId": "step:ANY /uss/olh/qna/updateQna.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "\tpublic static Object getAuthenticatedUser() {"
+          }
+        ],
+        "text": "질문 수정 과정에서 현재 로그인 여부와 인증된 사용자 정보를 꺼내오는 공통 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+              "line": 42,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+              "line": 63,
+              "snippet": "\t\t\tif (sUniqId == null || loginVO.getUniqId() == null || loginVO.getUniqId().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+              "line": 68,
+              "snippet": "\t\t\tif (!sUniqId.equals(loginVO.getUniqId())) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+              "line": 72,
+              "snippet": "\t\t\tthrow new EgovXssException(\"XSS00001\", \"errors.xss.checkerUser\");"
+            }
+          ],
+          "text": "로그인 사용자 정보를 인증 도우미로 얻어, 로그인 정보가 없거나 고유아이디가 비어 있으면 오류로 처리하고, 대상 글의 등록자 아이디와 로그인 사용자의 고유아이디가 다르면 권한 오류를 일으킨다. 두 조건을 모두 통과할 때만 참을 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+              "line": 28,
+              "snippet": "public class EgovXssChecker {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+              "line": 39,
+              "snippet": "\tpublic static boolean checkerUserXss(HttpServletRequest request, String sUniqId) throws Exception {"
+            }
+          ],
+          "text": "질문 수정·상세조회·삭제처럼 남의 글을 건드릴 수 있는 요청에서, 요청자가 그 글의 작성자 본인인지 확인하는 공통 관문 역할을 한다."
+        }
+      },
+      "name": "작성자 본인 확인 점검",
+      "stepId": "step:ANY /uss/olh/qna/updateQna.do:src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+            "line": 28,
+            "snippet": "public class EgovXssChecker {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+            "line": 39,
+            "snippet": "\tpublic static boolean checkerUserXss(HttpServletRequest request, String sUniqId) throws Exception {"
+          }
+        ],
+        "text": "질문 수정 요청이 실제 작성자 본인의 요청인지 로그인 사용자의 고유아이디와 질문의 최초등록자를 대조해 확인하는 공통 점검 모듈이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 17,
+              "snippet": "\tvoid insertQna(QnaVO qnaVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 15,
+              "snippet": "\tvoid updateQnaInqireCo(QnaVO qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 27,
+              "snippet": "\tvoid updateQnaAnswer(QnaVO qnaVO);"
+            }
+          ],
+          "text": "질문 등록은 채번 실패를 별도 예외로 알리고, 상세 조회는 조회 횟수 증가와 짝을 이루며, 답변 저장은 별도 작업으로 분리되어 있어 질문 본문 수정과 답변 작성의 책임이 나뉜다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 7,
+              "snippet": "public interface EgovQnaService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 19,
+              "snippet": "\tvoid updateQna(QnaVO qnaVO);"
+            }
+          ],
+          "text": "Q&A 도메인의 업무 계약을 정의하는 서비스로, 이 흐름에서는 질문 수정 작업을 맡는다. 질문 목록·상세 조회, 질문 등록·수정·삭제, 답변 목록 조회와 답변 저장까지 Q&A 업무 전반을 한 곳에서 조율한다."
+        }
+      },
+      "name": "Q&A 업무 서비스 질문 수정",
+      "stepId": "step:ANY /uss/olh/qna/updateQna.do:src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 7,
+            "snippet": "public interface EgovQnaService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 19,
+            "snippet": "\tvoid updateQna(QnaVO qnaVO);"
+          }
+        ],
+        "text": "Q&A 질문·답변 업무를 담당하는 서비스로서 질문 수정 작업을 수행하고 결과를 창구로 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 42,
+              "snippet": "\t@Size(max=250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 43,
+              "snippet": "\tprivate String qestnSj;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 47,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 56,
+              "snippet": "\t@Pattern(regexp=\"^[0-9]*$\", message=\"{validation.pattern.integer}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 91,
+              "snippet": "\tprivate String qnaProcessSttusCode;"
+            }
+          ],
+          "text": "질문 제목은 250자, 질문 내용과 답변 내용은 각각 2500자를 넘을 수 없고 모두 필수 입력이다. 지역번호·중간전화번호·끝전화번호는 숫자만 허용되는 4자리이며, 이메일 주소는 형식 검증 대상이고, 질의응답 처리상태는 코드와 코드명을 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 33,
+              "snippet": "public class QnaVO extends QnaDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 38,
+              "snippet": "\tprivate String qaId;"
+            }
+          ],
+          "text": "화면 입력값과 조회 결과를 함께 담는 Q&A 질문 정보 그릇으로, 검색조건과 페이지 정보를 상속받아 목록 조회부터 등록·수정·답변 작성까지 같은 형태로 사용된다."
+        }
+      },
+      "name": "Q&A 질문 정보",
+      "stepId": "step:ANY /uss/olh/qna/updateQna.do:src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 33,
+            "snippet": "public class QnaVO extends QnaDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 38,
+            "snippet": "\tprivate String qaId;"
+          }
+        ],
+        "text": "질문 수정 과정에서 질문 제목·내용·작성자·연락처·답변 내용과 처리상태를 담아 화면과 업무 서비스 사이를 오가는 질문 정보 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 340,
+              "snippet": "\t\tQnaVO vo = egovQnaService.selectQnaDetail(qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 343,
+              "snippet": "\t\tEgovXssChecker.checkerUserXss(request, vo.getFrstRegisterId());"
+            }
+          ],
+          "text": "요청 파라미터는 질문 정보와 검색조건 객체로 받아 처리하며, 수정·삭제 요청은 저장된 질문의 최초등록자를 조회해 로그인 사용자와 일치하는지 공통 권한 점검 모듈로 확인한 뒤에만 다음 단계로 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 279,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/updateQna.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 349,
+              "snippet": "\t\tegovQnaService.deleteQna(qnaVO);"
+            }
+          ],
+          "text": "Q&A 업무의 창구 역할을 맡아 질문 수정 요청을 받는다. 화면에서 넘어온 검색조건과 질문 정보를 받아 자체 업무 판단 없이 Q&A 업무 서비스로 넘기고, 처리 결과를 화면 또는 목록 경로로 되돌리는 일만 담당한다."
+        }
+      },
+      "name": "질문 수정 요청 접수",
+      "stepId": "step:ANY /uss/olh/qna/updateQna.do:src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 329,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/deleteQna.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 279,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/updateQna.do\")"
+          }
+        ],
+        "text": "Q&A 화면에서 들어온 질문 수정 요청을 받아 화면 파라미터를 질문 정보 객체에 담고, 업무 처리를 Q&A 업무 서비스에 위임한 뒤 결과 화면 또는 목록으로 되돌린다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            }
+          ],
+          "text": "빈 문자열을 공용 상수로 두고 문자열을 다루는 정적 기능만 제공하며, 지정 길이를 넘는 문자열을 잘라 주는 기능처럼 원본이 없으면 아무것도 만들지 않는 방식으로 빈 값을 다룬다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "값이 없을 수 있는 로그인 사용자 항목을 빈 문자열로 정규화해, 작성자명·이메일·등록자 아이디를 채울 때 빈 값 때문에 처리가 끊기지 않게 해 주는 공통 도우미 역할을 한다."
+        }
+      },
+      "name": "문자열 처리 공통 유틸",
+      "stepId": "step:ANY /uss/olh/qna/updateQna.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 47,
+            "snippet": "\tpublic static final String EMPTY = \"\";"
+          }
+        ],
+        "text": "질문 수정 과정에서 로그인 사용자의 이름·이메일·고유아이디가 없을 때 빈 문자열로 바꿔 안전하게 담도록 돕는 문자열 공통 유틸이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 아이디·상세코드·코드명·코드설명을 문자열로 보관하며 기본값은 모두 빈 문자열이다. 상세 조건 사용 여부는 기본이 사용 안 함이고, 특정 테이블에서 코드를 뽑을 때 쓰는 테이블명 항목을 별도로 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "어떤 공통코드 묶음을 가져올지 지정하는 조회 조건 그릇으로, 답변 작성 화면이 처리상태 선택 목록을 요청할 때 코드 아이디를 담아 공통코드 서비스에 넘긴다."
+        }
+      },
+      "name": "공통코드 조회 조건",
+      "stepId": "step:ANY /uss/olh/qna/updateQnaAnswer.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 29,
+            "snippet": "public class ComDefaultCodeVO implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 31,
+            "snippet": "    private String codeId = \"\";"
+          }
+        ],
+        "text": "답변 등록·수정 과정에서 조회할 공통코드를 지정하는 조건 객체로, 질의응답 처리상태 코드 묶음을 가리키는 데 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "\tprivate String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 51,
+              "snippet": "\tprivate String email;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디·이름·이메일 주소는 필수 값으로 표시되며 이메일은 형식 검증 대상이다. 사용자 구분과 조직 정보를 함께 보관하고, 본인 확인의 기준이 되는 고유아이디를 별도로 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "인증 세션에 보관된 사용자 정보를 담아, 질문 등록 시 작성자 이름과 이메일을 채우고 등록자·수정자 아이디를 남기는 근거로 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /uss/olh/qna/updateQnaAnswer.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "\tprivate String uniqId;"
+          }
+        ],
+        "text": "답변 등록·수정 과정에서 인증된 사용자의 이름·이메일·고유아이디를 제공해 작성자 정보와 본인 확인 기준으로 쓰이는 로그인 정보 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "코드 조회 조건 객체를 받아 상세코드 목록을 돌려주며, 여러 조건을 한 번에 넘겨 코드 묶음을 맵으로 받는 방식과 조직·그룹 정보를 코드 형태로 받는 방식도 함께 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "처리상태처럼 여러 업무가 공유하는 코드값을 한 곳에서 조회해 주는 공통 서비스로, Q&A 답변 화면의 처리상태 선택 목록을 공급한다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /uss/olh/qna/updateQnaAnswer.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          }
+        ],
+        "text": "답변 등록·수정 과정에서 질의응답 처리상태 코드 목록을 공통코드 체계에서 가져오는 공통 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스 한 개를 정적으로 보유하며, 인증된 사용자 객체 조회·권한 목록 조회·인증 여부 확인 세 가지를 제공한다. 서비스가 주입되어 있어야 동작한다는 전제를 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ],
+          "text": "인증 사용자 정보 서비스를 감싸, Q&A 화면 어디서나 로그인 여부와 로그인 사용자 정보를 같은 방식으로 얻게 해 주는 공통 창구 역할을 한다."
+        }
+      },
+      "name": "인증 사용자 조회 도우미",
+      "stepId": "step:ANY /uss/olh/qna/updateQnaAnswer.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "\tpublic static Object getAuthenticatedUser() {"
+          }
+        ],
+        "text": "답변 등록·수정 과정에서 현재 로그인 여부와 인증된 사용자 정보를 꺼내오는 공통 도우미이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 17,
+              "snippet": "\tvoid insertQna(QnaVO qnaVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 15,
+              "snippet": "\tvoid updateQnaInqireCo(QnaVO qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 27,
+              "snippet": "\tvoid updateQnaAnswer(QnaVO qnaVO);"
+            }
+          ],
+          "text": "질문 등록은 채번 실패를 별도 예외로 알리고, 상세 조회는 조회 횟수 증가와 짝을 이루며, 답변 저장은 별도 작업으로 분리되어 있어 질문 본문 수정과 답변 작성의 책임이 나뉜다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 7,
+              "snippet": "public interface EgovQnaService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 27,
+              "snippet": "\tvoid updateQnaAnswer(QnaVO qnaVO);"
+            }
+          ],
+          "text": "Q&A 도메인의 업무 계약을 정의하는 서비스로, 이 흐름에서는 답변 등록·수정 작업을 맡는다. 질문 목록·상세 조회, 질문 등록·수정·삭제, 답변 목록 조회와 답변 저장까지 Q&A 업무 전반을 한 곳에서 조율한다."
+        }
+      },
+      "name": "Q&A 업무 서비스 답변 등록·수정",
+      "stepId": "step:ANY /uss/olh/qna/updateQnaAnswer.do:src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 7,
+            "snippet": "public interface EgovQnaService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 27,
+            "snippet": "\tvoid updateQnaAnswer(QnaVO qnaVO);"
+          }
+        ],
+        "text": "Q&A 질문·답변 업무를 담당하는 서비스로서 답변 등록·수정 작업을 수행하고 결과를 창구로 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 42,
+              "snippet": "\t@Size(max=250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 43,
+              "snippet": "\tprivate String qestnSj;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 47,
+              "snippet": "\t@Size(max=2500)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 56,
+              "snippet": "\t@Pattern(regexp=\"^[0-9]*$\", message=\"{validation.pattern.integer}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 91,
+              "snippet": "\tprivate String qnaProcessSttusCode;"
+            }
+          ],
+          "text": "질문 제목은 250자, 질문 내용과 답변 내용은 각각 2500자를 넘을 수 없고 모두 필수 입력이다. 지역번호·중간전화번호·끝전화번호는 숫자만 허용되는 4자리이며, 이메일 주소는 형식 검증 대상이고, 질의응답 처리상태는 코드와 코드명을 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 33,
+              "snippet": "public class QnaVO extends QnaDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+              "line": 38,
+              "snippet": "\tprivate String qaId;"
+            }
+          ],
+          "text": "화면 입력값과 조회 결과를 함께 담는 Q&A 질문 정보 그릇으로, 검색조건과 페이지 정보를 상속받아 목록 조회부터 등록·수정·답변 작성까지 같은 형태로 사용된다."
+        }
+      },
+      "name": "Q&A 질문 정보",
+      "stepId": "step:ANY /uss/olh/qna/updateQnaAnswer.do:src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 33,
+            "snippet": "public class QnaVO extends QnaDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/QnaVO.java",
+            "line": 38,
+            "snippet": "\tprivate String qaId;"
+          }
+        ],
+        "text": "답변 등록·수정 과정에서 질문 제목·내용·작성자·연락처·답변 내용과 처리상태를 담아 화면과 업무 서비스 사이를 오가는 질문 정보 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 340,
+              "snippet": "\t\tQnaVO vo = egovQnaService.selectQnaDetail(qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 343,
+              "snippet": "\t\tEgovXssChecker.checkerUserXss(request, vo.getFrstRegisterId());"
+            }
+          ],
+          "text": "요청 파라미터는 질문 정보와 검색조건 객체로 받아 처리하며, 수정·삭제 요청은 저장된 질문의 최초등록자를 조회해 로그인 사용자와 일치하는지 공통 권한 점검 모듈로 확인한 뒤에만 다음 단계로 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 444,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/updateQnaAnswer.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 349,
+              "snippet": "\t\tegovQnaService.deleteQna(qnaVO);"
+            }
+          ],
+          "text": "Q&A 업무의 창구 역할을 맡아 답변 등록·수정 요청을 받는다. 화면에서 넘어온 검색조건과 질문 정보를 받아 자체 업무 판단 없이 Q&A 업무 서비스로 넘기고, 처리 결과를 화면 또는 목록 경로로 되돌리는 일만 담당한다."
+        }
+      },
+      "name": "답변 등록·수정 요청 접수",
+      "stepId": "step:ANY /uss/olh/qna/updateQnaAnswer.do:src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 329,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/deleteQna.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 444,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/updateQnaAnswer.do\")"
+          }
+        ],
+        "text": "Q&A 화면에서 들어온 답변 등록·수정 요청을 받아 화면 파라미터를 질문 정보 객체에 담고, 업무 처리를 Q&A 업무 서비스에 위임한 뒤 결과 화면 또는 목록으로 되돌린다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            }
+          ],
+          "text": "빈 문자열을 공용 상수로 두고 문자열을 다루는 정적 기능만 제공하며, 지정 길이를 넘는 문자열을 잘라 주는 기능처럼 원본이 없으면 아무것도 만들지 않는 방식으로 빈 값을 다룬다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "값이 없을 수 있는 로그인 사용자 항목을 빈 문자열로 정규화해, 작성자명·이메일·등록자 아이디를 채울 때 빈 값 때문에 처리가 끊기지 않게 해 주는 공통 도우미 역할을 한다."
+        }
+      },
+      "name": "문자열 처리 공통 유틸",
+      "stepId": "step:ANY /uss/olh/qna/updateQnaAnswer.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 47,
+            "snippet": "\tpublic static final String EMPTY = \"\";"
+          }
+        ],
+        "text": "답변 등록·수정 과정에서 로그인 사용자의 이름·이메일·고유아이디가 없을 때 빈 문자열로 바꿔 안전하게 담도록 돕는 문자열 공통 유틸이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 아이디·상세코드·코드명·코드설명을 문자열로 보관하며 기본값은 모두 빈 문자열이다. 상세 조건 사용 여부는 기본이 사용 안 함이고, 특정 테이블에서 코드를 뽑을 때 쓰는 테이블명 항목을 별도로 가진다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "어떤 공통코드 묶음을 가져올지 지정하는 조회 조건 그릇으로, 답변 작성 화면이 처리상태 선택 목록을 요청할 때 코드 아이디를 담아 공통코드 서비스에 넘긴다."
+        }
+      },
+      "name": "공통코드 조회 조건",
+      "stepId": "step:ANY /uss/olh/qna/updateQnaAnswerView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 29,
+            "snippet": "public class ComDefaultCodeVO implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 31,
+            "snippet": "    private String codeId = \"\";"
+          }
+        ],
+        "text": "답변 수정 화면 준비 과정에서 조회할 공통코드를 지정하는 조건 객체로, 질의응답 처리상태 코드 묶음을 가리키는 데 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "코드 조회 조건 객체를 받아 상세코드 목록을 돌려주며, 여러 조건을 한 번에 넘겨 코드 묶음을 맵으로 받는 방식과 조직·그룹 정보를 코드 형태로 받는 방식도 함께 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "처리상태처럼 여러 업무가 공유하는 코드값을 한 곳에서 조회해 주는 공통 서비스로, Q&A 답변 화면의 처리상태 선택 목록을 공급한다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /uss/olh/qna/updateQnaAnswerView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          }
+        ],
+        "text": "답변 수정 화면 준비 과정에서 질의응답 처리상태 코드 목록을 공통코드 체계에서 가져오는 공통 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 17,
+              "snippet": "\tvoid insertQna(QnaVO qnaVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 15,
+              "snippet": "\tvoid updateQnaInqireCo(QnaVO qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 27,
+              "snippet": "\tvoid updateQnaAnswer(QnaVO qnaVO);"
+            }
+          ],
+          "text": "질문 등록은 채번 실패를 별도 예외로 알리고, 상세 조회는 조회 횟수 증가와 짝을 이루며, 답변 저장은 별도 작업으로 분리되어 있어 질문 본문 수정과 답변 작성의 책임이 나뉜다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 7,
+              "snippet": "public interface EgovQnaService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 13,
+              "snippet": "\tQnaVO selectQnaDetail(QnaVO qnaVO) throws Exception;"
+            }
+          ],
+          "text": "Q&A 도메인의 업무 계약을 정의하는 서비스로, 이 흐름에서는 답변 수정 화면 준비 작업을 맡는다. 질문 목록·상세 조회, 질문 등록·수정·삭제, 답변 목록 조회와 답변 저장까지 Q&A 업무 전반을 한 곳에서 조율한다."
+        }
+      },
+      "name": "Q&A 업무 서비스 답변 수정 화면 준비",
+      "stepId": "step:ANY /uss/olh/qna/updateQnaAnswerView.do:src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 7,
+            "snippet": "public interface EgovQnaService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 13,
+            "snippet": "\tQnaVO selectQnaDetail(QnaVO qnaVO) throws Exception;"
+          }
+        ],
+        "text": "Q&A 질문·답변 업무를 담당하는 서비스로서 답변 수정 화면 준비 작업을 수행하고 결과를 창구로 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 340,
+              "snippet": "\t\tQnaVO vo = egovQnaService.selectQnaDetail(qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 343,
+              "snippet": "\t\tEgovXssChecker.checkerUserXss(request, vo.getFrstRegisterId());"
+            }
+          ],
+          "text": "요청 파라미터는 질문 정보와 검색조건 객체로 받아 처리하며, 수정·삭제 요청은 저장된 질문의 최초등록자를 조회해 로그인 사용자와 일치하는지 공통 권한 점검 모듈로 확인한 뒤에만 다음 단계로 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 419,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/updateQnaAnswerView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 349,
+              "snippet": "\t\tegovQnaService.deleteQna(qnaVO);"
+            }
+          ],
+          "text": "Q&A 업무의 창구 역할을 맡아 답변 수정 화면 준비 요청을 받는다. 화면에서 넘어온 검색조건과 질문 정보를 받아 자체 업무 판단 없이 Q&A 업무 서비스로 넘기고, 처리 결과를 화면 또는 목록 경로로 되돌리는 일만 담당한다."
+        }
+      },
+      "name": "답변 수정 화면 준비 요청 접수",
+      "stepId": "step:ANY /uss/olh/qna/updateQnaAnswerView.do:src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 329,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/deleteQna.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 419,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/updateQnaAnswerView.do\")"
+          }
+        ],
+        "text": "Q&A 화면에서 들어온 답변 수정 화면 준비 요청을 받아 화면 파라미터를 질문 정보 객체에 담고, 업무 처리를 Q&A 업무 서비스에 위임한 뒤 결과 화면 또는 목록으로 되돌린다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 17,
+              "snippet": "\tvoid insertQna(QnaVO qnaVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 15,
+              "snippet": "\tvoid updateQnaInqireCo(QnaVO qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 27,
+              "snippet": "\tvoid updateQnaAnswer(QnaVO qnaVO);"
+            }
+          ],
+          "text": "질문 등록은 채번 실패를 별도 예외로 알리고, 상세 조회는 조회 횟수 증가와 짝을 이루며, 답변 저장은 별도 작업으로 분리되어 있어 질문 본문 수정과 답변 작성의 책임이 나뉜다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 7,
+              "snippet": "public interface EgovQnaService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+              "line": 13,
+              "snippet": "\tQnaVO selectQnaDetail(QnaVO qnaVO) throws Exception;"
+            }
+          ],
+          "text": "Q&A 도메인의 업무 계약을 정의하는 서비스로, 이 흐름에서는 질문 수정 화면 준비 작업을 맡는다. 질문 목록·상세 조회, 질문 등록·수정·삭제, 답변 목록 조회와 답변 저장까지 Q&A 업무 전반을 한 곳에서 조율한다."
+        }
+      },
+      "name": "Q&A 업무 서비스 질문 수정 화면 준비",
+      "stepId": "step:ANY /uss/olh/qna/updateQnaView.do:src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 7,
+            "snippet": "public interface EgovQnaService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+            "line": 13,
+            "snippet": "\tQnaVO selectQnaDetail(QnaVO qnaVO) throws Exception;"
+          }
+        ],
+        "text": "Q&A 질문·답변 업무를 담당하는 서비스로서 질문 수정 화면 준비 작업을 수행하고 결과를 창구로 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 340,
+              "snippet": "\t\tQnaVO vo = egovQnaService.selectQnaDetail(qnaVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 343,
+              "snippet": "\t\tEgovXssChecker.checkerUserXss(request, vo.getFrstRegisterId());"
+            }
+          ],
+          "text": "요청 파라미터는 질문 정보와 검색조건 객체로 받아 처리하며, 수정·삭제 요청은 저장된 질문의 최초등록자를 조회해 로그인 사용자와 일치하는지 공통 권한 점검 모듈로 확인한 뒤에만 다음 단계로 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 253,
+              "snippet": "@RequestMapping(\"/uss/olh/qna/updateQnaView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+              "line": 349,
+              "snippet": "\t\tegovQnaService.deleteQna(qnaVO);"
+            }
+          ],
+          "text": "Q&A 업무의 창구 역할을 맡아 질문 수정 화면 준비 요청을 받는다. 화면에서 넘어온 검색조건과 질문 정보를 받아 자체 업무 판단 없이 Q&A 업무 서비스로 넘기고, 처리 결과를 화면 또는 목록 경로로 되돌리는 일만 담당한다."
+        }
+      },
+      "name": "질문 수정 화면 준비 요청 접수",
+      "stepId": "step:ANY /uss/olh/qna/updateQnaView.do:src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 329,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/deleteQna.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+            "line": 253,
+            "snippet": "@RequestMapping(\"/uss/olh/qna/updateQnaView.do\")"
+          }
+        ],
+        "text": "Q&A 화면에서 들어온 질문 수정 화면 준비 요청을 받아 화면 파라미터를 질문 정보 객체에 담고, 업무 처리를 Q&A 업무 서비스에 위임한 뒤 결과 화면 또는 목록으로 되돌린다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+        "line": 105,
+        "snippet": "@RequestMapping(value = \"/uss/olh/qna/selectQnaList.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/uss/olh/qna/web/EgovQnaController.java",
+        "line": 363,
+        "snippet": "@RequestMapping(value = \"/uss/olh/qna/selectQnaAnswerList.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/uss/olh/qna/service/EgovQnaService.java",
+        "line": 7,
+        "snippet": "public interface EgovQnaService {"
+      }
+    ],
+    "text": "국민·민원인이 온라인으로 질문을 등록하고 조회·수정·삭제하며, 담당자가 그 질문에 답변을 작성하고 처리상태를 관리하는 Q&A 업무 영역이다. 질문 관리와 답변 관리 두 갈래의 화면 흐름으로 구성되며, 남의 글을 수정·삭제하지 못하도록 작성자 본인 확인을 거친다."
+  }
+}

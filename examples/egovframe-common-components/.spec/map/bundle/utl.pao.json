@@ -1,0 +1,181 @@
+{
+  "domainId": "domain:utl.pao",
+  "files": [
+    {
+      "className": "EgovPrntngOutpt",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/pao/service/EgovPrntngOutpt.java — java 파일",
+        "tags": []
+      },
+      "line": 20,
+      "relPath": "src/main/java/egovframework/com/utl/pao/service/EgovPrntngOutpt.java",
+      "slice": {
+        "endLine": 28,
+        "startLine": 10,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.02.01  이중호          최초 생성\n *\n * </pre>\n */\npublic interface EgovPrntngOutpt {\n\n\t/**\n\t * 전자관인 정보를 제공하는 기능\n\t */\n\tPrntngOutptVO selectErncsl(PrntngOutptVO searchVO) throws Exception;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "PrntngOutptVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/pao/service/PrntngOutptVO.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/utl/pao/service/PrntngOutptVO.java",
+      "slice": {
+        "endLine": 81,
+        "startLine": 15,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.02.01  이중호          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\npublic class PrntngOutptVO implements Serializable {\n\n\tprivate static final long serialVersionUID = 941289557959718464L;\n\n\t/*\n\t * 이미지정보\n\t */\n    private byte[] imgInfo;\n\n    /*\n     * 이미지타입\n     */\n\tprivate String imgType;\n\n\t/*\n\t * 기관코드\n\t */\n    private String orgCode;\n\n    /*\n     * 관인구분\n     */\n    private String erncslSe;\n\n\t/**\n\t * imgInfo attribute 를 리턴한다.\n\t * @return byte[]\n\t */\n\tpublic byte[] getImgInfo() {\n\t\tbyte[] ret = null;\n\n\t\tif (imgInfo != null) {\n\t\t\tret = new byte[imgInfo.length];\n\n\t\t\tfor (int i = 0; i < imgInfo.length; i++) {\n\t\t\t\tret[i] = imgInfo[i];\n\t\t\t}\n\t\t}\n\t\treturn ret;\n\t}\n\n\t/**\n\t * imgInfo attribute 값을 설정한다.\n\t * @param imgInfo byte[]\n\t */\n\tpublic void setImgInfo(byte[] imgInfo) {\n\t\tthis.imgInfo = new byte[imgInfo.length];\n\n\t\tfor (int i = 0; i <  imgInfo.length; ++i) {\n\t\t\tthis.imgInfo[i] = imgInfo[i];\n\t\t}\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovErncslController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/pao/web/EgovErncslController.java — java 파일",
+        "tags": []
+      },
+      "line": 66,
+      "relPath": "src/main/java/egovframework/com/utl/pao/web/EgovErncslController.java",
+      "slice": {
+        "endLine": 116,
+        "startLine": 56,
+        "text": "\t}\n\n\t/**\n\t * 관인이미지를 조회하여 출력\n\t * @param\n\t * @param\n\t * @return\n\t * @exception MyException\n\t * @see\n\t*/\n\t@RequestMapping(value = \"/utl/pao/EgovErncsl.do\")\n\tpublic void doGet(@RequestParam(\"sOrgCode\") String orgCode, @RequestParam(\"sErncslSe\") String erncslSe, HttpServletRequest request, HttpServletResponse response)\n\t\t\tthrows ServletException, IOException {\n\n\t\tLOGGER.info(\"EgovErncsl start....\");\n\n\t\tPrntngOutptVO req = new PrntngOutptVO();\n\n\t\treq.setOrgCode(orgCode);\n\t\treq.setErncslSe(erncslSe);\n\n\t\tPrntngOutptVO res = null;\n\t\ttry {\n\t\t\tres = prntngOutpt.selectErncsl(req);\n\t\t} catch (SQLException e) {\n\t\t\tLOGGER.error(\"[\"+ e.getClass() +\"] : \", e.getMessage());\n\t\t\tthrow new RuntimeException(\"Service call error\", e);\n\t\t} catch (Exception e) {\n//\t\t\tLOGGER.error(e.getMessage());\n\t\t\t// 2017-02-14  이정은          시큐어코딩(ES) - 시큐어코딩 부적절한 예외 처리[CWE-253, CWE-440, CWE-754]\n\t\t\tLOGGER.error(\"[\"+ e.getClass() +\"] : \", e.getMessage());\n\t\t\tthrow new RuntimeException(\"Service call error\", e);\n\t\t}\n\n\t\tif (res == null) {\n\t\t\tthrow new RuntimeException(\"image not found!!!\");\n\t\t}\n\n\t\tbyte[] img = res.getImgInfo();\n\t\tString imgtype = res.getImgType();\n\t\tString type = \"\";\n\n\t\tif (imgtype != null && !\"\".equals(imgtype)) {\n\t\t\ttype = \"image/\" + imgtype;\n\t\t} else {\n\t\t\tLOGGER.debug(\"Image fileType is null.\");\n\t\t}\n\t\tif (img == null) {\n\t\t\tLOGGER.debug(\"Image fileInfo is null.\");\n\t\t\treturn;\n\t\t}\n\n\t\tresponse.setHeader(\"Content-Type\", type.replaceAll(\"\\r\", \"\").replaceAll(\"\\n\", \"\"));\n\t\tresponse.setHeader(\"Content-Length\", \"\" + img.length);\n\t\tresponse.getOutputStream().write(img);\n\t\tresponse.getOutputStream().flush();\n\t\tresponse.getOutputStream().close();\n\n\t\tLOGGER.info(\"EgovErncsl end....\");\n\t}\n}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovPrntngOutptController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/pao/web/EgovPrntngOutptController.java — java 파일",
+        "tags": []
+      },
+      "line": 47,
+      "relPath": "src/main/java/egovframework/com/utl/pao/web/EgovPrntngOutptController.java",
+      "slice": {
+        "endLine": 74,
+        "startLine": 37,
+        "text": "\tprivate static final Logger LOGGER = LoggerFactory.getLogger(EgovPrntngOutptController.class);\n\n\t/**\n\t * 전자관인 출력 화면 컨트롤\n\t * @param request\n\t * @param response\n\t * @return\n\t * @throws ServletException\n\t * @throws IOException\n\t */\n\t@RequestMapping(value = \"/utl/pao/EgovPrntngOutpt.do\")\n\tpublic ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {\n\t\tLOGGER.info(\"EgovPrntngOutptController start....\");\n\t\tMap<String, Object> cmdModel = new HashMap<>();\n\n\t\t// 이동할 JSP\n\t\tString jspStr = \"\";\n\t\t// 결과정보\n\t\t//String resultStr = \"\";\n\t\t// 실행명령어\n\t\tString cmdStr = request.getParameter(\"cmdStr\");\n\t\tif (cmdStr == null || cmdStr.equals(\"\")) {\n\t\t\tcmdStr = \"\";\n\t\t}\n\n\t\t// 실행명령어에 따른 JSP 할당\n\t\tif (cmdStr.equals(\"ComUtlPaoErncslOutpt\")) { // test 샘플용 경로\n\t\t\tjspStr = \"egovframework/com/utl/pao/EgovErncslOutpt\";\n\n\t\t\tcmdModel.put(\"resultStr\", \"UTILITY 직접 호출\");\n\t\t} else {\n\t\t\tjspStr = \"/egovDevIndex\";\n\t\t}\n\t\tLOGGER.info(\"EgovPrntngOutptController end....\");\n\n\t\treturn new ModelAndView(jspStr, \"cmdModel\", cmdModel);\n\t}\n}",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovErncslController#doGet",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/pao/web/EgovErncslController.java",
+      "flowId": "flow:ANY /utl/pao/EgovErncsl.do",
+      "line": 66,
+      "stepIds": [
+        "step:ANY /utl/pao/EgovErncsl.do:src/main/java/egovframework/com/utl/pao/web/EgovErncslController.java",
+        "step:ANY /utl/pao/EgovErncsl.do:src/main/java/egovframework/com/utl/pao/service/PrntngOutptVO.java",
+        "step:ANY /utl/pao/EgovErncsl.do:src/main/java/egovframework/com/utl/pao/service/EgovPrntngOutpt.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovPrntngOutptController#handleRequest",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/pao/web/EgovPrntngOutptController.java",
+      "flowId": "flow:ANY /utl/pao/EgovPrntngOutpt.do",
+      "line": 47,
+      "stepIds": [
+        "step:ANY /utl/pao/EgovPrntngOutpt.do:src/main/java/egovframework/com/utl/pao/web/EgovPrntngOutptController.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "utl.pao",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/utl/pao/service/EgovPrntngOutpt.java",
+      "stepId": "step:ANY /utl/pao/EgovErncsl.do:src/main/java/egovframework/com/utl/pao/service/EgovPrntngOutpt.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/pao/service/PrntngOutptVO.java",
+      "stepId": "step:ANY /utl/pao/EgovErncsl.do:src/main/java/egovframework/com/utl/pao/service/PrntngOutptVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/utl/pao/web/EgovErncslController.java",
+      "stepId": "step:ANY /utl/pao/EgovErncsl.do:src/main/java/egovframework/com/utl/pao/web/EgovErncslController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/utl/pao/web/EgovPrntngOutptController.java",
+      "stepId": "step:ANY /utl/pao/EgovPrntngOutpt.do:src/main/java/egovframework/com/utl/pao/web/EgovPrntngOutptController.java"
+    }
+  ]
+}

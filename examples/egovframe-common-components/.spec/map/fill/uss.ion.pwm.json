@@ -1,0 +1,3553 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "m_start",
+          "to": "m_list"
+        },
+        {
+          "from": "m_list",
+          "to": "m_pick"
+        },
+        {
+          "from": "m_pick",
+          "label": "신규 등록",
+          "to": "m_regview"
+        },
+        {
+          "from": "m_pick",
+          "label": "기존 항목 선택",
+          "to": "m_detail"
+        },
+        {
+          "from": "m_detail",
+          "to": "m_cmd"
+        },
+        {
+          "from": "m_cmd",
+          "label": "수정",
+          "to": "m_updview"
+        },
+        {
+          "from": "m_cmd",
+          "label": "삭제",
+          "to": "m_del"
+        },
+        {
+          "from": "m_del",
+          "to": "m_list"
+        },
+        {
+          "from": "m_regview",
+          "to": "m_auth"
+        },
+        {
+          "from": "m_updview",
+          "to": "m_auth"
+        },
+        {
+          "from": "m_auth",
+          "label": "미인증",
+          "to": "m_login"
+        },
+        {
+          "from": "m_auth",
+          "label": "인증됨",
+          "to": "m_valid"
+        },
+        {
+          "from": "m_login",
+          "to": "m_end"
+        },
+        {
+          "from": "m_valid",
+          "label": "검증 실패",
+          "to": "m_reinput"
+        },
+        {
+          "from": "m_valid",
+          "label": "검증 통과",
+          "to": "m_save"
+        },
+        {
+          "from": "m_reinput",
+          "to": "m_end"
+        },
+        {
+          "from": "m_save",
+          "to": "m_list"
+        },
+        {
+          "from": "m_list",
+          "to": "m_end"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "m_start",
+          "kind": "start",
+          "label": "관리자 팝업창 관리 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 87,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/listPopup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 72,
+              "snippet": "\tpublic List<EgovMap> selectPopupList(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/pwm/listPopup.do",
+          "id": "m_list",
+          "kind": "activity",
+          "label": "팝업창 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 158,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/insertPopupView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 130,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/detailPopup.do\")"
+            }
+          ],
+          "id": "m_pick",
+          "kind": "decision",
+          "label": "작업 선택"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 158,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/insertPopupView.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/pwm/insertPopupView.do",
+          "id": "m_regview",
+          "kind": "activity",
+          "label": "등록 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 130,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/detailPopup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 54,
+              "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/pwm/detailPopup.do",
+          "id": "m_detail",
+          "kind": "activity",
+          "label": "팝업창 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 27,
+              "snippet": "\tpublic void deletePopup(PopupManageVO popupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 45,
+              "snippet": "\tpublic void updatePopup(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "id": "m_cmd",
+          "kind": "decision",
+          "label": "상세 화면 명령 구분"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 183,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/updatePopupView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 54,
+              "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/pwm/updatePopupView.do",
+          "id": "m_updview",
+          "kind": "activity",
+          "label": "수정 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 21,
+              "snippet": "\t * 기 등록된 팝업창정보를 삭제한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 27,
+              "snippet": "\tpublic void deletePopup(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/pwm/detailPopup.do",
+          "id": "m_del",
+          "kind": "activity",
+          "label": "팝업창 삭제"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "id": "m_auth",
+          "kind": "decision",
+          "label": "로그인 인증 여부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "id": "m_login",
+          "kind": "activity",
+          "label": "로그인 화면으로 이동"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 45,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 46,
+              "snippet": "\t@Size(max = 1024)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 59,
+              "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+            }
+          ],
+          "id": "m_valid",
+          "kind": "decision",
+          "label": "입력값 검증 통과 여부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 47,
+              "snippet": "\tprivate String popupTitleNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 53,
+              "snippet": "\tprivate String fileUrl;"
+            }
+          ],
+          "id": "m_reinput",
+          "kind": "activity",
+          "label": "입력 화면 재표시"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 291,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/registPopup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 223,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/updtPopup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 36,
+              "snippet": "\tpublic void insertPopup(PopupManageVO popupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 45,
+              "snippet": "\tpublic void updatePopup(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "id": "m_save",
+          "kind": "activity",
+          "label": "등록 또는 수정 저장"
+        },
+        {
+          "id": "m_end",
+          "kind": "end",
+          "label": "팝업창 관리 종료"
+        }
+      ],
+      "title": "팝업창 관리"
+    },
+    {
+      "edges": [
+        {
+          "from": "u_start",
+          "to": "u_main"
+        },
+        {
+          "from": "u_main",
+          "to": "u_info"
+        },
+        {
+          "from": "u_info",
+          "to": "u_open"
+        },
+        {
+          "from": "u_open",
+          "to": "u_clean"
+        },
+        {
+          "from": "u_clean",
+          "to": "u_white"
+        },
+        {
+          "from": "u_white",
+          "to": "u_match"
+        },
+        {
+          "from": "u_match",
+          "label": "일치",
+          "to": "u_show"
+        },
+        {
+          "from": "u_match",
+          "label": "불일치",
+          "to": "u_err"
+        },
+        {
+          "from": "u_show",
+          "to": "u_end"
+        },
+        {
+          "from": "u_err",
+          "to": "u_end"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "u_start",
+          "kind": "start",
+          "label": "사용자 화면 진입"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 414,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/listMainPopup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 417,
+              "snippet": "\t\tList<EgovMap> resultList = egovPopupManageService.selectPopupMainList(popupManageVO);"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/pwm/listMainPopup.do",
+          "id": "u_main",
+          "kind": "activity",
+          "label": "메인 팝업창 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 349,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 360,
+              "snippet": "\t\t\tPopupManageVO popupManageVOs = egovPopupManageService.selectPopup(popupManageVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 366,
+              "snippet": "\t\tout.print(EgovWebUtil.clearXSSMinimum(sPrint));"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/pwm/ajaxPopupManageInfo.do",
+          "id": "u_info",
+          "kind": "activity",
+          "label": "팝업창 정보 비동기 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 379,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/openPopupManage.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/pwm/openPopupManage.do",
+          "id": "u_open",
+          "kind": "activity",
+          "label": "팝업창 열기 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 387,
+              "snippet": "\t\tString fileUrl2 = EgovWebUtil.filePathBlackList(fileUrl);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ],
+          "id": "u_clean",
+          "kind": "activity",
+          "label": "파일 경로 위험 문자 제거"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 389,
+              "snippet": "\t\tList<EgovMap> popupWhiteList = egovPopupManageService.selectPopupWhiteList();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 63,
+              "snippet": "\tpublic List<EgovMap> selectPopupWhiteList() throws Exception;"
+            }
+          ],
+          "id": "u_white",
+          "kind": "activity",
+          "label": "팝업창 화이트리스트 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 397,
+              "snippet": "\t\t\tif (fileUrl2.equals(map.get(\"fileUrl\"))) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 403,
+              "snippet": "\t\treturn \"egovframework/com/cmm/egovError\";"
+            }
+          ],
+          "id": "u_match",
+          "kind": "decision",
+          "label": "화이트리스트 일치 여부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 398,
+              "snippet": "\t\t\t\treturn fileUrl2;"
+            }
+          ],
+          "id": "u_show",
+          "kind": "activity",
+          "label": "팝업창 화면 표시"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 402,
+              "snippet": "\t\tLOGGER.debug(\"Open Popup > WhiteList mismatch! Please check Admin page!\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 403,
+              "snippet": "\t\treturn \"egovframework/com/cmm/egovError\";"
+            }
+          ],
+          "id": "u_err",
+          "kind": "activity",
+          "label": "공통 오류 화면 표시"
+        },
+        {
+          "id": "u_end",
+          "kind": "end",
+          "label": "팝업창 노출 종료"
+        }
+      ],
+      "title": "팝업창 노출"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 58,
+          "snippet": "\tpublic static Boolean isAuthenticated() {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 52,
+          "snippet": "\tpublic String getMessage(String code) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+          "line": 291,
+          "snippet": "@RequestMapping(value = \"/uss/ion/pwm/registPopup.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+          "line": 223,
+          "snippet": "@RequestMapping(value = \"/uss/ion/pwm/updtPopup.do\")"
+        }
+      ],
+      "text": "팝업창 등록과 수정은 로그인 인증을 통과한 사용자만 수행할 수 있으며, 미인증이면 로그인 실패 안내와 함께 로그인 화면으로 보낸다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 45,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 46,
+          "snippet": "\t@Size(max = 1024)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 47,
+          "snippet": "\tprivate String popupTitleNm;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 51,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 52,
+          "snippet": "\t@Size(max = 1024)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 53,
+          "snippet": "\tprivate String fileUrl;"
+        }
+      ],
+      "text": "팝업창 타이틀명과 실파일 URL은 반드시 입력해야 하며 각각 최대 1024자까지 허용한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 57,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 58,
+          "snippet": "\t@Size(max = 10)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 59,
+          "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 73,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 74,
+          "snippet": "\t@Size(max = 10)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 75,
+          "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+        }
+      ],
+      "text": "팝업창의 가로·세로 표시 위치와 높이·넓이는 필수 입력이며 최대 10자의 숫자만 허용한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+          "line": 389,
+          "snippet": "\t\tList<EgovMap> popupWhiteList = egovPopupManageService.selectPopupWhiteList();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+          "line": 397,
+          "snippet": "\t\t\tif (fileUrl2.equals(map.get(\"fileUrl\"))) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+          "line": 398,
+          "snippet": "\t\t\t\treturn fileUrl2;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+          "line": 403,
+          "snippet": "\t\treturn \"egovframework/com/cmm/egovError\";"
+        }
+      ],
+      "text": "팝업창 열기는 요청된 파일 URL이 등록된 화이트리스트 항목과 정확히 일치할 때만 허용하고, 일치하지 않으면 공통 오류 화면으로 보낸다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+          "line": 387,
+          "snippet": "\t\tString fileUrl2 = EgovWebUtil.filePathBlackList(fileUrl);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 79,
+          "snippet": "\tpublic static String filePathBlackList(String value) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 85,
+          "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+        }
+      ],
+      "text": "팝업창 열기 요청의 파일 URL은 화이트리스트 대조 전에 상위 경로 이동 문자열을 제거해 경로 조작 위험을 차단한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+          "line": 362,
+          "snippet": "\t\t\tString sPrint = popupManageVOs.getFileUrl() + \"||\" + popupManageVOs.getPopupWSize() + \"||\""
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+          "line": 366,
+          "snippet": "\t\tout.print(EgovWebUtil.clearXSSMinimum(sPrint));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 26,
+          "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+        }
+      ],
+      "text": "팝업창 정보를 비동기로 응답할 때는 조회 결과를 구분자로 이어붙인 뒤 최소 XSS 정화를 거쳐 출력한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 67,
+          "snippet": "\tprivate String uniqId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 47,
+          "snippet": "\tpublic static final String EMPTY = \"\";"
+        }
+      ],
+      "text": "저장 시 로그인 사용자의 고유아이디를 최초등록자와 최종수정자로 기록하며, 값이 없으면 빈 문자열로 대체한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+          "line": 13,
+          "snippet": " * - 팝업창의 조회기능은 목록조회, 상세조회, 팝업사용자 보기로 구분된다."
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+          "line": 54,
+          "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+          "line": 72,
+          "snippet": "\tpublic List<EgovMap> selectPopupList(PopupManageVO popupManageVO) throws Exception;"
+        }
+      ],
+      "text": "팝업창 조회 기능은 관리 목록 조회, 상세 조회, 사용자 팝업 보기로 구분해 제공한다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 25,
+          "snippet": "public class EgovUserDetailsHelper {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 58,
+          "snippet": "\tpublic static Boolean isAuthenticated() {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 24,
+          "snippet": "\tpublic Boolean isAuthenticated(); "
+        }
+      ],
+      "text": "사용자 인증 영역: 팝업창 등록·수정 진입 시 공통 인증정보 조회 도우미와 인증 상세 서비스를 통해 인증 여부와 로그인 사용자 정보를 확인한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 52,
+          "snippet": "\tpublic String getMessage(String code) {"
+        }
+      ],
+      "text": "공통 메시지 영역: 인증 실패 안내 등 화면 문구를 공통 메시지 조회 서비스에서 코드로 가져온다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 25,
+          "snippet": "public class EgovWebUtil {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 26,
+          "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 79,
+          "snippet": "\tpublic static String filePathBlackList(String value) {"
+        }
+      ],
+      "text": "공통 보안 유틸리티 영역: 팝업창 열기의 파일 경로 정화와 비동기 응답의 XSS 정화를 공통 웹 보안 유틸리티에 의존한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 29,
+          "snippet": "public class ComDefaultCodeVO implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 31,
+          "snippet": "    private String codeId = \"\";"
+        }
+      ],
+      "text": "공통 코드 영역: 등록·수정 입력 화면의 선택 목록을 공통 코드 조회 조건 객체로 조회한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 43,
+          "snippet": "public class EgovStringUtil {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 47,
+          "snippet": "\tpublic static final String EMPTY = \"\";"
+        }
+      ],
+      "text": "공통 문자열 유틸리티 영역: 저장 직전 로그인 사용자 고유아이디의 빈 값 보정을 공통 문자열 처리 유틸리티에 의존한다."
+    }
+  ],
+  "domainId": "domain:uss.ion.pwm",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 41,
+          "snippet": "\tprivate String popupId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 47,
+          "snippet": "\tprivate String popupTitleNm;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 53,
+          "snippet": "\tprivate String fileUrl;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 89,
+          "snippet": "\tprivate String ntceBgnde;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 93,
+          "snippet": "\tprivate String ntceEndde;"
+        }
+      ],
+      "text": "팝업창: 팝업창 아이디로 식별되며 타이틀명, 실파일 URL, 화면 가로·세로 표시 위치, 높이·넓이, 게시시작일과 게시종료일을 갖는 이 도메인의 중심 정보다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+          "line": 57,
+          "snippet": "\t * 팝업창의 취약점을 관리하기 위해 등록된 팝업창 화이트리스트를 조회한다."
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+          "line": 63,
+          "snippet": "\tpublic List<EgovMap> selectPopupWhiteList() throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+          "line": 389,
+          "snippet": "\t\tList<EgovMap> popupWhiteList = egovPopupManageService.selectPopupWhiteList();"
+        }
+      ],
+      "text": "팝업창 화이트리스트: 팝업창의 취약점을 관리하기 위해 등록해 둔 허용 파일 URL 목록으로, 팝업창 열기 요청의 허용 여부를 판정하는 기준이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 89,
+          "snippet": "\tprivate String ntceBgnde;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 93,
+          "snippet": "\tprivate String ntceEndde;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 96,
+          "snippet": "\tprivate String ntceBgndeHH;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+          "line": 99,
+          "snippet": "\tprivate String ntceBgndeMM;"
+        }
+      ],
+      "text": "게시 기간: 팝업창이 노출되는 시작일과 종료일이며, 화면 입력을 위해 시와 분을 별도 항목으로 나누어 관리한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 67,
+          "snippet": "\tprivate String uniqId;"
+        }
+      ],
+      "text": "로그인 사용자: 팝업창 등록·수정 시 인증 주체이며, 고유아이디가 팝업창의 최초등록자·최종수정자로 기록된다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/ion/pwm/ajaxPopupManageInfo.do",
+      "name": "팝업창 정보 비동기 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 349,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 360,
+            "snippet": "\t\t\tPopupManageVO popupManageVOs = egovPopupManageService.selectPopup(popupManageVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 366,
+            "snippet": "\t\tout.print(EgovWebUtil.clearXSSMinimum(sPrint));"
+          }
+        ],
+        "text": "사용자 화면에서 팝업창 아이디로 팝업창 정보를 비동기 요청하면, 팝업창 상세정보를 조회해 파일 URL·가로/세로 크기·표시 위치·그만보기 여부를 구분자로 이어붙인 문자열로 응답한다. 응답 직전 최소 XSS 정화를 거쳐 화면에 내려준다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/pwm/detailPopup.do",
+      "name": "팝업창 상세 조회 및 삭제",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 130,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/detailPopup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 54,
+            "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 27,
+            "snippet": "\tpublic void deletePopup(PopupManageVO popupManageVO) throws Exception;"
+          }
+        ],
+        "text": "관리자가 팝업창 목록에서 한 건을 선택하면 상세정보를 조회해 상세 화면에 표시한다. 명령 구분값이 삭제이면 상세 표시 대신 해당 팝업창을 삭제하고 목록 화면으로 되돌린다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/pwm/insertPopupView.do",
+      "name": "팝업창 등록 화면 표시",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 158,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/insertPopupView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 89,
+            "snippet": "\tprivate String ntceBgnde;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 93,
+            "snippet": "\tprivate String ntceEndde;"
+          }
+        ],
+        "text": "관리자가 팝업창을 새로 등록하기 위한 입력 화면을 연다. 게시 시작일과 종료일의 시·분 선택값을 미리 준비해 등록 화면에 전달하는 등록 전 단계 처리다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/pwm/listMainPopup.do",
+      "name": "메인 화면 팝업창 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 414,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/listMainPopup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 417,
+            "snippet": "\t\tList<EgovMap> resultList = egovPopupManageService.selectPopupMainList(popupManageVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 418,
+            "snippet": "\t\tModelAndView mav = new ModelAndView(\"jsonView\");"
+          }
+        ],
+        "text": "메인 화면에서 노출할 팝업창 목록을 조회해 JSON 형식으로 응답한다. 게시 기간 등 노출 조건에 맞는 팝업창만 목록으로 내려주어 사용자 화면이 띄울 팝업을 결정하게 한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/pwm/listPopup.do",
+      "name": "팝업창 관리 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 87,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/listPopup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 72,
+            "snippet": "\tpublic List<EgovMap> selectPopupList(PopupManageVO popupManageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 81,
+            "snippet": "\tpublic int selectPopupListCount(PopupManageVO popupManageVO) throws Exception;"
+          }
+        ],
+        "text": "관리자가 등록된 팝업창 목록을 검색조건과 검색어로 조회한다. 페이지 단위·페이지 크기를 설정해 페이징 처리하고, 전체 건수를 함께 계산해 목록 화면에 표시한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/pwm/openPopupManage.do",
+      "name": "팝업창 열기",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 379,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/openPopupManage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 387,
+            "snippet": "\t\tString fileUrl2 = EgovWebUtil.filePathBlackList(fileUrl);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 389,
+            "snippet": "\t\tList<EgovMap> popupWhiteList = egovPopupManageService.selectPopupWhiteList();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 397,
+            "snippet": "\t\t\tif (fileUrl2.equals(map.get(\"fileUrl\"))) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 403,
+            "snippet": "\t\treturn \"egovframework/com/cmm/egovError\";"
+          }
+        ],
+        "text": "사용자 화면에서 팝업창을 실제로 열 때, 요청된 파일 URL의 경로 조작 위험 문자열을 제거한 뒤 등록된 팝업창 화이트리스트와 대조한다. 화이트리스트에 있는 URL만 열어주고, 일치하지 않으면 오류 화면으로 보낸다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/pwm/registPopup.do",
+      "name": "팝업창 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 291,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/registPopup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 58,
+            "snippet": "\tpublic static Boolean isAuthenticated() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 36,
+            "snippet": "\tpublic void insertPopup(PopupManageVO popupManageVO) throws Exception;"
+          }
+        ],
+        "text": "관리자가 입력한 팝업창 정보를 신규로 등록한다. 먼저 로그인 인증 여부를 확인하고 미인증이면 로그인 화면으로 보낸다. 저장 명령일 때 입력값 검증을 통과하면 로그인 사용자의 고유아이디를 최초등록자·최종수정자로 설정해 저장한 뒤 목록으로 이동한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/pwm/updatePopupView.do",
+      "name": "팝업창 수정 화면 표시",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 183,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/updatePopupView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 54,
+            "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 96,
+            "snippet": "\tprivate String ntceBgndeHH;"
+          }
+        ],
+        "text": "관리자가 기존 팝업창을 수정하기 위한 입력 화면을 연다. 팝업창 상세정보를 조회한 뒤 게시 시작일·종료일 문자열에서 시와 분을 분리해 화면 선택값으로 채워 수정 화면에 전달한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/pwm/updtPopup.do",
+      "name": "팝업창 수정",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 223,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/updtPopup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 58,
+            "snippet": "\tpublic static Boolean isAuthenticated() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 45,
+            "snippet": "\tpublic void updatePopup(PopupManageVO popupManageVO) throws Exception;"
+          }
+        ],
+        "text": "관리자가 기존 팝업창 정보를 수정한다. 로그인 인증 여부를 먼저 확인하고, 저장 명령일 때 입력값 검증을 통과하면 로그인 사용자의 고유아이디를 최종수정자로 남겨 저장한 뒤 목록으로 이동한다. 저장 명령이 아니면 현재 정보를 다시 조회해 수정 화면에 표시한다."
+      }
+    }
+  ],
+  "name": "팝업창 관리",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 27,
+              "snippet": "\t\tif (value == null || value.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 34,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 35,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");"
+            }
+          ],
+          "text": "문자열 하나를 받아 문자열을 돌려주는 정적 처리이며 상태를 갖지 않는다. 입력이 비었으면 빈 문자열을 돌려주고, 앰퍼샌드·부등호·따옴표 등 위험 문자를 HTML 엔티티로 치환해 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ],
+          "text": "이 노드는 팝업창 정보 비동기 조회 흐름에서 응답 본문에 출력할 문자열을 내보내기 직전 정화하는 협력 객체다. 팝업창 도메인 외부의 공통 보안 유틸리티다."
+        }
+      },
+      "name": "웹 보안 정화 유틸리티 - 팝업창 정보 비동기 조회",
+      "stepId": "step:ANY /uss/ion/pwm/ajaxPopupManageInfo.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 26,
+            "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 366,
+            "snippet": "\t\tout.print(EgovWebUtil.clearXSSMinimum(sPrint));"
+          }
+        ],
+        "text": "비동기 응답 문자열에 최소 XSS 정화를 적용해 위험 문자를 치환하는 공통 보안 유틸리티다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 54,
+              "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 360,
+              "snippet": "\t\t\tPopupManageVO popupManageVOs = egovPopupManageService.selectPopup(popupManageVO);"
+            }
+          ],
+          "text": "사용자 화면에서 볼 수 있는 팝업창 정보를 조회하는 계약을 제공하며, 조회 결과 객체에서 파일 URL·크기·표시 위치·그만보기 여부를 꺼내 쓴다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovPopupManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 12,
+              "snippet": " * - 팝업창에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+            }
+          ],
+          "text": "팝업창 아이디에 해당하는 팝업창 상세정보를 조회해 비동기 응답에 사용할 값을 돌려주는 팝업창 조회 서비스다. 팝업창에 대한 등록·수정·삭제·조회·반영확인 기능을 정의한 서비스 계약의 일부로, 팝업창 정보 비동기 조회 흐름에서 화면 처리 담당의 요청을 받아 팝업창 업무 처리를 조율한다."
+        }
+      },
+      "name": "팝업창 관리 서비스 - 팝업창 정보 비동기 조회",
+      "stepId": "step:ANY /uss/ion/pwm/ajaxPopupManageInfo.do:src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovPopupManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 54,
+            "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 360,
+            "snippet": "\t\t\tPopupManageVO popupManageVOs = egovPopupManageService.selectPopup(popupManageVO);"
+          }
+        ],
+        "text": "팝업창 아이디에 해당하는 팝업창 상세정보를 조회해 비동기 응답에 사용할 값을 돌려주는 팝업창 조회 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 41,
+              "snippet": "\tprivate String popupId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 46,
+              "snippet": "\t@Size(max = 1024)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 47,
+              "snippet": "\tprivate String popupTitleNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 53,
+              "snippet": "\tprivate String fileUrl;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 59,
+              "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 89,
+              "snippet": "\tprivate String ntceBgnde;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 96,
+              "snippet": "\tprivate String ntceBgndeHH;"
+            }
+          ],
+          "text": "팝업창 아이디를 식별자로 갖고, 팝업창 타이틀명과 실파일 URL은 필수이며 각각 최대 1024자로 제한된다. 팝업창의 가로·세로 표시 위치와 높이·넓이는 필수이며 최대 10자의 숫자만 허용된다. 게시시작일과 게시종료일을 문자열로 보관하고, 시·분은 별도 항목으로 나누어 화면 선택값과 맞춘다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 34,
+              "snippet": "public class PopupManageVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 34,
+              "snippet": "public class PopupManageVO extends ComDefaultVO {"
+            }
+          ],
+          "text": "이 노드는 팝업창 정보 비동기 조회 흐름에서 화면과 서비스 사이를 오가는 팝업창 데이터 구조다. 조회 조건이자 조회 결과이며, 등록·수정 시에는 입력값 검증 대상이 된다. 공통 조회 조건 객체를 상속해 검색조건과 페이징 항목을 함께 갖는다."
+        }
+      },
+      "name": "팝업창 정보 객체 - 팝업창 정보 비동기 조회",
+      "stepId": "step:ANY /uss/ion/pwm/ajaxPopupManageInfo.do:src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 34,
+            "snippet": "public class PopupManageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 41,
+            "snippet": "\tprivate String popupId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 47,
+            "snippet": "\tprivate String popupTitleNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 53,
+            "snippet": "\tprivate String fileUrl;"
+          }
+        ],
+        "text": "팝업창 정보 비동기 조회 흐름에서 주고받는 팝업창 정보 객체로, 팝업창 아이디·타이틀명·실파일 URL·표시 위치와 크기·게시 기간을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 354,
+              "snippet": "\t\tresponse.setContentType(\"text/html;charset=utf-8\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 366,
+              "snippet": "\t\tout.print(EgovWebUtil.clearXSSMinimum(sPrint));"
+            }
+          ],
+          "text": "요청 파라미터 묶음과 팝업창 조건 객체를 함께 받고, 응답 문자셋을 UTF-8 HTML로 지정한 뒤 출력 스트림에 결과를 쓴다. 별도의 로그인 인증 검사는 두지 않으며, 응답 직전 최소 XSS 정화를 거쳐 화면에 내보낸다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 349,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 360,
+              "snippet": "\t\t\tPopupManageVO popupManageVOs = egovPopupManageService.selectPopup(popupManageVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 362,
+              "snippet": "\t\t\tString sPrint = popupManageVOs.getFileUrl() + \"||\" + popupManageVOs.getPopupWSize() + \"||\""
+            }
+          ],
+          "text": "이 흐름에서 팝업창 관리 화면 처리 담당은 사용자 화면의 비동기 팝업창 정보 요청을 받는 진입점이다. 요청 파라미터로 받은 팝업창 조건을 팝업창 조회 서비스에 넘겨 상세정보를 얻고, 파일 URL·가로 크기·세로 크기·세로 위치·가로 위치·그만보기 여부를 구분자로 이어붙여 응답 본문에 직접 출력한다."
+        }
+      },
+      "name": "팝업창 관리 화면 처리 - 팝업창 정보 비동기 조회",
+      "stepId": "step:ANY /uss/ion/pwm/ajaxPopupManageInfo.do:src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 349,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 360,
+            "snippet": "\t\t\tPopupManageVO popupManageVOs = egovPopupManageService.selectPopup(popupManageVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 362,
+            "snippet": "\t\t\tString sPrint = popupManageVOs.getFileUrl() + \"||\" + popupManageVOs.getPopupWSize() + \"||\""
+          }
+        ],
+        "text": "팝업창 정보 비동기 조회 요청을 받아 팝업창 조회 서비스에 위임하고, 조회 결과를 구분자로 이어붙인 문자열로 응답 본문에 직접 출력한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 27,
+              "snippet": "\tpublic void deletePopup(PopupManageVO popupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 54,
+              "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "text": "상세 조회와 삭제 두 계약을 제공한다. 명령 구분값이 삭제일 때는 팝업창 삭제를, 그 외에는 팝업창 상세 조회를 수행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovPopupManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 12,
+              "snippet": " * - 팝업창에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+            }
+          ],
+          "text": "팝업창 상세정보 조회와 팝업창 삭제를 함께 담당하는 팝업창 관리 서비스다. 팝업창에 대한 등록·수정·삭제·조회·반영확인 기능을 정의한 서비스 계약의 일부로, 팝업창 상세 조회 및 삭제 흐름에서 화면 처리 담당의 요청을 받아 팝업창 업무 처리를 조율한다."
+        }
+      },
+      "name": "팝업창 관리 서비스 - 팝업창 상세 조회 및 삭제",
+      "stepId": "step:ANY /uss/ion/pwm/detailPopup.do:src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovPopupManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 27,
+            "snippet": "\tpublic void deletePopup(PopupManageVO popupManageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 54,
+            "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+          }
+        ],
+        "text": "팝업창 상세정보 조회와 팝업창 삭제를 함께 담당하는 팝업창 관리 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 130,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/detailPopup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 54,
+              "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "text": "팝업창 조건 객체와 요청 파라미터 묶음을 받아 명령 구분값을 꺼내 분기한다. 삭제 명령이면 삭제 후 목록 화면으로 되돌리고, 아니면 조회한 상세정보를 화면 모델에 담아 상세 화면을 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 349,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 130,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/detailPopup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 27,
+              "snippet": "\tpublic void deletePopup(PopupManageVO popupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 54,
+              "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "text": "이 흐름에서 팝업창 관리 화면 처리 담당은 관리자의 팝업창 상세 요청을 받는 진입점이다. 명령 구분값이 삭제이면 팝업창 삭제 서비스로, 그 외에는 팝업창 상세 조회 서비스로 위임하고 결과에 맞는 화면 이름을 돌려준다."
+        }
+      },
+      "name": "팝업창 관리 화면 처리 - 팝업창 상세 조회 및 삭제",
+      "stepId": "step:ANY /uss/ion/pwm/detailPopup.do:src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 349,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 130,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/detailPopup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 27,
+            "snippet": "\tpublic void deletePopup(PopupManageVO popupManageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 54,
+            "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+          }
+        ],
+        "text": "팝업창 상세 조회 요청을 받아 명령 구분값에 따라 삭제 또는 상세정보 조회로 갈라 처리하고, 상세 화면 또는 목록 화면으로 이동시킨다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 34,
+              "snippet": "    private String code = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 아이디·상세코드·코드명·코드설명을 보관하며 모두 빈 문자열을 기본값으로 갖는다. 특정 테이블에서 코드정보를 추출할 때 쓰는 테이블명 항목과, 상세 조건 사용 여부 및 상세 조건 항목을 함께 갖는다. 상세 조건 여부의 기본값은 사용 안 함이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "이 노드는 팝업창 등록 화면 표시 흐름에서 등록·수정 입력 화면이 필요로 하는 공통 코드 목록을 조회하기 위한 조건 데이터 구조다. 팝업창 도메인 외부의 공통 객체로, 코드 아이디를 기준으로 화면 선택값 목록을 얻는 데 쓰인다."
+        }
+      },
+      "name": "공통 코드 조회 조건 객체 - 팝업창 등록 화면 표시",
+      "stepId": "step:ANY /uss/ion/pwm/insertPopupView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 31,
+            "snippet": "    private String codeId = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 37,
+            "snippet": "    private String codeNm = \"\";"
+          }
+        ],
+        "text": "팝업창 등록 화면 표시 흐름에서 화면 선택 목록에 쓰일 공통 코드를 조회할 때 사용하는 조건 객체다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 158,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/insertPopupView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 93,
+              "snippet": "\tprivate String ntceEndde;"
+            }
+          ],
+          "text": "팝업창 입력 객체를 화면 모델 속성으로 받아 그대로 화면에 되돌려 준다. 게시 시작일과 종료일의 시·분 기본 선택값을 함께 내려주며, 이 단계에서는 입력값 검증이나 인증 검사를 하지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 349,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 158,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/insertPopupView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 89,
+              "snippet": "\tprivate String ntceBgnde;"
+            }
+          ],
+          "text": "이 흐름에서 팝업창 관리 화면 처리 담당은 등록 전 단계 처리를 맡는다. 조회나 저장 없이 빈 팝업창 입력 객체와 게시 기간의 시·분 선택값만 화면 모델에 담아 등록 화면을 연다."
+        }
+      },
+      "name": "팝업창 관리 화면 처리 - 팝업창 등록 화면 표시",
+      "stepId": "step:ANY /uss/ion/pwm/insertPopupView.do:src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 349,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 158,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/insertPopupView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 89,
+            "snippet": "\tprivate String ntceBgnde;"
+          }
+        ],
+        "text": "팝업창 등록 입력 화면을 여는 요청을 받아 게시 시작일·종료일의 시·분 선택값을 준비해 등록 화면으로 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 84,
+              "snippet": "\t * 팝업창을 사용하기 위해 팝업창목록을 조회한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 417,
+              "snippet": "\t\tList<EgovMap> resultList = egovPopupManageService.selectPopupMainList(popupManageVO);"
+            }
+          ],
+          "text": "팝업창을 사용하기 위한 목록 조회 계약을 제공하며, 조회 결과 목록을 그대로 JSON 응답 대상으로 넘긴다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovPopupManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 12,
+              "snippet": " * - 팝업창에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+            }
+          ],
+          "text": "메인 화면에 노출할 팝업창 목록을 조회하는 팝업창 조회 서비스다. 팝업창에 대한 등록·수정·삭제·조회·반영확인 기능을 정의한 서비스 계약의 일부로, 메인 화면 팝업창 목록 조회 흐름에서 화면 처리 담당의 요청을 받아 팝업창 업무 처리를 조율한다."
+        }
+      },
+      "name": "팝업창 관리 서비스 - 메인 화면 팝업창 목록 조회",
+      "stepId": "step:ANY /uss/ion/pwm/listMainPopup.do:src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovPopupManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 84,
+            "snippet": "\t * 팝업창을 사용하기 위해 팝업창목록을 조회한다."
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 417,
+            "snippet": "\t\tList<EgovMap> resultList = egovPopupManageService.selectPopupMainList(popupManageVO);"
+          }
+        ],
+        "text": "메인 화면에 노출할 팝업창 목록을 조회하는 팝업창 조회 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 416,
+              "snippet": "\tpublic ModelAndView egovPopupManageMainList(PopupManageVO popupManageVO, ModelMap model) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 418,
+              "snippet": "\t\tModelAndView mav = new ModelAndView(\"jsonView\");"
+            }
+          ],
+          "text": "팝업창 조회 조건 객체와 화면 모델을 받아 별도의 인증 검사 없이 메인 목록 조회를 수행한다. 응답은 화면 템플릿이 아니라 JSON 응답 형식으로 돌려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 349,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 417,
+              "snippet": "\t\tList<EgovMap> resultList = egovPopupManageService.selectPopupMainList(popupManageVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 418,
+              "snippet": "\t\tModelAndView mav = new ModelAndView(\"jsonView\");"
+            }
+          ],
+          "text": "이 흐름에서 팝업창 관리 화면 처리 담당은 메인 화면용 팝업창 목록 요청의 진입점이다. 조회 조건을 팝업창 메인 목록 조회 서비스에 넘기고, 받은 목록을 JSON 응답 화면으로 내보낸다."
+        }
+      },
+      "name": "팝업창 관리 화면 처리 - 메인 화면 팝업창 목록 조회",
+      "stepId": "step:ANY /uss/ion/pwm/listMainPopup.do:src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 349,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 417,
+            "snippet": "\t\tList<EgovMap> resultList = egovPopupManageService.selectPopupMainList(popupManageVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 418,
+            "snippet": "\t\tModelAndView mav = new ModelAndView(\"jsonView\");"
+          }
+        ],
+        "text": "메인 화면에 띄울 팝업창 목록 요청을 받아 팝업창 목록 조회 서비스에 위임하고 결과를 JSON 형식으로 응답한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 72,
+              "snippet": "\tpublic List<EgovMap> selectPopupList(PopupManageVO popupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 81,
+              "snippet": "\tpublic int selectPopupListCount(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "text": "페이징 구간이 채워진 조회 조건으로 팝업창 목록을 조회하는 계약과, 검색조건에 해당하는 전체 건수를 세는 계약을 각각 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovPopupManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 12,
+              "snippet": " * - 팝업창에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+            }
+          ],
+          "text": "관리자 팝업창 목록과 전체 건수를 조회하는 팝업창 관리 서비스다. 팝업창에 대한 등록·수정·삭제·조회·반영확인 기능을 정의한 서비스 계약의 일부로, 팝업창 관리 목록 조회 흐름에서 화면 처리 담당의 요청을 받아 팝업창 업무 처리를 조율한다."
+        }
+      },
+      "name": "팝업창 관리 서비스 - 팝업창 관리 목록 조회",
+      "stepId": "step:ANY /uss/ion/pwm/listPopup.do:src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovPopupManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 72,
+            "snippet": "\tpublic List<EgovMap> selectPopupList(PopupManageVO popupManageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 81,
+            "snippet": "\tpublic int selectPopupListCount(PopupManageVO popupManageVO) throws Exception;"
+          }
+        ],
+        "text": "관리자 팝업창 목록과 전체 건수를 조회하는 팝업창 관리 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 41,
+              "snippet": "\tprivate String popupId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 46,
+              "snippet": "\t@Size(max = 1024)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 47,
+              "snippet": "\tprivate String popupTitleNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 53,
+              "snippet": "\tprivate String fileUrl;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 59,
+              "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 89,
+              "snippet": "\tprivate String ntceBgnde;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 96,
+              "snippet": "\tprivate String ntceBgndeHH;"
+            }
+          ],
+          "text": "팝업창 아이디를 식별자로 갖고, 팝업창 타이틀명과 실파일 URL은 필수이며 각각 최대 1024자로 제한된다. 팝업창의 가로·세로 표시 위치와 높이·넓이는 필수이며 최대 10자의 숫자만 허용된다. 게시시작일과 게시종료일을 문자열로 보관하고, 시·분은 별도 항목으로 나누어 화면 선택값과 맞춘다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 34,
+              "snippet": "public class PopupManageVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 34,
+              "snippet": "public class PopupManageVO extends ComDefaultVO {"
+            }
+          ],
+          "text": "이 노드는 팝업창 관리 목록 조회 흐름에서 화면과 서비스 사이를 오가는 팝업창 데이터 구조다. 조회 조건이자 조회 결과이며, 등록·수정 시에는 입력값 검증 대상이 된다. 공통 조회 조건 객체를 상속해 검색조건과 페이징 항목을 함께 갖는다."
+        }
+      },
+      "name": "팝업창 정보 객체 - 팝업창 관리 목록 조회",
+      "stepId": "step:ANY /uss/ion/pwm/listPopup.do:src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 34,
+            "snippet": "public class PopupManageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 41,
+            "snippet": "\tprivate String popupId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 47,
+            "snippet": "\tprivate String popupTitleNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 53,
+            "snippet": "\tprivate String fileUrl;"
+          }
+        ],
+        "text": "팝업창 관리 목록 조회 흐름에서 주고받는 팝업창 정보 객체로, 팝업창 아이디·타이틀명·실파일 URL·표시 위치와 크기·게시 기간을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 87,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/listPopup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 72,
+              "snippet": "\tpublic List<EgovMap> selectPopupList(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "text": "요청 파라미터 묶음에서 검색조건과 검색어를 꺼내 없으면 빈 값으로 대체하고, 팝업창 조회 조건 객체에 페이징 구간을 채워 조회한다. 이 흐름에는 로그인 인증 검사가 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 349,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 87,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/listPopup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 72,
+              "snippet": "\tpublic List<EgovMap> selectPopupList(PopupManageVO popupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 81,
+              "snippet": "\tpublic int selectPopupListCount(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "text": "이 흐름에서 팝업창 관리 화면 처리 담당은 관리자 목록 화면의 진입점이다. 페이지 단위와 페이지 크기를 설정해 조회 구간을 계산한 뒤 팝업창 목록 조회와 전체 건수 조회를 서비스에 위임하고, 검색조건·검색어와 함께 목록 화면에 표시한다."
+        }
+      },
+      "name": "팝업창 관리 화면 처리 - 팝업창 관리 목록 조회",
+      "stepId": "step:ANY /uss/ion/pwm/listPopup.do:src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 349,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 87,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/listPopup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 72,
+            "snippet": "\tpublic List<EgovMap> selectPopupList(PopupManageVO popupManageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 81,
+            "snippet": "\tpublic int selectPopupListCount(PopupManageVO popupManageVO) throws Exception;"
+          }
+        ],
+        "text": "관리자 팝업창 목록 요청을 받아 페이징 정보를 설정하고 목록과 전체 건수를 조회해 관리 목록 화면에 표시한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "\tpublic static String filePathBlackList(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 81,
+              "snippet": "\t\tif (returnValue == null || returnValue.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            }
+          ],
+          "text": "문자열 하나를 받아 문자열을 돌려주는 정적 처리이며 상태를 갖지 않는다. 입력이 비었으면 빈 문자열을 돌려주고, 상위 경로 이동을 뜻하는 점 두 개 연속 문자열을 모두 제거해 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "\tpublic static String filePathBlackList(String value) {"
+            }
+          ],
+          "text": "이 노드는 팝업창 열기 흐름에서 외부 입력으로 들어온 파일 URL을 화이트리스트 대조 전에 정화하는 협력 객체다. 경로 조작 및 자원 삽입 취약점 조치를 목적으로 하는 공통 유틸리티로, 팝업창 도메인 외부의 공통 모듈이다."
+        }
+      },
+      "name": "웹 보안 정화 유틸리티 - 팝업창 열기",
+      "stepId": "step:ANY /uss/ion/pwm/openPopupManage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 79,
+            "snippet": "\tpublic static String filePathBlackList(String value) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 387,
+            "snippet": "\t\tString fileUrl2 = EgovWebUtil.filePathBlackList(fileUrl);"
+          }
+        ],
+        "text": "팝업창 열기 요청의 파일 URL에서 상위 경로 이동 문자열을 제거해 경로 조작 위험을 차단하는 공통 보안 유틸리티다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 57,
+              "snippet": "\t * 팝업창의 취약점을 관리하기 위해 등록된 팝업창 화이트리스트를 조회한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 63,
+              "snippet": "\tpublic List<EgovMap> selectPopupWhiteList() throws Exception;"
+            }
+          ],
+          "text": "팝업창의 취약점을 관리하기 위해 등록된 팝업창 화이트리스트를 조회하는 계약을 제공한다. 이 목록은 열기 요청의 파일 URL 허용 여부를 판정하는 기준이 된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovPopupManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 12,
+              "snippet": " * - 팝업창에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+            }
+          ],
+          "text": "팝업창 열기가 허용된 파일 URL 화이트리스트를 조회하는 팝업창 관리 서비스다. 팝업창에 대한 등록·수정·삭제·조회·반영확인 기능을 정의한 서비스 계약의 일부로, 팝업창 열기 흐름에서 화면 처리 담당의 요청을 받아 팝업창 업무 처리를 조율한다."
+        }
+      },
+      "name": "팝업창 관리 서비스 - 팝업창 열기",
+      "stepId": "step:ANY /uss/ion/pwm/openPopupManage.do:src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovPopupManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 57,
+            "snippet": "\t * 팝업창의 취약점을 관리하기 위해 등록된 팝업창 화이트리스트를 조회한다."
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 63,
+            "snippet": "\tpublic List<EgovMap> selectPopupWhiteList() throws Exception;"
+          }
+        ],
+        "text": "팝업창 열기가 허용된 파일 URL 화이트리스트를 조회하는 팝업창 관리 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 380,
+              "snippet": "\tpublic String egovPopupManagePopupOpen(@RequestParam(\"fileUrl\") String fileUrl,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 387,
+              "snippet": "\t\tString fileUrl2 = EgovWebUtil.filePathBlackList(fileUrl);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 397,
+              "snippet": "\t\t\tif (fileUrl2.equals(map.get(\"fileUrl\"))) {"
+            }
+          ],
+          "text": "파일 URL·그만보기 여부·팝업창 아이디를 필수 요청 파라미터로 받는다. 파일 URL은 상위 경로 이동 문자열을 제거한 뒤 사용하며, 정화 결과가 없으면 빈 문자열로 대체하고 화이트리스트 항목과 정확히 일치하는지 검사한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 349,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 387,
+              "snippet": "\t\tString fileUrl2 = EgovWebUtil.filePathBlackList(fileUrl);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 389,
+              "snippet": "\t\tList<EgovMap> popupWhiteList = egovPopupManageService.selectPopupWhiteList();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 403,
+              "snippet": "\t\treturn \"egovframework/com/cmm/egovError\";"
+            }
+          ],
+          "text": "이 흐름에서 팝업창 관리 화면 처리 담당은 사용자 팝업창 열기 요청의 진입점이자 보안 관문이다. 요청된 파일 URL을 정화한 뒤 등록된 팝업창 화이트리스트를 조회해 일치하는 항목이 있을 때만 해당 화면을 열고, 없으면 공통 오류 화면을 돌려준다."
+        }
+      },
+      "name": "팝업창 관리 화면 처리 - 팝업창 열기",
+      "stepId": "step:ANY /uss/ion/pwm/openPopupManage.do:src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 349,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 387,
+            "snippet": "\t\tString fileUrl2 = EgovWebUtil.filePathBlackList(fileUrl);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 389,
+            "snippet": "\t\tList<EgovMap> popupWhiteList = egovPopupManageService.selectPopupWhiteList();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 403,
+            "snippet": "\t\treturn \"egovframework/com/cmm/egovError\";"
+          }
+        ],
+        "text": "팝업창 열기 요청을 받아 파일 URL의 경로 조작 위험 문자열을 제거하고 화이트리스트와 대조해 허용된 URL만 열어준다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드를 받아 재적재 가능한 자원 묶음에서 문구를 찾아 돌려준다. 로케일을 지정하지 않으면 시스템 기본 로케일을 사용하고, 로케일이나 매개변수를 함께 받는 조회 방식도 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "이 흐름에서 이 서비스는 사용자에게 보여줄 안내 문구를 코드로 조회하는 역할을 맡는다. 로그인 인증에 실패했을 때 로그인 실패 안내 메시지를 얻어 화면 모델에 담는 데 쓰인다."
+        }
+      },
+      "name": "공통 메시지 조회 서비스 - 팝업창 등록",
+      "stepId": "step:ANY /uss/ion/pwm/registPopup.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "\tpublic String getMessage(String code) {"
+          }
+        ],
+        "text": "팝업창 등록 흐름에서 인증 실패 안내 문구 등 화면 메시지를 코드로 조회하는 공통 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "\tprivate String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 61,
+              "snippet": "\tprivate String userSe;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디·이름·이메일주소는 값이 반드시 있어야 하는 항목으로 표시되고, 비밀번호 힌트와 정답도 필수 항목이다. 사용자구분과 조직 아이디·조직명, 그리고 팝업창 저장에 사용하는 고유아이디를 보관한다. 직렬화 가능한 데이터 구조다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "이 노드는 팝업창 등록 흐름에서 인증정보 조회 도우미가 돌려주는 로그인 사용자 데이터 구조다. 저장 직전 이 객체의 고유아이디를 꺼내 팝업창의 최초등록자·최종수정자로 설정하므로, 팝업창 이력 추적의 근거가 된다."
+        }
+      },
+      "name": "로그인 사용자 정보 객체 - 팝업창 등록",
+      "stepId": "step:ANY /uss/ion/pwm/registPopup.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "\tprivate String uniqId;"
+          }
+        ],
+        "text": "팝업창 등록 흐름에서 인증된 사용자 정보를 담아 등록자·최종수정자 아이디의 출처가 되는 공통 객체다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체를 조회하는 계약, 사용자 권한 정보 목록을 조회하는 계약, 인증된 사용자 여부를 참·거짓으로 돌려주는 계약을 정의한다. 팝업창 등록·수정은 이 중 인증 여부와 사용자 객체만 사용한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "이 흐름에서 이 서비스는 인증 상세 판정을 담당한다. 인증정보 조회 도우미가 위임한 인증 여부 확인과 인증된 사용자 객체 조회를 실제로 수행해, 팝업창 등록·수정의 권한 통과 여부를 결정한다."
+        }
+      },
+      "name": "사용자 인증정보 서비스 - 팝업창 등록",
+      "stepId": "step:ANY /uss/ion/pwm/registPopup.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 24,
+            "snippet": "\tpublic Boolean isAuthenticated(); "
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 11,
+            "snippet": "\tpublic Object getAuthenticatedUser();"
+          }
+        ],
+        "text": "팝업창 등록 흐름에서 인증 여부와 인증된 사용자 정보를 실제로 판정하는 공통 인증 서비스 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 상세 서비스 한 개를 정적으로 보유하는 도우미로, 인스턴스 상태를 갖지 않는다. 인증 여부 확인, 인증된 사용자 객체 조회, 사용자 권한 목록 조회 세 가지를 정적 처리로 제공하며 모두 보유한 인증 상세 서비스에 그대로 위임한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ],
+          "text": "이 노드는 팝업창 등록 흐름에서 권한 검사를 대행하는 협력 객체다. 인증된 사용자 여부를 판정해 미인증이면 처리를 중단시키고, 인증된 경우 사용자 객체를 돌려주어 등록자·수정자 정보의 출처가 된다. 실제 판정은 인증 상세 서비스에 위임한다."
+        }
+      },
+      "name": "사용자 인증정보 조회 도우미 - 팝업창 등록",
+      "stepId": "step:ANY /uss/ion/pwm/registPopup.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 58,
+            "snippet": "\tpublic static Boolean isAuthenticated() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "\tpublic static Object getAuthenticatedUser() {"
+          }
+        ],
+        "text": "팝업창 등록 흐름의 진입 시점에 로그인 인증 여부와 인증된 사용자 정보를 확인하는 공통 도우미다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 30,
+              "snippet": "\t * 팝업창정보를 신규로 등록한다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 36,
+              "snippet": "\tpublic void insertPopup(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "text": "팝업창정보를 신규로 등록하는 계약을 제공한다. 등록자·최종수정자 아이디가 설정된 팝업창 입력 객체를 받아 저장한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovPopupManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 12,
+              "snippet": " * - 팝업창에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+            }
+          ],
+          "text": "팝업창 정보를 신규로 등록하는 팝업창 관리 서비스다. 팝업창에 대한 등록·수정·삭제·조회·반영확인 기능을 정의한 서비스 계약의 일부로, 팝업창 등록 흐름에서 화면 처리 담당의 요청을 받아 팝업창 업무 처리를 조율한다."
+        }
+      },
+      "name": "팝업창 관리 서비스 - 팝업창 등록",
+      "stepId": "step:ANY /uss/ion/pwm/registPopup.do:src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovPopupManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 30,
+            "snippet": "\t * 팝업창정보를 신규로 등록한다."
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 36,
+            "snippet": "\tpublic void insertPopup(PopupManageVO popupManageVO) throws Exception;"
+          }
+        ],
+        "text": "팝업창 정보를 신규로 등록하는 팝업창 관리 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 41,
+              "snippet": "\tprivate String popupId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 46,
+              "snippet": "\t@Size(max = 1024)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 47,
+              "snippet": "\tprivate String popupTitleNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 53,
+              "snippet": "\tprivate String fileUrl;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 59,
+              "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 89,
+              "snippet": "\tprivate String ntceBgnde;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 96,
+              "snippet": "\tprivate String ntceBgndeHH;"
+            }
+          ],
+          "text": "팝업창 아이디를 식별자로 갖고, 팝업창 타이틀명과 실파일 URL은 필수이며 각각 최대 1024자로 제한된다. 팝업창의 가로·세로 표시 위치와 높이·넓이는 필수이며 최대 10자의 숫자만 허용된다. 게시시작일과 게시종료일을 문자열로 보관하고, 시·분은 별도 항목으로 나누어 화면 선택값과 맞춘다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 34,
+              "snippet": "public class PopupManageVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 34,
+              "snippet": "public class PopupManageVO extends ComDefaultVO {"
+            }
+          ],
+          "text": "이 노드는 팝업창 등록 흐름에서 화면과 서비스 사이를 오가는 팝업창 데이터 구조다. 조회 조건이자 조회 결과이며, 등록·수정 시에는 입력값 검증 대상이 된다. 공통 조회 조건 객체를 상속해 검색조건과 페이징 항목을 함께 갖는다."
+        }
+      },
+      "name": "팝업창 정보 객체 - 팝업창 등록",
+      "stepId": "step:ANY /uss/ion/pwm/registPopup.do:src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 34,
+            "snippet": "public class PopupManageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 41,
+            "snippet": "\tprivate String popupId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 47,
+            "snippet": "\tprivate String popupTitleNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 53,
+            "snippet": "\tprivate String fileUrl;"
+          }
+        ],
+        "text": "팝업창 등록 흐름에서 주고받는 팝업창 정보 객체로, 팝업창 아이디·타이틀명·실파일 URL·표시 위치와 크기·게시 기간을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "요청 파라미터 묶음과 검증 대상 팝업창 입력 객체를 받는다. 미인증이면 로그인 실패 안내 메시지를 담아 로그인 화면으로 보내고, 저장 명령이면서 검증 오류가 있으면 입력값을 그대로 등록 화면에 되돌려 재입력을 요구한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 349,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 291,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/registPopup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 36,
+              "snippet": "\tpublic void insertPopup(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "text": "이 흐름에서 팝업창 관리 화면 처리 담당은 등록 요청의 진입점이자 권한·검증 관문이다. 로그인 인증 여부를 확인하고 인증된 사용자 정보를 얻어 등록자 정보로 사용하며, 저장 명령일 때 팝업창 등록 서비스에 위임한다."
+        }
+      },
+      "name": "팝업창 관리 화면 처리 - 팝업창 등록",
+      "stepId": "step:ANY /uss/ion/pwm/registPopup.do:src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 349,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 291,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/registPopup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 58,
+            "snippet": "\tpublic static Boolean isAuthenticated() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 36,
+            "snippet": "\tpublic void insertPopup(PopupManageVO popupManageVO) throws Exception;"
+          }
+        ],
+        "text": "팝업창 등록 요청을 받아 로그인 인증과 입력값 검증을 거친 뒤 등록 서비스에 위임하고 목록 화면으로 이동시킨다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            }
+          ],
+          "text": "상태를 갖지 않는 정적 문자열 처리 모음으로, 빈 문자열 상수와 문자열 자르기·널 검사 등의 처리를 제공한다. 값이 없을 때 빈 문자열을 기준값으로 삼는 규약을 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "이 노드는 팝업창 등록 흐름에서 저장 직전 값 보정을 맡는 협력 객체다. 로그인 사용자의 고유아이디가 비어 있을 때도 팝업창의 등록자·최종수정자 항목이 빈 문자열로 안전하게 채워지도록 문자열 변환을 제공한다. 팝업창 도메인 외부의 공통 모듈이다."
+        }
+      },
+      "name": "공통 문자열 처리 유틸리티 - 팝업창 등록",
+      "stepId": "step:ANY /uss/ion/pwm/registPopup.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 47,
+            "snippet": "\tpublic static final String EMPTY = \"\";"
+          }
+        ],
+        "text": "팝업창 등록 흐름에서 로그인 사용자의 고유아이디를 저장값으로 변환할 때 쓰는 공통 문자열 유틸리티다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 34,
+              "snippet": "    private String code = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 아이디·상세코드·코드명·코드설명을 보관하며 모두 빈 문자열을 기본값으로 갖는다. 특정 테이블에서 코드정보를 추출할 때 쓰는 테이블명 항목과, 상세 조건 사용 여부 및 상세 조건 항목을 함께 갖는다. 상세 조건 여부의 기본값은 사용 안 함이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "이 노드는 팝업창 수정 화면 표시 흐름에서 등록·수정 입력 화면이 필요로 하는 공통 코드 목록을 조회하기 위한 조건 데이터 구조다. 팝업창 도메인 외부의 공통 객체로, 코드 아이디를 기준으로 화면 선택값 목록을 얻는 데 쓰인다."
+        }
+      },
+      "name": "공통 코드 조회 조건 객체 - 팝업창 수정 화면 표시",
+      "stepId": "step:ANY /uss/ion/pwm/updatePopupView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 31,
+            "snippet": "    private String codeId = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 37,
+            "snippet": "    private String codeNm = \"\";"
+          }
+        ],
+        "text": "팝업창 수정 화면 표시 흐름에서 화면 선택 목록에 쓰일 공통 코드를 조회할 때 사용하는 조건 객체다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 54,
+              "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 89,
+              "snippet": "\tprivate String ntceBgnde;"
+            }
+          ],
+          "text": "팝업창 상세 조회 계약을 제공한다. 조회 결과의 게시 시작일·종료일 문자열은 화면에서 시와 분으로 분리해 사용한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovPopupManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 12,
+              "snippet": " * - 팝업창에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+            }
+          ],
+          "text": "수정 화면에 채울 팝업창 현재 정보를 조회하는 팝업창 조회 서비스다. 팝업창에 대한 등록·수정·삭제·조회·반영확인 기능을 정의한 서비스 계약의 일부로, 팝업창 수정 화면 표시 흐름에서 화면 처리 담당의 요청을 받아 팝업창 업무 처리를 조율한다."
+        }
+      },
+      "name": "팝업창 관리 서비스 - 팝업창 수정 화면 표시",
+      "stepId": "step:ANY /uss/ion/pwm/updatePopupView.do:src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovPopupManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 54,
+            "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 89,
+            "snippet": "\tprivate String ntceBgnde;"
+          }
+        ],
+        "text": "수정 화면에 채울 팝업창 현재 정보를 조회하는 팝업창 조회 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 41,
+              "snippet": "\tprivate String popupId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 46,
+              "snippet": "\t@Size(max = 1024)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 47,
+              "snippet": "\tprivate String popupTitleNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 53,
+              "snippet": "\tprivate String fileUrl;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 59,
+              "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 89,
+              "snippet": "\tprivate String ntceBgnde;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 96,
+              "snippet": "\tprivate String ntceBgndeHH;"
+            }
+          ],
+          "text": "팝업창 아이디를 식별자로 갖고, 팝업창 타이틀명과 실파일 URL은 필수이며 각각 최대 1024자로 제한된다. 팝업창의 가로·세로 표시 위치와 높이·넓이는 필수이며 최대 10자의 숫자만 허용된다. 게시시작일과 게시종료일을 문자열로 보관하고, 시·분은 별도 항목으로 나누어 화면 선택값과 맞춘다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 34,
+              "snippet": "public class PopupManageVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 34,
+              "snippet": "public class PopupManageVO extends ComDefaultVO {"
+            }
+          ],
+          "text": "이 노드는 팝업창 수정 화면 표시 흐름에서 화면과 서비스 사이를 오가는 팝업창 데이터 구조다. 조회 조건이자 조회 결과이며, 등록·수정 시에는 입력값 검증 대상이 된다. 공통 조회 조건 객체를 상속해 검색조건과 페이징 항목을 함께 갖는다."
+        }
+      },
+      "name": "팝업창 정보 객체 - 팝업창 수정 화면 표시",
+      "stepId": "step:ANY /uss/ion/pwm/updatePopupView.do:src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 34,
+            "snippet": "public class PopupManageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 41,
+            "snippet": "\tprivate String popupId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 47,
+            "snippet": "\tprivate String popupTitleNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 53,
+            "snippet": "\tprivate String fileUrl;"
+          }
+        ],
+        "text": "팝업창 수정 화면 표시 흐름에서 주고받는 팝업창 정보 객체로, 팝업창 아이디·타이틀명·실파일 URL·표시 위치와 크기·게시 기간을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 183,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/updatePopupView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 96,
+              "snippet": "\tprivate String ntceBgndeHH;"
+            }
+          ],
+          "text": "팝업창 입력 객체를 화면 모델 속성으로 받아 조회 조건으로 사용한다. 이 단계에서는 저장이 없어 입력값 검증을 하지 않으며, 게시 기간의 시·분 선택값을 함께 내려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 349,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 183,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/updatePopupView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 54,
+              "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "text": "이 흐름에서 팝업창 관리 화면 처리 담당은 수정 전 단계 처리를 맡는다. 팝업창 상세 조회 서비스로 현재 정보를 얻은 뒤 게시 시작일·종료일 문자열에서 시와 분을 분리해 화면 선택값으로 채워 수정 화면을 연다."
+        }
+      },
+      "name": "팝업창 관리 화면 처리 - 팝업창 수정 화면 표시",
+      "stepId": "step:ANY /uss/ion/pwm/updatePopupView.do:src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 349,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 183,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/updatePopupView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 54,
+            "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+          }
+        ],
+        "text": "팝업창 수정 입력 화면 요청을 받아 상세정보를 조회하고 게시 기간의 시·분을 분리해 수정 화면에 채워 준다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드를 받아 재적재 가능한 자원 묶음에서 문구를 찾아 돌려준다. 로케일을 지정하지 않으면 시스템 기본 로케일을 사용하고, 로케일이나 매개변수를 함께 받는 조회 방식도 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "이 흐름에서 이 서비스는 사용자에게 보여줄 안내 문구를 코드로 조회하는 역할을 맡는다. 로그인 인증에 실패했을 때 로그인 실패 안내 메시지를 얻어 화면 모델에 담는 데 쓰인다."
+        }
+      },
+      "name": "공통 메시지 조회 서비스 - 팝업창 수정",
+      "stepId": "step:ANY /uss/ion/pwm/updtPopup.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "\tpublic String getMessage(String code) {"
+          }
+        ],
+        "text": "팝업창 수정 흐름에서 인증 실패 안내 문구 등 화면 메시지를 코드로 조회하는 공통 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "\tprivate String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 61,
+              "snippet": "\tprivate String userSe;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디·이름·이메일주소는 값이 반드시 있어야 하는 항목으로 표시되고, 비밀번호 힌트와 정답도 필수 항목이다. 사용자구분과 조직 아이디·조직명, 그리고 팝업창 저장에 사용하는 고유아이디를 보관한다. 직렬화 가능한 데이터 구조다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "이 노드는 팝업창 수정 흐름에서 인증정보 조회 도우미가 돌려주는 로그인 사용자 데이터 구조다. 저장 직전 이 객체의 고유아이디를 꺼내 팝업창의 최초등록자·최종수정자로 설정하므로, 팝업창 이력 추적의 근거가 된다."
+        }
+      },
+      "name": "로그인 사용자 정보 객체 - 팝업창 수정",
+      "stepId": "step:ANY /uss/ion/pwm/updtPopup.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "\tprivate String uniqId;"
+          }
+        ],
+        "text": "팝업창 수정 흐름에서 인증된 사용자 정보를 담아 등록자·최종수정자 아이디의 출처가 되는 공통 객체다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체를 조회하는 계약, 사용자 권한 정보 목록을 조회하는 계약, 인증된 사용자 여부를 참·거짓으로 돌려주는 계약을 정의한다. 팝업창 등록·수정은 이 중 인증 여부와 사용자 객체만 사용한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "이 흐름에서 이 서비스는 인증 상세 판정을 담당한다. 인증정보 조회 도우미가 위임한 인증 여부 확인과 인증된 사용자 객체 조회를 실제로 수행해, 팝업창 등록·수정의 권한 통과 여부를 결정한다."
+        }
+      },
+      "name": "사용자 인증정보 서비스 - 팝업창 수정",
+      "stepId": "step:ANY /uss/ion/pwm/updtPopup.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 24,
+            "snippet": "\tpublic Boolean isAuthenticated(); "
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 11,
+            "snippet": "\tpublic Object getAuthenticatedUser();"
+          }
+        ],
+        "text": "팝업창 수정 흐름에서 인증 여부와 인증된 사용자 정보를 실제로 판정하는 공통 인증 서비스 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 상세 서비스 한 개를 정적으로 보유하는 도우미로, 인스턴스 상태를 갖지 않는다. 인증 여부 확인, 인증된 사용자 객체 조회, 사용자 권한 목록 조회 세 가지를 정적 처리로 제공하며 모두 보유한 인증 상세 서비스에 그대로 위임한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ],
+          "text": "이 노드는 팝업창 수정 흐름에서 권한 검사를 대행하는 협력 객체다. 인증된 사용자 여부를 판정해 미인증이면 처리를 중단시키고, 인증된 경우 사용자 객체를 돌려주어 등록자·수정자 정보의 출처가 된다. 실제 판정은 인증 상세 서비스에 위임한다."
+        }
+      },
+      "name": "사용자 인증정보 조회 도우미 - 팝업창 수정",
+      "stepId": "step:ANY /uss/ion/pwm/updtPopup.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 58,
+            "snippet": "\tpublic static Boolean isAuthenticated() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "\tpublic static Object getAuthenticatedUser() {"
+          }
+        ],
+        "text": "팝업창 수정 흐름의 진입 시점에 로그인 인증 여부와 인증된 사용자 정보를 확인하는 공통 도우미다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 45,
+              "snippet": "\tpublic void updatePopup(PopupManageVO popupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 54,
+              "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "text": "기 등록된 팝업창정보를 수정하는 계약과 상세 조회 계약을 제공한다. 저장 명령일 때만 수정이 수행되고, 그 외에는 상세 조회 결과를 화면에 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 18,
+              "snippet": "public interface EgovPopupManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 12,
+              "snippet": " * - 팝업창에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+            }
+          ],
+          "text": "기 등록된 팝업창 정보를 수정하고, 재표시용 상세정보를 조회하는 팝업창 관리 서비스다. 팝업창에 대한 등록·수정·삭제·조회·반영확인 기능을 정의한 서비스 계약의 일부로, 팝업창 수정 흐름에서 화면 처리 담당의 요청을 받아 팝업창 업무 처리를 조율한다."
+        }
+      },
+      "name": "팝업창 관리 서비스 - 팝업창 수정",
+      "stepId": "step:ANY /uss/ion/pwm/updtPopup.do:src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 18,
+            "snippet": "public interface EgovPopupManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 45,
+            "snippet": "\tpublic void updatePopup(PopupManageVO popupManageVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 54,
+            "snippet": "\tpublic PopupManageVO selectPopup(PopupManageVO popupManageVO) throws Exception;"
+          }
+        ],
+        "text": "기 등록된 팝업창 정보를 수정하고, 재표시용 상세정보를 조회하는 팝업창 관리 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 41,
+              "snippet": "\tprivate String popupId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 46,
+              "snippet": "\t@Size(max = 1024)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 47,
+              "snippet": "\tprivate String popupTitleNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 53,
+              "snippet": "\tprivate String fileUrl;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 59,
+              "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 89,
+              "snippet": "\tprivate String ntceBgnde;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 96,
+              "snippet": "\tprivate String ntceBgndeHH;"
+            }
+          ],
+          "text": "팝업창 아이디를 식별자로 갖고, 팝업창 타이틀명과 실파일 URL은 필수이며 각각 최대 1024자로 제한된다. 팝업창의 가로·세로 표시 위치와 높이·넓이는 필수이며 최대 10자의 숫자만 허용된다. 게시시작일과 게시종료일을 문자열로 보관하고, 시·분은 별도 항목으로 나누어 화면 선택값과 맞춘다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 34,
+              "snippet": "public class PopupManageVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+              "line": 34,
+              "snippet": "public class PopupManageVO extends ComDefaultVO {"
+            }
+          ],
+          "text": "이 노드는 팝업창 수정 흐름에서 화면과 서비스 사이를 오가는 팝업창 데이터 구조다. 조회 조건이자 조회 결과이며, 등록·수정 시에는 입력값 검증 대상이 된다. 공통 조회 조건 객체를 상속해 검색조건과 페이징 항목을 함께 갖는다."
+        }
+      },
+      "name": "팝업창 정보 객체 - 팝업창 수정",
+      "stepId": "step:ANY /uss/ion/pwm/updtPopup.do:src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 34,
+            "snippet": "public class PopupManageVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 41,
+            "snippet": "\tprivate String popupId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 47,
+            "snippet": "\tprivate String popupTitleNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+            "line": 53,
+            "snippet": "\tprivate String fileUrl;"
+          }
+        ],
+        "text": "팝업창 수정 흐름에서 주고받는 팝업창 정보 객체로, 팝업창 아이디·타이틀명·실파일 URL·표시 위치와 크기·게시 기간을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "요청 파라미터 묶음과 검증 대상 팝업창 입력 객체를 받는다. 미인증이면 로그인 실패 안내 메시지를 담아 로그인 화면으로 보내고, 저장 명령이면서 검증 오류가 있으면 수정 화면으로 되돌린다. 게시 기간의 시·분 선택값도 함께 내려준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 349,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+              "line": 223,
+              "snippet": "@RequestMapping(value = \"/uss/ion/pwm/updtPopup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+              "line": 45,
+              "snippet": "\tpublic void updatePopup(PopupManageVO popupManageVO) throws Exception;"
+            }
+          ],
+          "text": "이 흐름에서 팝업창 관리 화면 처리 담당은 수정 요청의 진입점이자 권한·검증 관문이다. 로그인 인증 여부를 확인하고, 저장 명령이면 팝업창 수정 서비스에 위임하며 그 외에는 상세 조회로 현재 정보를 다시 채워 수정 화면을 보여준다."
+        }
+      },
+      "name": "팝업창 관리 화면 처리 - 팝업창 수정",
+      "stepId": "step:ANY /uss/ion/pwm/updtPopup.do:src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 349,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/ajaxPopupManageInfo.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+            "line": 223,
+            "snippet": "@RequestMapping(value = \"/uss/ion/pwm/updtPopup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 58,
+            "snippet": "\tpublic static Boolean isAuthenticated() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+            "line": 45,
+            "snippet": "\tpublic void updatePopup(PopupManageVO popupManageVO) throws Exception;"
+          }
+        ],
+        "text": "팝업창 수정 요청을 받아 로그인 인증과 입력값 검증을 거친 뒤 수정 서비스에 위임하거나 현재 정보를 다시 조회해 수정 화면에 표시한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            }
+          ],
+          "text": "상태를 갖지 않는 정적 문자열 처리 모음으로, 빈 문자열 상수와 문자열 자르기·널 검사 등의 처리를 제공한다. 값이 없을 때 빈 문자열을 기준값으로 삼는 규약을 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "이 노드는 팝업창 수정 흐름에서 저장 직전 값 보정을 맡는 협력 객체다. 로그인 사용자의 고유아이디가 비어 있을 때도 팝업창의 등록자·최종수정자 항목이 빈 문자열로 안전하게 채워지도록 문자열 변환을 제공한다. 팝업창 도메인 외부의 공통 모듈이다."
+        }
+      },
+      "name": "공통 문자열 처리 유틸리티 - 팝업창 수정",
+      "stepId": "step:ANY /uss/ion/pwm/updtPopup.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 47,
+            "snippet": "\tpublic static final String EMPTY = \"\";"
+          }
+        ],
+        "text": "팝업창 수정 흐름에서 로그인 사용자의 고유아이디를 저장값으로 변환할 때 쓰는 공통 문자열 유틸리티다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+        "line": 9,
+        "snippet": " * - 팝업창에 대한 Service Interface를 정의한다."
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+        "line": 12,
+        "snippet": " * - 팝업창에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다."
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/EgovPopupManageService.java",
+        "line": 13,
+        "snippet": " * - 팝업창의 조회기능은 목록조회, 상세조회, 팝업사용자 보기로 구분된다."
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/uss/ion/pwm/service/PopupManageVO.java",
+        "line": 47,
+        "snippet": "\tprivate String popupTitleNm;"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/uss/ion/pwm/web/EgovPopupManageController.java",
+        "line": 389,
+        "snippet": "\t\tList<EgovMap> popupWhiteList = egovPopupManageService.selectPopupWhiteList();"
+      }
+    ],
+    "text": "사이트에 띄울 팝업창을 관리자가 등록·수정·삭제·조회하고, 사용자 화면에서 게시 기간에 맞는 팝업창을 열어 보여주는 업무 영역이다. 팝업창 정보는 타이틀명과 실파일 URL, 화면 표시 위치와 크기, 게시 시작일·종료일로 구성되며, 팝업창 열기는 등록된 화이트리스트에 있는 URL만 허용한다."
+  }
+}

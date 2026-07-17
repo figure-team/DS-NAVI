@@ -1,0 +1,3098 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "m_start",
+          "to": "m_auth"
+        },
+        {
+          "from": "m_auth",
+          "label": "NO",
+          "to": "m_login"
+        },
+        {
+          "from": "m_auth",
+          "label": "YES",
+          "to": "m_list"
+        },
+        {
+          "from": "m_login",
+          "to": "m_end"
+        },
+        {
+          "from": "m_list",
+          "to": "m_detail"
+        },
+        {
+          "from": "m_list",
+          "to": "m_regform"
+        },
+        {
+          "from": "m_detail",
+          "to": "m_updform"
+        },
+        {
+          "from": "m_detail",
+          "to": "m_delete"
+        },
+        {
+          "from": "m_regform",
+          "to": "m_valid"
+        },
+        {
+          "from": "m_updform",
+          "to": "m_valid"
+        },
+        {
+          "from": "m_valid",
+          "label": "NO",
+          "to": "m_reform"
+        },
+        {
+          "from": "m_valid",
+          "label": "YES (등록)",
+          "to": "m_insert"
+        },
+        {
+          "from": "m_valid",
+          "label": "YES (수정)",
+          "to": "m_update"
+        },
+        {
+          "from": "m_reform",
+          "to": "m_end"
+        },
+        {
+          "from": "m_insert",
+          "to": "m_result"
+        },
+        {
+          "from": "m_update",
+          "to": "m_result"
+        },
+        {
+          "from": "m_delete",
+          "to": "m_result"
+        },
+        {
+          "from": "m_result",
+          "to": "m_end"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "m_start",
+          "kind": "start",
+          "label": "모니터링 관리 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 103,
+              "snippet": "    \tif(!isAuthenticated) {"
+            }
+          ],
+          "id": "m_auth",
+          "kind": "decision",
+          "label": "로그인 사용자인가"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 104,
+              "snippet": "    \t\tredirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 105,
+              "snippet": "        \treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ],
+          "id": "m_login",
+          "kind": "activity",
+          "label": "로그인 화면으로 되돌림"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 214,
+              "snippet": "@RequestMapping(\"/utl/sys/trm/getTrsmrcvMntrngList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/trm/getTrsmrcvMntrngList.do",
+          "id": "m_list",
+          "kind": "activity",
+          "label": "모니터링 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 134,
+              "snippet": "@RequestMapping(\"/utl/sys/trm/getTrsmrcvMntrng.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/trm/getTrsmrcvMntrng.do",
+          "id": "m_detail",
+          "kind": "activity",
+          "label": "모니터링 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 174,
+              "snippet": "@RequestMapping(\"/utl/sys/trm/getTrsmrcvMntrngForRegist.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/trm/getTrsmrcvMntrngForRegist.do",
+          "id": "m_regform",
+          "kind": "activity",
+          "label": "등록 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 190,
+              "snippet": "@RequestMapping(\"/utl/sys/trm/getTrsmrcvMntrngForUpdate.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/trm/getTrsmrcvMntrngForUpdate.do",
+          "id": "m_updform",
+          "kind": "activity",
+          "label": "수정 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 111,
+              "snippet": "        checkDuplication(trsmrcvMntrng, bindingResult);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 112,
+              "snippet": "    \tif (bindingResult.hasErrors()){"
+            }
+          ],
+          "id": "m_valid",
+          "kind": "decision",
+          "label": "입력값 검증 통과인가"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 113,
+              "snippet": "    \t\tmodel.addAttribute(\"trsmrcvMntrng\", trsmrcvMntrng);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 114,
+              "snippet": "    \t\treturn \"egovframework/com/utl/sys/trm/EgovTrsmrcvMntrngRegist\";"
+            }
+          ],
+          "id": "m_reform",
+          "kind": "activity",
+          "label": "입력 화면 다시 표시"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 97,
+              "snippet": "@RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/trm/addTrsmrcvMntrng.do",
+          "id": "m_insert",
+          "kind": "activity",
+          "label": "모니터링 등록"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 292,
+              "snippet": "@RequestMapping(\"/utl/sys/trm/updateTrsmrcvMntrng.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/trm/updateTrsmrcvMntrng.do",
+          "id": "m_update",
+          "kind": "activity",
+          "label": "모니터링 수정"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 73,
+              "snippet": "@RequestMapping(\"/utl/sys/trm/deleteTrsmrcvMntrng.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/trm/deleteTrsmrcvMntrng.do",
+          "id": "m_delete",
+          "kind": "activity",
+          "label": "모니터링 삭제"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 121,
+              "snippet": "\t        model.addAttribute(\"resultMsg\", \"success.common.insert\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 123,
+              "snippet": "    \treturn \"forward:/utl/sys/trm/getTrsmrcvMntrngList.do\";"
+            }
+          ],
+          "id": "m_result",
+          "kind": "activity",
+          "label": "결과 안내 후 목록 복귀"
+        },
+        {
+          "id": "m_end",
+          "kind": "end",
+          "label": "관리 종료"
+        }
+      ],
+      "title": "송수신모니터링 관리"
+    },
+    {
+      "edges": [
+        {
+          "from": "l_start",
+          "to": "l_list"
+        },
+        {
+          "from": "l_list",
+          "to": "l_detail"
+        },
+        {
+          "from": "l_detail",
+          "to": "l_show"
+        },
+        {
+          "from": "l_show",
+          "to": "l_end"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "l_start",
+          "kind": "start",
+          "label": "감시 결과 확인 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 254,
+              "snippet": "@RequestMapping(\"/utl/sys/trm/getTrsmrcvMntrngLogList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/trm/getTrsmrcvMntrngLogList.do",
+          "id": "l_list",
+          "kind": "activity",
+          "label": "로그 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 154,
+              "snippet": "@RequestMapping(\"/utl/sys/trm/getTrsmrcvMntrngLog.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/trm/getTrsmrcvMntrngLog.do",
+          "id": "l_detail",
+          "kind": "activity",
+          "label": "로그 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 159,
+              "snippet": "\t\tmodel.addAttribute(\"resultInfo\", result);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 162,
+              "snippet": "      return \"egovframework/com/utl/sys/trm/EgovTrsmrcvMntrngLogDetail\";"
+            }
+          ],
+          "id": "l_show",
+          "kind": "activity",
+          "label": "로그 상세 화면 표시"
+        },
+        {
+          "id": "l_end",
+          "kind": "end",
+          "label": "확인 종료"
+        }
+      ],
+      "title": "모니터링 로그 조회"
+    },
+    {
+      "edges": [
+        {
+          "from": "c_start",
+          "to": "c_popup"
+        },
+        {
+          "from": "c_popup",
+          "to": "c_list"
+        },
+        {
+          "from": "c_list",
+          "to": "c_pick"
+        },
+        {
+          "from": "c_pick",
+          "to": "c_end"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "c_start",
+          "kind": "start",
+          "label": "감시 대상 연계 선택 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 360,
+              "snippet": "@RequestMapping(\"/utl/sys/trm/getCntcListPopup.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/trm/getCntcListPopup.do",
+          "id": "c_popup",
+          "kind": "activity",
+          "label": "연계 선택 팝업 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 325,
+              "snippet": "@RequestMapping(\"/utl/sys/trm/getCntcList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/trm/getCntcList.do",
+          "id": "c_list",
+          "kind": "activity",
+          "label": "연계정보 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/CntcVO.java",
+              "line": 35,
+              "snippet": "\tprivate String cntcId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 35,
+              "snippet": "\tprivate String cntcId;"
+            }
+          ],
+          "id": "c_pick",
+          "kind": "activity",
+          "label": "연계ID 선택해 등록 화면 반영"
+        },
+        {
+          "id": "c_end",
+          "kind": "end",
+          "label": "선택 종료"
+        }
+      ],
+      "title": "연계 대상 선택"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+          "line": 102,
+          "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+          "line": 103,
+          "snippet": "    \tif(!isAuthenticated) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+          "line": 104,
+          "snippet": "    \t\tredirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+          "line": 105,
+          "snippet": "        \treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+        }
+      ],
+      "text": "등록·수정·삭제·목록조회 요청은 로그인한 사용자만 수행할 수 있으며, 미인증 사용자는 로그인 실패 안내 메시지와 함께 로그인 화면으로 되돌린다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+          "line": 111,
+          "snippet": "        checkDuplication(trsmrcvMntrng, bindingResult);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+          "line": 112,
+          "snippet": "    \tif (bindingResult.hasErrors()){"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+          "line": 114,
+          "snippet": "    \t\treturn \"egovframework/com/utl/sys/trm/EgovTrsmrcvMntrngRegist\";"
+        }
+      ],
+      "text": "등록 요청은 연계ID 중복 여부를 확인한 뒤 검증 오류가 하나라도 있으면 저장하지 않고 등록 입력 화면을 다시 보여준다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+          "line": 33,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+          "line": 34,
+          "snippet": "\t@Size(max=8)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+          "line": 52,
+          "snippet": "\t@Size(max=50)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+          "line": 53,
+          "snippet": "\t@EgovEmailCheck"
+        }
+      ],
+      "text": "연계ID는 반드시 입력해야 하고 8자를 넘길 수 없으며, 관리자이메일주소는 50자 이내의 이메일 형식이어야 한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+          "line": 117,
+          "snippet": "\t\t\ttrsmrcvMntrng.setLastUpdusrId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 67,
+          "snippet": "\tprivate String uniqId;"
+        }
+      ],
+      "text": "저장 시 최종수정자 아이디는 로그인 사용자의 고유아이디로 채우되, 로그인 정보가 없으면 빈 문자열로 남긴다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+          "line": 121,
+          "snippet": "\t        model.addAttribute(\"resultMsg\", \"success.common.insert\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+          "line": 123,
+          "snippet": "    \treturn \"forward:/utl/sys/trm/getTrsmrcvMntrngList.do\";"
+        }
+      ],
+      "text": "등록이 예외 없이 끝나면 등록 성공 안내를 남기고 목록 조회 화면으로 이어 보여준다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+          "line": 102,
+          "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 25,
+          "snippet": "public class EgovUserDetailsHelper {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 5,
+          "snippet": "public interface EgovUserDetailsService {"
+        }
+      ],
+      "text": "공통 인증 영역에 접근 통제를 의존한다. 로그인 사용자 확인 창구를 통해 인증 여부와 인증 사용자 정보를 받아 요청 수행 여부를 판단한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+          "line": 104,
+          "snippet": "    \t\tredirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 52,
+          "snippet": "\tpublic String getMessage(String code) {"
+        }
+      ],
+      "text": "공통 메시지 영역에 사용자 안내 문구를 의존한다. 로그인 실패 안내 등 화면 메시지를 메시지 코드로 조회해 사용한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+          "line": 117,
+          "snippet": "\t\t\ttrsmrcvMntrng.setLastUpdusrId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 43,
+          "snippet": "public class EgovStringUtil {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 47,
+          "snippet": "\tpublic static final String EMPTY = \"\";"
+        }
+      ],
+      "text": "공통 유틸리티 영역의 문자열 보정 도구에 의존해, 로그인 정보가 없을 때도 최종수정자 값이 안전한 빈 문자열이 되도록 처리한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+          "line": 325,
+          "snippet": "@RequestMapping(\"/utl/sys/trm/getCntcList.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/CntcVO.java",
+          "line": 35,
+          "snippet": "\tprivate String cntcId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+          "line": 35,
+          "snippet": "\tprivate String cntcId;"
+        }
+      ],
+      "text": "기관 간 연계 정보 영역을 대상으로 삼는다. 감시 항목은 연계ID로 연계 정보와 이어지며, 등록 시 연계 목록에서 대상을 고른다."
+    }
+  ],
+  "domainId": "domain:utl.sys.trm",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+          "line": 27,
+          "snippet": "public class TrsmrcvMntrng extends ComDefaultVO implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+          "line": 35,
+          "snippet": "\tprivate String cntcId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+          "line": 58,
+          "snippet": "\tprivate String mntrngSttus;"
+        }
+      ],
+      "text": "송수신모니터링 — 감시 대상 연계 한 건의 설정 정보. 연계ID, 테스트클래스명, 관리자명과 관리자이메일주소, 모니터링상태를 담는다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrngLog.java",
+          "line": 22,
+          "snippet": "public class TrsmrcvMntrngLog extends ComDefaultVO implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrngLog.java",
+          "line": 28,
+          "snippet": "\tprivate String logId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrngLog.java",
+          "line": 32,
+          "snippet": "\tprivate String cntcId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrngLog.java",
+          "line": 72,
+          "snippet": "\tprivate String logInfo;"
+        }
+      ],
+      "text": "송수신모니터링 로그 — 감시 결과가 시점별로 쌓인 기록. 로그ID로 식별하고 연계ID로 대상 연계와 이어지며 모니터링상태와 로그정보를 담는다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/CntcVO.java",
+          "line": 28,
+          "snippet": "public class CntcVO extends ComDefaultVO implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/CntcVO.java",
+          "line": 40,
+          "snippet": "\tprivate String cntcNm;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/CntcVO.java",
+          "line": 45,
+          "snippet": "\tprivate String provdInsttNm;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/CntcVO.java",
+          "line": 60,
+          "snippet": "\tprivate String requstInsttNm;"
+        }
+      ],
+      "text": "연계 정보 — 감시 대상으로 고를 수 있는 기관 간 연계 한 건. 연계명과 제공기관·제공시스템·제공서비스, 요청기관 정보로 구성된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 42,
+          "snippet": "\tprivate String id;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 67,
+          "snippet": "\tprivate String uniqId;"
+        }
+      ],
+      "text": "로그인 사용자 — 등록·수정 시 최종수정자로 기록되는 인증된 담당자 정보. 아이디·이름과 고유아이디를 담는다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /utl/sys/trm/addTrsmrcvMntrng.do",
+      "name": "송수신모니터링 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+          }
+        ],
+        "text": "담당자가 연계 대상의 송수신모니터링 항목을 새로 등록하는 업무 흐름이다. 로그인 여부를 먼저 확인하고, 연계ID 중복과 필수값 검증을 통과한 건만 최종수정자 아이디를 채워 저장한 뒤 목록 화면으로 되돌린다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/trm/deleteTrsmrcvMntrng.do",
+      "name": "송수신모니터링 삭제",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 73,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/deleteTrsmrcvMntrng.do\")"
+          }
+        ],
+        "text": "등록된 송수신모니터링 항목을 삭제하는 업무 흐름이다. 로그인한 사용자만 수행할 수 있으며, 삭제 후에는 목록 화면으로 돌아가 결과를 알린다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/trm/getCntcList.do",
+      "name": "연계정보 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 325,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/getCntcList.do\")"
+          }
+        ],
+        "text": "송수신모니터링 대상으로 지정할 수 있는 연계정보 목록을 조회하는 업무 흐름이다. 연계명·제공기관 등 조회조건으로 걸러 목록을 돌려준다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/trm/getCntcListPopup.do",
+      "name": "연계정보 선택 팝업 열기",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 360,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/getCntcListPopup.do\")"
+          }
+        ],
+        "text": "연계정보를 고르기 위한 선택 팝업 화면을 여는 업무 흐름이다. 별도 조회 없이 팝업 화면만 띄운다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/trm/getTrsmrcvMntrng.do",
+      "name": "송수신모니터링 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 134,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/getTrsmrcvMntrng.do\")"
+          }
+        ],
+        "text": "선택한 송수신모니터링 한 건의 상세 내용을 조회해 상세 화면에 보여주는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/trm/getTrsmrcvMntrngForRegist.do",
+      "name": "송수신모니터링 등록 화면 호출",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 174,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/getTrsmrcvMntrngForRegist.do\")"
+          }
+        ],
+        "text": "송수신모니터링을 새로 등록하기 위한 입력 화면을 여는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/trm/getTrsmrcvMntrngForUpdate.do",
+      "name": "송수신모니터링 수정 화면 호출",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 190,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/getTrsmrcvMntrngForUpdate.do\")"
+          }
+        ],
+        "text": "기존 송수신모니터링 한 건을 조회해 수정 입력 화면에 채워 보여주는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/trm/getTrsmrcvMntrngList.do",
+      "name": "송수신모니터링 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 214,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/getTrsmrcvMntrngList.do\")"
+          }
+        ],
+        "text": "등록된 송수신모니터링을 조회조건과 페이지 단위로 목록 조회하는 업무 흐름이다. 로그인 사용자에게 전체 건수와 함께 목록을 제공한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/trm/getTrsmrcvMntrngLog.do",
+      "name": "송수신모니터링 로그 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 154,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/getTrsmrcvMntrngLog.do\")"
+          }
+        ],
+        "text": "송수신모니터링 로그 한 건의 상세 내용을 조회해 로그 상세 화면에 보여주는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/trm/getTrsmrcvMntrngLogList.do",
+      "name": "송수신모니터링 로그 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 254,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/getTrsmrcvMntrngLogList.do\")"
+          }
+        ],
+        "text": "송수신 결과가 쌓인 모니터링 로그를 조회조건과 페이지 단위로 목록 조회하는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/trm/updateTrsmrcvMntrng.do",
+      "name": "송수신모니터링 수정",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 292,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/updateTrsmrcvMntrng.do\")"
+          }
+        ],
+        "text": "등록된 송수신모니터링의 내용을 변경하는 업무 흐름이다. 로그인 확인과 입력값 검증을 거친 뒤 최종수정자 아이디를 갱신해 저장한다."
+      }
+    }
+  ],
+  "name": "송수신 모니터링",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            }
+          ],
+          "text": "메시지 코드와 선택적 매개변수·로케일을 받아 해당 언어의 문구를 돌려주며, 로케일을 주지 않으면 시스템 기본 로케일을 사용한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 104,
+              "snippet": "    \t\tredirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+            }
+          ],
+          "text": "송수신모니터링 흐름에서 로그인 실패 안내 등 사용자에게 전달할 문구를 메시지 코드로 조회해 주는 역할을 맡는다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /utl/sys/trm/addTrsmrcvMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "화면에 보여줄 안내·오류 메시지를 메시지 코드로 찾아 주는 공통 서비스다. 미로그인 안내처럼 흐름 중 사용자에게 알릴 문구를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "\tprivate String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 51,
+              "snippet": "\tprivate String email;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디·이름·이메일주소는 비어 있을 수 없는 필수값이고, 고유아이디는 다른 업무에서 사용자를 식별하는 값으로 쓰인다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 117,
+              "snippet": "\t\t\ttrsmrcvMntrng.setLastUpdusrId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));"
+            }
+          ],
+          "text": "인증된 사용자 정보를 담아 전달하는 데이터 구조로, 송수신모니터링 등록·수정 흐름에서 최종수정자 아이디를 채우는 데 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /utl/sys/trm/addTrsmrcvMntrng.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "로그인한 사용자의 아이디·이름·소속 조직·고유아이디 등을 담는 정보 묶음이다. 등록·수정 시 최종수정자를 남기는 근거가 된다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체 반환, 사용자 권한 목록 반환, 인증 여부 판정의 세 가지 규약을 정의하며 판정 결과에 따라 후속 업무 수행 여부가 갈린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "송수신모니터링 요청의 접근 통제 판정 근거를 제공하는 서비스로, 인증된 사용자 정보와 권한, 인증 여부 판정을 담당한다."
+        }
+      },
+      "name": "인증 사용자 정보 제공",
+      "stepId": "step:ANY /utl/sys/trm/addTrsmrcvMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증된 사용자 객체와 권한 목록, 인증 여부를 판정해 제공하는 공통 인증 서비스 규약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "\t\treturn egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "자체 데이터를 보관하지 않고 인증 사용자 정보 제공 담당 하나만 지니며, 인증 사용자 객체·권한 목록·인증 여부 세 가지를 그대로 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "송수신모니터링 요청 처리 첫 단계에서 인증 여부를 판정하고 인증된 사용자 정보를 제공하는 협력 객체 역할을 맡는다. 실제 판정은 인증 사용자 정보 제공 담당에게 넘긴다."
+        }
+      },
+      "name": "로그인 사용자 확인",
+      "stepId": "step:ANY /utl/sys/trm/addTrsmrcvMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "요청한 사람이 로그인한 사용자인지 확인하고, 인증된 사용자 정보와 권한 목록을 꺼내 주는 공통 창구다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            }
+          ],
+          "text": "상태를 갖지 않는 도구 모음으로, 빈 문자열 상수를 기준값으로 두고 지정 길이 초과 문자열 자르기 등 문자열 가공 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 117,
+              "snippet": "\t\t\ttrsmrcvMntrng.setLastUpdusrId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));"
+            }
+          ],
+          "text": "송수신모니터링 등록·수정 흐름에서 로그인 사용자의 고유아이디를 최종수정자 아이디로 옮길 때 값이 없어도 빈 문자열이 되도록 보정하는 협력 도구 역할을 맡는다."
+        }
+      },
+      "name": "문자열 값 보정",
+      "stepId": "step:ANY /utl/sys/trm/addTrsmrcvMntrng.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "문자열이 비었거나 없을 때 안전한 값으로 바꿔 주는 공통 도구다. 로그인 정보가 없을 때도 최종수정자 값이 빈 문자열로 채워지게 한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 28,
+              "snippet": "\tpublic void deleteTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 37,
+              "snippet": "\tpublic void insertTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 46,
+              "snippet": "\tpublic void insertTrsmrcvMntrngLog(TrsmrcvMntrngLog trsmrcvMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 76,
+              "snippet": "\tpublic List<TrsmrcvMntrng> selectTrsmrcvMntrngList(TrsmrcvMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 86,
+              "snippet": "\tpublic int selectTrsmrcvMntrngListCnt(TrsmrcvMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 등록·삭제, 로그 등록, 모니터링 상세조회, 목록과 전체 건수 조회를 각각 규약으로 정의한다. 목록 조회는 조회조건 정보를 받아 목록과 건수를 따로 제공해 페이지 처리를 뒷받침한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 20,
+              "snippet": "public interface EgovTrsmrcvMntrngService {"
+            }
+          ],
+          "text": "송수신모니터링 업무의 중심 서비스로, 화면 요청 접수 창구에서 넘어온 요청을 받아 모니터링 항목과 로그의 등록·삭제·조회 작업을 조율한다."
+        }
+      },
+      "name": "송수신모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/trm/addTrsmrcvMntrng.do:src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+            "line": 20,
+            "snippet": "public interface EgovTrsmrcvMntrngService {"
+          }
+        ],
+        "text": "송수신모니터링과 그 로그의 등록·삭제·상세조회·목록조회를 담당하는 핵심 업무 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 33,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 34,
+              "snippet": "\t@Size(max=8)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 35,
+              "snippet": "\tprivate String cntcId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 52,
+              "snippet": "\t@Size(max=50)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 53,
+              "snippet": "\t@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 58,
+              "snippet": "\tprivate String mntrngSttus;"
+            }
+          ],
+          "text": "연계ID는 필수이며 8자를 넘길 수 없다. 관리자이메일주소는 필수이면서 50자 이내의 이메일 형식이어야 한다. 이 밖에 모니터링상태를 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 27,
+              "snippet": "public class TrsmrcvMntrng extends ComDefaultVO implements Serializable {"
+            }
+          ],
+          "text": "송수신모니터링 등록·수정·목록조회 흐름에서 화면 입력값과 조회조건을 함께 담아 나르는 데이터 구조 역할을 맡는다."
+        }
+      },
+      "name": "송수신모니터링 정보",
+      "stepId": "step:ANY /utl/sys/trm/addTrsmrcvMntrng.do:src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+            "line": 27,
+            "snippet": "public class TrsmrcvMntrng extends ComDefaultVO implements Serializable {"
+          }
+        ],
+        "text": "어떤 연계를 누가 어떤 테스트 방식으로 감시하는지를 담는 송수신모니터링 정보 묶음이다. 연계ID, 테스트클래스명, 관리자와 연락처, 모니터링상태를 보관한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 103,
+              "snippet": "    \tif(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 105,
+              "snippet": "        \treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 112,
+              "snippet": "    \tif (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청은 화면 입력값을 모델 객체로 묶어 받으며, 로그인 여부를 먼저 확인해 미인증 사용자는 로그인 안내와 함께 로그인 화면으로 되돌린다. 등록·수정 요청은 입력값 검증 결과에 오류가 있으면 저장하지 않고 입력 화면을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 97,
+              "snippet": "    @RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 158,
+              "snippet": "\t\tTrsmrcvMntrngLog result = egovTrsmrcvMntrngService.selectTrsmrcvMntrngLog(trsmrcvMntrngLog);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 159,
+              "snippet": "\t\tmodel.addAttribute(\"resultInfo\", result);"
+            }
+          ],
+          "text": "송수신모니터링 등록 요청의 진입 지점으로, 화면에서 넘어온 조회조건 또는 입력값을 받아 송수신모니터링 업무 처리에 위임하고 그 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "송수신모니터링 등록 요청 접수",
+      "stepId": "step:ANY /utl/sys/trm/addTrsmrcvMntrng.do:src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+          }
+        ],
+        "text": "사용자의 화면 요청을 받아 송수신모니터링 등록 업무를 수행하도록 조율하는 창구다. 로그인 여부와 입력값 검증을 확인한 뒤 송수신모니터링 업무 처리에 위임하고, 결과에 맞는 화면으로 이동시킨다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            }
+          ],
+          "text": "메시지 코드와 선택적 매개변수·로케일을 받아 해당 언어의 문구를 돌려주며, 로케일을 주지 않으면 시스템 기본 로케일을 사용한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 104,
+              "snippet": "    \t\tredirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+            }
+          ],
+          "text": "송수신모니터링 흐름에서 로그인 실패 안내 등 사용자에게 전달할 문구를 메시지 코드로 조회해 주는 역할을 맡는다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /utl/sys/trm/deleteTrsmrcvMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "화면에 보여줄 안내·오류 메시지를 메시지 코드로 찾아 주는 공통 서비스다. 미로그인 안내처럼 흐름 중 사용자에게 알릴 문구를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체 반환, 사용자 권한 목록 반환, 인증 여부 판정의 세 가지 규약을 정의하며 판정 결과에 따라 후속 업무 수행 여부가 갈린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "송수신모니터링 요청의 접근 통제 판정 근거를 제공하는 서비스로, 인증된 사용자 정보와 권한, 인증 여부 판정을 담당한다."
+        }
+      },
+      "name": "인증 사용자 정보 제공",
+      "stepId": "step:ANY /utl/sys/trm/deleteTrsmrcvMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증된 사용자 객체와 권한 목록, 인증 여부를 판정해 제공하는 공통 인증 서비스 규약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "\t\treturn egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "자체 데이터를 보관하지 않고 인증 사용자 정보 제공 담당 하나만 지니며, 인증 사용자 객체·권한 목록·인증 여부 세 가지를 그대로 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "송수신모니터링 요청 처리 첫 단계에서 인증 여부를 판정하고 인증된 사용자 정보를 제공하는 협력 객체 역할을 맡는다. 실제 판정은 인증 사용자 정보 제공 담당에게 넘긴다."
+        }
+      },
+      "name": "로그인 사용자 확인",
+      "stepId": "step:ANY /utl/sys/trm/deleteTrsmrcvMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "요청한 사람이 로그인한 사용자인지 확인하고, 인증된 사용자 정보와 권한 목록을 꺼내 주는 공통 창구다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 28,
+              "snippet": "\tpublic void deleteTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 37,
+              "snippet": "\tpublic void insertTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 46,
+              "snippet": "\tpublic void insertTrsmrcvMntrngLog(TrsmrcvMntrngLog trsmrcvMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 76,
+              "snippet": "\tpublic List<TrsmrcvMntrng> selectTrsmrcvMntrngList(TrsmrcvMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 86,
+              "snippet": "\tpublic int selectTrsmrcvMntrngListCnt(TrsmrcvMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 등록·삭제, 로그 등록, 모니터링 상세조회, 목록과 전체 건수 조회를 각각 규약으로 정의한다. 목록 조회는 조회조건 정보를 받아 목록과 건수를 따로 제공해 페이지 처리를 뒷받침한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 20,
+              "snippet": "public interface EgovTrsmrcvMntrngService {"
+            }
+          ],
+          "text": "송수신모니터링 업무의 중심 서비스로, 화면 요청 접수 창구에서 넘어온 요청을 받아 모니터링 항목과 로그의 등록·삭제·조회 작업을 조율한다."
+        }
+      },
+      "name": "송수신모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/trm/deleteTrsmrcvMntrng.do:src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+            "line": 20,
+            "snippet": "public interface EgovTrsmrcvMntrngService {"
+          }
+        ],
+        "text": "송수신모니터링과 그 로그의 등록·삭제·상세조회·목록조회를 담당하는 핵심 업무 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 103,
+              "snippet": "    \tif(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 105,
+              "snippet": "        \treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 112,
+              "snippet": "    \tif (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청은 화면 입력값을 모델 객체로 묶어 받으며, 로그인 여부를 먼저 확인해 미인증 사용자는 로그인 안내와 함께 로그인 화면으로 되돌린다. 등록·수정 요청은 입력값 검증 결과에 오류가 있으면 저장하지 않고 입력 화면을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 97,
+              "snippet": "    @RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 158,
+              "snippet": "\t\tTrsmrcvMntrngLog result = egovTrsmrcvMntrngService.selectTrsmrcvMntrngLog(trsmrcvMntrngLog);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 159,
+              "snippet": "\t\tmodel.addAttribute(\"resultInfo\", result);"
+            }
+          ],
+          "text": "송수신모니터링 삭제 요청의 진입 지점으로, 화면에서 넘어온 조회조건 또는 입력값을 받아 송수신모니터링 업무 처리에 위임하고 그 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "송수신모니터링 삭제 요청 접수",
+      "stepId": "step:ANY /utl/sys/trm/deleteTrsmrcvMntrng.do:src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+          }
+        ],
+        "text": "사용자의 화면 요청을 받아 송수신모니터링 삭제 업무를 수행하도록 조율하는 창구다. 로그인 여부와 입력값 검증을 확인한 뒤 송수신모니터링 업무 처리에 위임하고, 결과에 맞는 화면으로 이동시킨다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/CntcVO.java",
+              "line": 35,
+              "snippet": "\tprivate String cntcId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/CntcVO.java",
+              "line": 40,
+              "snippet": "\tprivate String cntcNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/CntcVO.java",
+              "line": 45,
+              "snippet": "\tprivate String provdInsttNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/CntcVO.java",
+              "line": 60,
+              "snippet": "\tprivate String requstInsttNm;"
+            }
+          ],
+          "text": "연계ID로 한 건을 식별하고 연계명을 함께 보관하며, 제공 측 정보로 제공기관명 등을, 요청 측 정보로 요청기관명을 지닌다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/CntcVO.java",
+              "line": 28,
+              "snippet": "public class CntcVO extends ComDefaultVO implements Serializable {"
+            }
+          ],
+          "text": "연계정보 목록 조회 흐름에서 조회조건과 조회 결과 한 건을 담아 나르는 데이터 구조 역할을 맡는다."
+        }
+      },
+      "name": "연계 정보",
+      "stepId": "step:ANY /utl/sys/trm/getCntcList.do:src/main/java/egovframework/com/utl/sys/trm/service/CntcVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/CntcVO.java",
+            "line": 28,
+            "snippet": "public class CntcVO extends ComDefaultVO implements Serializable {"
+          }
+        ],
+        "text": "모니터링 대상으로 고를 수 있는 연계 한 건을 담는 정보 묶음이다. 연계ID와 연계명, 제공기관·제공시스템·제공서비스, 요청기관·요청시스템을 보관한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 28,
+              "snippet": "\tpublic void deleteTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 37,
+              "snippet": "\tpublic void insertTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 46,
+              "snippet": "\tpublic void insertTrsmrcvMntrngLog(TrsmrcvMntrngLog trsmrcvMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 76,
+              "snippet": "\tpublic List<TrsmrcvMntrng> selectTrsmrcvMntrngList(TrsmrcvMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 86,
+              "snippet": "\tpublic int selectTrsmrcvMntrngListCnt(TrsmrcvMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 등록·삭제, 로그 등록, 모니터링 상세조회, 목록과 전체 건수 조회를 각각 규약으로 정의한다. 목록 조회는 조회조건 정보를 받아 목록과 건수를 따로 제공해 페이지 처리를 뒷받침한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 20,
+              "snippet": "public interface EgovTrsmrcvMntrngService {"
+            }
+          ],
+          "text": "송수신모니터링 업무의 중심 서비스로, 화면 요청 접수 창구에서 넘어온 요청을 받아 모니터링 항목과 로그의 등록·삭제·조회 작업을 조율한다."
+        }
+      },
+      "name": "송수신모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/trm/getCntcList.do:src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+            "line": 20,
+            "snippet": "public interface EgovTrsmrcvMntrngService {"
+          }
+        ],
+        "text": "송수신모니터링과 그 로그의 등록·삭제·상세조회·목록조회를 담당하는 핵심 업무 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 103,
+              "snippet": "    \tif(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 105,
+              "snippet": "        \treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 112,
+              "snippet": "    \tif (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청은 화면 입력값을 모델 객체로 묶어 받으며, 로그인 여부를 먼저 확인해 미인증 사용자는 로그인 안내와 함께 로그인 화면으로 되돌린다. 등록·수정 요청은 입력값 검증 결과에 오류가 있으면 저장하지 않고 입력 화면을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 97,
+              "snippet": "    @RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 158,
+              "snippet": "\t\tTrsmrcvMntrngLog result = egovTrsmrcvMntrngService.selectTrsmrcvMntrngLog(trsmrcvMntrngLog);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 159,
+              "snippet": "\t\tmodel.addAttribute(\"resultInfo\", result);"
+            }
+          ],
+          "text": "연계정보 목록 조회 요청의 진입 지점으로, 화면에서 넘어온 조회조건 또는 입력값을 받아 송수신모니터링 업무 처리에 위임하고 그 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "연계정보 목록 조회 요청 접수",
+      "stepId": "step:ANY /utl/sys/trm/getCntcList.do:src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+          }
+        ],
+        "text": "사용자의 화면 요청을 받아 연계정보 목록 조회 업무를 수행하도록 조율하는 창구다. 로그인 여부와 입력값 검증을 확인한 뒤 송수신모니터링 업무 처리에 위임하고, 결과에 맞는 화면으로 이동시킨다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 103,
+              "snippet": "    \tif(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 105,
+              "snippet": "        \treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 112,
+              "snippet": "    \tif (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청은 화면 입력값을 모델 객체로 묶어 받으며, 로그인 여부를 먼저 확인해 미인증 사용자는 로그인 안내와 함께 로그인 화면으로 되돌린다. 등록·수정 요청은 입력값 검증 결과에 오류가 있으면 저장하지 않고 입력 화면을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 97,
+              "snippet": "    @RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 158,
+              "snippet": "\t\tTrsmrcvMntrngLog result = egovTrsmrcvMntrngService.selectTrsmrcvMntrngLog(trsmrcvMntrngLog);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 159,
+              "snippet": "\t\tmodel.addAttribute(\"resultInfo\", result);"
+            }
+          ],
+          "text": "연계정보 선택 팝업 열기 요청의 진입 지점으로, 화면에서 넘어온 조회조건 또는 입력값을 받아 송수신모니터링 업무 처리에 위임하고 그 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "연계정보 선택 팝업 열기 요청 접수",
+      "stepId": "step:ANY /utl/sys/trm/getCntcListPopup.do:src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+          }
+        ],
+        "text": "사용자의 화면 요청을 받아 연계정보 선택 팝업 열기 업무를 수행하도록 조율하는 창구다. 로그인 여부와 입력값 검증을 확인한 뒤 송수신모니터링 업무 처리에 위임하고, 결과에 맞는 화면으로 이동시킨다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 28,
+              "snippet": "\tpublic void deleteTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 37,
+              "snippet": "\tpublic void insertTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 46,
+              "snippet": "\tpublic void insertTrsmrcvMntrngLog(TrsmrcvMntrngLog trsmrcvMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 76,
+              "snippet": "\tpublic List<TrsmrcvMntrng> selectTrsmrcvMntrngList(TrsmrcvMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 86,
+              "snippet": "\tpublic int selectTrsmrcvMntrngListCnt(TrsmrcvMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 등록·삭제, 로그 등록, 모니터링 상세조회, 목록과 전체 건수 조회를 각각 규약으로 정의한다. 목록 조회는 조회조건 정보를 받아 목록과 건수를 따로 제공해 페이지 처리를 뒷받침한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 20,
+              "snippet": "public interface EgovTrsmrcvMntrngService {"
+            }
+          ],
+          "text": "송수신모니터링 업무의 중심 서비스로, 화면 요청 접수 창구에서 넘어온 요청을 받아 모니터링 항목과 로그의 등록·삭제·조회 작업을 조율한다."
+        }
+      },
+      "name": "송수신모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/trm/getTrsmrcvMntrng.do:src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+            "line": 20,
+            "snippet": "public interface EgovTrsmrcvMntrngService {"
+          }
+        ],
+        "text": "송수신모니터링과 그 로그의 등록·삭제·상세조회·목록조회를 담당하는 핵심 업무 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 103,
+              "snippet": "    \tif(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 105,
+              "snippet": "        \treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 112,
+              "snippet": "    \tif (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청은 화면 입력값을 모델 객체로 묶어 받으며, 로그인 여부를 먼저 확인해 미인증 사용자는 로그인 안내와 함께 로그인 화면으로 되돌린다. 등록·수정 요청은 입력값 검증 결과에 오류가 있으면 저장하지 않고 입력 화면을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 97,
+              "snippet": "    @RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 158,
+              "snippet": "\t\tTrsmrcvMntrngLog result = egovTrsmrcvMntrngService.selectTrsmrcvMntrngLog(trsmrcvMntrngLog);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 159,
+              "snippet": "\t\tmodel.addAttribute(\"resultInfo\", result);"
+            }
+          ],
+          "text": "송수신모니터링 상세 조회 요청의 진입 지점으로, 화면에서 넘어온 조회조건 또는 입력값을 받아 송수신모니터링 업무 처리에 위임하고 그 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "송수신모니터링 상세 조회 요청 접수",
+      "stepId": "step:ANY /utl/sys/trm/getTrsmrcvMntrng.do:src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+          }
+        ],
+        "text": "사용자의 화면 요청을 받아 송수신모니터링 상세 조회 업무를 수행하도록 조율하는 창구다. 로그인 여부와 입력값 검증을 확인한 뒤 송수신모니터링 업무 처리에 위임하고, 결과에 맞는 화면으로 이동시킨다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 103,
+              "snippet": "    \tif(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 105,
+              "snippet": "        \treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 112,
+              "snippet": "    \tif (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청은 화면 입력값을 모델 객체로 묶어 받으며, 로그인 여부를 먼저 확인해 미인증 사용자는 로그인 안내와 함께 로그인 화면으로 되돌린다. 등록·수정 요청은 입력값 검증 결과에 오류가 있으면 저장하지 않고 입력 화면을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 97,
+              "snippet": "    @RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 158,
+              "snippet": "\t\tTrsmrcvMntrngLog result = egovTrsmrcvMntrngService.selectTrsmrcvMntrngLog(trsmrcvMntrngLog);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 159,
+              "snippet": "\t\tmodel.addAttribute(\"resultInfo\", result);"
+            }
+          ],
+          "text": "송수신모니터링 등록 화면 호출 요청의 진입 지점으로, 화면에서 넘어온 조회조건 또는 입력값을 받아 송수신모니터링 업무 처리에 위임하고 그 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "송수신모니터링 등록 화면 호출 요청 접수",
+      "stepId": "step:ANY /utl/sys/trm/getTrsmrcvMntrngForRegist.do:src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+          }
+        ],
+        "text": "사용자의 화면 요청을 받아 송수신모니터링 등록 화면 호출 업무를 수행하도록 조율하는 창구다. 로그인 여부와 입력값 검증을 확인한 뒤 송수신모니터링 업무 처리에 위임하고, 결과에 맞는 화면으로 이동시킨다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 28,
+              "snippet": "\tpublic void deleteTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 37,
+              "snippet": "\tpublic void insertTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 46,
+              "snippet": "\tpublic void insertTrsmrcvMntrngLog(TrsmrcvMntrngLog trsmrcvMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 76,
+              "snippet": "\tpublic List<TrsmrcvMntrng> selectTrsmrcvMntrngList(TrsmrcvMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 86,
+              "snippet": "\tpublic int selectTrsmrcvMntrngListCnt(TrsmrcvMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 등록·삭제, 로그 등록, 모니터링 상세조회, 목록과 전체 건수 조회를 각각 규약으로 정의한다. 목록 조회는 조회조건 정보를 받아 목록과 건수를 따로 제공해 페이지 처리를 뒷받침한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 20,
+              "snippet": "public interface EgovTrsmrcvMntrngService {"
+            }
+          ],
+          "text": "송수신모니터링 업무의 중심 서비스로, 화면 요청 접수 창구에서 넘어온 요청을 받아 모니터링 항목과 로그의 등록·삭제·조회 작업을 조율한다."
+        }
+      },
+      "name": "송수신모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/trm/getTrsmrcvMntrngForUpdate.do:src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+            "line": 20,
+            "snippet": "public interface EgovTrsmrcvMntrngService {"
+          }
+        ],
+        "text": "송수신모니터링과 그 로그의 등록·삭제·상세조회·목록조회를 담당하는 핵심 업무 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 103,
+              "snippet": "    \tif(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 105,
+              "snippet": "        \treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 112,
+              "snippet": "    \tif (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청은 화면 입력값을 모델 객체로 묶어 받으며, 로그인 여부를 먼저 확인해 미인증 사용자는 로그인 안내와 함께 로그인 화면으로 되돌린다. 등록·수정 요청은 입력값 검증 결과에 오류가 있으면 저장하지 않고 입력 화면을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 97,
+              "snippet": "    @RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 158,
+              "snippet": "\t\tTrsmrcvMntrngLog result = egovTrsmrcvMntrngService.selectTrsmrcvMntrngLog(trsmrcvMntrngLog);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 159,
+              "snippet": "\t\tmodel.addAttribute(\"resultInfo\", result);"
+            }
+          ],
+          "text": "송수신모니터링 수정 화면 호출 요청의 진입 지점으로, 화면에서 넘어온 조회조건 또는 입력값을 받아 송수신모니터링 업무 처리에 위임하고 그 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "송수신모니터링 수정 화면 호출 요청 접수",
+      "stepId": "step:ANY /utl/sys/trm/getTrsmrcvMntrngForUpdate.do:src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+          }
+        ],
+        "text": "사용자의 화면 요청을 받아 송수신모니터링 수정 화면 호출 업무를 수행하도록 조율하는 창구다. 로그인 여부와 입력값 검증을 확인한 뒤 송수신모니터링 업무 처리에 위임하고, 결과에 맞는 화면으로 이동시킨다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체 반환, 사용자 권한 목록 반환, 인증 여부 판정의 세 가지 규약을 정의하며 판정 결과에 따라 후속 업무 수행 여부가 갈린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "송수신모니터링 요청의 접근 통제 판정 근거를 제공하는 서비스로, 인증된 사용자 정보와 권한, 인증 여부 판정을 담당한다."
+        }
+      },
+      "name": "인증 사용자 정보 제공",
+      "stepId": "step:ANY /utl/sys/trm/getTrsmrcvMntrngList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증된 사용자 객체와 권한 목록, 인증 여부를 판정해 제공하는 공통 인증 서비스 규약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "\t\treturn egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "자체 데이터를 보관하지 않고 인증 사용자 정보 제공 담당 하나만 지니며, 인증 사용자 객체·권한 목록·인증 여부 세 가지를 그대로 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "송수신모니터링 요청 처리 첫 단계에서 인증 여부를 판정하고 인증된 사용자 정보를 제공하는 협력 객체 역할을 맡는다. 실제 판정은 인증 사용자 정보 제공 담당에게 넘긴다."
+        }
+      },
+      "name": "로그인 사용자 확인",
+      "stepId": "step:ANY /utl/sys/trm/getTrsmrcvMntrngList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "요청한 사람이 로그인한 사용자인지 확인하고, 인증된 사용자 정보와 권한 목록을 꺼내 주는 공통 창구다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 28,
+              "snippet": "\tpublic void deleteTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 37,
+              "snippet": "\tpublic void insertTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 46,
+              "snippet": "\tpublic void insertTrsmrcvMntrngLog(TrsmrcvMntrngLog trsmrcvMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 76,
+              "snippet": "\tpublic List<TrsmrcvMntrng> selectTrsmrcvMntrngList(TrsmrcvMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 86,
+              "snippet": "\tpublic int selectTrsmrcvMntrngListCnt(TrsmrcvMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 등록·삭제, 로그 등록, 모니터링 상세조회, 목록과 전체 건수 조회를 각각 규약으로 정의한다. 목록 조회는 조회조건 정보를 받아 목록과 건수를 따로 제공해 페이지 처리를 뒷받침한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 20,
+              "snippet": "public interface EgovTrsmrcvMntrngService {"
+            }
+          ],
+          "text": "송수신모니터링 업무의 중심 서비스로, 화면 요청 접수 창구에서 넘어온 요청을 받아 모니터링 항목과 로그의 등록·삭제·조회 작업을 조율한다."
+        }
+      },
+      "name": "송수신모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/trm/getTrsmrcvMntrngList.do:src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+            "line": 20,
+            "snippet": "public interface EgovTrsmrcvMntrngService {"
+          }
+        ],
+        "text": "송수신모니터링과 그 로그의 등록·삭제·상세조회·목록조회를 담당하는 핵심 업무 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 33,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 34,
+              "snippet": "\t@Size(max=8)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 35,
+              "snippet": "\tprivate String cntcId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 52,
+              "snippet": "\t@Size(max=50)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 53,
+              "snippet": "\t@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 58,
+              "snippet": "\tprivate String mntrngSttus;"
+            }
+          ],
+          "text": "연계ID는 필수이며 8자를 넘길 수 없다. 관리자이메일주소는 필수이면서 50자 이내의 이메일 형식이어야 한다. 이 밖에 모니터링상태를 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 27,
+              "snippet": "public class TrsmrcvMntrng extends ComDefaultVO implements Serializable {"
+            }
+          ],
+          "text": "송수신모니터링 등록·수정·목록조회 흐름에서 화면 입력값과 조회조건을 함께 담아 나르는 데이터 구조 역할을 맡는다."
+        }
+      },
+      "name": "송수신모니터링 정보",
+      "stepId": "step:ANY /utl/sys/trm/getTrsmrcvMntrngList.do:src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+            "line": 27,
+            "snippet": "public class TrsmrcvMntrng extends ComDefaultVO implements Serializable {"
+          }
+        ],
+        "text": "어떤 연계를 누가 어떤 테스트 방식으로 감시하는지를 담는 송수신모니터링 정보 묶음이다. 연계ID, 테스트클래스명, 관리자와 연락처, 모니터링상태를 보관한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 103,
+              "snippet": "    \tif(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 105,
+              "snippet": "        \treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 112,
+              "snippet": "    \tif (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청은 화면 입력값을 모델 객체로 묶어 받으며, 로그인 여부를 먼저 확인해 미인증 사용자는 로그인 안내와 함께 로그인 화면으로 되돌린다. 등록·수정 요청은 입력값 검증 결과에 오류가 있으면 저장하지 않고 입력 화면을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 97,
+              "snippet": "    @RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 158,
+              "snippet": "\t\tTrsmrcvMntrngLog result = egovTrsmrcvMntrngService.selectTrsmrcvMntrngLog(trsmrcvMntrngLog);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 159,
+              "snippet": "\t\tmodel.addAttribute(\"resultInfo\", result);"
+            }
+          ],
+          "text": "송수신모니터링 목록 조회 요청의 진입 지점으로, 화면에서 넘어온 조회조건 또는 입력값을 받아 송수신모니터링 업무 처리에 위임하고 그 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "송수신모니터링 목록 조회 요청 접수",
+      "stepId": "step:ANY /utl/sys/trm/getTrsmrcvMntrngList.do:src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+          }
+        ],
+        "text": "사용자의 화면 요청을 받아 송수신모니터링 목록 조회 업무를 수행하도록 조율하는 창구다. 로그인 여부와 입력값 검증을 확인한 뒤 송수신모니터링 업무 처리에 위임하고, 결과에 맞는 화면으로 이동시킨다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 28,
+              "snippet": "\tpublic void deleteTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 37,
+              "snippet": "\tpublic void insertTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 46,
+              "snippet": "\tpublic void insertTrsmrcvMntrngLog(TrsmrcvMntrngLog trsmrcvMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 76,
+              "snippet": "\tpublic List<TrsmrcvMntrng> selectTrsmrcvMntrngList(TrsmrcvMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 86,
+              "snippet": "\tpublic int selectTrsmrcvMntrngListCnt(TrsmrcvMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 등록·삭제, 로그 등록, 모니터링 상세조회, 목록과 전체 건수 조회를 각각 규약으로 정의한다. 목록 조회는 조회조건 정보를 받아 목록과 건수를 따로 제공해 페이지 처리를 뒷받침한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 20,
+              "snippet": "public interface EgovTrsmrcvMntrngService {"
+            }
+          ],
+          "text": "송수신모니터링 업무의 중심 서비스로, 화면 요청 접수 창구에서 넘어온 요청을 받아 모니터링 항목과 로그의 등록·삭제·조회 작업을 조율한다."
+        }
+      },
+      "name": "송수신모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/trm/getTrsmrcvMntrngLog.do:src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+            "line": 20,
+            "snippet": "public interface EgovTrsmrcvMntrngService {"
+          }
+        ],
+        "text": "송수신모니터링과 그 로그의 등록·삭제·상세조회·목록조회를 담당하는 핵심 업무 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 103,
+              "snippet": "    \tif(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 105,
+              "snippet": "        \treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 112,
+              "snippet": "    \tif (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청은 화면 입력값을 모델 객체로 묶어 받으며, 로그인 여부를 먼저 확인해 미인증 사용자는 로그인 안내와 함께 로그인 화면으로 되돌린다. 등록·수정 요청은 입력값 검증 결과에 오류가 있으면 저장하지 않고 입력 화면을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 97,
+              "snippet": "    @RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 158,
+              "snippet": "\t\tTrsmrcvMntrngLog result = egovTrsmrcvMntrngService.selectTrsmrcvMntrngLog(trsmrcvMntrngLog);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 159,
+              "snippet": "\t\tmodel.addAttribute(\"resultInfo\", result);"
+            }
+          ],
+          "text": "송수신모니터링 로그 상세 조회 요청의 진입 지점으로, 화면에서 넘어온 조회조건 또는 입력값을 받아 송수신모니터링 업무 처리에 위임하고 그 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "송수신모니터링 로그 상세 조회 요청 접수",
+      "stepId": "step:ANY /utl/sys/trm/getTrsmrcvMntrngLog.do:src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+          }
+        ],
+        "text": "사용자의 화면 요청을 받아 송수신모니터링 로그 상세 조회 업무를 수행하도록 조율하는 창구다. 로그인 여부와 입력값 검증을 확인한 뒤 송수신모니터링 업무 처리에 위임하고, 결과에 맞는 화면으로 이동시킨다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 28,
+              "snippet": "\tpublic void deleteTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 37,
+              "snippet": "\tpublic void insertTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 46,
+              "snippet": "\tpublic void insertTrsmrcvMntrngLog(TrsmrcvMntrngLog trsmrcvMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 76,
+              "snippet": "\tpublic List<TrsmrcvMntrng> selectTrsmrcvMntrngList(TrsmrcvMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 86,
+              "snippet": "\tpublic int selectTrsmrcvMntrngListCnt(TrsmrcvMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 등록·삭제, 로그 등록, 모니터링 상세조회, 목록과 전체 건수 조회를 각각 규약으로 정의한다. 목록 조회는 조회조건 정보를 받아 목록과 건수를 따로 제공해 페이지 처리를 뒷받침한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 20,
+              "snippet": "public interface EgovTrsmrcvMntrngService {"
+            }
+          ],
+          "text": "송수신모니터링 업무의 중심 서비스로, 화면 요청 접수 창구에서 넘어온 요청을 받아 모니터링 항목과 로그의 등록·삭제·조회 작업을 조율한다."
+        }
+      },
+      "name": "송수신모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/trm/getTrsmrcvMntrngLogList.do:src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+            "line": 20,
+            "snippet": "public interface EgovTrsmrcvMntrngService {"
+          }
+        ],
+        "text": "송수신모니터링과 그 로그의 등록·삭제·상세조회·목록조회를 담당하는 핵심 업무 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrngLog.java",
+              "line": 28,
+              "snippet": "\tprivate String logId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrngLog.java",
+              "line": 32,
+              "snippet": "\tprivate String cntcId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrngLog.java",
+              "line": 48,
+              "snippet": "\tprivate String mntrngSttus;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrngLog.java",
+              "line": 68,
+              "snippet": "\tprivate String creatDt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrngLog.java",
+              "line": 72,
+              "snippet": "\tprivate String logInfo;"
+            }
+          ],
+          "text": "로그ID로 한 건을 식별하고 연계ID로 어떤 연계의 기록인지 이어 주며, 모니터링상태와 상세 로그정보, 생성일시를 함께 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrngLog.java",
+              "line": 22,
+              "snippet": "public class TrsmrcvMntrngLog extends ComDefaultVO implements Serializable {"
+            }
+          ],
+          "text": "송수신모니터링 로그 상세·목록 조회 흐름에서 조회조건과 조회 결과를 담아 나르는 데이터 구조 역할을 맡는다."
+        }
+      },
+      "name": "송수신모니터링 로그 정보",
+      "stepId": "step:ANY /utl/sys/trm/getTrsmrcvMntrngLogList.do:src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrngLog.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrngLog.java",
+            "line": 22,
+            "snippet": "public class TrsmrcvMntrngLog extends ComDefaultVO implements Serializable {"
+          }
+        ],
+        "text": "송수신 감시 결과가 시점별로 쌓인 로그 한 건을 담는 정보 묶음이다. 로그ID와 연계ID, 모니터링상태, 로그정보를 보관한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 103,
+              "snippet": "    \tif(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 105,
+              "snippet": "        \treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 112,
+              "snippet": "    \tif (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청은 화면 입력값을 모델 객체로 묶어 받으며, 로그인 여부를 먼저 확인해 미인증 사용자는 로그인 안내와 함께 로그인 화면으로 되돌린다. 등록·수정 요청은 입력값 검증 결과에 오류가 있으면 저장하지 않고 입력 화면을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 97,
+              "snippet": "    @RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 158,
+              "snippet": "\t\tTrsmrcvMntrngLog result = egovTrsmrcvMntrngService.selectTrsmrcvMntrngLog(trsmrcvMntrngLog);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 159,
+              "snippet": "\t\tmodel.addAttribute(\"resultInfo\", result);"
+            }
+          ],
+          "text": "송수신모니터링 로그 목록 조회 요청의 진입 지점으로, 화면에서 넘어온 조회조건 또는 입력값을 받아 송수신모니터링 업무 처리에 위임하고 그 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "송수신모니터링 로그 목록 조회 요청 접수",
+      "stepId": "step:ANY /utl/sys/trm/getTrsmrcvMntrngLogList.do:src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+          }
+        ],
+        "text": "사용자의 화면 요청을 받아 송수신모니터링 로그 목록 조회 업무를 수행하도록 조율하는 창구다. 로그인 여부와 입력값 검증을 확인한 뒤 송수신모니터링 업무 처리에 위임하고, 결과에 맞는 화면으로 이동시킨다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            }
+          ],
+          "text": "메시지 코드와 선택적 매개변수·로케일을 받아 해당 언어의 문구를 돌려주며, 로케일을 주지 않으면 시스템 기본 로케일을 사용한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 104,
+              "snippet": "    \t\tredirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+            }
+          ],
+          "text": "송수신모니터링 흐름에서 로그인 실패 안내 등 사용자에게 전달할 문구를 메시지 코드로 조회해 주는 역할을 맡는다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /utl/sys/trm/updateTrsmrcvMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "화면에 보여줄 안내·오류 메시지를 메시지 코드로 찾아 주는 공통 서비스다. 미로그인 안내처럼 흐름 중 사용자에게 알릴 문구를 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "\tprivate String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 51,
+              "snippet": "\tprivate String email;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디·이름·이메일주소는 비어 있을 수 없는 필수값이고, 고유아이디는 다른 업무에서 사용자를 식별하는 값으로 쓰인다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 117,
+              "snippet": "\t\t\ttrsmrcvMntrng.setLastUpdusrId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));"
+            }
+          ],
+          "text": "인증된 사용자 정보를 담아 전달하는 데이터 구조로, 송수신모니터링 등록·수정 흐름에서 최종수정자 아이디를 채우는 데 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /utl/sys/trm/updateTrsmrcvMntrng.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "로그인한 사용자의 아이디·이름·소속 조직·고유아이디 등을 담는 정보 묶음이다. 등록·수정 시 최종수정자를 남기는 근거가 된다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체 반환, 사용자 권한 목록 반환, 인증 여부 판정의 세 가지 규약을 정의하며 판정 결과에 따라 후속 업무 수행 여부가 갈린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "송수신모니터링 요청의 접근 통제 판정 근거를 제공하는 서비스로, 인증된 사용자 정보와 권한, 인증 여부 판정을 담당한다."
+        }
+      },
+      "name": "인증 사용자 정보 제공",
+      "stepId": "step:ANY /utl/sys/trm/updateTrsmrcvMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증된 사용자 객체와 권한 목록, 인증 여부를 판정해 제공하는 공통 인증 서비스 규약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "\t\treturn egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "자체 데이터를 보관하지 않고 인증 사용자 정보 제공 담당 하나만 지니며, 인증 사용자 객체·권한 목록·인증 여부 세 가지를 그대로 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "송수신모니터링 요청 처리 첫 단계에서 인증 여부를 판정하고 인증된 사용자 정보를 제공하는 협력 객체 역할을 맡는다. 실제 판정은 인증 사용자 정보 제공 담당에게 넘긴다."
+        }
+      },
+      "name": "로그인 사용자 확인",
+      "stepId": "step:ANY /utl/sys/trm/updateTrsmrcvMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "요청한 사람이 로그인한 사용자인지 확인하고, 인증된 사용자 정보와 권한 목록을 꺼내 주는 공통 창구다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            }
+          ],
+          "text": "상태를 갖지 않는 도구 모음으로, 빈 문자열 상수를 기준값으로 두고 지정 길이 초과 문자열 자르기 등 문자열 가공 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 117,
+              "snippet": "\t\t\ttrsmrcvMntrng.setLastUpdusrId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));"
+            }
+          ],
+          "text": "송수신모니터링 등록·수정 흐름에서 로그인 사용자의 고유아이디를 최종수정자 아이디로 옮길 때 값이 없어도 빈 문자열이 되도록 보정하는 협력 도구 역할을 맡는다."
+        }
+      },
+      "name": "문자열 값 보정",
+      "stepId": "step:ANY /utl/sys/trm/updateTrsmrcvMntrng.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "문자열이 비었거나 없을 때 안전한 값으로 바꿔 주는 공통 도구다. 로그인 정보가 없을 때도 최종수정자 값이 빈 문자열로 채워지게 한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 28,
+              "snippet": "\tpublic void deleteTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 37,
+              "snippet": "\tpublic void insertTrsmrcvMntrng(TrsmrcvMntrng trsmrcvMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 46,
+              "snippet": "\tpublic void insertTrsmrcvMntrngLog(TrsmrcvMntrngLog trsmrcvMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 76,
+              "snippet": "\tpublic List<TrsmrcvMntrng> selectTrsmrcvMntrngList(TrsmrcvMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 86,
+              "snippet": "\tpublic int selectTrsmrcvMntrngListCnt(TrsmrcvMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 등록·삭제, 로그 등록, 모니터링 상세조회, 목록과 전체 건수 조회를 각각 규약으로 정의한다. 목록 조회는 조회조건 정보를 받아 목록과 건수를 따로 제공해 페이지 처리를 뒷받침한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+              "line": 20,
+              "snippet": "public interface EgovTrsmrcvMntrngService {"
+            }
+          ],
+          "text": "송수신모니터링 업무의 중심 서비스로, 화면 요청 접수 창구에서 넘어온 요청을 받아 모니터링 항목과 로그의 등록·삭제·조회 작업을 조율한다."
+        }
+      },
+      "name": "송수신모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/trm/updateTrsmrcvMntrng.do:src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/EgovTrsmrcvMntrngService.java",
+            "line": 20,
+            "snippet": "public interface EgovTrsmrcvMntrngService {"
+          }
+        ],
+        "text": "송수신모니터링과 그 로그의 등록·삭제·상세조회·목록조회를 담당하는 핵심 업무 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 33,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 34,
+              "snippet": "\t@Size(max=8)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 35,
+              "snippet": "\tprivate String cntcId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 52,
+              "snippet": "\t@Size(max=50)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 53,
+              "snippet": "\t@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 58,
+              "snippet": "\tprivate String mntrngSttus;"
+            }
+          ],
+          "text": "연계ID는 필수이며 8자를 넘길 수 없다. 관리자이메일주소는 필수이면서 50자 이내의 이메일 형식이어야 한다. 이 밖에 모니터링상태를 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+              "line": 27,
+              "snippet": "public class TrsmrcvMntrng extends ComDefaultVO implements Serializable {"
+            }
+          ],
+          "text": "송수신모니터링 등록·수정·목록조회 흐름에서 화면 입력값과 조회조건을 함께 담아 나르는 데이터 구조 역할을 맡는다."
+        }
+      },
+      "name": "송수신모니터링 정보",
+      "stepId": "step:ANY /utl/sys/trm/updateTrsmrcvMntrng.do:src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/service/TrsmrcvMntrng.java",
+            "line": 27,
+            "snippet": "public class TrsmrcvMntrng extends ComDefaultVO implements Serializable {"
+          }
+        ],
+        "text": "어떤 연계를 누가 어떤 테스트 방식으로 감시하는지를 담는 송수신모니터링 정보 묶음이다. 연계ID, 테스트클래스명, 관리자와 연락처, 모니터링상태를 보관한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 102,
+              "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 103,
+              "snippet": "    \tif(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 105,
+              "snippet": "        \treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 112,
+              "snippet": "    \tif (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청은 화면 입력값을 모델 객체로 묶어 받으며, 로그인 여부를 먼저 확인해 미인증 사용자는 로그인 안내와 함께 로그인 화면으로 되돌린다. 등록·수정 요청은 입력값 검증 결과에 오류가 있으면 저장하지 않고 입력 화면을 다시 보여준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 97,
+              "snippet": "    @RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 158,
+              "snippet": "\t\tTrsmrcvMntrngLog result = egovTrsmrcvMntrngService.selectTrsmrcvMntrngLog(trsmrcvMntrngLog);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+              "line": 159,
+              "snippet": "\t\tmodel.addAttribute(\"resultInfo\", result);"
+            }
+          ],
+          "text": "송수신모니터링 수정 요청의 진입 지점으로, 화면에서 넘어온 조회조건 또는 입력값을 받아 송수신모니터링 업무 처리에 위임하고 그 결과를 화면 모델에 담아 반환하는 역할을 맡는다."
+        }
+      },
+      "name": "송수신모니터링 수정 요청 접수",
+      "stepId": "step:ANY /utl/sys/trm/updateTrsmrcvMntrng.do:src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+            "line": 97,
+            "snippet": "@RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+          }
+        ],
+        "text": "사용자의 화면 요청을 받아 송수신모니터링 수정 업무를 수행하도록 조율하는 창구다. 로그인 여부와 입력값 검증을 확인한 뒤 송수신모니터링 업무 처리에 위임하고, 결과에 맞는 화면으로 이동시킨다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+        "line": 214,
+        "snippet": "@RequestMapping(\"/utl/sys/trm/getTrsmrcvMntrngList.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+        "line": 97,
+        "snippet": "@RequestMapping(\"/utl/sys/trm/addTrsmrcvMntrng.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+        "line": 254,
+        "snippet": "@RequestMapping(\"/utl/sys/trm/getTrsmrcvMntrngLogList.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/trm/web/EgovTrsmrcvMntrngController.java",
+        "line": 102,
+        "snippet": "    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+      }
+    ],
+    "text": "기관 간 연계 서비스의 송수신이 정상 동작하는지 감시하기 위해, 감시 대상 연계와 담당 관리자·테스트 방식을 등록·관리하고 그 감시 결과 로그를 조회하는 업무 영역이다. 등록·수정·삭제는 로그인한 담당자만 수행할 수 있고, 조회는 목록과 상세 화면으로 제공된다."
+  }
+}

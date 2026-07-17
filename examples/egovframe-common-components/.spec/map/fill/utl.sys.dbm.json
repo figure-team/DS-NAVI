@@ -1,0 +1,3377 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "n0",
+          "to": "n1"
+        },
+        {
+          "from": "n1",
+          "label": "NO",
+          "to": "n2"
+        },
+        {
+          "from": "n1",
+          "label": "YES",
+          "to": "n3"
+        },
+        {
+          "from": "n2",
+          "to": "n13"
+        },
+        {
+          "from": "n3",
+          "label": "신규 등록",
+          "to": "n4"
+        },
+        {
+          "from": "n3",
+          "label": "상세 확인",
+          "to": "n6"
+        },
+        {
+          "from": "n3",
+          "label": "삭제",
+          "to": "n9"
+        },
+        {
+          "from": "n4",
+          "to": "n5"
+        },
+        {
+          "from": "n6",
+          "to": "n7"
+        },
+        {
+          "from": "n7",
+          "to": "n8"
+        },
+        {
+          "from": "n5",
+          "to": "n10"
+        },
+        {
+          "from": "n8",
+          "to": "n10"
+        },
+        {
+          "from": "n10",
+          "label": "NO",
+          "to": "n11"
+        },
+        {
+          "from": "n10",
+          "label": "YES",
+          "to": "n12"
+        },
+        {
+          "from": "n11",
+          "to": "n13"
+        },
+        {
+          "from": "n12",
+          "to": "n13"
+        },
+        {
+          "from": "n9",
+          "to": "n13"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "n0",
+          "kind": "start",
+          "label": "모니터링 대상 관리 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 109,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 110,
+              "snippet": "if(!isAuthenticated) {"
+            }
+          ],
+          "id": "n1",
+          "kind": "decision",
+          "label": "로그인 사용자 여부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 111,
+              "snippet": "redirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 112,
+              "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ],
+          "id": "n2",
+          "kind": "activity",
+          "label": "로그인 화면으로 이동"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 236,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/dbm/getDbMntrngList.do",
+          "id": "n3",
+          "kind": "activity",
+          "label": "모니터링 대상 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 181,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngForRegist.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/dbm/getDbMntrngForRegist.do",
+          "id": "n4",
+          "kind": "activity",
+          "label": "등록 화면 준비"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 104,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/dbm/addDbMntrng.do",
+          "id": "n5",
+          "kind": "activity",
+          "label": "모니터링 대상 등록"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 142,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrng.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/dbm/getDbMntrng.do",
+          "id": "n6",
+          "kind": "activity",
+          "label": "대상 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 212,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngForUpdate.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/dbm/getDbMntrngForUpdate.do",
+          "id": "n7",
+          "kind": "activity",
+          "label": "수정 화면 준비"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 318,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/updateDbMntrng.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/dbm/updateDbMntrng.do",
+          "id": "n8",
+          "kind": "activity",
+          "label": "모니터링 대상 수정"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 80,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/deleteDbMntrng.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/dbm/deleteDbMntrng.do",
+          "id": "n9",
+          "kind": "activity",
+          "label": "모니터링 대상 삭제"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 118,
+              "snippet": "if (bindingResult.hasErrors()){"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 121,
+              "snippet": "return \"egovframework/com/utl/sys/dbm/EgovDbMntrngRegist\";"
+            }
+          ],
+          "id": "n10",
+          "kind": "decision",
+          "label": "입력값 검증 통과 여부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 120,
+              "snippet": "model.addAttribute(\"dbMntrng\", dbMntrng);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 121,
+              "snippet": "return \"egovframework/com/utl/sys/dbm/EgovDbMntrngRegist\";"
+            }
+          ],
+          "id": "n11",
+          "kind": "activity",
+          "label": "입력 화면으로 되돌림"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 127,
+              "snippet": "egovDbMntrngService.insertDbMntrng(dbMntrng);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 129,
+              "snippet": "model.addAttribute(\"resultMsg\", \"success.common.insert\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 131,
+              "snippet": "return \"forward:/utl/sys/dbm/getDbMntrngList.do\";"
+            }
+          ],
+          "id": "n12",
+          "kind": "activity",
+          "label": "저장 후 목록 화면 이동"
+        },
+        {
+          "id": "n13",
+          "kind": "end",
+          "label": "대상 관리 완료"
+        }
+      ],
+      "title": "모니터링 대상 관리"
+    },
+    {
+      "edges": [
+        {
+          "from": "m0",
+          "to": "m1"
+        },
+        {
+          "from": "m1",
+          "label": "NO",
+          "to": "m2"
+        },
+        {
+          "from": "m1",
+          "label": "YES",
+          "to": "m3"
+        },
+        {
+          "from": "m2",
+          "to": "m5"
+        },
+        {
+          "from": "m3",
+          "label": "로그 선택",
+          "to": "m4"
+        },
+        {
+          "from": "m3",
+          "label": "목록만 확인",
+          "to": "m5"
+        },
+        {
+          "from": "m4",
+          "to": "m5"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "m0",
+          "kind": "start",
+          "label": "점검 이력 확인 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 109,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 110,
+              "snippet": "if(!isAuthenticated) {"
+            }
+          ],
+          "id": "m1",
+          "kind": "decision",
+          "label": "로그인 사용자 여부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 111,
+              "snippet": "redirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 112,
+              "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ],
+          "id": "m2",
+          "kind": "activity",
+          "label": "로그인 화면으로 이동"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 275,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngLogList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/dbm/getDbMntrngLogList.do",
+          "id": "m3",
+          "kind": "activity",
+          "label": "점검 로그 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngLog.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/dbm/getDbMntrngLog.do",
+          "id": "m4",
+          "kind": "activity",
+          "label": "점검 로그 상세 조회"
+        },
+        {
+          "id": "m5",
+          "kind": "end",
+          "label": "점검 이력 확인 완료"
+        }
+      ],
+      "title": "모니터링 로그 조회"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+          "line": 109,
+          "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+          "line": 110,
+          "snippet": "if(!isAuthenticated) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+          "line": 112,
+          "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+        }
+      ],
+      "text": "모니터링 대상의 등록·수정·삭제와 목록 조회는 로그인한 사용자만 수행할 수 있으며, 미인증 상태이면 안내 메시지와 함께 로그인 화면으로 되돌린다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+          "line": 117,
+          "snippet": "checkDuplication(dbMntrng, bindingResult);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+          "line": 118,
+          "snippet": "if (bindingResult.hasErrors()){"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+          "line": 121,
+          "snippet": "return \"egovframework/com/utl/sys/dbm/EgovDbMntrngRegist\";"
+        }
+      ],
+      "text": "등록 시 데이터소스명 중복 여부를 확인하고, 입력값 검증에 오류가 있으면 저장하지 않고 입력 화면으로 되돌려 다시 입력하게 한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+          "line": 124,
+          "snippet": "dbMntrng.setLastUpdusrId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+          "line": 125,
+          "snippet": "dbMntrng.setFrstRegisterId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));"
+        }
+      ],
+      "text": "모니터링 대상을 저장할 때 로그인 사용자의 고유아이디를 최초등록자·최종수정자 아이디로 기록하며, 로그인 정보가 없으면 빈 값으로 처리한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+          "line": 32,
+          "snippet": "@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+          "line": 33,
+          "snippet": "@Size(max=60)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+          "line": 50,
+          "snippet": "@Size(max=250)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+          "line": 62,
+          "snippet": "@Size(max=50)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+          "line": 63,
+          "snippet": "@EgovEmailCheck"
+        }
+      ],
+      "text": "데이터소스명·서버명·DBMS 종류·체크 구문·관리자명·관리자 이메일주소는 필수 입력이며, 데이터소스명·서버명·관리자명은 60자, 체크 구문은 250자, 관리자 이메일주소는 50자 이내이고 이메일 형식을 지켜야 한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+          "line": 127,
+          "snippet": "egovDbMntrngService.insertDbMntrng(dbMntrng);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+          "line": 129,
+          "snippet": "model.addAttribute(\"resultMsg\", \"success.common.insert\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+          "line": 131,
+          "snippet": "return \"forward:/utl/sys/dbm/getDbMntrngList.do\";"
+        }
+      ],
+      "text": "등록이 정상 처리되면 등록 성공 안내 메시지를 남기고 모니터링 대상 목록 화면으로 이동한다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 25,
+          "snippet": "public class EgovUserDetailsHelper {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 5,
+          "snippet": "public interface EgovUserDetailsService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+          "line": 109,
+          "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+        }
+      ],
+      "text": "인증·권한 영역과 연계해 요청자의 로그인 여부와 로그인 사용자 정보를 확인한 뒤 업무 수행 여부를 결정한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 26,
+          "snippet": "public interface EgovCmmUseService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 34,
+          "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+        }
+      ],
+      "text": "공통코드 영역과 연계해 DBMS 종류 등 등록·수정 화면의 선택 목록을 조회한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+          "line": 111,
+          "snippet": "redirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+        }
+      ],
+      "text": "공통 메시지 영역과 연계해 로그인 필요 안내 등 화면에 표시할 문구를 메시지 코드로 조회한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+          "line": 112,
+          "snippet": "return \"redirect:/uat/uia/egovLoginUsr.do\";"
+        }
+      ],
+      "text": "미인증 사용자는 로그인 업무 영역의 로그인 화면으로 이동시킨다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 43,
+          "snippet": "public class EgovStringUtil {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+          "line": 124,
+          "snippet": "dbMntrng.setLastUpdusrId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));"
+        }
+      ],
+      "text": "공통 문자열 처리 기능과 연계해 로그인 사용자의 고유아이디가 없는 경우를 빈 값으로 안전하게 변환한다."
+    }
+  ],
+  "domainId": "domain:utl.sys.dbm",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+          "line": 26,
+          "snippet": "public class DbMntrng extends ComDefaultVO implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+          "line": 34,
+          "snippet": "private String dataSourcNm;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+          "line": 51,
+          "snippet": "private String ceckSql;"
+        }
+      ],
+      "text": "DB 서비스 모니터링 대상 — 감시할 DB 서비스 한 건으로 데이터소스명·서버명·DBMS 종류·체크 구문·관리자명·관리자 이메일주소와 모니터링 상태를 보관한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+          "line": 22,
+          "snippet": "public class DbMntrngLog extends ComDefaultVO implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+          "line": 29,
+          "snippet": "private String logId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+          "line": 83,
+          "snippet": "private String logInfo;"
+        }
+      ],
+      "text": "DB 서비스 모니터링 로그 — 점검 수행 결과 한 건으로 로그 아이디와 점검 대상 정보, 모니터링 상태, 로그 정보와 생성일시를 남긴다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 66,
+          "snippet": "/** 고유아이디 */"
+        }
+      ],
+      "text": "로그인 사용자 — 모니터링 대상을 등록·수정하는 운영자의 신원 정보로, 고유아이디가 등록자·수정자 아이디로 기록된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 29,
+          "snippet": "public class ComDefaultCodeVO implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 31,
+          "snippet": "private String codeId = \"\";"
+        }
+      ],
+      "text": "공통코드 조회 조건 — DBMS 종류처럼 등록·수정 화면의 선택 목록을 채울 코드를 지정하는 조회 조건 정보이다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/addDbMntrng.do",
+      "name": "DB 서비스 모니터링 대상 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 104,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+          }
+        ],
+        "text": "운영자가 감시할 DB 서비스 접속 정보를 새로 등록하는 업무 흐름이다. 로그인 여부를 먼저 확인하고, 데이터소스명 중복과 필수 입력값을 검증한 뒤 등록자·최종수정자 아이디를 채워 모니터링 대상으로 저장하고 목록 화면으로 되돌린다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/deleteDbMntrng.do",
+      "name": "DB 서비스 모니터링 대상 삭제",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 80,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/deleteDbMntrng.do\")"
+          }
+        ],
+        "text": "더 이상 감시하지 않을 DB 서비스 모니터링 대상을 삭제하는 업무 흐름이다. 로그인한 사용자만 수행할 수 있으며, 삭제 처리 후 모니터링 대상 목록 화면으로 이동한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/getDbMntrng.do",
+      "name": "DB 서비스 모니터링 대상 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 142,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrng.do\")"
+          }
+        ],
+        "text": "선택한 DB 서비스 모니터링 대상 한 건의 상세 정보를 조회해 상세 화면에 표시하는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/getDbMntrngForRegist.do",
+      "name": "DB 서비스 모니터링 등록 화면 준비",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 181,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngForRegist.do\")"
+          }
+        ],
+        "text": "모니터링 대상 등록 화면을 여는 업무 흐름이다. DBMS 종류처럼 화면에서 선택할 공통코드 목록을 미리 조회해 입력 화면에 함께 내려준다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/getDbMntrngForUpdate.do",
+      "name": "DB 서비스 모니터링 수정 화면 준비",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 212,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngForUpdate.do\")"
+          }
+        ],
+        "text": "모니터링 대상 수정 화면을 여는 업무 흐름이다. 기존 등록 내용을 상세 조회하고 DBMS 종류 등 공통코드 목록을 함께 준비해 수정 화면에 채워준다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/getDbMntrngList.do",
+      "name": "DB 서비스 모니터링 대상 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 236,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngList.do\")"
+          }
+        ],
+        "text": "등록된 DB 서비스 모니터링 대상 전체를 조회 조건과 페이징에 맞춰 목록으로 보여주는 업무 흐름이다. 목록과 함께 전체 건수를 조회해 페이지를 구성한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/getDbMntrngLog.do",
+      "name": "DB 서비스 모니터링 로그 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 162,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngLog.do\")"
+          }
+        ],
+        "text": "특정 DB 서비스 모니터링 점검 로그 한 건의 상세 내용을 조회해 로그 상세 화면에 표시하는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/getDbMntrngLogList.do",
+      "name": "DB 서비스 모니터링 로그 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 275,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngLogList.do\")"
+          }
+        ],
+        "text": "모니터링 수행 결과로 쌓인 점검 로그를 조회 조건과 페이징에 맞춰 목록으로 보여주는 업무 흐름이다. 운영자가 DB 서비스 점검 이력을 확인하는 창구가 된다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/updateDbMntrng.do",
+      "name": "DB 서비스 모니터링 대상 수정",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 318,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/updateDbMntrng.do\")"
+          }
+        ],
+        "text": "이미 등록된 DB 서비스 모니터링 대상의 접속 정보나 관리자 정보를 변경하는 업무 흐름이다. 로그인 확인과 입력값 검증을 거쳐 최종수정자 아이디를 갱신하며 저장한다."
+      }
+    }
+  ],
+  "name": "DB 서비스 모니터링",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "public String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "public String getMessageArgs(String code, Object[] args) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드를 받아 정의된 메시지를 조회하며, 필요에 따라 로케일과 매개변수를 함께 지정해 사용 환경에 맞는 문구를 만들어 낸다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            }
+          ],
+          "text": "이 흐름에서 사용자에게 보여줄 안내 문구를 메시지 코드로 찾아 돌려주는 역할을 맡는다. 미인증 사용자를 로그인 화면으로 돌려보낼 때 함께 전달할 안내 메시지가 여기서 조회된다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "로그인 필요 안내나 처리 결과 안내처럼 화면에 표시할 문구를 메시지 코드로 조회해 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 44,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 49,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 50,
+              "snippet": "@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 66,
+              "snippet": "/** 고유아이디 */"
+            }
+          ],
+          "text": "아이디·이름·이메일 등 필수 확인 대상 항목과 사용자구분, 조직 아이디·조직명, 고유아이디 같은 신원 항목을 갖는다. 아이디·이름·이메일은 비어 있을 수 없고 이메일은 형식 검증을 지켜야 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 66,
+              "snippet": "/** 고유아이디 */"
+            }
+          ],
+          "text": "이 흐름에서 로그인한 운영자가 누구인지를 나타내는 데이터 구조 역할을 맡는다. 여기 담긴 고유아이디가 모니터링 대상의 최초등록자·최종수정자 아이디로 기록된다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "아이디·이름·이메일·조직 정보 등 로그인한 사용자의 신원 정보를 담는 정보 묶음으로, 등록자·수정자 아이디를 채우는 근거가 된다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "public List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인의 세 가지 판단을 제공하며 권한 목록은 관리자·일반 사용자 등 역할 정보를 담는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ],
+          "text": "이 흐름에서 현재 요청자가 로그인한 사용자인지, 그리고 누구인지를 알려주는 역할을 맡는다. 화면 처리 계층은 이 판단 결과로 업무 수행 여부를 결정한다."
+        }
+      },
+      "name": "인증 사용자 정보 확인",
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 확인하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "static EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 51,
+              "snippet": "return egovUserDetailsService.getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "return egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "인증 사용자 정보 확인 업무를 하나만 보관하고, 인증 사용자 객체·사용자 권한 목록·인증 여부라는 세 가지 확인 통로를 제공한다. 확인 업무가 미리 지정되어 있어야 정상 동작한다는 전제를 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "return egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "이 흐름에서 화면 처리 계층이 인증 여부와 로그인 사용자 정보를 손쉽게 확인하도록 중계하는 협력 객체 역할을 맡는다. 실제 판단은 인증 사용자 정보 확인 업무에 그대로 위임한다."
+        }
+      },
+      "name": "인증 사용자 확인 창구",
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "인증 사용자 정보 확인 업무를 어디서나 간편하게 호출할 수 있도록 중계하는 공통 창구이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "public static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 79,
+              "snippet": "if (source != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "public static String cutString(String source, int slength) {"
+            }
+          ],
+          "text": "빈 문자열을 공통 기준값으로 두고, 지정 길이를 넘는 문자열을 자르거나 뒤에 문구를 덧붙이는 처리를 제공한다. 원본 문자열이 없으면 결과도 만들지 않는다는 전제를 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "이 흐름에서 로그인 사용자의 고유아이디처럼 값이 없을 수 있는 항목을 안전한 문자열로 바꾸어 주는 협력 객체 역할을 맡는다."
+        }
+      },
+      "name": "문자열 처리 공통 기능",
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "빈 값 확인이나 길이 제한 처리 등 문자열을 안전하게 다루는 공통 기능 모음으로, 값이 없을 때 빈 문자열로 바꾸는 처리에 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 32,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 33,
+              "snippet": "@Size(max=60)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 34,
+              "snippet": "private String dataSourcNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 50,
+              "snippet": "@Size(max=250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 51,
+              "snippet": "private String ceckSql;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 62,
+              "snippet": "@Size(max=50)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 63,
+              "snippet": "@EgovEmailCheck"
+            }
+          ],
+          "text": "데이터소스명·서버명·DBMS 종류·체크 구문·관리자명·관리자 이메일주소를 필수 항목으로 갖고, 모니터링 상태와 등록자·수정자 아이디 및 시점을 함께 보관한다. 데이터소스명·서버명·관리자명은 60자, 체크 구문은 250자, 관리자 이메일주소는 50자를 넘을 수 없고 이메일주소는 형식 검증을 지켜야 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 26,
+              "snippet": "public class DbMntrng extends ComDefaultVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 34,
+              "snippet": "private String dataSourcNm;"
+            }
+          ],
+          "text": "이 흐름에서 운영자가 등록·조회하는 DB 서비스 모니터링 대상 한 건을 표현하는 데이터 구조 역할을 맡는다. 화면 입력값을 담아 업무 처리 계층으로 전달되고, 조회 시에는 조회 조건과 결과를 함께 나른다."
+        }
+      },
+      "name": "DB 서비스 모니터링 대상 정보",
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+            "line": 26,
+            "snippet": "public class DbMntrng extends ComDefaultVO implements Serializable {"
+          }
+        ],
+        "text": "데이터소스명·서버명·DBMS 종류·체크 구문·관리자 정보 등 감시할 DB 서비스 한 건의 등록 내용을 담는 정보 묶음이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 47,
+              "snippet": "public void insertDbMntrngLog(DbMntrngLog dbMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 57,
+              "snippet": "public DbMntrng selectDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 77,
+              "snippet": "public List<DbMntrng> selectDbMntrngList(DbMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 87,
+              "snippet": "public int selectDbMntrngListCnt(DbMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 대상 등록·삭제와 점검 로그 등록을 각각 독립된 업무 단위로 나누어 처리한다. 목록 조회는 조회 조건을 받아 대상 목록과 전체 건수를 따로 제공해 페이징 화면을 구성할 수 있게 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 21,
+              "snippet": "public interface EgovDbMntrngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 29,
+              "snippet": "public void deleteDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            }
+          ],
+          "text": "이 흐름에서 화면 처리 계층의 요청을 받아 DB 서비스 모니터링 업무를 실제로 수행하는 역할을 맡는다. 모니터링 대상의 등록·삭제·상세 조회와 점검 로그 등록·조회, 목록 및 건수 조회를 하나의 업무 창구로 묶어 제공한다."
+        }
+      },
+      "name": "DB 서비스 모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+            "line": 21,
+            "snippet": "public interface EgovDbMntrngService {"
+          }
+        ],
+        "text": "DB 서비스 모니터링 대상과 점검 로그에 대한 등록·수정·삭제·상세 조회·목록 조회·건수 조회 업무를 정의하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 105,
+              "snippet": "public String insertDbMntrng(@Valid @ModelAttribute(\"dbMntrng\") DbMntrng dbMntrng, BindingResult bindingResult, ModelMap model,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 109,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 110,
+              "snippet": "if(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 118,
+              "snippet": "if (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청을 받으면 가장 먼저 로그인 사용자 여부를 확인해 미인증이면 안내 메시지와 함께 로그인 화면으로 돌려보낸다. 이후 화면에서 넘어온 모니터링 대상 정보를 검증 규칙에 따라 확인하고, 오류가 있으면 입력 화면으로 되돌리며 오류가 없을 때만 저장을 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 104,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 127,
+              "snippet": "egovDbMntrngService.insertDbMntrng(dbMntrng);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 131,
+              "snippet": "return \"forward:/utl/sys/dbm/getDbMntrngList.do\";"
+            }
+          ],
+          "text": "이 흐름의 진입점으로서 운영자의 화면 요청을 받아 처리 결과를 화면으로 연결하는 역할을 맡는다. 요청 파라미터를 모니터링 대상 정보로 묶어 받고, 실제 등록·조회 같은 업무 처리는 DB 서비스 모니터링 업무 계층에 위임한 뒤 결과 메시지와 이동할 화면 경로를 돌려준다."
+        }
+      },
+      "name": "DB 서비스 모니터링 화면 처리",
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 104,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+          }
+        ],
+        "text": "DB 서비스 모니터링 관련 화면 요청을 받아 로그인 여부를 확인하고, 입력값 검증 결과에 따라 업무 처리 계층에 등록·수정·삭제·조회를 위임한 뒤 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "public String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "public String getMessageArgs(String code, Object[] args) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드를 받아 정의된 메시지를 조회하며, 필요에 따라 로케일과 매개변수를 함께 지정해 사용 환경에 맞는 문구를 만들어 낸다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            }
+          ],
+          "text": "이 흐름에서 사용자에게 보여줄 안내 문구를 메시지 코드로 찾아 돌려주는 역할을 맡는다. 미인증 사용자를 로그인 화면으로 돌려보낼 때 함께 전달할 안내 메시지가 여기서 조회된다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /utl/sys/dbm/deleteDbMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "로그인 필요 안내나 처리 결과 안내처럼 화면에 표시할 문구를 메시지 코드로 조회해 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "public List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인의 세 가지 판단을 제공하며 권한 목록은 관리자·일반 사용자 등 역할 정보를 담는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ],
+          "text": "이 흐름에서 현재 요청자가 로그인한 사용자인지, 그리고 누구인지를 알려주는 역할을 맡는다. 화면 처리 계층은 이 판단 결과로 업무 수행 여부를 결정한다."
+        }
+      },
+      "name": "인증 사용자 정보 확인",
+      "stepId": "step:ANY /utl/sys/dbm/deleteDbMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 확인하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "static EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 51,
+              "snippet": "return egovUserDetailsService.getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "return egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "인증 사용자 정보 확인 업무를 하나만 보관하고, 인증 사용자 객체·사용자 권한 목록·인증 여부라는 세 가지 확인 통로를 제공한다. 확인 업무가 미리 지정되어 있어야 정상 동작한다는 전제를 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "return egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "이 흐름에서 화면 처리 계층이 인증 여부와 로그인 사용자 정보를 손쉽게 확인하도록 중계하는 협력 객체 역할을 맡는다. 실제 판단은 인증 사용자 정보 확인 업무에 그대로 위임한다."
+        }
+      },
+      "name": "인증 사용자 확인 창구",
+      "stepId": "step:ANY /utl/sys/dbm/deleteDbMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "인증 사용자 정보 확인 업무를 어디서나 간편하게 호출할 수 있도록 중계하는 공통 창구이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 47,
+              "snippet": "public void insertDbMntrngLog(DbMntrngLog dbMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 57,
+              "snippet": "public DbMntrng selectDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 77,
+              "snippet": "public List<DbMntrng> selectDbMntrngList(DbMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 87,
+              "snippet": "public int selectDbMntrngListCnt(DbMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 대상 등록·삭제와 점검 로그 등록을 각각 독립된 업무 단위로 나누어 처리한다. 목록 조회는 조회 조건을 받아 대상 목록과 전체 건수를 따로 제공해 페이징 화면을 구성할 수 있게 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 21,
+              "snippet": "public interface EgovDbMntrngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 29,
+              "snippet": "public void deleteDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            }
+          ],
+          "text": "이 흐름에서 화면 처리 계층의 요청을 받아 DB 서비스 모니터링 업무를 실제로 수행하는 역할을 맡는다. 모니터링 대상의 등록·삭제·상세 조회와 점검 로그 등록·조회, 목록 및 건수 조회를 하나의 업무 창구로 묶어 제공한다."
+        }
+      },
+      "name": "DB 서비스 모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/dbm/deleteDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+            "line": 21,
+            "snippet": "public interface EgovDbMntrngService {"
+          }
+        ],
+        "text": "DB 서비스 모니터링 대상과 점검 로그에 대한 등록·수정·삭제·상세 조회·목록 조회·건수 조회 업무를 정의하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 105,
+              "snippet": "public String insertDbMntrng(@Valid @ModelAttribute(\"dbMntrng\") DbMntrng dbMntrng, BindingResult bindingResult, ModelMap model,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 109,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 110,
+              "snippet": "if(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 118,
+              "snippet": "if (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청을 받으면 가장 먼저 로그인 사용자 여부를 확인해 미인증이면 안내 메시지와 함께 로그인 화면으로 돌려보낸다. 이후 화면에서 넘어온 모니터링 대상 정보를 검증 규칙에 따라 확인하고, 오류가 있으면 입력 화면으로 되돌리며 오류가 없을 때만 저장을 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 104,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 127,
+              "snippet": "egovDbMntrngService.insertDbMntrng(dbMntrng);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 131,
+              "snippet": "return \"forward:/utl/sys/dbm/getDbMntrngList.do\";"
+            }
+          ],
+          "text": "이 흐름의 진입점으로서 운영자의 화면 요청을 받아 처리 결과를 화면으로 연결하는 역할을 맡는다. 요청 파라미터를 모니터링 대상 정보로 묶어 받고, 실제 등록·조회 같은 업무 처리는 DB 서비스 모니터링 업무 계층에 위임한 뒤 결과 메시지와 이동할 화면 경로를 돌려준다."
+        }
+      },
+      "name": "DB 서비스 모니터링 화면 처리",
+      "stepId": "step:ANY /utl/sys/dbm/deleteDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 104,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+          }
+        ],
+        "text": "DB 서비스 모니터링 관련 화면 요청을 받아 로그인 여부를 확인하고, 입력값 검증 결과에 따라 업무 처리 계층에 등록·수정·삭제·조회를 위임한 뒤 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 47,
+              "snippet": "public void insertDbMntrngLog(DbMntrngLog dbMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 57,
+              "snippet": "public DbMntrng selectDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 77,
+              "snippet": "public List<DbMntrng> selectDbMntrngList(DbMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 87,
+              "snippet": "public int selectDbMntrngListCnt(DbMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 대상 등록·삭제와 점검 로그 등록을 각각 독립된 업무 단위로 나누어 처리한다. 목록 조회는 조회 조건을 받아 대상 목록과 전체 건수를 따로 제공해 페이징 화면을 구성할 수 있게 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 21,
+              "snippet": "public interface EgovDbMntrngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 29,
+              "snippet": "public void deleteDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            }
+          ],
+          "text": "이 흐름에서 화면 처리 계층의 요청을 받아 DB 서비스 모니터링 업무를 실제로 수행하는 역할을 맡는다. 모니터링 대상의 등록·삭제·상세 조회와 점검 로그 등록·조회, 목록 및 건수 조회를 하나의 업무 창구로 묶어 제공한다."
+        }
+      },
+      "name": "DB 서비스 모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+            "line": 21,
+            "snippet": "public interface EgovDbMntrngService {"
+          }
+        ],
+        "text": "DB 서비스 모니터링 대상과 점검 로그에 대한 등록·수정·삭제·상세 조회·목록 조회·건수 조회 업무를 정의하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 105,
+              "snippet": "public String insertDbMntrng(@Valid @ModelAttribute(\"dbMntrng\") DbMntrng dbMntrng, BindingResult bindingResult, ModelMap model,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 109,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 110,
+              "snippet": "if(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 118,
+              "snippet": "if (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청을 받으면 가장 먼저 로그인 사용자 여부를 확인해 미인증이면 안내 메시지와 함께 로그인 화면으로 돌려보낸다. 이후 화면에서 넘어온 모니터링 대상 정보를 검증 규칙에 따라 확인하고, 오류가 있으면 입력 화면으로 되돌리며 오류가 없을 때만 저장을 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 104,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 127,
+              "snippet": "egovDbMntrngService.insertDbMntrng(dbMntrng);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 131,
+              "snippet": "return \"forward:/utl/sys/dbm/getDbMntrngList.do\";"
+            }
+          ],
+          "text": "이 흐름의 진입점으로서 운영자의 화면 요청을 받아 처리 결과를 화면으로 연결하는 역할을 맡는다. 요청 파라미터를 모니터링 대상 정보로 묶어 받고, 실제 등록·조회 같은 업무 처리는 DB 서비스 모니터링 업무 계층에 위임한 뒤 결과 메시지와 이동할 화면 경로를 돌려준다."
+        }
+      },
+      "name": "DB 서비스 모니터링 화면 처리",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 104,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+          }
+        ],
+        "text": "DB 서비스 모니터링 관련 화면 요청을 받아 로그인 여부를 확인하고, 입력값 검증 결과에 따라 업무 처리 계층에 등록·수정·삭제·조회를 위임한 뒤 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 34,
+              "snippet": "private String code = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 아이디·상세코드·코드명·코드설명을 갖고, 특정 테이블에서 코드 정보를 뽑을 때 쓰는 테이블명과 상세 조건 여부·상세 조건 항목을 함께 보관한다. 상세 조건 여부는 기본값이 사용 안 함이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            }
+          ],
+          "text": "이 흐름에서 화면의 선택 목록을 채우기 위해 어떤 공통코드를 가져올지 지정하는 데이터 구조 역할을 맡는다. DBMS 종류처럼 화면에서 고를 항목의 코드 아이디가 여기에 담긴다."
+        }
+      },
+      "name": "공통코드 조회 조건",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngForRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "코드 아이디와 상세 조건 등 공통코드 목록을 조회할 때 사용하는 조회 조건 정보 묶음이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "public Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "public List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 58,
+              "snippet": "public List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회 조건 한 건으로 코드 목록을 조회하는 방식과, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶음으로 돌려주는 방식을 함께 제공한다. 조직 정보와 그룹 정보도 같은 코드 형태로 조회할 수 있다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "이 흐름에서 화면의 선택 목록에 채울 공통코드를 조회해 주는 역할을 맡는다. 등록·수정 화면을 준비할 때 DBMS 종류 같은 선택 항목이 이 업무를 통해 준비된다."
+        }
+      },
+      "name": "공통코드 조회 업무",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngForRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "조회 조건에 맞는 공통코드 상세 목록과 조직·그룹 정보를 코드 형태로 조회하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 105,
+              "snippet": "public String insertDbMntrng(@Valid @ModelAttribute(\"dbMntrng\") DbMntrng dbMntrng, BindingResult bindingResult, ModelMap model,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 109,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 110,
+              "snippet": "if(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 118,
+              "snippet": "if (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청을 받으면 가장 먼저 로그인 사용자 여부를 확인해 미인증이면 안내 메시지와 함께 로그인 화면으로 돌려보낸다. 이후 화면에서 넘어온 모니터링 대상 정보를 검증 규칙에 따라 확인하고, 오류가 있으면 입력 화면으로 되돌리며 오류가 없을 때만 저장을 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 104,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 127,
+              "snippet": "egovDbMntrngService.insertDbMntrng(dbMntrng);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 131,
+              "snippet": "return \"forward:/utl/sys/dbm/getDbMntrngList.do\";"
+            }
+          ],
+          "text": "이 흐름의 진입점으로서 운영자의 화면 요청을 받아 처리 결과를 화면으로 연결하는 역할을 맡는다. 요청 파라미터를 모니터링 대상 정보로 묶어 받고, 실제 등록·조회 같은 업무 처리는 DB 서비스 모니터링 업무 계층에 위임한 뒤 결과 메시지와 이동할 화면 경로를 돌려준다."
+        }
+      },
+      "name": "DB 서비스 모니터링 화면 처리",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngForRegist.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 104,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+          }
+        ],
+        "text": "DB 서비스 모니터링 관련 화면 요청을 받아 로그인 여부를 확인하고, 입력값 검증 결과에 따라 업무 처리 계층에 등록·수정·삭제·조회를 위임한 뒤 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 34,
+              "snippet": "private String code = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 아이디·상세코드·코드명·코드설명을 갖고, 특정 테이블에서 코드 정보를 뽑을 때 쓰는 테이블명과 상세 조건 여부·상세 조건 항목을 함께 보관한다. 상세 조건 여부는 기본값이 사용 안 함이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            }
+          ],
+          "text": "이 흐름에서 화면의 선택 목록을 채우기 위해 어떤 공통코드를 가져올지 지정하는 데이터 구조 역할을 맡는다. DBMS 종류처럼 화면에서 고를 항목의 코드 아이디가 여기에 담긴다."
+        }
+      },
+      "name": "공통코드 조회 조건",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngForUpdate.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "코드 아이디와 상세 조건 등 공통코드 목록을 조회할 때 사용하는 조회 조건 정보 묶음이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "public Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "public List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 58,
+              "snippet": "public List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회 조건 한 건으로 코드 목록을 조회하는 방식과, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶음으로 돌려주는 방식을 함께 제공한다. 조직 정보와 그룹 정보도 같은 코드 형태로 조회할 수 있다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "이 흐름에서 화면의 선택 목록에 채울 공통코드를 조회해 주는 역할을 맡는다. 등록·수정 화면을 준비할 때 DBMS 종류 같은 선택 항목이 이 업무를 통해 준비된다."
+        }
+      },
+      "name": "공통코드 조회 업무",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngForUpdate.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "조회 조건에 맞는 공통코드 상세 목록과 조직·그룹 정보를 코드 형태로 조회하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 47,
+              "snippet": "public void insertDbMntrngLog(DbMntrngLog dbMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 57,
+              "snippet": "public DbMntrng selectDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 77,
+              "snippet": "public List<DbMntrng> selectDbMntrngList(DbMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 87,
+              "snippet": "public int selectDbMntrngListCnt(DbMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 대상 등록·삭제와 점검 로그 등록을 각각 독립된 업무 단위로 나누어 처리한다. 목록 조회는 조회 조건을 받아 대상 목록과 전체 건수를 따로 제공해 페이징 화면을 구성할 수 있게 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 21,
+              "snippet": "public interface EgovDbMntrngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 29,
+              "snippet": "public void deleteDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            }
+          ],
+          "text": "이 흐름에서 화면 처리 계층의 요청을 받아 DB 서비스 모니터링 업무를 실제로 수행하는 역할을 맡는다. 모니터링 대상의 등록·삭제·상세 조회와 점검 로그 등록·조회, 목록 및 건수 조회를 하나의 업무 창구로 묶어 제공한다."
+        }
+      },
+      "name": "DB 서비스 모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngForUpdate.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+            "line": 21,
+            "snippet": "public interface EgovDbMntrngService {"
+          }
+        ],
+        "text": "DB 서비스 모니터링 대상과 점검 로그에 대한 등록·수정·삭제·상세 조회·목록 조회·건수 조회 업무를 정의하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 105,
+              "snippet": "public String insertDbMntrng(@Valid @ModelAttribute(\"dbMntrng\") DbMntrng dbMntrng, BindingResult bindingResult, ModelMap model,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 109,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 110,
+              "snippet": "if(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 118,
+              "snippet": "if (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청을 받으면 가장 먼저 로그인 사용자 여부를 확인해 미인증이면 안내 메시지와 함께 로그인 화면으로 돌려보낸다. 이후 화면에서 넘어온 모니터링 대상 정보를 검증 규칙에 따라 확인하고, 오류가 있으면 입력 화면으로 되돌리며 오류가 없을 때만 저장을 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 104,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 127,
+              "snippet": "egovDbMntrngService.insertDbMntrng(dbMntrng);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 131,
+              "snippet": "return \"forward:/utl/sys/dbm/getDbMntrngList.do\";"
+            }
+          ],
+          "text": "이 흐름의 진입점으로서 운영자의 화면 요청을 받아 처리 결과를 화면으로 연결하는 역할을 맡는다. 요청 파라미터를 모니터링 대상 정보로 묶어 받고, 실제 등록·조회 같은 업무 처리는 DB 서비스 모니터링 업무 계층에 위임한 뒤 결과 메시지와 이동할 화면 경로를 돌려준다."
+        }
+      },
+      "name": "DB 서비스 모니터링 화면 처리",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngForUpdate.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 104,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+          }
+        ],
+        "text": "DB 서비스 모니터링 관련 화면 요청을 받아 로그인 여부를 확인하고, 입력값 검증 결과에 따라 업무 처리 계층에 등록·수정·삭제·조회를 위임한 뒤 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "public List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인의 세 가지 판단을 제공하며 권한 목록은 관리자·일반 사용자 등 역할 정보를 담는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ],
+          "text": "이 흐름에서 현재 요청자가 로그인한 사용자인지, 그리고 누구인지를 알려주는 역할을 맡는다. 화면 처리 계층은 이 판단 결과로 업무 수행 여부를 결정한다."
+        }
+      },
+      "name": "인증 사용자 정보 확인",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 확인하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "static EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 51,
+              "snippet": "return egovUserDetailsService.getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "return egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "인증 사용자 정보 확인 업무를 하나만 보관하고, 인증 사용자 객체·사용자 권한 목록·인증 여부라는 세 가지 확인 통로를 제공한다. 확인 업무가 미리 지정되어 있어야 정상 동작한다는 전제를 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "return egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "이 흐름에서 화면 처리 계층이 인증 여부와 로그인 사용자 정보를 손쉽게 확인하도록 중계하는 협력 객체 역할을 맡는다. 실제 판단은 인증 사용자 정보 확인 업무에 그대로 위임한다."
+        }
+      },
+      "name": "인증 사용자 확인 창구",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "인증 사용자 정보 확인 업무를 어디서나 간편하게 호출할 수 있도록 중계하는 공통 창구이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 32,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 33,
+              "snippet": "@Size(max=60)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 34,
+              "snippet": "private String dataSourcNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 50,
+              "snippet": "@Size(max=250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 51,
+              "snippet": "private String ceckSql;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 62,
+              "snippet": "@Size(max=50)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 63,
+              "snippet": "@EgovEmailCheck"
+            }
+          ],
+          "text": "데이터소스명·서버명·DBMS 종류·체크 구문·관리자명·관리자 이메일주소를 필수 항목으로 갖고, 모니터링 상태와 등록자·수정자 아이디 및 시점을 함께 보관한다. 데이터소스명·서버명·관리자명은 60자, 체크 구문은 250자, 관리자 이메일주소는 50자를 넘을 수 없고 이메일주소는 형식 검증을 지켜야 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 26,
+              "snippet": "public class DbMntrng extends ComDefaultVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 34,
+              "snippet": "private String dataSourcNm;"
+            }
+          ],
+          "text": "이 흐름에서 운영자가 등록·조회하는 DB 서비스 모니터링 대상 한 건을 표현하는 데이터 구조 역할을 맡는다. 화면 입력값을 담아 업무 처리 계층으로 전달되고, 조회 시에는 조회 조건과 결과를 함께 나른다."
+        }
+      },
+      "name": "DB 서비스 모니터링 대상 정보",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngList.do:src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+            "line": 26,
+            "snippet": "public class DbMntrng extends ComDefaultVO implements Serializable {"
+          }
+        ],
+        "text": "데이터소스명·서버명·DBMS 종류·체크 구문·관리자 정보 등 감시할 DB 서비스 한 건의 등록 내용을 담는 정보 묶음이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 47,
+              "snippet": "public void insertDbMntrngLog(DbMntrngLog dbMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 57,
+              "snippet": "public DbMntrng selectDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 77,
+              "snippet": "public List<DbMntrng> selectDbMntrngList(DbMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 87,
+              "snippet": "public int selectDbMntrngListCnt(DbMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 대상 등록·삭제와 점검 로그 등록을 각각 독립된 업무 단위로 나누어 처리한다. 목록 조회는 조회 조건을 받아 대상 목록과 전체 건수를 따로 제공해 페이징 화면을 구성할 수 있게 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 21,
+              "snippet": "public interface EgovDbMntrngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 29,
+              "snippet": "public void deleteDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            }
+          ],
+          "text": "이 흐름에서 화면 처리 계층의 요청을 받아 DB 서비스 모니터링 업무를 실제로 수행하는 역할을 맡는다. 모니터링 대상의 등록·삭제·상세 조회와 점검 로그 등록·조회, 목록 및 건수 조회를 하나의 업무 창구로 묶어 제공한다."
+        }
+      },
+      "name": "DB 서비스 모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngList.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+            "line": 21,
+            "snippet": "public interface EgovDbMntrngService {"
+          }
+        ],
+        "text": "DB 서비스 모니터링 대상과 점검 로그에 대한 등록·수정·삭제·상세 조회·목록 조회·건수 조회 업무를 정의하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 105,
+              "snippet": "public String insertDbMntrng(@Valid @ModelAttribute(\"dbMntrng\") DbMntrng dbMntrng, BindingResult bindingResult, ModelMap model,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 109,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 110,
+              "snippet": "if(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 118,
+              "snippet": "if (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청을 받으면 가장 먼저 로그인 사용자 여부를 확인해 미인증이면 안내 메시지와 함께 로그인 화면으로 돌려보낸다. 이후 화면에서 넘어온 모니터링 대상 정보를 검증 규칙에 따라 확인하고, 오류가 있으면 입력 화면으로 되돌리며 오류가 없을 때만 저장을 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 104,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 127,
+              "snippet": "egovDbMntrngService.insertDbMntrng(dbMntrng);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 131,
+              "snippet": "return \"forward:/utl/sys/dbm/getDbMntrngList.do\";"
+            }
+          ],
+          "text": "이 흐름의 진입점으로서 운영자의 화면 요청을 받아 처리 결과를 화면으로 연결하는 역할을 맡는다. 요청 파라미터를 모니터링 대상 정보로 묶어 받고, 실제 등록·조회 같은 업무 처리는 DB 서비스 모니터링 업무 계층에 위임한 뒤 결과 메시지와 이동할 화면 경로를 돌려준다."
+        }
+      },
+      "name": "DB 서비스 모니터링 화면 처리",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngList.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 104,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+          }
+        ],
+        "text": "DB 서비스 모니터링 관련 화면 요청을 받아 로그인 여부를 확인하고, 입력값 검증 결과에 따라 업무 처리 계층에 등록·수정·삭제·조회를 위임한 뒤 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 47,
+              "snippet": "public void insertDbMntrngLog(DbMntrngLog dbMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 57,
+              "snippet": "public DbMntrng selectDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 77,
+              "snippet": "public List<DbMntrng> selectDbMntrngList(DbMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 87,
+              "snippet": "public int selectDbMntrngListCnt(DbMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 대상 등록·삭제와 점검 로그 등록을 각각 독립된 업무 단위로 나누어 처리한다. 목록 조회는 조회 조건을 받아 대상 목록과 전체 건수를 따로 제공해 페이징 화면을 구성할 수 있게 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 21,
+              "snippet": "public interface EgovDbMntrngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 29,
+              "snippet": "public void deleteDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            }
+          ],
+          "text": "이 흐름에서 화면 처리 계층의 요청을 받아 DB 서비스 모니터링 업무를 실제로 수행하는 역할을 맡는다. 모니터링 대상의 등록·삭제·상세 조회와 점검 로그 등록·조회, 목록 및 건수 조회를 하나의 업무 창구로 묶어 제공한다."
+        }
+      },
+      "name": "DB 서비스 모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngLog.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+            "line": 21,
+            "snippet": "public interface EgovDbMntrngService {"
+          }
+        ],
+        "text": "DB 서비스 모니터링 대상과 점검 로그에 대한 등록·수정·삭제·상세 조회·목록 조회·건수 조회 업무를 정의하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 105,
+              "snippet": "public String insertDbMntrng(@Valid @ModelAttribute(\"dbMntrng\") DbMntrng dbMntrng, BindingResult bindingResult, ModelMap model,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 109,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 110,
+              "snippet": "if(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 118,
+              "snippet": "if (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청을 받으면 가장 먼저 로그인 사용자 여부를 확인해 미인증이면 안내 메시지와 함께 로그인 화면으로 돌려보낸다. 이후 화면에서 넘어온 모니터링 대상 정보를 검증 규칙에 따라 확인하고, 오류가 있으면 입력 화면으로 되돌리며 오류가 없을 때만 저장을 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 104,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 127,
+              "snippet": "egovDbMntrngService.insertDbMntrng(dbMntrng);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 131,
+              "snippet": "return \"forward:/utl/sys/dbm/getDbMntrngList.do\";"
+            }
+          ],
+          "text": "이 흐름의 진입점으로서 운영자의 화면 요청을 받아 처리 결과를 화면으로 연결하는 역할을 맡는다. 요청 파라미터를 모니터링 대상 정보로 묶어 받고, 실제 등록·조회 같은 업무 처리는 DB 서비스 모니터링 업무 계층에 위임한 뒤 결과 메시지와 이동할 화면 경로를 돌려준다."
+        }
+      },
+      "name": "DB 서비스 모니터링 화면 처리",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngLog.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 104,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+          }
+        ],
+        "text": "DB 서비스 모니터링 관련 화면 요청을 받아 로그인 여부를 확인하고, 입력값 검증 결과에 따라 업무 처리 계층에 등록·수정·삭제·조회를 위임한 뒤 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "public List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인의 세 가지 판단을 제공하며 권한 목록은 관리자·일반 사용자 등 역할 정보를 담는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ],
+          "text": "이 흐름에서 현재 요청자가 로그인한 사용자인지, 그리고 누구인지를 알려주는 역할을 맡는다. 화면 처리 계층은 이 판단 결과로 업무 수행 여부를 결정한다."
+        }
+      },
+      "name": "인증 사용자 정보 확인",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngLogList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 확인하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "static EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 51,
+              "snippet": "return egovUserDetailsService.getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "return egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "인증 사용자 정보 확인 업무를 하나만 보관하고, 인증 사용자 객체·사용자 권한 목록·인증 여부라는 세 가지 확인 통로를 제공한다. 확인 업무가 미리 지정되어 있어야 정상 동작한다는 전제를 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "return egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "이 흐름에서 화면 처리 계층이 인증 여부와 로그인 사용자 정보를 손쉽게 확인하도록 중계하는 협력 객체 역할을 맡는다. 실제 판단은 인증 사용자 정보 확인 업무에 그대로 위임한다."
+        }
+      },
+      "name": "인증 사용자 확인 창구",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngLogList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "인증 사용자 정보 확인 업무를 어디서나 간편하게 호출할 수 있도록 중계하는 공통 창구이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+              "line": 29,
+              "snippet": "private String logId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+              "line": 34,
+              "snippet": "private String dataSourcNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+              "line": 58,
+              "snippet": "private String mntrngSttus;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+              "line": 79,
+              "snippet": "private String creatDt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+              "line": 83,
+              "snippet": "private String logInfo;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+              "line": 89,
+              "snippet": "private String mntrngSttusNm;"
+            }
+          ],
+          "text": "로그를 식별하는 로그 아이디와 함께 점검 대상의 데이터소스명·서버명·DBMS 종류·체크 구문·관리자 정보, 그리고 모니터링 상태와 생성일시·로그 정보를 보관한다. 화면 표시용으로 모니터링 상태명도 함께 갖는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+              "line": 22,
+              "snippet": "public class DbMntrngLog extends ComDefaultVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+              "line": 29,
+              "snippet": "private String logId;"
+            }
+          ],
+          "text": "이 흐름에서 조회 대상이 되는 DB 서비스 모니터링 점검 로그 한 건을 표현하는 데이터 구조 역할을 맡는다. 조회 조건과 조회 결과를 함께 나르며 로그 목록 화면을 구성하는 재료가 된다."
+        }
+      },
+      "name": "DB 서비스 모니터링 로그 정보",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngLogList.do:src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+            "line": 22,
+            "snippet": "public class DbMntrngLog extends ComDefaultVO implements Serializable {"
+          }
+        ],
+        "text": "모니터링 수행 결과로 남는 점검 로그 한 건의 내용을 담는 정보 묶음으로, 점검 대상 정보와 함께 로그 아이디·로그 내용·생성 일시를 보관한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 47,
+              "snippet": "public void insertDbMntrngLog(DbMntrngLog dbMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 57,
+              "snippet": "public DbMntrng selectDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 77,
+              "snippet": "public List<DbMntrng> selectDbMntrngList(DbMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 87,
+              "snippet": "public int selectDbMntrngListCnt(DbMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 대상 등록·삭제와 점검 로그 등록을 각각 독립된 업무 단위로 나누어 처리한다. 목록 조회는 조회 조건을 받아 대상 목록과 전체 건수를 따로 제공해 페이징 화면을 구성할 수 있게 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 21,
+              "snippet": "public interface EgovDbMntrngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 29,
+              "snippet": "public void deleteDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            }
+          ],
+          "text": "이 흐름에서 화면 처리 계층의 요청을 받아 DB 서비스 모니터링 업무를 실제로 수행하는 역할을 맡는다. 모니터링 대상의 등록·삭제·상세 조회와 점검 로그 등록·조회, 목록 및 건수 조회를 하나의 업무 창구로 묶어 제공한다."
+        }
+      },
+      "name": "DB 서비스 모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngLogList.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+            "line": 21,
+            "snippet": "public interface EgovDbMntrngService {"
+          }
+        ],
+        "text": "DB 서비스 모니터링 대상과 점검 로그에 대한 등록·수정·삭제·상세 조회·목록 조회·건수 조회 업무를 정의하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 105,
+              "snippet": "public String insertDbMntrng(@Valid @ModelAttribute(\"dbMntrng\") DbMntrng dbMntrng, BindingResult bindingResult, ModelMap model,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 109,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 110,
+              "snippet": "if(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 118,
+              "snippet": "if (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청을 받으면 가장 먼저 로그인 사용자 여부를 확인해 미인증이면 안내 메시지와 함께 로그인 화면으로 돌려보낸다. 이후 화면에서 넘어온 모니터링 대상 정보를 검증 규칙에 따라 확인하고, 오류가 있으면 입력 화면으로 되돌리며 오류가 없을 때만 저장을 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 104,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 127,
+              "snippet": "egovDbMntrngService.insertDbMntrng(dbMntrng);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 131,
+              "snippet": "return \"forward:/utl/sys/dbm/getDbMntrngList.do\";"
+            }
+          ],
+          "text": "이 흐름의 진입점으로서 운영자의 화면 요청을 받아 처리 결과를 화면으로 연결하는 역할을 맡는다. 요청 파라미터를 모니터링 대상 정보로 묶어 받고, 실제 등록·조회 같은 업무 처리는 DB 서비스 모니터링 업무 계층에 위임한 뒤 결과 메시지와 이동할 화면 경로를 돌려준다."
+        }
+      },
+      "name": "DB 서비스 모니터링 화면 처리",
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngLogList.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 104,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+          }
+        ],
+        "text": "DB 서비스 모니터링 관련 화면 요청을 받아 로그인 여부를 확인하고, 입력값 검증 결과에 따라 업무 처리 계층에 등록·수정·삭제·조회를 위임한 뒤 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "public String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "public String getMessageArgs(String code, Object[] args) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드를 받아 정의된 메시지를 조회하며, 필요에 따라 로케일과 매개변수를 함께 지정해 사용 환경에 맞는 문구를 만들어 낸다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            }
+          ],
+          "text": "이 흐름에서 사용자에게 보여줄 안내 문구를 메시지 코드로 찾아 돌려주는 역할을 맡는다. 미인증 사용자를 로그인 화면으로 돌려보낼 때 함께 전달할 안내 메시지가 여기서 조회된다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "로그인 필요 안내나 처리 결과 안내처럼 화면에 표시할 문구를 메시지 코드로 조회해 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 44,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 49,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 50,
+              "snippet": "@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 66,
+              "snippet": "/** 고유아이디 */"
+            }
+          ],
+          "text": "아이디·이름·이메일 등 필수 확인 대상 항목과 사용자구분, 조직 아이디·조직명, 고유아이디 같은 신원 항목을 갖는다. 아이디·이름·이메일은 비어 있을 수 없고 이메일은 형식 검증을 지켜야 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 66,
+              "snippet": "/** 고유아이디 */"
+            }
+          ],
+          "text": "이 흐름에서 로그인한 운영자가 누구인지를 나타내는 데이터 구조 역할을 맡는다. 여기 담긴 고유아이디가 모니터링 대상의 최초등록자·최종수정자 아이디로 기록된다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "아이디·이름·이메일·조직 정보 등 로그인한 사용자의 신원 정보를 담는 정보 묶음으로, 등록자·수정자 아이디를 채우는 근거가 된다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "public List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ],
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인의 세 가지 판단을 제공하며 권한 목록은 관리자·일반 사용자 등 역할 정보를 담는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "public Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "public Boolean isAuthenticated();"
+            }
+          ],
+          "text": "이 흐름에서 현재 요청자가 로그인한 사용자인지, 그리고 누구인지를 알려주는 역할을 맡는다. 화면 처리 계층은 이 판단 결과로 업무 수행 여부를 결정한다."
+        }
+      },
+      "name": "인증 사용자 정보 확인",
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 확인하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "static EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 51,
+              "snippet": "return egovUserDetailsService.getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "return egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "인증 사용자 정보 확인 업무를 하나만 보관하고, 인증 사용자 객체·사용자 권한 목록·인증 여부라는 세 가지 확인 통로를 제공한다. 확인 업무가 미리 지정되어 있어야 정상 동작한다는 전제를 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "return egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "이 흐름에서 화면 처리 계층이 인증 여부와 로그인 사용자 정보를 손쉽게 확인하도록 중계하는 협력 객체 역할을 맡는다. 실제 판단은 인증 사용자 정보 확인 업무에 그대로 위임한다."
+        }
+      },
+      "name": "인증 사용자 확인 창구",
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "인증 사용자 정보 확인 업무를 어디서나 간편하게 호출할 수 있도록 중계하는 공통 창구이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "public static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 79,
+              "snippet": "if (source != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "public static String cutString(String source, int slength) {"
+            }
+          ],
+          "text": "빈 문자열을 공통 기준값으로 두고, 지정 길이를 넘는 문자열을 자르거나 뒤에 문구를 덧붙이는 처리를 제공한다. 원본 문자열이 없으면 결과도 만들지 않는다는 전제를 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "이 흐름에서 로그인 사용자의 고유아이디처럼 값이 없을 수 있는 항목을 안전한 문자열로 바꾸어 주는 협력 객체 역할을 맡는다."
+        }
+      },
+      "name": "문자열 처리 공통 기능",
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "빈 값 확인이나 길이 제한 처리 등 문자열을 안전하게 다루는 공통 기능 모음으로, 값이 없을 때 빈 문자열로 바꾸는 처리에 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 32,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 33,
+              "snippet": "@Size(max=60)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 34,
+              "snippet": "private String dataSourcNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 50,
+              "snippet": "@Size(max=250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 51,
+              "snippet": "private String ceckSql;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 62,
+              "snippet": "@Size(max=50)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 63,
+              "snippet": "@EgovEmailCheck"
+            }
+          ],
+          "text": "데이터소스명·서버명·DBMS 종류·체크 구문·관리자명·관리자 이메일주소를 필수 항목으로 갖고, 모니터링 상태와 등록자·수정자 아이디 및 시점을 함께 보관한다. 데이터소스명·서버명·관리자명은 60자, 체크 구문은 250자, 관리자 이메일주소는 50자를 넘을 수 없고 이메일주소는 형식 검증을 지켜야 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 26,
+              "snippet": "public class DbMntrng extends ComDefaultVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+              "line": 34,
+              "snippet": "private String dataSourcNm;"
+            }
+          ],
+          "text": "이 흐름에서 운영자가 등록·조회하는 DB 서비스 모니터링 대상 한 건을 표현하는 데이터 구조 역할을 맡는다. 화면 입력값을 담아 업무 처리 계층으로 전달되고, 조회 시에는 조회 조건과 결과를 함께 나른다."
+        }
+      },
+      "name": "DB 서비스 모니터링 대상 정보",
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+            "line": 26,
+            "snippet": "public class DbMntrng extends ComDefaultVO implements Serializable {"
+          }
+        ],
+        "text": "데이터소스명·서버명·DBMS 종류·체크 구문·관리자 정보 등 감시할 DB 서비스 한 건의 등록 내용을 담는 정보 묶음이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 47,
+              "snippet": "public void insertDbMntrngLog(DbMntrngLog dbMntrngLog)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 57,
+              "snippet": "public DbMntrng selectDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 77,
+              "snippet": "public List<DbMntrng> selectDbMntrngList(DbMntrng searchVO)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 87,
+              "snippet": "public int selectDbMntrngListCnt(DbMntrng searchVO)"
+            }
+          ],
+          "text": "모니터링 대상 등록·삭제와 점검 로그 등록을 각각 독립된 업무 단위로 나누어 처리한다. 목록 조회는 조회 조건을 받아 대상 목록과 전체 건수를 따로 제공해 페이징 화면을 구성할 수 있게 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 21,
+              "snippet": "public interface EgovDbMntrngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 29,
+              "snippet": "public void deleteDbMntrng(DbMntrng dbMntrng)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+              "line": 38,
+              "snippet": "public void insertDbMntrng(DbMntrng dbMntrng)"
+            }
+          ],
+          "text": "이 흐름에서 화면 처리 계층의 요청을 받아 DB 서비스 모니터링 업무를 실제로 수행하는 역할을 맡는다. 모니터링 대상의 등록·삭제·상세 조회와 점검 로그 등록·조회, 목록 및 건수 조회를 하나의 업무 창구로 묶어 제공한다."
+        }
+      },
+      "name": "DB 서비스 모니터링 업무 처리",
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+            "line": 21,
+            "snippet": "public interface EgovDbMntrngService {"
+          }
+        ],
+        "text": "DB 서비스 모니터링 대상과 점검 로그에 대한 등록·수정·삭제·상세 조회·목록 조회·건수 조회 업무를 정의하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 105,
+              "snippet": "public String insertDbMntrng(@Valid @ModelAttribute(\"dbMntrng\") DbMntrng dbMntrng, BindingResult bindingResult, ModelMap model,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 109,
+              "snippet": "Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 110,
+              "snippet": "if(!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 118,
+              "snippet": "if (bindingResult.hasErrors()){"
+            }
+          ],
+          "text": "요청을 받으면 가장 먼저 로그인 사용자 여부를 확인해 미인증이면 안내 메시지와 함께 로그인 화면으로 돌려보낸다. 이후 화면에서 넘어온 모니터링 대상 정보를 검증 규칙에 따라 확인하고, 오류가 있으면 입력 화면으로 되돌리며 오류가 없을 때만 저장을 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 104,
+              "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 127,
+              "snippet": "egovDbMntrngService.insertDbMntrng(dbMntrng);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+              "line": 131,
+              "snippet": "return \"forward:/utl/sys/dbm/getDbMntrngList.do\";"
+            }
+          ],
+          "text": "이 흐름의 진입점으로서 운영자의 화면 요청을 받아 처리 결과를 화면으로 연결하는 역할을 맡는다. 요청 파라미터를 모니터링 대상 정보로 묶어 받고, 실제 등록·조회 같은 업무 처리는 DB 서비스 모니터링 업무 계층에 위임한 뒤 결과 메시지와 이동할 화면 경로를 돌려준다."
+        }
+      },
+      "name": "DB 서비스 모니터링 화면 처리",
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+            "line": 104,
+            "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+          }
+        ],
+        "text": "DB 서비스 모니터링 관련 화면 요청을 받아 로그인 여부를 확인하고, 입력값 검증 결과에 따라 업무 처리 계층에 등록·수정·삭제·조회를 위임한 뒤 이동할 화면을 결정한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 275,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngLogList.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+        "line": 26,
+        "snippet": "public class DbMntrng extends ComDefaultVO implements Serializable {"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+        "line": 22,
+        "snippet": "public class DbMntrngLog extends ComDefaultVO implements Serializable {"
+      }
+    ],
+    "text": "운영자가 감시할 DB 서비스 접속 정보를 등록·수정·삭제하고, 그 점검 결과로 쌓인 로그를 조회하는 시스템 운영 업무 영역이다. 모니터링 대상마다 데이터소스명·서버명·DBMS 종류·체크 구문과 담당 관리자 연락처를 관리하며, 점검 이력은 로그로 남겨 목록과 상세로 확인한다."
+  }
+}

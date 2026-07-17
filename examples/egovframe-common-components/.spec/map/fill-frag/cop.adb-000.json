@@ -1,0 +1,4966 @@
+{
+ "schemaVersion": 1,
+ "chunkId": "cop.adb-000",
+ "domainId": "domain:cop.adb",
+ "header": {
+  "name": "주소록 관리",
+  "summary": {
+   "text": "사용자가 업무용 주소록을 만들고 구성원(사용자)을 담아 관리하는 업무 영역이다. 주소록 목록·상세 조회, 등록, 수정, 삭제와 구성원 추가·삭제·조회를 제공하며, 모든 요청은 로그인 인증을 통과해야 처리된다.",
+   "citations": [
+    {
+     "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+     "line": 429,
+     "snippet": "    @RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+    },
+    {
+     "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+     "line": 21,
+     "snippet": "public interface EgovAddressBookService {"
+    },
+    {
+     "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+     "line": 437,
+     "snippet": "        if(!isAuthenticated) {"
+    }
+   ]
+  },
+  "entities": [
+   {
+    "text": "주소록: 주소록 명과 공개범위, 사용여부, 최초등록자 부서와 등록·수정 이력을 갖는 기본 단위이며 주소록 아이디로 식별한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+      "line": 25,
+      "snippet": "public class AddressBook implements Serializable{"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+      "line": 28,
+      "snippet": "    private String adbkId = \"\";"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+      "line": 33,
+      "snippet": "    private String adbkNm = \"\";"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+      "line": 37,
+      "snippet": "    private String othbcScope = \"\";"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+      "line": 40,
+      "snippet": "    private String trgetOrgnztId = \"\";"
+     }
+    ]
+   },
+   {
+    "text": "주소록 구성원: 주소록에 담기는 사용자로 아이디·이름·이메일·집전화를 가진다. 주소록 정보는 구성원 목록을 함께 보관한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+      "line": 25,
+      "snippet": "public class AddressBookUserVO extends AddressBookUser {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+      "line": 28,
+      "snippet": "    private String userId = \"\";"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+      "line": 31,
+      "snippet": "    private String userNm = \"\";"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+      "line": 79,
+      "snippet": "    private List< AddressBookUser > adbkMan = new ArrayList<AddressBookUser>();"
+     }
+    ]
+   },
+   {
+    "text": "주소록 조회 조건: 검색어·검색조건·검색기간·정렬순서와 현재 페이지·페이지당 건수를 담아 목록 조회에 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+      "line": 43,
+      "snippet": "    private String searchWrd = \"\";"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+      "line": 37,
+      "snippet": "    private String searchCnd = \"\";"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+      "line": 52,
+      "snippet": "    private int pageIndex = 1;"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+      "line": 55,
+      "snippet": "    private int pageUnit = 10;"
+     }
+    ]
+   },
+   {
+    "text": "로그인 사용자: 주소록 작업의 주체로 아이디와 소속 조직(부서) 아이디를 가지며 등록자·수정자·대상 부서 값의 원천이 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "line": 33,
+      "snippet": "public class LoginVO implements Serializable{"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "line": 42,
+      "snippet": "\tprivate String id;"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "line": 63,
+      "snippet": "\tprivate String orgnztId;"
+     }
+    ]
+   }
+  ],
+  "businessRules": [
+   {
+    "text": "모든 주소록 요청은 인증된 사용자만 처리한다. 인증되지 않은 요청은 업무를 수행하지 않고 로그인 화면으로 되돌린다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 435,
+      "snippet": "        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 437,
+      "snippet": "        if(!isAuthenticated) {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 438,
+      "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+     }
+    ]
+   },
+   {
+    "text": "주소록 등록 입력값에 검증 오류가 있으면 저장하지 않고 등록 입력 화면을 다시 보여준다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 451,
+      "snippet": "        if (bindingResult.hasErrors()) {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 452,
+      "snippet": "            return \"egovframework/com/cop/adb/EgovAddressBookRegist\";"
+     }
+    ]
+   },
+   {
+    "text": "주소록 명과 공개범위는 반드시 입력해야 하며 주소록 명은 최대 50자까지 허용한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+      "line": 31,
+      "snippet": "    @EgovNullCheck"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+      "line": 32,
+      "snippet": "    @Size(max=50)"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+      "line": 36,
+      "snippet": "    @EgovNullCheck"
+     }
+    ]
+   },
+   {
+    "text": "주소록을 등록할 때 등록자·최초등록자·최종수정자 아이디와 대상 부서는 화면 입력이 아니라 로그인 사용자 정보로 채운다. 사용자 정보가 없으면 빈 값으로 둔다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 455,
+      "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 456,
+      "snippet": "        adbkVO.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 457,
+      "snippet": "        adbkVO.setLastUpdusrId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 459,
+      "snippet": "        adbkVO.setTrgetOrgnztId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getOrgnztId()));"
+     }
+    ]
+   },
+   {
+    "text": "화면에서 선택된 구성원 아이디는 쉼표로 구분된 하나의 문자열로 전달되며, 빈 항목은 건너뛰고 각 아이디로 구성원 정보를 불러와 주소록 구성원 목록에 담는다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 442,
+      "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 444,
+      "snippet": "        for (String element : tempId) {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 445,
+      "snippet": "            if(!element.equals(\"\")){"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 446,
+      "snippet": "                AddressBookUser adbkUser = adbkService.selectAdbkUser(element);"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 447,
+      "snippet": "                adbkVO.getAdbkMan().add(adbkUser);"
+     }
+    ]
+   },
+   {
+    "text": "주소록 구성원 목록은 설정 이후 변경할 수 없는 목록으로 보관한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+      "line": 88,
+      "snippet": "    public void setAdbkMan(List<AddressBookUser> adbkMan) {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+      "line": 89,
+      "snippet": "        this.adbkMan = Collections.unmodifiableList(adbkMan);"
+     }
+    ]
+   },
+   {
+    "text": "주소록 등록이 끝나면 등록 화면에 머무르지 않고 주소록 목록 조회로 넘겨 최신 목록을 보여준다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 461,
+      "snippet": "        adbkService.insertAdressBook(adbkVO);"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 463,
+      "snippet": "        return \"forward:/cop/adb/selectAdbkList.do\";"
+     }
+    ]
+   }
+  ],
+  "crossDomainInteractions": [
+   {
+    "text": "사용자 인증 영역: 로그인 사용자 정보와 인증 여부를 공통 인증 도우미를 통해 확인하며, 실제 판정은 공통 사용자 인증 서비스가 담당한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 434,
+      "snippet": "        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "line": 41,
+      "snippet": "\tpublic static Object getAuthenticatedUser() {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "line": 24,
+      "snippet": "\tpublic Boolean isAuthenticated(); "
+     }
+    ]
+   },
+   {
+    "text": "로그인 화면 영역: 인증되지 않은 요청은 사용자 로그인 화면으로 넘긴다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 438,
+      "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 486,
+      "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+     }
+    ]
+   },
+   {
+    "text": "공통 유틸 영역: 구성원 아이디 문자열과 사용자 아이디의 빈 값 처리를 공통 문자열 유틸에 맡긴다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "line": 43,
+      "snippet": "public class EgovStringUtil {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 442,
+      "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 455,
+      "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+     }
+    ]
+   }
+  ],
+  "businessFlows": [
+   {
+    "title": "주소록 등록·수정",
+    "nodes": [
+     {
+      "id": "s",
+      "kind": "start",
+      "label": "주소록 작성 시작"
+     },
+     {
+      "id": "a1",
+      "kind": "activity",
+      "label": "등록 화면 열기",
+      "flowRef": "flow:ANY /cop/adb/addAdbkInf.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 160,
+        "snippet": "@RequestMapping(\"/cop/adb/addAdbkInf.do\")"
+       }
+      ]
+     },
+     {
+      "id": "a2",
+      "kind": "activity",
+      "label": "수정 화면 열기",
+      "flowRef": "flow:ANY /cop/adb/updateAdbkInf.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 369,
+        "snippet": "@RequestMapping(\"/cop/adb/updateAdbkInf.do\")"
+       }
+      ]
+     },
+     {
+      "id": "d1",
+      "kind": "decision",
+      "label": "인증된 사용자인가",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 437,
+        "snippet": "        if(!isAuthenticated) {"
+       }
+      ]
+     },
+     {
+      "id": "a3",
+      "kind": "activity",
+      "label": "로그인 화면으로 이동",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 438,
+        "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+       }
+      ]
+     },
+     {
+      "id": "a4",
+      "kind": "activity",
+      "label": "선택 구성원 정보 불러오기",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 442,
+        "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+       },
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 446,
+        "snippet": "                AddressBookUser adbkUser = adbkService.selectAdbkUser(element);"
+       }
+      ]
+     },
+     {
+      "id": "d2",
+      "kind": "decision",
+      "label": "입력 검증 통과 여부",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 451,
+        "snippet": "        if (bindingResult.hasErrors()) {"
+       }
+      ]
+     },
+     {
+      "id": "a5",
+      "kind": "activity",
+      "label": "등록 화면 다시 표시",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 452,
+        "snippet": "            return \"egovframework/com/cop/adb/EgovAddressBookRegist\";"
+       }
+      ]
+     },
+     {
+      "id": "a6",
+      "kind": "activity",
+      "label": "등록자·부서 정보 채움",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 455,
+        "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+       },
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 459,
+        "snippet": "        adbkVO.setTrgetOrgnztId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getOrgnztId()));"
+       }
+      ]
+     },
+     {
+      "id": "a7",
+      "kind": "activity",
+      "label": "주소록 등록",
+      "flowRef": "flow:ANY /cop/adb/RegistAdbkInf.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 429,
+        "snippet": "@RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+       },
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 461,
+        "snippet": "        adbkService.insertAdressBook(adbkVO);"
+       }
+      ]
+     },
+     {
+      "id": "a8",
+      "kind": "activity",
+      "label": "주소록 수정",
+      "flowRef": "flow:ANY /cop/adb/UpdateAddressBook.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 477,
+        "snippet": "@RequestMapping(\"/cop/adb/UpdateAddressBook.do\")"
+       },
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+        "line": 78,
+        "snippet": "    public void updateAdressBook(AddressBookVO addressBookVO) throws Exception;"
+       }
+      ]
+     },
+     {
+      "id": "a9",
+      "kind": "activity",
+      "label": "주소록 목록으로 이동",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 463,
+        "snippet": "        return \"forward:/cop/adb/selectAdbkList.do\";"
+       }
+      ]
+     },
+     {
+      "id": "e",
+      "kind": "end",
+      "label": "작성 완료"
+     }
+    ],
+    "edges": [
+     {
+      "from": "s",
+      "to": "a1"
+     },
+     {
+      "from": "a1",
+      "to": "a2"
+     },
+     {
+      "from": "a2",
+      "to": "d1"
+     },
+     {
+      "from": "d1",
+      "to": "a3",
+      "label": "NO"
+     },
+     {
+      "from": "d1",
+      "to": "a4",
+      "label": "YES"
+     },
+     {
+      "from": "a3",
+      "to": "e"
+     },
+     {
+      "from": "a4",
+      "to": "d2"
+     },
+     {
+      "from": "d2",
+      "to": "a5",
+      "label": "검증 오류"
+     },
+     {
+      "from": "d2",
+      "to": "a6",
+      "label": "검증 통과"
+     },
+     {
+      "from": "a5",
+      "to": "e"
+     },
+     {
+      "from": "a6",
+      "to": "a7"
+     },
+     {
+      "from": "a6",
+      "to": "a8"
+     },
+     {
+      "from": "a7",
+      "to": "a9"
+     },
+     {
+      "from": "a8",
+      "to": "a9"
+     },
+     {
+      "from": "a9",
+      "to": "e"
+     }
+    ]
+   },
+   {
+    "title": "주소록 조회·삭제",
+    "nodes": [
+     {
+      "id": "s",
+      "kind": "start",
+      "label": "주소록 찾기 시작"
+     },
+     {
+      "id": "d1",
+      "kind": "decision",
+      "label": "인증된 사용자인가",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 435,
+        "snippet": "        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+       },
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 437,
+        "snippet": "        if(!isAuthenticated) {"
+       }
+      ]
+     },
+     {
+      "id": "b3",
+      "kind": "activity",
+      "label": "로그인 화면으로 이동",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 438,
+        "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+       }
+      ]
+     },
+     {
+      "id": "b1",
+      "kind": "activity",
+      "label": "주소록 목록 조회",
+      "flowRef": "flow:ANY /cop/adb/selectAdbkList.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 64,
+        "snippet": "@RequestMapping(\"/cop/adb/selectAdbkList.do\")"
+       },
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+        "line": 30,
+        "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+       }
+      ]
+     },
+     {
+      "id": "b2",
+      "kind": "activity",
+      "label": "메인 주소록 목록 조회",
+      "flowRef": "flow:ANY /cop/adb/selectAdbkMainList.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 113,
+        "snippet": "@RequestMapping(\"/cop/adb/selectAdbkMainList.do\")"
+       }
+      ]
+     },
+     {
+      "id": "b4",
+      "kind": "activity",
+      "label": "주소록 상세 조회",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+        "line": 38,
+        "snippet": "    public AddressBookVO selectAdressBook(AddressBookVO addressBookVO) throws Exception;"
+       }
+      ]
+     },
+     {
+      "id": "b5",
+      "kind": "activity",
+      "label": "주소록 삭제",
+      "flowRef": "flow:ANY /cop/adb/deleteAdbkInf.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 178,
+        "snippet": "@RequestMapping(\"/cop/adb/deleteAdbkInf.do\")"
+       },
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+        "line": 46,
+        "snippet": "    public void deleteAdressBook(AddressBook addressBook) throws Exception;"
+       }
+      ]
+     },
+     {
+      "id": "e",
+      "kind": "end",
+      "label": "조회·삭제 완료"
+     }
+    ],
+    "edges": [
+     {
+      "from": "s",
+      "to": "d1"
+     },
+     {
+      "from": "d1",
+      "to": "b3",
+      "label": "NO"
+     },
+     {
+      "from": "d1",
+      "to": "b1",
+      "label": "YES"
+     },
+     {
+      "from": "b3",
+      "to": "e"
+     },
+     {
+      "from": "b1",
+      "to": "b2"
+     },
+     {
+      "from": "b2",
+      "to": "b4"
+     },
+     {
+      "from": "b4",
+      "to": "b5"
+     },
+     {
+      "from": "b5",
+      "to": "e"
+     }
+    ]
+   },
+   {
+    "title": "주소록 구성원 관리",
+    "nodes": [
+     {
+      "id": "s",
+      "kind": "start",
+      "label": "구성원 편집 시작"
+     },
+     {
+      "id": "c1",
+      "kind": "activity",
+      "label": "사용자 선택 팝업 열기",
+      "flowRef": "flow:ANY /cop/adb/openPopup.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 293,
+        "snippet": "@RequestMapping(\"/cop/adb/openPopup.do\")"
+       }
+      ]
+     },
+     {
+      "id": "c2",
+      "kind": "activity",
+      "label": "구성원 목록 조회",
+      "flowRef": "flow:ANY /cop/adb/selectManList.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 317,
+        "snippet": "@RequestMapping(\"/cop/adb/selectManList.do\")"
+       },
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+        "line": 54,
+        "snippet": "    public Map<String, Object> selectManList(AddressBookUserVO addressBookUserVO) throws Exception;"
+       }
+      ]
+     },
+     {
+      "id": "c3",
+      "kind": "activity",
+      "label": "구성원 추가",
+      "flowRef": "flow:ANY /cop/adb/addUser.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 205,
+        "snippet": "@RequestMapping(\"/cop/adb/addUser.do\")"
+       },
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 447,
+        "snippet": "                adbkVO.getAdbkMan().add(adbkUser);"
+       }
+      ]
+     },
+     {
+      "id": "c4",
+      "kind": "activity",
+      "label": "구성원 삭제",
+      "flowRef": "flow:ANY /cop/adb/deleteUser.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+        "line": 242,
+        "snippet": "@RequestMapping(\"/cop/adb/deleteUser.do\")"
+       }
+      ]
+     },
+     {
+      "id": "c5",
+      "kind": "activity",
+      "label": "구성원 목록 확정",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+        "line": 88,
+        "snippet": "    public void setAdbkMan(List<AddressBookUser> adbkMan) {"
+       },
+       {
+        "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+        "line": 89,
+        "snippet": "        this.adbkMan = Collections.unmodifiableList(adbkMan);"
+       }
+      ]
+     },
+     {
+      "id": "e",
+      "kind": "end",
+      "label": "구성원 편집 완료"
+     }
+    ],
+    "edges": [
+     {
+      "from": "s",
+      "to": "c1"
+     },
+     {
+      "from": "c1",
+      "to": "c2"
+     },
+     {
+      "from": "c2",
+      "to": "c3"
+     },
+     {
+      "from": "c2",
+      "to": "c4"
+     },
+     {
+      "from": "c3",
+      "to": "c5"
+     },
+     {
+      "from": "c4",
+      "to": "c5"
+     },
+     {
+      "from": "c5",
+      "to": "e"
+     }
+    ]
+   }
+  ]
+ },
+ "flows": [
+  {
+   "flowId": "flow:ANY /cop/adb/RegistAdbkInf.do",
+   "name": "주소록 등록 처리",
+   "summary": {
+    "text": "입력된 주소록 정보와 선택된 구성원 아이디를 받아 유효성 검증 후 주소록을 신규 등록하고 목록 화면으로 넘긴다. 주소록 화면 요청은 모두 주소록 담당 화면 처리기가 받아 인증 확인 후 주소록 업무 서비스로 넘긴다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 429,
+      "snippet": "@RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /cop/adb/UpdateAddressBook.do",
+   "name": "주소록 수정 처리",
+   "summary": {
+    "text": "기존 주소록의 정보와 구성원 구성을 갱신하고 목록 화면으로 넘긴다. 주소록 화면 요청은 모두 주소록 담당 화면 처리기가 받아 인증 확인 후 주소록 업무 서비스로 넘긴다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 477,
+      "snippet": "@RequestMapping(\"/cop/adb/UpdateAddressBook.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /cop/adb/addAdbkInf.do",
+   "name": "주소록 등록 화면 열기",
+   "summary": {
+    "text": "주소록을 새로 만들기 위한 등록 입력 화면을 연다. 주소록 화면 요청은 모두 주소록 담당 화면 처리기가 받아 인증 확인 후 주소록 업무 서비스로 넘긴다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 160,
+      "snippet": "@RequestMapping(\"/cop/adb/addAdbkInf.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /cop/adb/addUser.do",
+   "name": "주소록 구성원 추가",
+   "summary": {
+    "text": "선택한 사용자를 작성 중인 주소록의 구성원 목록에 더한다. 주소록 화면 요청은 모두 주소록 담당 화면 처리기가 받아 인증 확인 후 주소록 업무 서비스로 넘긴다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 205,
+      "snippet": "@RequestMapping(\"/cop/adb/addUser.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /cop/adb/deleteAdbkInf.do",
+   "name": "주소록 삭제",
+   "summary": {
+    "text": "선택한 주소록을 삭제한다. 주소록 화면 요청은 모두 주소록 담당 화면 처리기가 받아 인증 확인 후 주소록 업무 서비스로 넘긴다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 178,
+      "snippet": "@RequestMapping(\"/cop/adb/deleteAdbkInf.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /cop/adb/deleteUser.do",
+   "name": "주소록 구성원 삭제",
+   "summary": {
+    "text": "작성 중인 주소록의 구성원 목록에서 선택한 사용자를 뺀다. 주소록 화면 요청은 모두 주소록 담당 화면 처리기가 받아 인증 확인 후 주소록 업무 서비스로 넘긴다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 242,
+      "snippet": "@RequestMapping(\"/cop/adb/deleteUser.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /cop/adb/openPopup.do",
+   "name": "사용자 선택 팝업 열기",
+   "summary": {
+    "text": "주소록 구성원으로 넣을 사용자를 고르는 팝업 화면을 연다. 주소록 화면 요청은 모두 주소록 담당 화면 처리기가 받아 인증 확인 후 주소록 업무 서비스로 넘긴다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 293,
+      "snippet": "@RequestMapping(\"/cop/adb/openPopup.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /cop/adb/selectAdbkList.do",
+   "name": "주소록 목록 조회",
+   "summary": {
+    "text": "검색 조건과 페이지 조건에 맞는 주소록 목록을 조회해 목록 화면에 보여준다. 주소록 화면 요청은 모두 주소록 담당 화면 처리기가 받아 인증 확인 후 주소록 업무 서비스로 넘긴다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 64,
+      "snippet": "@RequestMapping(\"/cop/adb/selectAdbkList.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /cop/adb/selectAdbkMainList.do",
+   "name": "주소록 메인 목록 조회",
+   "summary": {
+    "text": "메인 화면에 노출할 주소록 목록을 조회한다. 주소록 화면 요청은 모두 주소록 담당 화면 처리기가 받아 인증 확인 후 주소록 업무 서비스로 넘긴다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 113,
+      "snippet": "@RequestMapping(\"/cop/adb/selectAdbkMainList.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /cop/adb/selectManList.do",
+   "name": "주소록 구성원 목록 조회",
+   "summary": {
+    "text": "주소록에 속한 구성원(사용자) 목록을 검색 조건에 맞게 조회한다. 주소록 화면 요청은 모두 주소록 담당 화면 처리기가 받아 인증 확인 후 주소록 업무 서비스로 넘긴다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 317,
+      "snippet": "@RequestMapping(\"/cop/adb/selectManList.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /cop/adb/updateAdbkInf.do",
+   "name": "주소록 수정 화면 열기",
+   "summary": {
+    "text": "선택한 주소록의 현재 정보를 불러와 수정 입력 화면을 연다. 주소록 화면 요청은 모두 주소록 담당 화면 처리기가 받아 인증 확인 후 주소록 업무 서비스로 넘긴다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 369,
+      "snippet": "@RequestMapping(\"/cop/adb/updateAdbkInf.do\")"
+     }
+    ]
+   }
+  }
+ ],
+ "steps": [
+  {
+   "stepId": "step:ANY /cop/adb/RegistAdbkInf.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+   "name": "로그인 사용자 정보",
+   "summary": {
+    "text": "현재 로그인한 사용자의 아이디·이름·소속 부서 등을 담는 정보 묶음으로, 주소록의 등록자·수정자·대상 부서를 채우는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "line": 33,
+      "snippet": "public class LoginVO implements Serializable{"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "인증 확인 결과로 받은 사용자 정보를 담는 데이터 구조다. 주소록 등록·수정 시 등록자 아이디와 대상 부서를 채우는 원천이 된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 33,
+       "snippet": "public class LoginVO implements Serializable{"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 455,
+       "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "아이디·이름·이메일 등은 필수 값으로 표시되며, 조직(부서) 아이디와 고유 아이디도 함께 보관한다. 주소록에서는 이 가운데 아이디와 조직 아이디를 사용한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 42,
+       "snippet": "\tprivate String id;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 45,
+       "snippet": "\tprivate String name;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 63,
+       "snippet": "\tprivate String orgnztId;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 67,
+       "snippet": "\tprivate String uniqId;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/RegistAdbkInf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+   "name": "사용자 인증 정보 서비스",
+   "summary": {
+    "text": "인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 인증 서비스로 주소록 접근 통제의 판단 근거가 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "line": 5,
+      "snippet": "public interface EgovUserDetailsService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 업무 자체를 처리하지는 않지만, 흐름의 첫 관문인 인증 확인을 담당한다. 화면 처리기가 도우미를 통해 이 서비스를 호출해 사용자와 인증 여부를 얻는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 5,
+       "snippet": "public interface EgovUserDetailsService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "인증된 사용자 객체 제공, 사용자 권한 목록 제공, 인증 여부 판정의 세 가지 규약을 정의한다. 인증 여부 판정 결과가 거짓이면 주소록 화면 처리기는 업무를 진행하지 않는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 18,
+       "snippet": "\tpublic List<String> getAuthorities();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 24,
+       "snippet": "\tpublic Boolean isAuthenticated(); "
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/RegistAdbkInf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+   "name": "로그인 사용자 확인 도우미",
+   "summary": {
+    "text": "현재 로그인한 사용자 정보와 인증 여부를 꺼내 주는 공통 도우미로, 주소록 화면 처리기가 접근 통제를 위해 호출한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "line": 25,
+      "snippet": "public class EgovUserDetailsHelper {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록의 모든 화면 요청에서 접근 통제의 근거가 되는 협력 객체다. 사용자 인증 서비스를 감싸 현재 사용자 정보와 인증 여부를 제공한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 25,
+       "snippet": "public class EgovUserDetailsHelper {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 27,
+       "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "보관하는 상태는 사용자 인증 서비스 참조 하나이며, 인증된 사용자 객체와 권한 목록, 인증 여부를 각각 꺼내 준다. 인증 서비스가 설정되어 있어야 동작한다는 전제를 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 41,
+       "snippet": "\tpublic static Object getAuthenticatedUser() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 50,
+       "snippet": "\tpublic static List<String> getAuthorities() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 58,
+       "snippet": "\tpublic static Boolean isAuthenticated() {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/RegistAdbkInf.do:src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+   "name": "주소록 구성원 정보",
+   "summary": {
+    "text": "주소록에 담을 구성원(사용자)의 아이디·이름·연락처와 구성원 검색·페이지 조건을 담는 정보 묶음이다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+      "line": 24,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 구성원을 표현하고, 구성원 선택·조회 화면의 검색 조건과 페이지 조건을 함께 실어 나르는 데이터 구조다. 화면에서 선택된 사용자 아이디가 이 묶음으로 전달된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 25,
+       "snippet": "public class AddressBookUserVO extends AddressBookUser {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 431,
+       "snippet": "    \t\t@ModelAttribute(\"adbkUserVO\") AddressBookUserVO adbkUserVO,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 442,
+       "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "사용자 아이디·이름·이메일과 집전화 번호를 세 토막으로 나눠 보관하고, 검색어·검색조건·검색기간과 현재 페이지·페이지당 건수 같은 목록 조회 조건을 함께 가진다. 문자열 항목은 빈 문자열로, 페이지 항목은 기본 10건으로 초기화된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 28,
+       "snippet": "    private String userId = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 31,
+       "snippet": "    private String userNm = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 34,
+       "snippet": "    private String userEmail = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 55,
+       "snippet": "    private String searchWrd = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 64,
+       "snippet": "    private int pageIndex = 1;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 79,
+       "snippet": "    private int recordCountPerPage = 10;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/RegistAdbkInf.do:src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+   "name": "주소록 조회·등록 정보",
+   "summary": {
+    "text": "주소록 기본 정보에 검색·페이지 조건과 구성원 목록을 더한 정보 묶음으로, 주소록 조회·등록·수정 요청의 입출력이 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+      "line": 29,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 기본 정보를 물려받아 목록 조회용 검색·페이지 조건과 구성원 목록을 함께 담는 데이터 구조다. 등록·수정 흐름에서 화면 입력값을 받아 업무 서비스로 전달하는 그릇 역할을 한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 30,
+       "snippet": "public class AddressBookVO extends AddressBook implements Serializable  {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "검색어·검색조건·검색기간·정렬순서와 현재 페이지·페이지당 건수 등 목록 조회 조건을 가지며, 주소록 구성원 목록을 함께 보관한다. 구성원 목록은 설정 시 변경 불가능한 리스트로 감싸 보관하는 것이 지켜야 할 규칙이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 43,
+       "snippet": "    private String searchWrd = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 52,
+       "snippet": "    private int pageIndex = 1;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 79,
+       "snippet": "    private List< AddressBookUser > adbkMan = new ArrayList<AddressBookUser>();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 88,
+       "snippet": "    public void setAdbkMan(List<AddressBookUser> adbkMan) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 89,
+       "snippet": "        this.adbkMan = Collections.unmodifiableList(adbkMan);"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/RegistAdbkInf.do:src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+   "name": "주소록 업무 서비스",
+   "summary": {
+    "text": "주소록과 구성원의 조회·등록·수정·삭제 업무를 정의하는 서비스로, 화면 처리기의 요청을 받아 실제 주소록 작업을 수행한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+      "line": 21,
+      "snippet": "public interface EgovAddressBookService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 도메인의 업무 조율 지점이다. 화면 처리기는 인증과 입력 정리만 하고, 주소록 목록·상세 조회, 등록, 수정, 삭제와 구성원·명함 목록 조회를 이 서비스에 위임한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 21,
+       "snippet": "public interface EgovAddressBookService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "주소록 목록 조회와 상세 조회, 주소록 등록·수정·삭제, 구성원 목록과 명함 목록 조회, 구성원 한 명 불러오기를 업무 규약으로 정의한다. 등록·수정은 구성원 목록이 채워진 주소록 정보를 통째로 받아 처리한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 38,
+       "snippet": "    public AddressBookVO selectAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 46,
+       "snippet": "    public void deleteAdressBook(AddressBook addressBook) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 54,
+       "snippet": "    public Map<String, Object> selectManList(AddressBookUserVO addressBookUserVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 70,
+       "snippet": "    public void insertAdressBook(AddressBookVO adbkVO) throws Exception;   "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 78,
+       "snippet": "    public void updateAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 86,
+       "snippet": "    public AddressBookUser selectAdbkUser(String id) throws Exception;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/RegistAdbkInf.do:src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+   "name": "주소록 등록 처리 화면 요청 처리",
+   "summary": {
+    "text": "주소록 담당 화면 처리기가 '주소록 등록 처리' 요청을 받아 로그인 사용자와 인증 여부를 확인한 뒤, 입력값을 주소록 업무 서비스로 넘기고 결과 화면을 정한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 429,
+      "snippet": "@RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "이 흐름의 시작점으로, 사용자의 '주소록 등록 처리' 요청을 받아 인증 상태를 확인하고 화면 입력값을 정리한 다음 주소록 업무 서비스에 실제 처리를 위임한다. 처리 후에는 이동할 화면 또는 목록 재조회를 되돌려 준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 429,
+       "snippet": "    @RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "request": {
+     "text": "화면 입력값은 주소록 정보와 구성원 정보 두 묶음으로 받으며 주소록 정보는 유효성 검증 대상이다. 로그인 사용자 정보와 인증 여부를 확인해 미인증이면 로그인 화면으로 되돌리고, 검증 오류가 있으면 등록 입력 화면을 다시 보여준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 434,
+       "snippet": "        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 435,
+       "snippet": "        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 437,
+       "snippet": "        if(!isAuthenticated) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 438,
+       "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 451,
+       "snippet": "        if (bindingResult.hasErrors()) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/RegistAdbkInf.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+   "name": "문자열 처리 공통 유틸",
+   "summary": {
+    "text": "빈 값 처리와 문자열 가공을 담당하는 공통 유틸로, 주소록에서 선택된 구성원 아이디 목록과 사용자 아이디의 빈 값을 안전하게 다루는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "line": 43,
+      "snippet": "public class EgovStringUtil {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 흐름에서 화면으로 들어온 값이 비어 있을 때를 안전하게 처리하는 협력 객체다. 선택된 구성원 아이디 문자열을 쉼표로 나누기 전과 등록자 아이디를 채울 때 빈 값 보정을 위해 호출된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 43,
+       "snippet": "public class EgovStringUtil {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 442,
+       "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 455,
+       "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "상태를 갖지 않는 공통 유틸로 빈 문자열 상수와 난수 생성기를 클래스 수준에서 보관하며, 문자열 자르기 등 가공 기능을 제공한다. 빈 값이 들어와도 널 대신 빈 문자열로 다뤄지는 것이 주소록 쪽이 기대하는 불변식이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 47,
+       "snippet": "\tpublic static final String EMPTY = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 50,
+       "snippet": "\tprivate static SecureRandom rnd = new SecureRandom();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 77,
+       "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/UpdateAddressBook.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+   "name": "로그인 사용자 정보",
+   "summary": {
+    "text": "현재 로그인한 사용자의 아이디·이름·소속 부서 등을 담는 정보 묶음으로, 주소록의 등록자·수정자·대상 부서를 채우는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "line": 33,
+      "snippet": "public class LoginVO implements Serializable{"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "인증 확인 결과로 받은 사용자 정보를 담는 데이터 구조다. 주소록 등록·수정 시 등록자 아이디와 대상 부서를 채우는 원천이 된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 33,
+       "snippet": "public class LoginVO implements Serializable{"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 455,
+       "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "아이디·이름·이메일 등은 필수 값으로 표시되며, 조직(부서) 아이디와 고유 아이디도 함께 보관한다. 주소록에서는 이 가운데 아이디와 조직 아이디를 사용한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 42,
+       "snippet": "\tprivate String id;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 45,
+       "snippet": "\tprivate String name;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 63,
+       "snippet": "\tprivate String orgnztId;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 67,
+       "snippet": "\tprivate String uniqId;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/UpdateAddressBook.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+   "name": "사용자 인증 정보 서비스",
+   "summary": {
+    "text": "인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 인증 서비스로 주소록 접근 통제의 판단 근거가 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "line": 5,
+      "snippet": "public interface EgovUserDetailsService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 업무 자체를 처리하지는 않지만, 흐름의 첫 관문인 인증 확인을 담당한다. 화면 처리기가 도우미를 통해 이 서비스를 호출해 사용자와 인증 여부를 얻는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 5,
+       "snippet": "public interface EgovUserDetailsService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "인증된 사용자 객체 제공, 사용자 권한 목록 제공, 인증 여부 판정의 세 가지 규약을 정의한다. 인증 여부 판정 결과가 거짓이면 주소록 화면 처리기는 업무를 진행하지 않는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 18,
+       "snippet": "\tpublic List<String> getAuthorities();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 24,
+       "snippet": "\tpublic Boolean isAuthenticated(); "
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/UpdateAddressBook.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+   "name": "로그인 사용자 확인 도우미",
+   "summary": {
+    "text": "현재 로그인한 사용자 정보와 인증 여부를 꺼내 주는 공통 도우미로, 주소록 화면 처리기가 접근 통제를 위해 호출한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "line": 25,
+      "snippet": "public class EgovUserDetailsHelper {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록의 모든 화면 요청에서 접근 통제의 근거가 되는 협력 객체다. 사용자 인증 서비스를 감싸 현재 사용자 정보와 인증 여부를 제공한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 25,
+       "snippet": "public class EgovUserDetailsHelper {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 27,
+       "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "보관하는 상태는 사용자 인증 서비스 참조 하나이며, 인증된 사용자 객체와 권한 목록, 인증 여부를 각각 꺼내 준다. 인증 서비스가 설정되어 있어야 동작한다는 전제를 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 41,
+       "snippet": "\tpublic static Object getAuthenticatedUser() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 50,
+       "snippet": "\tpublic static List<String> getAuthorities() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 58,
+       "snippet": "\tpublic static Boolean isAuthenticated() {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/UpdateAddressBook.do:src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+   "name": "주소록 구성원 정보",
+   "summary": {
+    "text": "주소록에 담을 구성원(사용자)의 아이디·이름·연락처와 구성원 검색·페이지 조건을 담는 정보 묶음이다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+      "line": 24,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 구성원을 표현하고, 구성원 선택·조회 화면의 검색 조건과 페이지 조건을 함께 실어 나르는 데이터 구조다. 화면에서 선택된 사용자 아이디가 이 묶음으로 전달된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 25,
+       "snippet": "public class AddressBookUserVO extends AddressBookUser {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 431,
+       "snippet": "    \t\t@ModelAttribute(\"adbkUserVO\") AddressBookUserVO adbkUserVO,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 442,
+       "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "사용자 아이디·이름·이메일과 집전화 번호를 세 토막으로 나눠 보관하고, 검색어·검색조건·검색기간과 현재 페이지·페이지당 건수 같은 목록 조회 조건을 함께 가진다. 문자열 항목은 빈 문자열로, 페이지 항목은 기본 10건으로 초기화된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 28,
+       "snippet": "    private String userId = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 31,
+       "snippet": "    private String userNm = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 34,
+       "snippet": "    private String userEmail = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 55,
+       "snippet": "    private String searchWrd = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 64,
+       "snippet": "    private int pageIndex = 1;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 79,
+       "snippet": "    private int recordCountPerPage = 10;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/UpdateAddressBook.do:src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+   "name": "주소록 조회·등록 정보",
+   "summary": {
+    "text": "주소록 기본 정보에 검색·페이지 조건과 구성원 목록을 더한 정보 묶음으로, 주소록 조회·등록·수정 요청의 입출력이 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+      "line": 29,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 기본 정보를 물려받아 목록 조회용 검색·페이지 조건과 구성원 목록을 함께 담는 데이터 구조다. 등록·수정 흐름에서 화면 입력값을 받아 업무 서비스로 전달하는 그릇 역할을 한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 30,
+       "snippet": "public class AddressBookVO extends AddressBook implements Serializable  {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "검색어·검색조건·검색기간·정렬순서와 현재 페이지·페이지당 건수 등 목록 조회 조건을 가지며, 주소록 구성원 목록을 함께 보관한다. 구성원 목록은 설정 시 변경 불가능한 리스트로 감싸 보관하는 것이 지켜야 할 규칙이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 43,
+       "snippet": "    private String searchWrd = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 52,
+       "snippet": "    private int pageIndex = 1;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 79,
+       "snippet": "    private List< AddressBookUser > adbkMan = new ArrayList<AddressBookUser>();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 88,
+       "snippet": "    public void setAdbkMan(List<AddressBookUser> adbkMan) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 89,
+       "snippet": "        this.adbkMan = Collections.unmodifiableList(adbkMan);"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/UpdateAddressBook.do:src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+   "name": "주소록 업무 서비스",
+   "summary": {
+    "text": "주소록과 구성원의 조회·등록·수정·삭제 업무를 정의하는 서비스로, 화면 처리기의 요청을 받아 실제 주소록 작업을 수행한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+      "line": 21,
+      "snippet": "public interface EgovAddressBookService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 도메인의 업무 조율 지점이다. 화면 처리기는 인증과 입력 정리만 하고, 주소록 목록·상세 조회, 등록, 수정, 삭제와 구성원·명함 목록 조회를 이 서비스에 위임한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 21,
+       "snippet": "public interface EgovAddressBookService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "주소록 목록 조회와 상세 조회, 주소록 등록·수정·삭제, 구성원 목록과 명함 목록 조회, 구성원 한 명 불러오기를 업무 규약으로 정의한다. 등록·수정은 구성원 목록이 채워진 주소록 정보를 통째로 받아 처리한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 38,
+       "snippet": "    public AddressBookVO selectAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 46,
+       "snippet": "    public void deleteAdressBook(AddressBook addressBook) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 54,
+       "snippet": "    public Map<String, Object> selectManList(AddressBookUserVO addressBookUserVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 70,
+       "snippet": "    public void insertAdressBook(AddressBookVO adbkVO) throws Exception;   "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 78,
+       "snippet": "    public void updateAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 86,
+       "snippet": "    public AddressBookUser selectAdbkUser(String id) throws Exception;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/UpdateAddressBook.do:src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+   "name": "주소록 수정 처리 화면 요청 처리",
+   "summary": {
+    "text": "주소록 담당 화면 처리기가 '주소록 수정 처리' 요청을 받아 로그인 사용자와 인증 여부를 확인한 뒤, 입력값을 주소록 업무 서비스로 넘기고 결과 화면을 정한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 429,
+      "snippet": "@RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "이 흐름의 시작점으로, 사용자의 '주소록 수정 처리' 요청을 받아 인증 상태를 확인하고 화면 입력값을 정리한 다음 주소록 업무 서비스에 실제 처리를 위임한다. 처리 후에는 이동할 화면 또는 목록 재조회를 되돌려 준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 429,
+       "snippet": "    @RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "request": {
+     "text": "화면 입력값은 주소록 정보와 구성원 정보 두 묶음으로 받으며 주소록 정보는 유효성 검증 대상이다. 로그인 사용자 정보와 인증 여부를 확인해 미인증이면 로그인 화면으로 되돌리고, 검증 오류가 있으면 등록 입력 화면을 다시 보여준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 434,
+       "snippet": "        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 435,
+       "snippet": "        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 437,
+       "snippet": "        if(!isAuthenticated) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 438,
+       "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 451,
+       "snippet": "        if (bindingResult.hasErrors()) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/UpdateAddressBook.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+   "name": "문자열 처리 공통 유틸",
+   "summary": {
+    "text": "빈 값 처리와 문자열 가공을 담당하는 공통 유틸로, 주소록에서 선택된 구성원 아이디 목록과 사용자 아이디의 빈 값을 안전하게 다루는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "line": 43,
+      "snippet": "public class EgovStringUtil {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 흐름에서 화면으로 들어온 값이 비어 있을 때를 안전하게 처리하는 협력 객체다. 선택된 구성원 아이디 문자열을 쉼표로 나누기 전과 등록자 아이디를 채울 때 빈 값 보정을 위해 호출된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 43,
+       "snippet": "public class EgovStringUtil {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 442,
+       "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 455,
+       "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "상태를 갖지 않는 공통 유틸로 빈 문자열 상수와 난수 생성기를 클래스 수준에서 보관하며, 문자열 자르기 등 가공 기능을 제공한다. 빈 값이 들어와도 널 대신 빈 문자열로 다뤄지는 것이 주소록 쪽이 기대하는 불변식이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 47,
+       "snippet": "\tpublic static final String EMPTY = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 50,
+       "snippet": "\tprivate static SecureRandom rnd = new SecureRandom();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 77,
+       "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/addAdbkInf.do:src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+   "name": "주소록 등록 화면 열기 화면 요청 처리",
+   "summary": {
+    "text": "주소록 담당 화면 처리기가 '주소록 등록 화면 열기' 요청을 받아 로그인 사용자와 인증 여부를 확인한 뒤, 입력값을 주소록 업무 서비스로 넘기고 결과 화면을 정한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 429,
+      "snippet": "@RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "이 흐름의 시작점으로, 사용자의 '주소록 등록 화면 열기' 요청을 받아 인증 상태를 확인하고 화면 입력값을 정리한 다음 주소록 업무 서비스에 실제 처리를 위임한다. 처리 후에는 이동할 화면 또는 목록 재조회를 되돌려 준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 429,
+       "snippet": "    @RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "request": {
+     "text": "화면 입력값은 주소록 정보와 구성원 정보 두 묶음으로 받으며 주소록 정보는 유효성 검증 대상이다. 로그인 사용자 정보와 인증 여부를 확인해 미인증이면 로그인 화면으로 되돌리고, 검증 오류가 있으면 등록 입력 화면을 다시 보여준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 434,
+       "snippet": "        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 435,
+       "snippet": "        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 437,
+       "snippet": "        if(!isAuthenticated) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 438,
+       "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 451,
+       "snippet": "        if (bindingResult.hasErrors()) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/addUser.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+   "name": "사용자 인증 정보 서비스",
+   "summary": {
+    "text": "인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 인증 서비스로 주소록 접근 통제의 판단 근거가 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "line": 5,
+      "snippet": "public interface EgovUserDetailsService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 업무 자체를 처리하지는 않지만, 흐름의 첫 관문인 인증 확인을 담당한다. 화면 처리기가 도우미를 통해 이 서비스를 호출해 사용자와 인증 여부를 얻는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 5,
+       "snippet": "public interface EgovUserDetailsService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "인증된 사용자 객체 제공, 사용자 권한 목록 제공, 인증 여부 판정의 세 가지 규약을 정의한다. 인증 여부 판정 결과가 거짓이면 주소록 화면 처리기는 업무를 진행하지 않는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 18,
+       "snippet": "\tpublic List<String> getAuthorities();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 24,
+       "snippet": "\tpublic Boolean isAuthenticated(); "
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/addUser.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+   "name": "로그인 사용자 확인 도우미",
+   "summary": {
+    "text": "현재 로그인한 사용자 정보와 인증 여부를 꺼내 주는 공통 도우미로, 주소록 화면 처리기가 접근 통제를 위해 호출한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "line": 25,
+      "snippet": "public class EgovUserDetailsHelper {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록의 모든 화면 요청에서 접근 통제의 근거가 되는 협력 객체다. 사용자 인증 서비스를 감싸 현재 사용자 정보와 인증 여부를 제공한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 25,
+       "snippet": "public class EgovUserDetailsHelper {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 27,
+       "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "보관하는 상태는 사용자 인증 서비스 참조 하나이며, 인증된 사용자 객체와 권한 목록, 인증 여부를 각각 꺼내 준다. 인증 서비스가 설정되어 있어야 동작한다는 전제를 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 41,
+       "snippet": "\tpublic static Object getAuthenticatedUser() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 50,
+       "snippet": "\tpublic static List<String> getAuthorities() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 58,
+       "snippet": "\tpublic static Boolean isAuthenticated() {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/addUser.do:src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+   "name": "주소록 구성원 정보",
+   "summary": {
+    "text": "주소록에 담을 구성원(사용자)의 아이디·이름·연락처와 구성원 검색·페이지 조건을 담는 정보 묶음이다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+      "line": 24,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 구성원을 표현하고, 구성원 선택·조회 화면의 검색 조건과 페이지 조건을 함께 실어 나르는 데이터 구조다. 화면에서 선택된 사용자 아이디가 이 묶음으로 전달된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 25,
+       "snippet": "public class AddressBookUserVO extends AddressBookUser {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 431,
+       "snippet": "    \t\t@ModelAttribute(\"adbkUserVO\") AddressBookUserVO adbkUserVO,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 442,
+       "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "사용자 아이디·이름·이메일과 집전화 번호를 세 토막으로 나눠 보관하고, 검색어·검색조건·검색기간과 현재 페이지·페이지당 건수 같은 목록 조회 조건을 함께 가진다. 문자열 항목은 빈 문자열로, 페이지 항목은 기본 10건으로 초기화된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 28,
+       "snippet": "    private String userId = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 31,
+       "snippet": "    private String userNm = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 34,
+       "snippet": "    private String userEmail = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 55,
+       "snippet": "    private String searchWrd = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 64,
+       "snippet": "    private int pageIndex = 1;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 79,
+       "snippet": "    private int recordCountPerPage = 10;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/addUser.do:src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+   "name": "주소록 조회·등록 정보",
+   "summary": {
+    "text": "주소록 기본 정보에 검색·페이지 조건과 구성원 목록을 더한 정보 묶음으로, 주소록 조회·등록·수정 요청의 입출력이 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+      "line": 29,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 기본 정보를 물려받아 목록 조회용 검색·페이지 조건과 구성원 목록을 함께 담는 데이터 구조다. 등록·수정 흐름에서 화면 입력값을 받아 업무 서비스로 전달하는 그릇 역할을 한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 30,
+       "snippet": "public class AddressBookVO extends AddressBook implements Serializable  {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "검색어·검색조건·검색기간·정렬순서와 현재 페이지·페이지당 건수 등 목록 조회 조건을 가지며, 주소록 구성원 목록을 함께 보관한다. 구성원 목록은 설정 시 변경 불가능한 리스트로 감싸 보관하는 것이 지켜야 할 규칙이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 43,
+       "snippet": "    private String searchWrd = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 52,
+       "snippet": "    private int pageIndex = 1;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 79,
+       "snippet": "    private List< AddressBookUser > adbkMan = new ArrayList<AddressBookUser>();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 88,
+       "snippet": "    public void setAdbkMan(List<AddressBookUser> adbkMan) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 89,
+       "snippet": "        this.adbkMan = Collections.unmodifiableList(adbkMan);"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/addUser.do:src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+   "name": "주소록 업무 서비스",
+   "summary": {
+    "text": "주소록과 구성원의 조회·등록·수정·삭제 업무를 정의하는 서비스로, 화면 처리기의 요청을 받아 실제 주소록 작업을 수행한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+      "line": 21,
+      "snippet": "public interface EgovAddressBookService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 도메인의 업무 조율 지점이다. 화면 처리기는 인증과 입력 정리만 하고, 주소록 목록·상세 조회, 등록, 수정, 삭제와 구성원·명함 목록 조회를 이 서비스에 위임한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 21,
+       "snippet": "public interface EgovAddressBookService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "주소록 목록 조회와 상세 조회, 주소록 등록·수정·삭제, 구성원 목록과 명함 목록 조회, 구성원 한 명 불러오기를 업무 규약으로 정의한다. 등록·수정은 구성원 목록이 채워진 주소록 정보를 통째로 받아 처리한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 38,
+       "snippet": "    public AddressBookVO selectAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 46,
+       "snippet": "    public void deleteAdressBook(AddressBook addressBook) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 54,
+       "snippet": "    public Map<String, Object> selectManList(AddressBookUserVO addressBookUserVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 70,
+       "snippet": "    public void insertAdressBook(AddressBookVO adbkVO) throws Exception;   "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 78,
+       "snippet": "    public void updateAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 86,
+       "snippet": "    public AddressBookUser selectAdbkUser(String id) throws Exception;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/addUser.do:src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+   "name": "주소록 구성원 추가 화면 요청 처리",
+   "summary": {
+    "text": "주소록 담당 화면 처리기가 '주소록 구성원 추가' 요청을 받아 로그인 사용자와 인증 여부를 확인한 뒤, 입력값을 주소록 업무 서비스로 넘기고 결과 화면을 정한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 429,
+      "snippet": "@RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "이 흐름의 시작점으로, 사용자의 '주소록 구성원 추가' 요청을 받아 인증 상태를 확인하고 화면 입력값을 정리한 다음 주소록 업무 서비스에 실제 처리를 위임한다. 처리 후에는 이동할 화면 또는 목록 재조회를 되돌려 준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 429,
+       "snippet": "    @RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "request": {
+     "text": "화면 입력값은 주소록 정보와 구성원 정보 두 묶음으로 받으며 주소록 정보는 유효성 검증 대상이다. 로그인 사용자 정보와 인증 여부를 확인해 미인증이면 로그인 화면으로 되돌리고, 검증 오류가 있으면 등록 입력 화면을 다시 보여준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 434,
+       "snippet": "        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 435,
+       "snippet": "        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 437,
+       "snippet": "        if(!isAuthenticated) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 438,
+       "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 451,
+       "snippet": "        if (bindingResult.hasErrors()) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/addUser.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+   "name": "문자열 처리 공통 유틸",
+   "summary": {
+    "text": "빈 값 처리와 문자열 가공을 담당하는 공통 유틸로, 주소록에서 선택된 구성원 아이디 목록과 사용자 아이디의 빈 값을 안전하게 다루는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "line": 43,
+      "snippet": "public class EgovStringUtil {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 흐름에서 화면으로 들어온 값이 비어 있을 때를 안전하게 처리하는 협력 객체다. 선택된 구성원 아이디 문자열을 쉼표로 나누기 전과 등록자 아이디를 채울 때 빈 값 보정을 위해 호출된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 43,
+       "snippet": "public class EgovStringUtil {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 442,
+       "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 455,
+       "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "상태를 갖지 않는 공통 유틸로 빈 문자열 상수와 난수 생성기를 클래스 수준에서 보관하며, 문자열 자르기 등 가공 기능을 제공한다. 빈 값이 들어와도 널 대신 빈 문자열로 다뤄지는 것이 주소록 쪽이 기대하는 불변식이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 47,
+       "snippet": "\tpublic static final String EMPTY = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 50,
+       "snippet": "\tprivate static SecureRandom rnd = new SecureRandom();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 77,
+       "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/deleteAdbkInf.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+   "name": "로그인 사용자 정보",
+   "summary": {
+    "text": "현재 로그인한 사용자의 아이디·이름·소속 부서 등을 담는 정보 묶음으로, 주소록의 등록자·수정자·대상 부서를 채우는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "line": 33,
+      "snippet": "public class LoginVO implements Serializable{"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "인증 확인 결과로 받은 사용자 정보를 담는 데이터 구조다. 주소록 등록·수정 시 등록자 아이디와 대상 부서를 채우는 원천이 된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 33,
+       "snippet": "public class LoginVO implements Serializable{"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 455,
+       "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "아이디·이름·이메일 등은 필수 값으로 표시되며, 조직(부서) 아이디와 고유 아이디도 함께 보관한다. 주소록에서는 이 가운데 아이디와 조직 아이디를 사용한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 42,
+       "snippet": "\tprivate String id;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 45,
+       "snippet": "\tprivate String name;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 63,
+       "snippet": "\tprivate String orgnztId;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 67,
+       "snippet": "\tprivate String uniqId;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/deleteAdbkInf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+   "name": "사용자 인증 정보 서비스",
+   "summary": {
+    "text": "인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 인증 서비스로 주소록 접근 통제의 판단 근거가 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "line": 5,
+      "snippet": "public interface EgovUserDetailsService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 업무 자체를 처리하지는 않지만, 흐름의 첫 관문인 인증 확인을 담당한다. 화면 처리기가 도우미를 통해 이 서비스를 호출해 사용자와 인증 여부를 얻는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 5,
+       "snippet": "public interface EgovUserDetailsService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "인증된 사용자 객체 제공, 사용자 권한 목록 제공, 인증 여부 판정의 세 가지 규약을 정의한다. 인증 여부 판정 결과가 거짓이면 주소록 화면 처리기는 업무를 진행하지 않는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 18,
+       "snippet": "\tpublic List<String> getAuthorities();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 24,
+       "snippet": "\tpublic Boolean isAuthenticated(); "
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/deleteAdbkInf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+   "name": "로그인 사용자 확인 도우미",
+   "summary": {
+    "text": "현재 로그인한 사용자 정보와 인증 여부를 꺼내 주는 공통 도우미로, 주소록 화면 처리기가 접근 통제를 위해 호출한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "line": 25,
+      "snippet": "public class EgovUserDetailsHelper {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록의 모든 화면 요청에서 접근 통제의 근거가 되는 협력 객체다. 사용자 인증 서비스를 감싸 현재 사용자 정보와 인증 여부를 제공한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 25,
+       "snippet": "public class EgovUserDetailsHelper {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 27,
+       "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "보관하는 상태는 사용자 인증 서비스 참조 하나이며, 인증된 사용자 객체와 권한 목록, 인증 여부를 각각 꺼내 준다. 인증 서비스가 설정되어 있어야 동작한다는 전제를 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 41,
+       "snippet": "\tpublic static Object getAuthenticatedUser() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 50,
+       "snippet": "\tpublic static List<String> getAuthorities() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 58,
+       "snippet": "\tpublic static Boolean isAuthenticated() {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/deleteAdbkInf.do:src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+   "name": "주소록 기본 정보",
+   "summary": {
+    "text": "주소록 한 건의 이름·공개범위·사용여부와 등록/수정 이력을 담는 기본 정보 묶음으로, 삭제 요청 시 대상 식별에 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+      "line": 24,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 한 건을 나타내는 기본 데이터 구조로, 삭제 흐름에서는 삭제 대상 주소록을 지정하는 입력으로 전달된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+       "line": 25,
+       "snippet": "public class AddressBook implements Serializable{"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 46,
+       "snippet": "    public void deleteAdressBook(AddressBook addressBook) throws Exception;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "주소록 아이디를 식별자로 하고 주소록 명과 공개범위는 필수 입력이며 주소록 명은 최대 50자로 제한된다. 그 밖에 최초등록자 부서, 사용여부, 등록자·수정자 아이디와 시점을 보관한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+       "line": 28,
+       "snippet": "    private String adbkId = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+       "line": 31,
+       "snippet": "    @EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+       "line": 32,
+       "snippet": "    @Size(max=50)"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+       "line": 36,
+       "snippet": "    @EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+       "line": 40,
+       "snippet": "    private String trgetOrgnztId = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBook.java",
+       "line": 49,
+       "snippet": "    private String frstRegisterId = \"\";"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/deleteAdbkInf.do:src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+   "name": "주소록 업무 서비스",
+   "summary": {
+    "text": "주소록과 구성원의 조회·등록·수정·삭제 업무를 정의하는 서비스로, 화면 처리기의 요청을 받아 실제 주소록 작업을 수행한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+      "line": 21,
+      "snippet": "public interface EgovAddressBookService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 도메인의 업무 조율 지점이다. 화면 처리기는 인증과 입력 정리만 하고, 주소록 목록·상세 조회, 등록, 수정, 삭제와 구성원·명함 목록 조회를 이 서비스에 위임한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 21,
+       "snippet": "public interface EgovAddressBookService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "주소록 목록 조회와 상세 조회, 주소록 등록·수정·삭제, 구성원 목록과 명함 목록 조회, 구성원 한 명 불러오기를 업무 규약으로 정의한다. 등록·수정은 구성원 목록이 채워진 주소록 정보를 통째로 받아 처리한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 38,
+       "snippet": "    public AddressBookVO selectAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 46,
+       "snippet": "    public void deleteAdressBook(AddressBook addressBook) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 54,
+       "snippet": "    public Map<String, Object> selectManList(AddressBookUserVO addressBookUserVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 70,
+       "snippet": "    public void insertAdressBook(AddressBookVO adbkVO) throws Exception;   "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 78,
+       "snippet": "    public void updateAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 86,
+       "snippet": "    public AddressBookUser selectAdbkUser(String id) throws Exception;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/deleteAdbkInf.do:src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+   "name": "주소록 삭제 화면 요청 처리",
+   "summary": {
+    "text": "주소록 담당 화면 처리기가 '주소록 삭제' 요청을 받아 로그인 사용자와 인증 여부를 확인한 뒤, 입력값을 주소록 업무 서비스로 넘기고 결과 화면을 정한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 429,
+      "snippet": "@RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "이 흐름의 시작점으로, 사용자의 '주소록 삭제' 요청을 받아 인증 상태를 확인하고 화면 입력값을 정리한 다음 주소록 업무 서비스에 실제 처리를 위임한다. 처리 후에는 이동할 화면 또는 목록 재조회를 되돌려 준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 429,
+       "snippet": "    @RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "request": {
+     "text": "화면 입력값은 주소록 정보와 구성원 정보 두 묶음으로 받으며 주소록 정보는 유효성 검증 대상이다. 로그인 사용자 정보와 인증 여부를 확인해 미인증이면 로그인 화면으로 되돌리고, 검증 오류가 있으면 등록 입력 화면을 다시 보여준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 434,
+       "snippet": "        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 435,
+       "snippet": "        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 437,
+       "snippet": "        if(!isAuthenticated) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 438,
+       "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 451,
+       "snippet": "        if (bindingResult.hasErrors()) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/deleteAdbkInf.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+   "name": "문자열 처리 공통 유틸",
+   "summary": {
+    "text": "빈 값 처리와 문자열 가공을 담당하는 공통 유틸로, 주소록에서 선택된 구성원 아이디 목록과 사용자 아이디의 빈 값을 안전하게 다루는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "line": 43,
+      "snippet": "public class EgovStringUtil {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 흐름에서 화면으로 들어온 값이 비어 있을 때를 안전하게 처리하는 협력 객체다. 선택된 구성원 아이디 문자열을 쉼표로 나누기 전과 등록자 아이디를 채울 때 빈 값 보정을 위해 호출된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 43,
+       "snippet": "public class EgovStringUtil {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 442,
+       "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 455,
+       "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "상태를 갖지 않는 공통 유틸로 빈 문자열 상수와 난수 생성기를 클래스 수준에서 보관하며, 문자열 자르기 등 가공 기능을 제공한다. 빈 값이 들어와도 널 대신 빈 문자열로 다뤄지는 것이 주소록 쪽이 기대하는 불변식이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 47,
+       "snippet": "\tpublic static final String EMPTY = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 50,
+       "snippet": "\tprivate static SecureRandom rnd = new SecureRandom();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 77,
+       "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/deleteUser.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+   "name": "사용자 인증 정보 서비스",
+   "summary": {
+    "text": "인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 인증 서비스로 주소록 접근 통제의 판단 근거가 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "line": 5,
+      "snippet": "public interface EgovUserDetailsService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 업무 자체를 처리하지는 않지만, 흐름의 첫 관문인 인증 확인을 담당한다. 화면 처리기가 도우미를 통해 이 서비스를 호출해 사용자와 인증 여부를 얻는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 5,
+       "snippet": "public interface EgovUserDetailsService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "인증된 사용자 객체 제공, 사용자 권한 목록 제공, 인증 여부 판정의 세 가지 규약을 정의한다. 인증 여부 판정 결과가 거짓이면 주소록 화면 처리기는 업무를 진행하지 않는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 18,
+       "snippet": "\tpublic List<String> getAuthorities();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 24,
+       "snippet": "\tpublic Boolean isAuthenticated(); "
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/deleteUser.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+   "name": "로그인 사용자 확인 도우미",
+   "summary": {
+    "text": "현재 로그인한 사용자 정보와 인증 여부를 꺼내 주는 공통 도우미로, 주소록 화면 처리기가 접근 통제를 위해 호출한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "line": 25,
+      "snippet": "public class EgovUserDetailsHelper {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록의 모든 화면 요청에서 접근 통제의 근거가 되는 협력 객체다. 사용자 인증 서비스를 감싸 현재 사용자 정보와 인증 여부를 제공한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 25,
+       "snippet": "public class EgovUserDetailsHelper {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 27,
+       "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "보관하는 상태는 사용자 인증 서비스 참조 하나이며, 인증된 사용자 객체와 권한 목록, 인증 여부를 각각 꺼내 준다. 인증 서비스가 설정되어 있어야 동작한다는 전제를 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 41,
+       "snippet": "\tpublic static Object getAuthenticatedUser() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 50,
+       "snippet": "\tpublic static List<String> getAuthorities() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 58,
+       "snippet": "\tpublic static Boolean isAuthenticated() {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/deleteUser.do:src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+   "name": "주소록 구성원 정보",
+   "summary": {
+    "text": "주소록에 담을 구성원(사용자)의 아이디·이름·연락처와 구성원 검색·페이지 조건을 담는 정보 묶음이다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+      "line": 24,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 구성원을 표현하고, 구성원 선택·조회 화면의 검색 조건과 페이지 조건을 함께 실어 나르는 데이터 구조다. 화면에서 선택된 사용자 아이디가 이 묶음으로 전달된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 25,
+       "snippet": "public class AddressBookUserVO extends AddressBookUser {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 431,
+       "snippet": "    \t\t@ModelAttribute(\"adbkUserVO\") AddressBookUserVO adbkUserVO,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 442,
+       "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "사용자 아이디·이름·이메일과 집전화 번호를 세 토막으로 나눠 보관하고, 검색어·검색조건·검색기간과 현재 페이지·페이지당 건수 같은 목록 조회 조건을 함께 가진다. 문자열 항목은 빈 문자열로, 페이지 항목은 기본 10건으로 초기화된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 28,
+       "snippet": "    private String userId = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 31,
+       "snippet": "    private String userNm = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 34,
+       "snippet": "    private String userEmail = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 55,
+       "snippet": "    private String searchWrd = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 64,
+       "snippet": "    private int pageIndex = 1;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 79,
+       "snippet": "    private int recordCountPerPage = 10;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/deleteUser.do:src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+   "name": "주소록 조회·등록 정보",
+   "summary": {
+    "text": "주소록 기본 정보에 검색·페이지 조건과 구성원 목록을 더한 정보 묶음으로, 주소록 조회·등록·수정 요청의 입출력이 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+      "line": 29,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 기본 정보를 물려받아 목록 조회용 검색·페이지 조건과 구성원 목록을 함께 담는 데이터 구조다. 등록·수정 흐름에서 화면 입력값을 받아 업무 서비스로 전달하는 그릇 역할을 한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 30,
+       "snippet": "public class AddressBookVO extends AddressBook implements Serializable  {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "검색어·검색조건·검색기간·정렬순서와 현재 페이지·페이지당 건수 등 목록 조회 조건을 가지며, 주소록 구성원 목록을 함께 보관한다. 구성원 목록은 설정 시 변경 불가능한 리스트로 감싸 보관하는 것이 지켜야 할 규칙이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 43,
+       "snippet": "    private String searchWrd = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 52,
+       "snippet": "    private int pageIndex = 1;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 79,
+       "snippet": "    private List< AddressBookUser > adbkMan = new ArrayList<AddressBookUser>();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 88,
+       "snippet": "    public void setAdbkMan(List<AddressBookUser> adbkMan) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 89,
+       "snippet": "        this.adbkMan = Collections.unmodifiableList(adbkMan);"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/deleteUser.do:src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+   "name": "주소록 업무 서비스",
+   "summary": {
+    "text": "주소록과 구성원의 조회·등록·수정·삭제 업무를 정의하는 서비스로, 화면 처리기의 요청을 받아 실제 주소록 작업을 수행한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+      "line": 21,
+      "snippet": "public interface EgovAddressBookService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 도메인의 업무 조율 지점이다. 화면 처리기는 인증과 입력 정리만 하고, 주소록 목록·상세 조회, 등록, 수정, 삭제와 구성원·명함 목록 조회를 이 서비스에 위임한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 21,
+       "snippet": "public interface EgovAddressBookService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "주소록 목록 조회와 상세 조회, 주소록 등록·수정·삭제, 구성원 목록과 명함 목록 조회, 구성원 한 명 불러오기를 업무 규약으로 정의한다. 등록·수정은 구성원 목록이 채워진 주소록 정보를 통째로 받아 처리한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 38,
+       "snippet": "    public AddressBookVO selectAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 46,
+       "snippet": "    public void deleteAdressBook(AddressBook addressBook) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 54,
+       "snippet": "    public Map<String, Object> selectManList(AddressBookUserVO addressBookUserVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 70,
+       "snippet": "    public void insertAdressBook(AddressBookVO adbkVO) throws Exception;   "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 78,
+       "snippet": "    public void updateAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 86,
+       "snippet": "    public AddressBookUser selectAdbkUser(String id) throws Exception;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/deleteUser.do:src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+   "name": "주소록 구성원 삭제 화면 요청 처리",
+   "summary": {
+    "text": "주소록 담당 화면 처리기가 '주소록 구성원 삭제' 요청을 받아 로그인 사용자와 인증 여부를 확인한 뒤, 입력값을 주소록 업무 서비스로 넘기고 결과 화면을 정한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 429,
+      "snippet": "@RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "이 흐름의 시작점으로, 사용자의 '주소록 구성원 삭제' 요청을 받아 인증 상태를 확인하고 화면 입력값을 정리한 다음 주소록 업무 서비스에 실제 처리를 위임한다. 처리 후에는 이동할 화면 또는 목록 재조회를 되돌려 준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 429,
+       "snippet": "    @RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "request": {
+     "text": "화면 입력값은 주소록 정보와 구성원 정보 두 묶음으로 받으며 주소록 정보는 유효성 검증 대상이다. 로그인 사용자 정보와 인증 여부를 확인해 미인증이면 로그인 화면으로 되돌리고, 검증 오류가 있으면 등록 입력 화면을 다시 보여준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 434,
+       "snippet": "        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 435,
+       "snippet": "        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 437,
+       "snippet": "        if(!isAuthenticated) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 438,
+       "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 451,
+       "snippet": "        if (bindingResult.hasErrors()) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/deleteUser.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+   "name": "문자열 처리 공통 유틸",
+   "summary": {
+    "text": "빈 값 처리와 문자열 가공을 담당하는 공통 유틸로, 주소록에서 선택된 구성원 아이디 목록과 사용자 아이디의 빈 값을 안전하게 다루는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "line": 43,
+      "snippet": "public class EgovStringUtil {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 흐름에서 화면으로 들어온 값이 비어 있을 때를 안전하게 처리하는 협력 객체다. 선택된 구성원 아이디 문자열을 쉼표로 나누기 전과 등록자 아이디를 채울 때 빈 값 보정을 위해 호출된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 43,
+       "snippet": "public class EgovStringUtil {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 442,
+       "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 455,
+       "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "상태를 갖지 않는 공통 유틸로 빈 문자열 상수와 난수 생성기를 클래스 수준에서 보관하며, 문자열 자르기 등 가공 기능을 제공한다. 빈 값이 들어와도 널 대신 빈 문자열로 다뤄지는 것이 주소록 쪽이 기대하는 불변식이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 47,
+       "snippet": "\tpublic static final String EMPTY = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 50,
+       "snippet": "\tprivate static SecureRandom rnd = new SecureRandom();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 77,
+       "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/openPopup.do:src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+   "name": "사용자 선택 팝업 열기 화면 요청 처리",
+   "summary": {
+    "text": "주소록 담당 화면 처리기가 '사용자 선택 팝업 열기' 요청을 받아 로그인 사용자와 인증 여부를 확인한 뒤, 입력값을 주소록 업무 서비스로 넘기고 결과 화면을 정한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 429,
+      "snippet": "@RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "이 흐름의 시작점으로, 사용자의 '사용자 선택 팝업 열기' 요청을 받아 인증 상태를 확인하고 화면 입력값을 정리한 다음 주소록 업무 서비스에 실제 처리를 위임한다. 처리 후에는 이동할 화면 또는 목록 재조회를 되돌려 준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 429,
+       "snippet": "    @RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "request": {
+     "text": "화면 입력값은 주소록 정보와 구성원 정보 두 묶음으로 받으며 주소록 정보는 유효성 검증 대상이다. 로그인 사용자 정보와 인증 여부를 확인해 미인증이면 로그인 화면으로 되돌리고, 검증 오류가 있으면 등록 입력 화면을 다시 보여준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 434,
+       "snippet": "        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 435,
+       "snippet": "        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 437,
+       "snippet": "        if(!isAuthenticated) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 438,
+       "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 451,
+       "snippet": "        if (bindingResult.hasErrors()) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectAdbkList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+   "name": "로그인 사용자 정보",
+   "summary": {
+    "text": "현재 로그인한 사용자의 아이디·이름·소속 부서 등을 담는 정보 묶음으로, 주소록의 등록자·수정자·대상 부서를 채우는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "line": 33,
+      "snippet": "public class LoginVO implements Serializable{"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "인증 확인 결과로 받은 사용자 정보를 담는 데이터 구조다. 주소록 등록·수정 시 등록자 아이디와 대상 부서를 채우는 원천이 된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 33,
+       "snippet": "public class LoginVO implements Serializable{"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 455,
+       "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "아이디·이름·이메일 등은 필수 값으로 표시되며, 조직(부서) 아이디와 고유 아이디도 함께 보관한다. 주소록에서는 이 가운데 아이디와 조직 아이디를 사용한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 42,
+       "snippet": "\tprivate String id;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 45,
+       "snippet": "\tprivate String name;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 63,
+       "snippet": "\tprivate String orgnztId;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 67,
+       "snippet": "\tprivate String uniqId;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectAdbkList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+   "name": "사용자 인증 정보 서비스",
+   "summary": {
+    "text": "인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 인증 서비스로 주소록 접근 통제의 판단 근거가 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "line": 5,
+      "snippet": "public interface EgovUserDetailsService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 업무 자체를 처리하지는 않지만, 흐름의 첫 관문인 인증 확인을 담당한다. 화면 처리기가 도우미를 통해 이 서비스를 호출해 사용자와 인증 여부를 얻는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 5,
+       "snippet": "public interface EgovUserDetailsService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "인증된 사용자 객체 제공, 사용자 권한 목록 제공, 인증 여부 판정의 세 가지 규약을 정의한다. 인증 여부 판정 결과가 거짓이면 주소록 화면 처리기는 업무를 진행하지 않는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 18,
+       "snippet": "\tpublic List<String> getAuthorities();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 24,
+       "snippet": "\tpublic Boolean isAuthenticated(); "
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectAdbkList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+   "name": "로그인 사용자 확인 도우미",
+   "summary": {
+    "text": "현재 로그인한 사용자 정보와 인증 여부를 꺼내 주는 공통 도우미로, 주소록 화면 처리기가 접근 통제를 위해 호출한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "line": 25,
+      "snippet": "public class EgovUserDetailsHelper {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록의 모든 화면 요청에서 접근 통제의 근거가 되는 협력 객체다. 사용자 인증 서비스를 감싸 현재 사용자 정보와 인증 여부를 제공한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 25,
+       "snippet": "public class EgovUserDetailsHelper {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 27,
+       "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "보관하는 상태는 사용자 인증 서비스 참조 하나이며, 인증된 사용자 객체와 권한 목록, 인증 여부를 각각 꺼내 준다. 인증 서비스가 설정되어 있어야 동작한다는 전제를 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 41,
+       "snippet": "\tpublic static Object getAuthenticatedUser() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 50,
+       "snippet": "\tpublic static List<String> getAuthorities() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 58,
+       "snippet": "\tpublic static Boolean isAuthenticated() {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectAdbkList.do:src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+   "name": "주소록 조회·등록 정보",
+   "summary": {
+    "text": "주소록 기본 정보에 검색·페이지 조건과 구성원 목록을 더한 정보 묶음으로, 주소록 조회·등록·수정 요청의 입출력이 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+      "line": 29,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 기본 정보를 물려받아 목록 조회용 검색·페이지 조건과 구성원 목록을 함께 담는 데이터 구조다. 등록·수정 흐름에서 화면 입력값을 받아 업무 서비스로 전달하는 그릇 역할을 한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 30,
+       "snippet": "public class AddressBookVO extends AddressBook implements Serializable  {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "검색어·검색조건·검색기간·정렬순서와 현재 페이지·페이지당 건수 등 목록 조회 조건을 가지며, 주소록 구성원 목록을 함께 보관한다. 구성원 목록은 설정 시 변경 불가능한 리스트로 감싸 보관하는 것이 지켜야 할 규칙이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 43,
+       "snippet": "    private String searchWrd = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 52,
+       "snippet": "    private int pageIndex = 1;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 79,
+       "snippet": "    private List< AddressBookUser > adbkMan = new ArrayList<AddressBookUser>();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 88,
+       "snippet": "    public void setAdbkMan(List<AddressBookUser> adbkMan) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 89,
+       "snippet": "        this.adbkMan = Collections.unmodifiableList(adbkMan);"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectAdbkList.do:src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+   "name": "주소록 업무 서비스",
+   "summary": {
+    "text": "주소록과 구성원의 조회·등록·수정·삭제 업무를 정의하는 서비스로, 화면 처리기의 요청을 받아 실제 주소록 작업을 수행한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+      "line": 21,
+      "snippet": "public interface EgovAddressBookService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 도메인의 업무 조율 지점이다. 화면 처리기는 인증과 입력 정리만 하고, 주소록 목록·상세 조회, 등록, 수정, 삭제와 구성원·명함 목록 조회를 이 서비스에 위임한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 21,
+       "snippet": "public interface EgovAddressBookService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "주소록 목록 조회와 상세 조회, 주소록 등록·수정·삭제, 구성원 목록과 명함 목록 조회, 구성원 한 명 불러오기를 업무 규약으로 정의한다. 등록·수정은 구성원 목록이 채워진 주소록 정보를 통째로 받아 처리한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 38,
+       "snippet": "    public AddressBookVO selectAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 46,
+       "snippet": "    public void deleteAdressBook(AddressBook addressBook) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 54,
+       "snippet": "    public Map<String, Object> selectManList(AddressBookUserVO addressBookUserVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 70,
+       "snippet": "    public void insertAdressBook(AddressBookVO adbkVO) throws Exception;   "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 78,
+       "snippet": "    public void updateAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 86,
+       "snippet": "    public AddressBookUser selectAdbkUser(String id) throws Exception;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectAdbkList.do:src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+   "name": "주소록 목록 조회 화면 요청 처리",
+   "summary": {
+    "text": "주소록 담당 화면 처리기가 '주소록 목록 조회' 요청을 받아 로그인 사용자와 인증 여부를 확인한 뒤, 입력값을 주소록 업무 서비스로 넘기고 결과 화면을 정한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 429,
+      "snippet": "@RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "이 흐름의 시작점으로, 사용자의 '주소록 목록 조회' 요청을 받아 인증 상태를 확인하고 화면 입력값을 정리한 다음 주소록 업무 서비스에 실제 처리를 위임한다. 처리 후에는 이동할 화면 또는 목록 재조회를 되돌려 준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 429,
+       "snippet": "    @RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "request": {
+     "text": "화면 입력값은 주소록 정보와 구성원 정보 두 묶음으로 받으며 주소록 정보는 유효성 검증 대상이다. 로그인 사용자 정보와 인증 여부를 확인해 미인증이면 로그인 화면으로 되돌리고, 검증 오류가 있으면 등록 입력 화면을 다시 보여준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 434,
+       "snippet": "        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 435,
+       "snippet": "        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 437,
+       "snippet": "        if(!isAuthenticated) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 438,
+       "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 451,
+       "snippet": "        if (bindingResult.hasErrors()) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectAdbkList.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+   "name": "문자열 처리 공통 유틸",
+   "summary": {
+    "text": "빈 값 처리와 문자열 가공을 담당하는 공통 유틸로, 주소록에서 선택된 구성원 아이디 목록과 사용자 아이디의 빈 값을 안전하게 다루는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "line": 43,
+      "snippet": "public class EgovStringUtil {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 흐름에서 화면으로 들어온 값이 비어 있을 때를 안전하게 처리하는 협력 객체다. 선택된 구성원 아이디 문자열을 쉼표로 나누기 전과 등록자 아이디를 채울 때 빈 값 보정을 위해 호출된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 43,
+       "snippet": "public class EgovStringUtil {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 442,
+       "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 455,
+       "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "상태를 갖지 않는 공통 유틸로 빈 문자열 상수와 난수 생성기를 클래스 수준에서 보관하며, 문자열 자르기 등 가공 기능을 제공한다. 빈 값이 들어와도 널 대신 빈 문자열로 다뤄지는 것이 주소록 쪽이 기대하는 불변식이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 47,
+       "snippet": "\tpublic static final String EMPTY = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 50,
+       "snippet": "\tprivate static SecureRandom rnd = new SecureRandom();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 77,
+       "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectAdbkMainList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+   "name": "로그인 사용자 정보",
+   "summary": {
+    "text": "현재 로그인한 사용자의 아이디·이름·소속 부서 등을 담는 정보 묶음으로, 주소록의 등록자·수정자·대상 부서를 채우는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "line": 33,
+      "snippet": "public class LoginVO implements Serializable{"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "인증 확인 결과로 받은 사용자 정보를 담는 데이터 구조다. 주소록 등록·수정 시 등록자 아이디와 대상 부서를 채우는 원천이 된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 33,
+       "snippet": "public class LoginVO implements Serializable{"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 455,
+       "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "아이디·이름·이메일 등은 필수 값으로 표시되며, 조직(부서) 아이디와 고유 아이디도 함께 보관한다. 주소록에서는 이 가운데 아이디와 조직 아이디를 사용한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 42,
+       "snippet": "\tprivate String id;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 45,
+       "snippet": "\tprivate String name;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 63,
+       "snippet": "\tprivate String orgnztId;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 67,
+       "snippet": "\tprivate String uniqId;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectAdbkMainList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+   "name": "사용자 인증 정보 서비스",
+   "summary": {
+    "text": "인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 인증 서비스로 주소록 접근 통제의 판단 근거가 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "line": 5,
+      "snippet": "public interface EgovUserDetailsService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 업무 자체를 처리하지는 않지만, 흐름의 첫 관문인 인증 확인을 담당한다. 화면 처리기가 도우미를 통해 이 서비스를 호출해 사용자와 인증 여부를 얻는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 5,
+       "snippet": "public interface EgovUserDetailsService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "인증된 사용자 객체 제공, 사용자 권한 목록 제공, 인증 여부 판정의 세 가지 규약을 정의한다. 인증 여부 판정 결과가 거짓이면 주소록 화면 처리기는 업무를 진행하지 않는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 18,
+       "snippet": "\tpublic List<String> getAuthorities();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 24,
+       "snippet": "\tpublic Boolean isAuthenticated(); "
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectAdbkMainList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+   "name": "로그인 사용자 확인 도우미",
+   "summary": {
+    "text": "현재 로그인한 사용자 정보와 인증 여부를 꺼내 주는 공통 도우미로, 주소록 화면 처리기가 접근 통제를 위해 호출한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "line": 25,
+      "snippet": "public class EgovUserDetailsHelper {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록의 모든 화면 요청에서 접근 통제의 근거가 되는 협력 객체다. 사용자 인증 서비스를 감싸 현재 사용자 정보와 인증 여부를 제공한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 25,
+       "snippet": "public class EgovUserDetailsHelper {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 27,
+       "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "보관하는 상태는 사용자 인증 서비스 참조 하나이며, 인증된 사용자 객체와 권한 목록, 인증 여부를 각각 꺼내 준다. 인증 서비스가 설정되어 있어야 동작한다는 전제를 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 41,
+       "snippet": "\tpublic static Object getAuthenticatedUser() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 50,
+       "snippet": "\tpublic static List<String> getAuthorities() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 58,
+       "snippet": "\tpublic static Boolean isAuthenticated() {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectAdbkMainList.do:src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+   "name": "주소록 조회·등록 정보",
+   "summary": {
+    "text": "주소록 기본 정보에 검색·페이지 조건과 구성원 목록을 더한 정보 묶음으로, 주소록 조회·등록·수정 요청의 입출력이 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+      "line": 29,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 기본 정보를 물려받아 목록 조회용 검색·페이지 조건과 구성원 목록을 함께 담는 데이터 구조다. 등록·수정 흐름에서 화면 입력값을 받아 업무 서비스로 전달하는 그릇 역할을 한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 30,
+       "snippet": "public class AddressBookVO extends AddressBook implements Serializable  {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "검색어·검색조건·검색기간·정렬순서와 현재 페이지·페이지당 건수 등 목록 조회 조건을 가지며, 주소록 구성원 목록을 함께 보관한다. 구성원 목록은 설정 시 변경 불가능한 리스트로 감싸 보관하는 것이 지켜야 할 규칙이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 43,
+       "snippet": "    private String searchWrd = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 52,
+       "snippet": "    private int pageIndex = 1;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 79,
+       "snippet": "    private List< AddressBookUser > adbkMan = new ArrayList<AddressBookUser>();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 88,
+       "snippet": "    public void setAdbkMan(List<AddressBookUser> adbkMan) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 89,
+       "snippet": "        this.adbkMan = Collections.unmodifiableList(adbkMan);"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectAdbkMainList.do:src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+   "name": "주소록 업무 서비스",
+   "summary": {
+    "text": "주소록과 구성원의 조회·등록·수정·삭제 업무를 정의하는 서비스로, 화면 처리기의 요청을 받아 실제 주소록 작업을 수행한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+      "line": 21,
+      "snippet": "public interface EgovAddressBookService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 도메인의 업무 조율 지점이다. 화면 처리기는 인증과 입력 정리만 하고, 주소록 목록·상세 조회, 등록, 수정, 삭제와 구성원·명함 목록 조회를 이 서비스에 위임한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 21,
+       "snippet": "public interface EgovAddressBookService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "주소록 목록 조회와 상세 조회, 주소록 등록·수정·삭제, 구성원 목록과 명함 목록 조회, 구성원 한 명 불러오기를 업무 규약으로 정의한다. 등록·수정은 구성원 목록이 채워진 주소록 정보를 통째로 받아 처리한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 38,
+       "snippet": "    public AddressBookVO selectAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 46,
+       "snippet": "    public void deleteAdressBook(AddressBook addressBook) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 54,
+       "snippet": "    public Map<String, Object> selectManList(AddressBookUserVO addressBookUserVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 70,
+       "snippet": "    public void insertAdressBook(AddressBookVO adbkVO) throws Exception;   "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 78,
+       "snippet": "    public void updateAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 86,
+       "snippet": "    public AddressBookUser selectAdbkUser(String id) throws Exception;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectAdbkMainList.do:src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+   "name": "주소록 메인 목록 조회 화면 요청 처리",
+   "summary": {
+    "text": "주소록 담당 화면 처리기가 '주소록 메인 목록 조회' 요청을 받아 로그인 사용자와 인증 여부를 확인한 뒤, 입력값을 주소록 업무 서비스로 넘기고 결과 화면을 정한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 429,
+      "snippet": "@RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "이 흐름의 시작점으로, 사용자의 '주소록 메인 목록 조회' 요청을 받아 인증 상태를 확인하고 화면 입력값을 정리한 다음 주소록 업무 서비스에 실제 처리를 위임한다. 처리 후에는 이동할 화면 또는 목록 재조회를 되돌려 준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 429,
+       "snippet": "    @RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "request": {
+     "text": "화면 입력값은 주소록 정보와 구성원 정보 두 묶음으로 받으며 주소록 정보는 유효성 검증 대상이다. 로그인 사용자 정보와 인증 여부를 확인해 미인증이면 로그인 화면으로 되돌리고, 검증 오류가 있으면 등록 입력 화면을 다시 보여준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 434,
+       "snippet": "        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 435,
+       "snippet": "        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 437,
+       "snippet": "        if(!isAuthenticated) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 438,
+       "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 451,
+       "snippet": "        if (bindingResult.hasErrors()) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectAdbkMainList.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+   "name": "문자열 처리 공통 유틸",
+   "summary": {
+    "text": "빈 값 처리와 문자열 가공을 담당하는 공통 유틸로, 주소록에서 선택된 구성원 아이디 목록과 사용자 아이디의 빈 값을 안전하게 다루는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "line": 43,
+      "snippet": "public class EgovStringUtil {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 흐름에서 화면으로 들어온 값이 비어 있을 때를 안전하게 처리하는 협력 객체다. 선택된 구성원 아이디 문자열을 쉼표로 나누기 전과 등록자 아이디를 채울 때 빈 값 보정을 위해 호출된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 43,
+       "snippet": "public class EgovStringUtil {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 442,
+       "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 455,
+       "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "상태를 갖지 않는 공통 유틸로 빈 문자열 상수와 난수 생성기를 클래스 수준에서 보관하며, 문자열 자르기 등 가공 기능을 제공한다. 빈 값이 들어와도 널 대신 빈 문자열로 다뤄지는 것이 주소록 쪽이 기대하는 불변식이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 47,
+       "snippet": "\tpublic static final String EMPTY = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 50,
+       "snippet": "\tprivate static SecureRandom rnd = new SecureRandom();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 77,
+       "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectManList.do:src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+   "name": "주소록 구성원 정보",
+   "summary": {
+    "text": "주소록에 담을 구성원(사용자)의 아이디·이름·연락처와 구성원 검색·페이지 조건을 담는 정보 묶음이다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+      "line": 24,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 구성원을 표현하고, 구성원 선택·조회 화면의 검색 조건과 페이지 조건을 함께 실어 나르는 데이터 구조다. 화면에서 선택된 사용자 아이디가 이 묶음으로 전달된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 25,
+       "snippet": "public class AddressBookUserVO extends AddressBookUser {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 431,
+       "snippet": "    \t\t@ModelAttribute(\"adbkUserVO\") AddressBookUserVO adbkUserVO,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 442,
+       "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "사용자 아이디·이름·이메일과 집전화 번호를 세 토막으로 나눠 보관하고, 검색어·검색조건·검색기간과 현재 페이지·페이지당 건수 같은 목록 조회 조건을 함께 가진다. 문자열 항목은 빈 문자열로, 페이지 항목은 기본 10건으로 초기화된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 28,
+       "snippet": "    private String userId = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 31,
+       "snippet": "    private String userNm = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 34,
+       "snippet": "    private String userEmail = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 55,
+       "snippet": "    private String searchWrd = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 64,
+       "snippet": "    private int pageIndex = 1;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 79,
+       "snippet": "    private int recordCountPerPage = 10;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectManList.do:src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+   "name": "주소록 업무 서비스",
+   "summary": {
+    "text": "주소록과 구성원의 조회·등록·수정·삭제 업무를 정의하는 서비스로, 화면 처리기의 요청을 받아 실제 주소록 작업을 수행한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+      "line": 21,
+      "snippet": "public interface EgovAddressBookService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 도메인의 업무 조율 지점이다. 화면 처리기는 인증과 입력 정리만 하고, 주소록 목록·상세 조회, 등록, 수정, 삭제와 구성원·명함 목록 조회를 이 서비스에 위임한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 21,
+       "snippet": "public interface EgovAddressBookService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "주소록 목록 조회와 상세 조회, 주소록 등록·수정·삭제, 구성원 목록과 명함 목록 조회, 구성원 한 명 불러오기를 업무 규약으로 정의한다. 등록·수정은 구성원 목록이 채워진 주소록 정보를 통째로 받아 처리한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 38,
+       "snippet": "    public AddressBookVO selectAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 46,
+       "snippet": "    public void deleteAdressBook(AddressBook addressBook) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 54,
+       "snippet": "    public Map<String, Object> selectManList(AddressBookUserVO addressBookUserVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 70,
+       "snippet": "    public void insertAdressBook(AddressBookVO adbkVO) throws Exception;   "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 78,
+       "snippet": "    public void updateAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 86,
+       "snippet": "    public AddressBookUser selectAdbkUser(String id) throws Exception;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectManList.do:src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+   "name": "주소록 구성원 목록 조회 화면 요청 처리",
+   "summary": {
+    "text": "주소록 담당 화면 처리기가 '주소록 구성원 목록 조회' 요청을 받아 로그인 사용자와 인증 여부를 확인한 뒤, 입력값을 주소록 업무 서비스로 넘기고 결과 화면을 정한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 429,
+      "snippet": "@RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "이 흐름의 시작점으로, 사용자의 '주소록 구성원 목록 조회' 요청을 받아 인증 상태를 확인하고 화면 입력값을 정리한 다음 주소록 업무 서비스에 실제 처리를 위임한다. 처리 후에는 이동할 화면 또는 목록 재조회를 되돌려 준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 429,
+       "snippet": "    @RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "request": {
+     "text": "화면 입력값은 주소록 정보와 구성원 정보 두 묶음으로 받으며 주소록 정보는 유효성 검증 대상이다. 로그인 사용자 정보와 인증 여부를 확인해 미인증이면 로그인 화면으로 되돌리고, 검증 오류가 있으면 등록 입력 화면을 다시 보여준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 434,
+       "snippet": "        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 435,
+       "snippet": "        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 437,
+       "snippet": "        if(!isAuthenticated) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 438,
+       "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 451,
+       "snippet": "        if (bindingResult.hasErrors()) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/selectManList.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+   "name": "문자열 처리 공통 유틸",
+   "summary": {
+    "text": "빈 값 처리와 문자열 가공을 담당하는 공통 유틸로, 주소록에서 선택된 구성원 아이디 목록과 사용자 아이디의 빈 값을 안전하게 다루는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "line": 43,
+      "snippet": "public class EgovStringUtil {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 흐름에서 화면으로 들어온 값이 비어 있을 때를 안전하게 처리하는 협력 객체다. 선택된 구성원 아이디 문자열을 쉼표로 나누기 전과 등록자 아이디를 채울 때 빈 값 보정을 위해 호출된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 43,
+       "snippet": "public class EgovStringUtil {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 442,
+       "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 455,
+       "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "상태를 갖지 않는 공통 유틸로 빈 문자열 상수와 난수 생성기를 클래스 수준에서 보관하며, 문자열 자르기 등 가공 기능을 제공한다. 빈 값이 들어와도 널 대신 빈 문자열로 다뤄지는 것이 주소록 쪽이 기대하는 불변식이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 47,
+       "snippet": "\tpublic static final String EMPTY = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 50,
+       "snippet": "\tprivate static SecureRandom rnd = new SecureRandom();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 77,
+       "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/updateAdbkInf.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+   "name": "로그인 사용자 정보",
+   "summary": {
+    "text": "현재 로그인한 사용자의 아이디·이름·소속 부서 등을 담는 정보 묶음으로, 주소록의 등록자·수정자·대상 부서를 채우는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "line": 33,
+      "snippet": "public class LoginVO implements Serializable{"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "인증 확인 결과로 받은 사용자 정보를 담는 데이터 구조다. 주소록 등록·수정 시 등록자 아이디와 대상 부서를 채우는 원천이 된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 33,
+       "snippet": "public class LoginVO implements Serializable{"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 455,
+       "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "아이디·이름·이메일 등은 필수 값으로 표시되며, 조직(부서) 아이디와 고유 아이디도 함께 보관한다. 주소록에서는 이 가운데 아이디와 조직 아이디를 사용한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 42,
+       "snippet": "\tprivate String id;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 45,
+       "snippet": "\tprivate String name;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 63,
+       "snippet": "\tprivate String orgnztId;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 67,
+       "snippet": "\tprivate String uniqId;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/updateAdbkInf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+   "name": "사용자 인증 정보 서비스",
+   "summary": {
+    "text": "인증된 사용자 정보와 권한, 인증 여부를 제공하는 공통 인증 서비스로 주소록 접근 통제의 판단 근거가 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "line": 5,
+      "snippet": "public interface EgovUserDetailsService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 업무 자체를 처리하지는 않지만, 흐름의 첫 관문인 인증 확인을 담당한다. 화면 처리기가 도우미를 통해 이 서비스를 호출해 사용자와 인증 여부를 얻는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 5,
+       "snippet": "public interface EgovUserDetailsService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "인증된 사용자 객체 제공, 사용자 권한 목록 제공, 인증 여부 판정의 세 가지 규약을 정의한다. 인증 여부 판정 결과가 거짓이면 주소록 화면 처리기는 업무를 진행하지 않는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 11,
+       "snippet": "\tpublic Object getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 18,
+       "snippet": "\tpublic List<String> getAuthorities();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+       "line": 24,
+       "snippet": "\tpublic Boolean isAuthenticated(); "
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/updateAdbkInf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+   "name": "로그인 사용자 확인 도우미",
+   "summary": {
+    "text": "현재 로그인한 사용자 정보와 인증 여부를 꺼내 주는 공통 도우미로, 주소록 화면 처리기가 접근 통제를 위해 호출한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "line": 25,
+      "snippet": "public class EgovUserDetailsHelper {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록의 모든 화면 요청에서 접근 통제의 근거가 되는 협력 객체다. 사용자 인증 서비스를 감싸 현재 사용자 정보와 인증 여부를 제공한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 25,
+       "snippet": "public class EgovUserDetailsHelper {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 27,
+       "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "보관하는 상태는 사용자 인증 서비스 참조 하나이며, 인증된 사용자 객체와 권한 목록, 인증 여부를 각각 꺼내 준다. 인증 서비스가 설정되어 있어야 동작한다는 전제를 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 41,
+       "snippet": "\tpublic static Object getAuthenticatedUser() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 50,
+       "snippet": "\tpublic static List<String> getAuthorities() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 58,
+       "snippet": "\tpublic static Boolean isAuthenticated() {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/updateAdbkInf.do:src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+   "name": "주소록 구성원 정보",
+   "summary": {
+    "text": "주소록에 담을 구성원(사용자)의 아이디·이름·연락처와 구성원 검색·페이지 조건을 담는 정보 묶음이다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+      "line": 24,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 구성원을 표현하고, 구성원 선택·조회 화면의 검색 조건과 페이지 조건을 함께 실어 나르는 데이터 구조다. 화면에서 선택된 사용자 아이디가 이 묶음으로 전달된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 25,
+       "snippet": "public class AddressBookUserVO extends AddressBookUser {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 431,
+       "snippet": "    \t\t@ModelAttribute(\"adbkUserVO\") AddressBookUserVO adbkUserVO,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 442,
+       "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "사용자 아이디·이름·이메일과 집전화 번호를 세 토막으로 나눠 보관하고, 검색어·검색조건·검색기간과 현재 페이지·페이지당 건수 같은 목록 조회 조건을 함께 가진다. 문자열 항목은 빈 문자열로, 페이지 항목은 기본 10건으로 초기화된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 28,
+       "snippet": "    private String userId = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 31,
+       "snippet": "    private String userNm = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 34,
+       "snippet": "    private String userEmail = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 55,
+       "snippet": "    private String searchWrd = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 64,
+       "snippet": "    private int pageIndex = 1;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookUserVO.java",
+       "line": 79,
+       "snippet": "    private int recordCountPerPage = 10;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/updateAdbkInf.do:src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+   "name": "주소록 조회·등록 정보",
+   "summary": {
+    "text": "주소록 기본 정보에 검색·페이지 조건과 구성원 목록을 더한 정보 묶음으로, 주소록 조회·등록·수정 요청의 입출력이 된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+      "line": 29,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 기본 정보를 물려받아 목록 조회용 검색·페이지 조건과 구성원 목록을 함께 담는 데이터 구조다. 등록·수정 흐름에서 화면 입력값을 받아 업무 서비스로 전달하는 그릇 역할을 한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 30,
+       "snippet": "public class AddressBookVO extends AddressBook implements Serializable  {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "검색어·검색조건·검색기간·정렬순서와 현재 페이지·페이지당 건수 등 목록 조회 조건을 가지며, 주소록 구성원 목록을 함께 보관한다. 구성원 목록은 설정 시 변경 불가능한 리스트로 감싸 보관하는 것이 지켜야 할 규칙이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 43,
+       "snippet": "    private String searchWrd = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 52,
+       "snippet": "    private int pageIndex = 1;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 79,
+       "snippet": "    private List< AddressBookUser > adbkMan = new ArrayList<AddressBookUser>();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 88,
+       "snippet": "    public void setAdbkMan(List<AddressBookUser> adbkMan) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/AddressBookVO.java",
+       "line": 89,
+       "snippet": "        this.adbkMan = Collections.unmodifiableList(adbkMan);"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/updateAdbkInf.do:src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+   "name": "주소록 업무 서비스",
+   "summary": {
+    "text": "주소록과 구성원의 조회·등록·수정·삭제 업무를 정의하는 서비스로, 화면 처리기의 요청을 받아 실제 주소록 작업을 수행한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+      "line": 21,
+      "snippet": "public interface EgovAddressBookService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 도메인의 업무 조율 지점이다. 화면 처리기는 인증과 입력 정리만 하고, 주소록 목록·상세 조회, 등록, 수정, 삭제와 구성원·명함 목록 조회를 이 서비스에 위임한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 21,
+       "snippet": "public interface EgovAddressBookService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "주소록 목록 조회와 상세 조회, 주소록 등록·수정·삭제, 구성원 목록과 명함 목록 조회, 구성원 한 명 불러오기를 업무 규약으로 정의한다. 등록·수정은 구성원 목록이 채워진 주소록 정보를 통째로 받아 처리한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 30,
+       "snippet": "    public Map<String, Object> selectAdressBookList(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 38,
+       "snippet": "    public AddressBookVO selectAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 46,
+       "snippet": "    public void deleteAdressBook(AddressBook addressBook) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 54,
+       "snippet": "    public Map<String, Object> selectManList(AddressBookUserVO addressBookUserVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 70,
+       "snippet": "    public void insertAdressBook(AddressBookVO adbkVO) throws Exception;   "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 78,
+       "snippet": "    public void updateAdressBook(AddressBookVO addressBookVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/service/EgovAddressBookService.java",
+       "line": 86,
+       "snippet": "    public AddressBookUser selectAdbkUser(String id) throws Exception;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/updateAdbkInf.do:src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+   "name": "주소록 수정 화면 열기 화면 요청 처리",
+   "summary": {
+    "text": "주소록 담당 화면 처리기가 '주소록 수정 화면 열기' 요청을 받아 로그인 사용자와 인증 여부를 확인한 뒤, 입력값을 주소록 업무 서비스로 넘기고 결과 화면을 정한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+      "line": 429,
+      "snippet": "@RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "이 흐름의 시작점으로, 사용자의 '주소록 수정 화면 열기' 요청을 받아 인증 상태를 확인하고 화면 입력값을 정리한 다음 주소록 업무 서비스에 실제 처리를 위임한다. 처리 후에는 이동할 화면 또는 목록 재조회를 되돌려 준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 429,
+       "snippet": "    @RequestMapping(\"/cop/adb/RegistAdbkInf.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 461,
+       "snippet": "        adbkService.insertAdressBook(adbkVO);"
+      }
+     ]
+    },
+    "request": {
+     "text": "화면 입력값은 주소록 정보와 구성원 정보 두 묶음으로 받으며 주소록 정보는 유효성 검증 대상이다. 로그인 사용자 정보와 인증 여부를 확인해 미인증이면 로그인 화면으로 되돌리고, 검증 오류가 있으면 등록 입력 화면을 다시 보여준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 430,
+       "snippet": "    public String registadbk(@Valid @ModelAttribute(\"searchVO\") AddressBookVO adbkVO, BindingResult bindingResult, "
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 434,
+       "snippet": "        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 435,
+       "snippet": "        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 437,
+       "snippet": "        if(!isAuthenticated) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 438,
+       "snippet": "            return \"redirect:/uat/uia/egovLoginUsr.do\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 451,
+       "snippet": "        if (bindingResult.hasErrors()) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /cop/adb/updateAdbkInf.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+   "name": "문자열 처리 공통 유틸",
+   "summary": {
+    "text": "빈 값 처리와 문자열 가공을 담당하는 공통 유틸로, 주소록에서 선택된 구성원 아이디 목록과 사용자 아이디의 빈 값을 안전하게 다루는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "line": 43,
+      "snippet": "public class EgovStringUtil {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "주소록 흐름에서 화면으로 들어온 값이 비어 있을 때를 안전하게 처리하는 협력 객체다. 선택된 구성원 아이디 문자열을 쉼표로 나누기 전과 등록자 아이디를 채울 때 빈 값 보정을 위해 호출된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 43,
+       "snippet": "public class EgovStringUtil {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 442,
+       "snippet": "        String[] tempId = EgovStringUtil.isNullToString(adbkUserVO.getUserId()).split(\",\");"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cop/adb/web/EgovAddressBookController.java",
+       "line": 455,
+       "snippet": "        adbkVO.setWrterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "상태를 갖지 않는 공통 유틸로 빈 문자열 상수와 난수 생성기를 클래스 수준에서 보관하며, 문자열 자르기 등 가공 기능을 제공한다. 빈 값이 들어와도 널 대신 빈 문자열로 다뤄지는 것이 주소록 쪽이 기대하는 불변식이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 47,
+       "snippet": "\tpublic static final String EMPTY = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 50,
+       "snippet": "\tprivate static SecureRandom rnd = new SecureRandom();"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 77,
+       "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+      }
+     ]
+    }
+   }
+  }
+ ]
+}

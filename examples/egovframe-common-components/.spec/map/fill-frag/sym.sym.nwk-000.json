@@ -1,0 +1,3212 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "sym.sym.nwk-000",
+  "domainId": "domain:sym.sym.nwk",
+  "header": {
+    "name": "네트워크 관리",
+    "summary": {
+      "text": "시스템 운영에 필요한 네트워크 정보를 등록·조회·수정·삭제로 관리하는 업무 영역이다. 조회 기능은 목록조회와 상세조회로 구분되며, 등록·수정 시에는 인증된 사용자를 등록자·최종수정자로 남긴다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+          "line": 7,
+          "snippet": "* - 네트워크의 조회기능은 목록조회, 상세조회로 구분된다."
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+          "line": 17,
+          "snippet": "public interface EgovNtwrkService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+          "line": 172,
+          "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "네트워크: 네트워크ID로 식별되며 네트워크IP·게이트웨이·서브넷·도메인이름서버·관리항목·사용자명·사용여부·등록일자를 보유하는 관리 대상이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+            "line": 34,
+            "snippet": "public class Ntwrk extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+            "line": 40,
+            "snippet": "private String ntwrkId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+            "line": 46,
+            "snippet": "private String ntwrkIp;"
+          }
+        ]
+      },
+      {
+        "text": "네트워크 조회 정보: 네트워크 기본 정보에 화면 표시용 관리항목명·사용자명과 네트워크 목록, 삭제여부 목록을 더해 목록·상세 화면에 전달하는 정보이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+            "line": 35,
+            "snippet": "public class NtwrkVO extends Ntwrk {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+            "line": 44,
+            "snippet": "private String strManageIem;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+            "line": 54,
+            "snippet": "private List<NtwrkVO> ntwrkList;"
+          }
+        ]
+      },
+      {
+        "text": "공통코드 조회 조건: 네트워크 화면의 관리항목 선택값을 받아오기 위한 조회 조건으로 코드ID·상세코드·코드명 등을 보유한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 29,
+            "snippet": "public class ComDefaultCodeVO implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 31,
+            "snippet": "private String codeId = \"\";"
+          }
+        ]
+      },
+      {
+        "text": "로그인 사용자: 네트워크 등록·수정 시 최초등록자ID와 최종수정자ID의 출처가 되는 인증된 사용자 정보이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 42,
+            "snippet": "private String id;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 171,
+            "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "네트워크 등록·수정 요청은 입력값 검증을 먼저 수행하며, 검증 오류가 있으면 저장하지 않고 입력 화면을 다시 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 166,
+            "snippet": "if (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 169,
+            "snippet": "return \"egovframework/com/sym/sym/nwk/EgovNtwrkRegist\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 211,
+            "snippet": "if (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 213,
+            "snippet": "return \"egovframework/com/sym/sym/nwk/EgovNtwrkUpdt\";"
+          }
+        ]
+      },
+      {
+        "text": "네트워크 신규 등록 시 네트워크ID는 사용자 입력이 아니라 채번 서비스가 발급한 값을 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 174,
+            "snippet": "ntwrk.setNtwrkId(egovNtwrkIdGnrService.getNextStringId());"
+          }
+        ]
+      },
+      {
+        "text": "등록 시에는 최초등록자ID와 최종수정자ID를, 수정 시에는 최종수정자ID를 인증된 사용자 아이디로 채우며 인증 사용자가 없으면 빈 값으로 처리한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 172,
+            "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 173,
+            "snippet": "ntwrk.setLastUpdusrId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 216,
+            "snippet": "ntwrk.setLastUpdusrId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+          }
+        ]
+      },
+      {
+        "text": "네트워크IP·게이트웨이·서브넷·도메인이름서버는 필수 입력이며 23자 이내여야 하고, 사용자명은 30자 이내여야 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+            "line": 44,
+            "snippet": "@EgovNullCheck"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+            "line": 45,
+            "snippet": "@Size(max=23)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+            "line": 74,
+            "snippet": "@Size(max=30)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+            "line": 75,
+            "snippet": "private String userNm;"
+          }
+        ]
+      },
+      {
+        "text": "네트워크 수정이 완료되면 상세 조회로 이동해 수정된 내용을 다시 보여준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 217,
+            "snippet": "egovNtwrkService.updateNtwrk(ntwrk);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 220,
+            "snippet": "return \"forward:/sym/sym/nwk/getNtwrk.do\";"
+          }
+        ]
+      },
+      {
+        "text": "등록·수정·조회 결과는 공통 안내 메시지 코드로 조회한 메시지를 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 176,
+            "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 195,
+            "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 219,
+            "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.update\"));"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "공통코드 업무와 연동해 네트워크 화면의 관리항목 선택값 목록을 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 168,
+            "snippet": "model.addAttribute(\"cmmCodeDetailList\", getCmmCodeDetailList(new ComDefaultCodeVO(), \"COM067\"));"
+          }
+        ]
+      },
+      {
+        "text": "사용자 인증 업무와 연동해 등록자·최종수정자로 남길 인증된 사용자 정보를 가져온다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "public static Object getAuthenticatedUser() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 171,
+            "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          }
+        ]
+      },
+      {
+        "text": "공통 메시지 업무와 연동해 처리 결과 안내 메시지를 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "public String getMessage(String code) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 176,
+            "snippet": "model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+          }
+        ]
+      },
+      {
+        "text": "공통 ID 채번 업무와 연동해 신규 네트워크의 네트워크ID를 발급받는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 174,
+            "snippet": "ntwrk.setNtwrkId(egovNtwrkIdGnrService.getNextStringId());"
+          }
+        ]
+      },
+      {
+        "text": "공통 문자열 처리 도구를 이용해 인증 사용자 아이디가 없는 경우를 빈 문자열로 안전하게 변환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 172,
+            "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "네트워크 관리",
+        "nodes": [
+          {
+            "id": "s",
+            "kind": "start",
+            "label": "시작"
+          },
+          {
+            "id": "a1",
+            "kind": "activity",
+            "label": "목록 화면 요청",
+            "flowRef": "flow:ANY /sym/sym/nwk/selectNtwrkListView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+                "line": 76,
+                "snippet": "@RequestMapping(value = \"/sym/sym/nwk/selectNtwrkListView.do\")"
+              }
+            ]
+          },
+          {
+            "id": "a2",
+            "kind": "activity",
+            "label": "네트워크 목록 조회",
+            "flowRef": "flow:ANY /sym/sym/nwk/selectNtwrkList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+                "line": 91,
+                "snippet": "@RequestMapping(value = \"/sym/sym/nwk/selectNtwrkList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "a3",
+            "kind": "activity",
+            "label": "네트워크 상세 조회",
+            "flowRef": "flow:ANY /sym/sym/nwk/getNtwrk.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+                "line": 129,
+                "snippet": "@RequestMapping(value = \"/sym/sym/nwk/getNtwrk.do\")"
+              }
+            ]
+          },
+          {
+            "id": "a4",
+            "kind": "activity",
+            "label": "등록 화면 요청",
+            "flowRef": "flow:ANY /sym/sym/nwk/addViewNtwrk.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+                "line": 146,
+                "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addViewNtwrk.do\")"
+              }
+            ]
+          },
+          {
+            "id": "a5",
+            "kind": "activity",
+            "label": "네트워크 등록 요청",
+            "flowRef": "flow:ANY /sym/sym/nwk/addNtwrk.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+                "line": 162,
+                "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+              }
+            ]
+          },
+          {
+            "id": "d1",
+            "kind": "decision",
+            "label": "등록 입력값 정상 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+                "line": 166,
+                "snippet": "if (bindingResult.hasErrors()) {"
+              }
+            ]
+          },
+          {
+            "id": "a6",
+            "kind": "activity",
+            "label": "등록 화면 재표시",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+                "line": 169,
+                "snippet": "return \"egovframework/com/sym/sym/nwk/EgovNtwrkRegist\";"
+              }
+            ]
+          },
+          {
+            "id": "a7",
+            "kind": "activity",
+            "label": "네트워크 신규 저장",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+                "line": 175,
+                "snippet": "model.addAttribute(\"ntwrk\", egovNtwrkService.insertNtwrk(ntwrk, ntwrkVO));"
+              }
+            ]
+          },
+          {
+            "id": "a8",
+            "kind": "activity",
+            "label": "수정 화면 요청",
+            "flowRef": "flow:ANY /sym/sym/nwk/updtViewNtwrk.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+                "line": 188,
+                "snippet": "@RequestMapping(value = \"/sym/sym/nwk/updtViewNtwrk.do\")"
+              }
+            ]
+          },
+          {
+            "id": "a9",
+            "kind": "activity",
+            "label": "네트워크 수정 요청",
+            "flowRef": "flow:ANY /sym/sym/nwk/updtNtwrk.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+                "line": 207,
+                "snippet": "@RequestMapping(value = \"/sym/sym/nwk/updtNtwrk.do\")"
+              }
+            ]
+          },
+          {
+            "id": "d2",
+            "kind": "decision",
+            "label": "수정 입력값 정상 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+                "line": 211,
+                "snippet": "if (bindingResult.hasErrors()) {"
+              }
+            ]
+          },
+          {
+            "id": "a10",
+            "kind": "activity",
+            "label": "수정 화면 재표시",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+                "line": 213,
+                "snippet": "return \"egovframework/com/sym/sym/nwk/EgovNtwrkUpdt\";"
+              }
+            ]
+          },
+          {
+            "id": "a11",
+            "kind": "activity",
+            "label": "네트워크 정보 수정",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+                "line": 217,
+                "snippet": "egovNtwrkService.updateNtwrk(ntwrk);"
+              }
+            ]
+          },
+          {
+            "id": "a12",
+            "kind": "activity",
+            "label": "네트워크 삭제",
+            "flowRef": "flow:ANY /sym/sym/nwk/removeNtwrk.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+                "line": 232,
+                "snippet": "@RequestMapping(value = \"/sym/sym/nwk/removeNtwrk.do\")"
+              }
+            ]
+          },
+          {
+            "id": "e",
+            "kind": "end",
+            "label": "종료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "s",
+            "to": "a1"
+          },
+          {
+            "from": "a1",
+            "to": "a2"
+          },
+          {
+            "from": "a2",
+            "to": "a3"
+          },
+          {
+            "from": "a2",
+            "to": "a4"
+          },
+          {
+            "from": "a4",
+            "to": "a5"
+          },
+          {
+            "from": "a5",
+            "to": "d1"
+          },
+          {
+            "from": "d1",
+            "to": "a6",
+            "label": "검증 오류"
+          },
+          {
+            "from": "d1",
+            "to": "a7",
+            "label": "정상"
+          },
+          {
+            "from": "a6",
+            "to": "a5"
+          },
+          {
+            "from": "a7",
+            "to": "e"
+          },
+          {
+            "from": "a3",
+            "to": "a8"
+          },
+          {
+            "from": "a8",
+            "to": "a9"
+          },
+          {
+            "from": "a9",
+            "to": "d2"
+          },
+          {
+            "from": "d2",
+            "to": "a10",
+            "label": "검증 오류"
+          },
+          {
+            "from": "d2",
+            "to": "a11",
+            "label": "정상"
+          },
+          {
+            "from": "a10",
+            "to": "a9"
+          },
+          {
+            "from": "a11",
+            "to": "a3"
+          },
+          {
+            "from": "a3",
+            "to": "a12"
+          },
+          {
+            "from": "a12",
+            "to": "e"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /sym/sym/nwk/addNtwrk.do",
+      "name": "네트워크 등록",
+      "summary": {
+        "text": "입력된 네트워크 정보를 검증한 뒤 네트워크ID를 채번하고 등록자 정보를 담아 신규 네트워크로 등록한다. 검증에 실패하면 등록 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 162,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/sym/nwk/addViewNtwrk.do",
+      "name": "네트워크 등록 화면 요청",
+      "summary": {
+        "text": "네트워크 신규 등록 화면을 열면서 관리항목 공통코드 목록을 조회해 입력 항목의 선택값을 준비한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 146,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addViewNtwrk.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/sym/nwk/getNtwrk.do",
+      "name": "네트워크 상세 조회",
+      "summary": {
+        "text": "선택한 네트워크의 상세정보를 조회해 상세 화면에 표시하고 조회 성공 안내 메시지를 함께 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 129,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/getNtwrk.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/sym/nwk/removeNtwrk.do",
+      "name": "네트워크 삭제",
+      "summary": {
+        "text": "기 등록된 네트워크 정보를 삭제하고 삭제 결과 안내 메시지와 함께 목록 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 232,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/removeNtwrk.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/sym/nwk/selectNtwrkList.do",
+      "name": "네트워크 목록 조회",
+      "summary": {
+        "text": "검색 조건에 맞는 네트워크 목록과 총 건수를 조회해 페이지 단위로 목록 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 91,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/selectNtwrkList.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/sym/nwk/selectNtwrkListView.do",
+      "name": "네트워크 목록 화면 요청",
+      "summary": {
+        "text": "네트워크 관리 담당자가 목록 화면을 처음 열 때 진입하는 흐름으로, 관리항목 공통코드를 조회해 검색 조건 화면을 준비한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 76,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/selectNtwrkListView.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/sym/nwk/updtNtwrk.do",
+      "name": "네트워크 수정",
+      "summary": {
+        "text": "입력값 검증을 통과한 네트워크 정보를 최종수정자 정보와 함께 수정하고 상세 조회로 되돌린다. 검증에 실패하면 수정 화면을 다시 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 207,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/updtNtwrk.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/sym/nwk/updtViewNtwrk.do",
+      "name": "네트워크 수정 화면 요청",
+      "summary": {
+        "text": "수정 대상 네트워크의 현재 정보와 관리항목 공통코드를 조회해 수정 화면에 채워 넣는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 188,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/updtViewNtwrk.do\")"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /sym/sym/nwk/addNtwrk.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통코드 조회 조건",
+      "summary": {
+        "text": "네트워크 등록 흐름에서 공통코드 조회 조건을 담는 데이터 구조 역할을 맡아, 네트워크 화면이 관리항목 선택값을 받아오기 위한 조회 요청을 표현한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통코드 조회 조건을 담는 데이터 구조 역할을 맡아, 네트워크 화면이 관리항목 선택값을 받아오기 위한 조회 요청을 표현한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드ID·상세코드·코드명·코드설명을 보유하고, 특정 테이블에서 코드정보를 추출할 때 쓰는 테이블명과 상세 조건 여부·상세 조건 항목을 함께 가진다. 상세 조건 여부의 기본값은 사용하지 않음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/addNtwrk.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 제공",
+      "summary": {
+        "text": "네트워크 등록 흐름에서 처리 결과를 사용자에게 알리는 안내 메시지를 메시지 코드로 조회해 제공하며, 네트워크 등록·수정·삭제·조회 결과 메시지가 이 경로로 화면에 전달된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "처리 결과를 사용자에게 알리는 안내 메시지를 메시지 코드로 조회해 제공하며, 네트워크 등록·수정·삭제·조회 결과 메시지가 이 경로로 화면에 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드를 받아 정의된 메시지를 돌려주며, 필요에 따라 로케일과 매개변수를 함께 받아 사용자 언어와 상황에 맞는 메시지를 구성한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/addNtwrk.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "네트워크 등록 흐름에서 인증된 사용자를 표현하는 데이터 구조 역할을 맡아, 네트워크 등록·수정 흐름에서 최초등록자ID와 최종수정자ID의 출처가 된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증된 사용자를 표현하는 데이터 구조 역할을 맡아, 네트워크 등록·수정 흐름에서 최초등록자ID와 최종수정자ID의 출처가 된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "private String id;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일 등 필수 항목과 사용자구분·조직정보·고유아이디 등 사용자 식별 항목을 보유한다. 아이디는 값이 반드시 있어야 하는 항목으로 선언되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "private String id;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/addNtwrk.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 조회",
+      "summary": {
+        "text": "네트워크 등록 흐름에서 현재 인증된 사용자 정보를 흐름에 공급하는 협력 객체 역할을 맡아, 네트워크 등록·수정 시 등록자와 최종수정자를 확정하는 근거가 된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "현재 인증된 사용자 정보를 흐름에 공급하는 협력 객체 역할을 맡아, 네트워크 등록·수정 시 등록자와 최종수정자를 확정하는 근거가 된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 정보, 사용자 권한 목록, 인증 여부라는 세 가지 값을 제공한다. 사용자 정보는 값이 없을 수 있으므로 사용하는 쪽에서 미인증 상황을 함께 처리해야 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/addNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+      "name": "네트워크 업무 서비스",
+      "summary": {
+        "text": "네트워크 등록 흐름에서 네트워크 업무의 처리 규약을 정의해, 목록 조회·총건수 조회·상세 조회·등록·수정·삭제라는 업무 단위로 화면 요청을 실제 처리에 연결한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+            "line": 17,
+            "snippet": "public interface EgovNtwrkService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 업무의 처리 규약을 정의해, 목록 조회·총건수 조회·상세 조회·등록·수정·삭제라는 업무 단위로 화면 요청을 실제 처리에 연결한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 17,
+              "snippet": "public interface EgovNtwrkService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 7,
+              "snippet": "* - 네트워크의 조회기능은 목록조회, 상세조회로 구분된다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 24,
+              "snippet": "public List<NtwrkVO> selectNtwrkList(NtwrkVO ntwrkVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 56,
+              "snippet": "public void deleteNtwrk(Ntwrk ntwrk) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "네트워크 조회 기능은 목록조회와 상세조회로 구분되고, 변경 기능은 신규 등록·수정·삭제로 구성된다. 등록은 네트워크 정보를 받아 등록 결과 네트워크 정보를 돌려주며, 수정과 삭제는 대상 네트워크 정보를 받아 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 17,
+              "snippet": "public interface EgovNtwrkService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 7,
+              "snippet": "* - 네트워크의 조회기능은 목록조회, 상세조회로 구분된다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 24,
+              "snippet": "public List<NtwrkVO> selectNtwrkList(NtwrkVO ntwrkVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 56,
+              "snippet": "public void deleteNtwrk(Ntwrk ntwrk) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/addNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+      "name": "네트워크 정보",
+      "summary": {
+        "text": "네트워크 등록 흐름에서 네트워크 한 건을 표현하는 기본 데이터 구조 역할을 맡아, 등록·수정·삭제 흐름에서 처리 대상 네트워크 정보를 담아 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+            "line": 34,
+            "snippet": "public class Ntwrk extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 한 건을 표현하는 기본 데이터 구조 역할을 맡아, 등록·수정·삭제 흐름에서 처리 대상 네트워크 정보를 담아 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 34,
+              "snippet": "public class Ntwrk extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 40,
+              "snippet": "private String ntwrkId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 45,
+              "snippet": "@Size(max=23)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 46,
+              "snippet": "private String ntwrkIp;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "네트워크ID를 식별자로 하고 네트워크IP·게이트웨이·서브넷·도메인이름서버·관리항목·사용자명·사용여부·등록일자를 보유한다. 주소 성격 항목은 값이 반드시 있어야 하며 23자 이내여야 하고, 최초등록자·최종수정자 정보도 함께 관리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 34,
+              "snippet": "public class Ntwrk extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 40,
+              "snippet": "private String ntwrkId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 45,
+              "snippet": "@Size(max=23)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 46,
+              "snippet": "private String ntwrkIp;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/addNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+      "name": "네트워크 요청 처리",
+      "summary": {
+        "text": "네트워크 등록 흐름에서 네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 162,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 네트워크 조회조건 정보와 네트워크 정보로 받아들이며, 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록자·최종수정자로 남길 사용자는 인증된 로그인 사용자에서 가져오고, 인증 사용자가 없으면 빈 값으로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/addNtwrk.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 도구",
+      "summary": {
+        "text": "네트워크 등록 흐름에서 문자열 값을 안전하게 다루는 공통 도구 역할을 맡아, 네트워크 등록·수정 시 인증 사용자 아이디를 빈 값으로 안전하게 변환하는 데 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "문자열 값을 안전하게 다루는 공통 도구 역할을 맡아, 네트워크 등록·수정 시 인증 사용자 아이디를 빈 값으로 안전하게 변환하는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 상수와 문자열 자르기·비어있음 검증 같은 문자열 처리 규약을 제공해, 값이 없는 경우에도 빈 문자열로 일관되게 다룰 수 있게 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/addViewNtwrk.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통코드 조회 조건",
+      "summary": {
+        "text": "네트워크 등록 화면 요청 흐름에서 공통코드 조회 조건을 담는 데이터 구조 역할을 맡아, 네트워크 화면이 관리항목 선택값을 받아오기 위한 조회 요청을 표현한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통코드 조회 조건을 담는 데이터 구조 역할을 맡아, 네트워크 화면이 관리항목 선택값을 받아오기 위한 조회 요청을 표현한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드ID·상세코드·코드명·코드설명을 보유하고, 특정 테이블에서 코드정보를 추출할 때 쓰는 테이블명과 상세 조건 여부·상세 조건 항목을 함께 가진다. 상세 조건 여부의 기본값은 사용하지 않음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/addViewNtwrk.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 조회 서비스",
+      "summary": {
+        "text": "네트워크 등록 화면 요청 흐름에서 화면에 필요한 공통코드를 공급하는 공통 업무 서비스 역할을 맡아, 네트워크 화면의 관리항목 선택값 목록을 코드 형태로 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면에 필요한 공통코드를 공급하는 공통 업무 서비스 역할을 맡아, 네트워크 화면의 관리항목 선택값 목록을 코드 형태로 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "코드 조회 조건을 받아 공통코드 상세 목록을 돌려주며, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 돌려주는 처리와 조직정보·그룹정보를 코드 형태로 돌려주는 처리도 함께 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/addViewNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+      "name": "네트워크 요청 처리",
+      "summary": {
+        "text": "네트워크 등록 화면 요청 흐름에서 네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 162,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 네트워크 조회조건 정보와 네트워크 정보로 받아들이며, 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록자·최종수정자로 남길 사용자는 인증된 로그인 사용자에서 가져오고, 인증 사용자가 없으면 빈 값으로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/getNtwrk.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 제공",
+      "summary": {
+        "text": "네트워크 상세 조회 흐름에서 처리 결과를 사용자에게 알리는 안내 메시지를 메시지 코드로 조회해 제공하며, 네트워크 등록·수정·삭제·조회 결과 메시지가 이 경로로 화면에 전달된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "처리 결과를 사용자에게 알리는 안내 메시지를 메시지 코드로 조회해 제공하며, 네트워크 등록·수정·삭제·조회 결과 메시지가 이 경로로 화면에 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드를 받아 정의된 메시지를 돌려주며, 필요에 따라 로케일과 매개변수를 함께 받아 사용자 언어와 상황에 맞는 메시지를 구성한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/getNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+      "name": "네트워크 업무 서비스",
+      "summary": {
+        "text": "네트워크 상세 조회 흐름에서 네트워크 업무의 처리 규약을 정의해, 목록 조회·총건수 조회·상세 조회·등록·수정·삭제라는 업무 단위로 화면 요청을 실제 처리에 연결한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+            "line": 17,
+            "snippet": "public interface EgovNtwrkService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 업무의 처리 규약을 정의해, 목록 조회·총건수 조회·상세 조회·등록·수정·삭제라는 업무 단위로 화면 요청을 실제 처리에 연결한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 17,
+              "snippet": "public interface EgovNtwrkService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 7,
+              "snippet": "* - 네트워크의 조회기능은 목록조회, 상세조회로 구분된다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 24,
+              "snippet": "public List<NtwrkVO> selectNtwrkList(NtwrkVO ntwrkVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 56,
+              "snippet": "public void deleteNtwrk(Ntwrk ntwrk) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "네트워크 조회 기능은 목록조회와 상세조회로 구분되고, 변경 기능은 신규 등록·수정·삭제로 구성된다. 등록은 네트워크 정보를 받아 등록 결과 네트워크 정보를 돌려주며, 수정과 삭제는 대상 네트워크 정보를 받아 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 17,
+              "snippet": "public interface EgovNtwrkService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 7,
+              "snippet": "* - 네트워크의 조회기능은 목록조회, 상세조회로 구분된다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 24,
+              "snippet": "public List<NtwrkVO> selectNtwrkList(NtwrkVO ntwrkVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 56,
+              "snippet": "public void deleteNtwrk(Ntwrk ntwrk) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/getNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+      "name": "네트워크 조회 정보",
+      "summary": {
+        "text": "네트워크 상세 조회 흐름에서 네트워크 목록·상세 화면을 위한 데이터 구조 역할을 맡아, 네트워크 기본 정보에 화면 표시용 항목과 목록·삭제 대상 정보를 더해 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+            "line": 35,
+            "snippet": "public class NtwrkVO extends Ntwrk {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 목록·상세 화면을 위한 데이터 구조 역할을 맡아, 네트워크 기본 정보에 화면 표시용 항목과 목록·삭제 대상 정보를 더해 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 35,
+              "snippet": "public class NtwrkVO extends Ntwrk {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 44,
+              "snippet": "private String strManageIem;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 54,
+              "snippet": "private List<NtwrkVO> ntwrkList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 71,
+              "snippet": "this.ntwrkList = Collections.unmodifiableList(ntwrkList);"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "네트워크 기본 정보를 이어받으면서 화면 표시용 관리항목명과 사용자명, 네트워크 목록, 삭제여부 목록을 보유한다. 네트워크 목록은 바꿀 수 없는 형태로 보관하고 삭제여부 목록도 복사본으로만 주고받는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 35,
+              "snippet": "public class NtwrkVO extends Ntwrk {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 44,
+              "snippet": "private String strManageIem;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 54,
+              "snippet": "private List<NtwrkVO> ntwrkList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 71,
+              "snippet": "this.ntwrkList = Collections.unmodifiableList(ntwrkList);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/getNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+      "name": "네트워크 요청 처리",
+      "summary": {
+        "text": "네트워크 상세 조회 흐름에서 네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 162,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 네트워크 조회조건 정보와 네트워크 정보로 받아들이며, 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록자·최종수정자로 남길 사용자는 인증된 로그인 사용자에서 가져오고, 인증 사용자가 없으면 빈 값으로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/removeNtwrk.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 제공",
+      "summary": {
+        "text": "네트워크 삭제 흐름에서 처리 결과를 사용자에게 알리는 안내 메시지를 메시지 코드로 조회해 제공하며, 네트워크 등록·수정·삭제·조회 결과 메시지가 이 경로로 화면에 전달된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "처리 결과를 사용자에게 알리는 안내 메시지를 메시지 코드로 조회해 제공하며, 네트워크 등록·수정·삭제·조회 결과 메시지가 이 경로로 화면에 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드를 받아 정의된 메시지를 돌려주며, 필요에 따라 로케일과 매개변수를 함께 받아 사용자 언어와 상황에 맞는 메시지를 구성한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/removeNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+      "name": "네트워크 업무 서비스",
+      "summary": {
+        "text": "네트워크 삭제 흐름에서 네트워크 업무의 처리 규약을 정의해, 목록 조회·총건수 조회·상세 조회·등록·수정·삭제라는 업무 단위로 화면 요청을 실제 처리에 연결한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+            "line": 17,
+            "snippet": "public interface EgovNtwrkService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 업무의 처리 규약을 정의해, 목록 조회·총건수 조회·상세 조회·등록·수정·삭제라는 업무 단위로 화면 요청을 실제 처리에 연결한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 17,
+              "snippet": "public interface EgovNtwrkService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 7,
+              "snippet": "* - 네트워크의 조회기능은 목록조회, 상세조회로 구분된다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 24,
+              "snippet": "public List<NtwrkVO> selectNtwrkList(NtwrkVO ntwrkVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 56,
+              "snippet": "public void deleteNtwrk(Ntwrk ntwrk) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "네트워크 조회 기능은 목록조회와 상세조회로 구분되고, 변경 기능은 신규 등록·수정·삭제로 구성된다. 등록은 네트워크 정보를 받아 등록 결과 네트워크 정보를 돌려주며, 수정과 삭제는 대상 네트워크 정보를 받아 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 17,
+              "snippet": "public interface EgovNtwrkService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 7,
+              "snippet": "* - 네트워크의 조회기능은 목록조회, 상세조회로 구분된다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 24,
+              "snippet": "public List<NtwrkVO> selectNtwrkList(NtwrkVO ntwrkVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 56,
+              "snippet": "public void deleteNtwrk(Ntwrk ntwrk) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/removeNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+      "name": "네트워크 정보",
+      "summary": {
+        "text": "네트워크 삭제 흐름에서 네트워크 한 건을 표현하는 기본 데이터 구조 역할을 맡아, 등록·수정·삭제 흐름에서 처리 대상 네트워크 정보를 담아 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+            "line": 34,
+            "snippet": "public class Ntwrk extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 한 건을 표현하는 기본 데이터 구조 역할을 맡아, 등록·수정·삭제 흐름에서 처리 대상 네트워크 정보를 담아 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 34,
+              "snippet": "public class Ntwrk extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 40,
+              "snippet": "private String ntwrkId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 45,
+              "snippet": "@Size(max=23)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 46,
+              "snippet": "private String ntwrkIp;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "네트워크ID를 식별자로 하고 네트워크IP·게이트웨이·서브넷·도메인이름서버·관리항목·사용자명·사용여부·등록일자를 보유한다. 주소 성격 항목은 값이 반드시 있어야 하며 23자 이내여야 하고, 최초등록자·최종수정자 정보도 함께 관리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 34,
+              "snippet": "public class Ntwrk extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 40,
+              "snippet": "private String ntwrkId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 45,
+              "snippet": "@Size(max=23)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 46,
+              "snippet": "private String ntwrkIp;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/removeNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+      "name": "네트워크 요청 처리",
+      "summary": {
+        "text": "네트워크 삭제 흐름에서 네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 162,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 네트워크 조회조건 정보와 네트워크 정보로 받아들이며, 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록자·최종수정자로 남길 사용자는 인증된 로그인 사용자에서 가져오고, 인증 사용자가 없으면 빈 값으로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/selectNtwrkList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통코드 조회 조건",
+      "summary": {
+        "text": "네트워크 목록 조회 흐름에서 공통코드 조회 조건을 담는 데이터 구조 역할을 맡아, 네트워크 화면이 관리항목 선택값을 받아오기 위한 조회 요청을 표현한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통코드 조회 조건을 담는 데이터 구조 역할을 맡아, 네트워크 화면이 관리항목 선택값을 받아오기 위한 조회 요청을 표현한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드ID·상세코드·코드명·코드설명을 보유하고, 특정 테이블에서 코드정보를 추출할 때 쓰는 테이블명과 상세 조건 여부·상세 조건 항목을 함께 가진다. 상세 조건 여부의 기본값은 사용하지 않음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/selectNtwrkList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 제공",
+      "summary": {
+        "text": "네트워크 목록 조회 흐름에서 처리 결과를 사용자에게 알리는 안내 메시지를 메시지 코드로 조회해 제공하며, 네트워크 등록·수정·삭제·조회 결과 메시지가 이 경로로 화면에 전달된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "처리 결과를 사용자에게 알리는 안내 메시지를 메시지 코드로 조회해 제공하며, 네트워크 등록·수정·삭제·조회 결과 메시지가 이 경로로 화면에 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드를 받아 정의된 메시지를 돌려주며, 필요에 따라 로케일과 매개변수를 함께 받아 사용자 언어와 상황에 맞는 메시지를 구성한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/selectNtwrkList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 조회 서비스",
+      "summary": {
+        "text": "네트워크 목록 조회 흐름에서 화면에 필요한 공통코드를 공급하는 공통 업무 서비스 역할을 맡아, 네트워크 화면의 관리항목 선택값 목록을 코드 형태로 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면에 필요한 공통코드를 공급하는 공통 업무 서비스 역할을 맡아, 네트워크 화면의 관리항목 선택값 목록을 코드 형태로 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "코드 조회 조건을 받아 공통코드 상세 목록을 돌려주며, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 돌려주는 처리와 조직정보·그룹정보를 코드 형태로 돌려주는 처리도 함께 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/selectNtwrkList.do:src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+      "name": "네트워크 업무 서비스",
+      "summary": {
+        "text": "네트워크 목록 조회 흐름에서 네트워크 업무의 처리 규약을 정의해, 목록 조회·총건수 조회·상세 조회·등록·수정·삭제라는 업무 단위로 화면 요청을 실제 처리에 연결한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+            "line": 17,
+            "snippet": "public interface EgovNtwrkService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 업무의 처리 규약을 정의해, 목록 조회·총건수 조회·상세 조회·등록·수정·삭제라는 업무 단위로 화면 요청을 실제 처리에 연결한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 17,
+              "snippet": "public interface EgovNtwrkService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 7,
+              "snippet": "* - 네트워크의 조회기능은 목록조회, 상세조회로 구분된다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 24,
+              "snippet": "public List<NtwrkVO> selectNtwrkList(NtwrkVO ntwrkVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 56,
+              "snippet": "public void deleteNtwrk(Ntwrk ntwrk) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "네트워크 조회 기능은 목록조회와 상세조회로 구분되고, 변경 기능은 신규 등록·수정·삭제로 구성된다. 등록은 네트워크 정보를 받아 등록 결과 네트워크 정보를 돌려주며, 수정과 삭제는 대상 네트워크 정보를 받아 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 17,
+              "snippet": "public interface EgovNtwrkService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 7,
+              "snippet": "* - 네트워크의 조회기능은 목록조회, 상세조회로 구분된다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 24,
+              "snippet": "public List<NtwrkVO> selectNtwrkList(NtwrkVO ntwrkVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 56,
+              "snippet": "public void deleteNtwrk(Ntwrk ntwrk) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/selectNtwrkList.do:src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+      "name": "네트워크 조회 정보",
+      "summary": {
+        "text": "네트워크 목록 조회 흐름에서 네트워크 목록·상세 화면을 위한 데이터 구조 역할을 맡아, 네트워크 기본 정보에 화면 표시용 항목과 목록·삭제 대상 정보를 더해 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+            "line": 35,
+            "snippet": "public class NtwrkVO extends Ntwrk {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 목록·상세 화면을 위한 데이터 구조 역할을 맡아, 네트워크 기본 정보에 화면 표시용 항목과 목록·삭제 대상 정보를 더해 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 35,
+              "snippet": "public class NtwrkVO extends Ntwrk {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 44,
+              "snippet": "private String strManageIem;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 54,
+              "snippet": "private List<NtwrkVO> ntwrkList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 71,
+              "snippet": "this.ntwrkList = Collections.unmodifiableList(ntwrkList);"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "네트워크 기본 정보를 이어받으면서 화면 표시용 관리항목명과 사용자명, 네트워크 목록, 삭제여부 목록을 보유한다. 네트워크 목록은 바꿀 수 없는 형태로 보관하고 삭제여부 목록도 복사본으로만 주고받는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 35,
+              "snippet": "public class NtwrkVO extends Ntwrk {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 44,
+              "snippet": "private String strManageIem;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 54,
+              "snippet": "private List<NtwrkVO> ntwrkList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 71,
+              "snippet": "this.ntwrkList = Collections.unmodifiableList(ntwrkList);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/selectNtwrkList.do:src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+      "name": "네트워크 요청 처리",
+      "summary": {
+        "text": "네트워크 목록 조회 흐름에서 네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 162,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 네트워크 조회조건 정보와 네트워크 정보로 받아들이며, 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록자·최종수정자로 남길 사용자는 인증된 로그인 사용자에서 가져오고, 인증 사용자가 없으면 빈 값으로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/selectNtwrkListView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통코드 조회 조건",
+      "summary": {
+        "text": "네트워크 목록 화면 요청 흐름에서 공통코드 조회 조건을 담는 데이터 구조 역할을 맡아, 네트워크 화면이 관리항목 선택값을 받아오기 위한 조회 요청을 표현한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통코드 조회 조건을 담는 데이터 구조 역할을 맡아, 네트워크 화면이 관리항목 선택값을 받아오기 위한 조회 요청을 표현한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드ID·상세코드·코드명·코드설명을 보유하고, 특정 테이블에서 코드정보를 추출할 때 쓰는 테이블명과 상세 조건 여부·상세 조건 항목을 함께 가진다. 상세 조건 여부의 기본값은 사용하지 않음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/selectNtwrkListView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 조회 서비스",
+      "summary": {
+        "text": "네트워크 목록 화면 요청 흐름에서 화면에 필요한 공통코드를 공급하는 공통 업무 서비스 역할을 맡아, 네트워크 화면의 관리항목 선택값 목록을 코드 형태로 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면에 필요한 공통코드를 공급하는 공통 업무 서비스 역할을 맡아, 네트워크 화면의 관리항목 선택값 목록을 코드 형태로 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "코드 조회 조건을 받아 공통코드 상세 목록을 돌려주며, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 돌려주는 처리와 조직정보·그룹정보를 코드 형태로 돌려주는 처리도 함께 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/selectNtwrkListView.do:src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+      "name": "네트워크 요청 처리",
+      "summary": {
+        "text": "네트워크 목록 화면 요청 흐름에서 네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 162,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 네트워크 조회조건 정보와 네트워크 정보로 받아들이며, 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록자·최종수정자로 남길 사용자는 인증된 로그인 사용자에서 가져오고, 인증 사용자가 없으면 빈 값으로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/updtNtwrk.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통코드 조회 조건",
+      "summary": {
+        "text": "네트워크 수정 흐름에서 공통코드 조회 조건을 담는 데이터 구조 역할을 맡아, 네트워크 화면이 관리항목 선택값을 받아오기 위한 조회 요청을 표현한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통코드 조회 조건을 담는 데이터 구조 역할을 맡아, 네트워크 화면이 관리항목 선택값을 받아오기 위한 조회 요청을 표현한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드ID·상세코드·코드명·코드설명을 보유하고, 특정 테이블에서 코드정보를 추출할 때 쓰는 테이블명과 상세 조건 여부·상세 조건 항목을 함께 가진다. 상세 조건 여부의 기본값은 사용하지 않음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/updtNtwrk.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 제공",
+      "summary": {
+        "text": "네트워크 수정 흐름에서 처리 결과를 사용자에게 알리는 안내 메시지를 메시지 코드로 조회해 제공하며, 네트워크 등록·수정·삭제·조회 결과 메시지가 이 경로로 화면에 전달된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "처리 결과를 사용자에게 알리는 안내 메시지를 메시지 코드로 조회해 제공하며, 네트워크 등록·수정·삭제·조회 결과 메시지가 이 경로로 화면에 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드를 받아 정의된 메시지를 돌려주며, 필요에 따라 로케일과 매개변수를 함께 받아 사용자 언어와 상황에 맞는 메시지를 구성한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/updtNtwrk.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "네트워크 수정 흐름에서 인증된 사용자를 표현하는 데이터 구조 역할을 맡아, 네트워크 등록·수정 흐름에서 최초등록자ID와 최종수정자ID의 출처가 된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "인증된 사용자를 표현하는 데이터 구조 역할을 맡아, 네트워크 등록·수정 흐름에서 최초등록자ID와 최종수정자ID의 출처가 된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "private String id;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일 등 필수 항목과 사용자구분·조직정보·고유아이디 등 사용자 식별 항목을 보유한다. 아이디는 값이 반드시 있어야 하는 항목으로 선언되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "private String id;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/updtNtwrk.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 조회",
+      "summary": {
+        "text": "네트워크 수정 흐름에서 현재 인증된 사용자 정보를 흐름에 공급하는 협력 객체 역할을 맡아, 네트워크 등록·수정 시 등록자와 최종수정자를 확정하는 근거가 된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "현재 인증된 사용자 정보를 흐름에 공급하는 협력 객체 역할을 맡아, 네트워크 등록·수정 시 등록자와 최종수정자를 확정하는 근거가 된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 정보, 사용자 권한 목록, 인증 여부라는 세 가지 값을 제공한다. 사용자 정보는 값이 없을 수 있으므로 사용하는 쪽에서 미인증 상황을 함께 처리해야 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/updtNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+      "name": "네트워크 업무 서비스",
+      "summary": {
+        "text": "네트워크 수정 흐름에서 네트워크 업무의 처리 규약을 정의해, 목록 조회·총건수 조회·상세 조회·등록·수정·삭제라는 업무 단위로 화면 요청을 실제 처리에 연결한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+            "line": 17,
+            "snippet": "public interface EgovNtwrkService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 업무의 처리 규약을 정의해, 목록 조회·총건수 조회·상세 조회·등록·수정·삭제라는 업무 단위로 화면 요청을 실제 처리에 연결한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 17,
+              "snippet": "public interface EgovNtwrkService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 7,
+              "snippet": "* - 네트워크의 조회기능은 목록조회, 상세조회로 구분된다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 24,
+              "snippet": "public List<NtwrkVO> selectNtwrkList(NtwrkVO ntwrkVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 56,
+              "snippet": "public void deleteNtwrk(Ntwrk ntwrk) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "네트워크 조회 기능은 목록조회와 상세조회로 구분되고, 변경 기능은 신규 등록·수정·삭제로 구성된다. 등록은 네트워크 정보를 받아 등록 결과 네트워크 정보를 돌려주며, 수정과 삭제는 대상 네트워크 정보를 받아 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 17,
+              "snippet": "public interface EgovNtwrkService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 7,
+              "snippet": "* - 네트워크의 조회기능은 목록조회, 상세조회로 구분된다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 24,
+              "snippet": "public List<NtwrkVO> selectNtwrkList(NtwrkVO ntwrkVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 56,
+              "snippet": "public void deleteNtwrk(Ntwrk ntwrk) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/updtNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+      "name": "네트워크 정보",
+      "summary": {
+        "text": "네트워크 수정 흐름에서 네트워크 한 건을 표현하는 기본 데이터 구조 역할을 맡아, 등록·수정·삭제 흐름에서 처리 대상 네트워크 정보를 담아 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+            "line": 34,
+            "snippet": "public class Ntwrk extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 한 건을 표현하는 기본 데이터 구조 역할을 맡아, 등록·수정·삭제 흐름에서 처리 대상 네트워크 정보를 담아 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 34,
+              "snippet": "public class Ntwrk extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 40,
+              "snippet": "private String ntwrkId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 45,
+              "snippet": "@Size(max=23)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 46,
+              "snippet": "private String ntwrkIp;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "네트워크ID를 식별자로 하고 네트워크IP·게이트웨이·서브넷·도메인이름서버·관리항목·사용자명·사용여부·등록일자를 보유한다. 주소 성격 항목은 값이 반드시 있어야 하며 23자 이내여야 하고, 최초등록자·최종수정자 정보도 함께 관리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 34,
+              "snippet": "public class Ntwrk extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 40,
+              "snippet": "private String ntwrkId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 45,
+              "snippet": "@Size(max=23)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/Ntwrk.java",
+              "line": 46,
+              "snippet": "private String ntwrkIp;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/updtNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+      "name": "네트워크 요청 처리",
+      "summary": {
+        "text": "네트워크 수정 흐름에서 네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 162,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 네트워크 조회조건 정보와 네트워크 정보로 받아들이며, 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록자·최종수정자로 남길 사용자는 인증된 로그인 사용자에서 가져오고, 인증 사용자가 없으면 빈 값으로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/updtNtwrk.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 도구",
+      "summary": {
+        "text": "네트워크 수정 흐름에서 문자열 값을 안전하게 다루는 공통 도구 역할을 맡아, 네트워크 등록·수정 시 인증 사용자 아이디를 빈 값으로 안전하게 변환하는 데 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "문자열 값을 안전하게 다루는 공통 도구 역할을 맡아, 네트워크 등록·수정 시 인증 사용자 아이디를 빈 값으로 안전하게 변환하는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 상수와 문자열 자르기·비어있음 검증 같은 문자열 처리 규약을 제공해, 값이 없는 경우에도 빈 문자열로 일관되게 다룰 수 있게 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/updtViewNtwrk.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통코드 조회 조건",
+      "summary": {
+        "text": "네트워크 수정 화면 요청 흐름에서 공통코드 조회 조건을 담는 데이터 구조 역할을 맡아, 네트워크 화면이 관리항목 선택값을 받아오기 위한 조회 요청을 표현한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "공통코드 조회 조건을 담는 데이터 구조 역할을 맡아, 네트워크 화면이 관리항목 선택값을 받아오기 위한 조회 요청을 표현한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드ID·상세코드·코드명·코드설명을 보유하고, 특정 테이블에서 코드정보를 추출할 때 쓰는 테이블명과 상세 조건 여부·상세 조건 항목을 함께 가진다. 상세 조건 여부의 기본값은 사용하지 않음이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/updtViewNtwrk.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 제공",
+      "summary": {
+        "text": "네트워크 수정 화면 요청 흐름에서 처리 결과를 사용자에게 알리는 안내 메시지를 메시지 코드로 조회해 제공하며, 네트워크 등록·수정·삭제·조회 결과 메시지가 이 경로로 화면에 전달된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "처리 결과를 사용자에게 알리는 안내 메시지를 메시지 코드로 조회해 제공하며, 네트워크 등록·수정·삭제·조회 결과 메시지가 이 경로로 화면에 전달된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드를 받아 정의된 메시지를 돌려주며, 필요에 따라 로케일과 매개변수를 함께 받아 사용자 언어와 상황에 맞는 메시지를 구성한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "public String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/updtViewNtwrk.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 조회 서비스",
+      "summary": {
+        "text": "네트워크 수정 화면 요청 흐름에서 화면에 필요한 공통코드를 공급하는 공통 업무 서비스 역할을 맡아, 네트워크 화면의 관리항목 선택값 목록을 코드 형태로 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면에 필요한 공통코드를 공급하는 공통 업무 서비스 역할을 맡아, 네트워크 화면의 관리항목 선택값 목록을 코드 형태로 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "코드 조회 조건을 받아 공통코드 상세 목록을 돌려주며, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 돌려주는 처리와 조직정보·그룹정보를 코드 형태로 돌려주는 처리도 함께 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/updtViewNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+      "name": "네트워크 업무 서비스",
+      "summary": {
+        "text": "네트워크 수정 화면 요청 흐름에서 네트워크 업무의 처리 규약을 정의해, 목록 조회·총건수 조회·상세 조회·등록·수정·삭제라는 업무 단위로 화면 요청을 실제 처리에 연결한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+            "line": 17,
+            "snippet": "public interface EgovNtwrkService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 업무의 처리 규약을 정의해, 목록 조회·총건수 조회·상세 조회·등록·수정·삭제라는 업무 단위로 화면 요청을 실제 처리에 연결한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 17,
+              "snippet": "public interface EgovNtwrkService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 7,
+              "snippet": "* - 네트워크의 조회기능은 목록조회, 상세조회로 구분된다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 24,
+              "snippet": "public List<NtwrkVO> selectNtwrkList(NtwrkVO ntwrkVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 56,
+              "snippet": "public void deleteNtwrk(Ntwrk ntwrk) throws Exception;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "네트워크 조회 기능은 목록조회와 상세조회로 구분되고, 변경 기능은 신규 등록·수정·삭제로 구성된다. 등록은 네트워크 정보를 받아 등록 결과 네트워크 정보를 돌려주며, 수정과 삭제는 대상 네트워크 정보를 받아 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 17,
+              "snippet": "public interface EgovNtwrkService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 7,
+              "snippet": "* - 네트워크의 조회기능은 목록조회, 상세조회로 구분된다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 24,
+              "snippet": "public List<NtwrkVO> selectNtwrkList(NtwrkVO ntwrkVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/EgovNtwrkService.java",
+              "line": 56,
+              "snippet": "public void deleteNtwrk(Ntwrk ntwrk) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/updtViewNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+      "name": "네트워크 조회 정보",
+      "summary": {
+        "text": "네트워크 수정 화면 요청 흐름에서 네트워크 목록·상세 화면을 위한 데이터 구조 역할을 맡아, 네트워크 기본 정보에 화면 표시용 항목과 목록·삭제 대상 정보를 더해 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+            "line": 35,
+            "snippet": "public class NtwrkVO extends Ntwrk {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 목록·상세 화면을 위한 데이터 구조 역할을 맡아, 네트워크 기본 정보에 화면 표시용 항목과 목록·삭제 대상 정보를 더해 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 35,
+              "snippet": "public class NtwrkVO extends Ntwrk {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 44,
+              "snippet": "private String strManageIem;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 54,
+              "snippet": "private List<NtwrkVO> ntwrkList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 71,
+              "snippet": "this.ntwrkList = Collections.unmodifiableList(ntwrkList);"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "네트워크 기본 정보를 이어받으면서 화면 표시용 관리항목명과 사용자명, 네트워크 목록, 삭제여부 목록을 보유한다. 네트워크 목록은 바꿀 수 없는 형태로 보관하고 삭제여부 목록도 복사본으로만 주고받는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 35,
+              "snippet": "public class NtwrkVO extends Ntwrk {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 44,
+              "snippet": "private String strManageIem;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 54,
+              "snippet": "private List<NtwrkVO> ntwrkList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/service/NtwrkVO.java",
+              "line": 71,
+              "snippet": "this.ntwrkList = Collections.unmodifiableList(ntwrkList);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/sym/nwk/updtViewNtwrk.do:src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+      "name": "네트워크 요청 처리",
+      "summary": {
+        "text": "네트워크 수정 화면 요청 흐름에서 네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+            "line": 162,
+            "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "네트워크 관리 화면의 요청을 받아들이는 창구 역할을 맡아, 요청 파라미터를 네트워크 정보에 담고 입력값 검증 결과를 확인한 뒤 네트워크 업무 서비스에 처리를 위임하고 이동할 화면과 안내 메시지를 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청은 네트워크 조회조건 정보와 네트워크 정보로 받아들이며, 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다. 등록자·최종수정자로 남길 사용자는 인증된 로그인 사용자에서 가져오고, 인증 사용자가 없으면 빈 값으로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 162,
+              "snippet": "@RequestMapping(value = \"/sym/sym/nwk/addNtwrk.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 166,
+              "snippet": "if (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 171,
+              "snippet": "LoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/sym/nwk/web/EgovNtwrkController.java",
+              "line": 172,
+              "snippet": "ntwrk.setFrstRegisterId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

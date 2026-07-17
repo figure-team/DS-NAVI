@@ -1,0 +1,172 @@
+{
+  "domainId": "domain:sec.pki",
+  "files": [
+    {
+      "className": "EgovMessageSource",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovMessageSource.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이문준          최초 생성\n *   2017.07.21  장동한 \t\t\targs, locale 설정\n *\n * </pre>\n */\n\npublic class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {\n\n\tprivate ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;\n\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @param reloadableResourceBundleMessageSource - resource MessageSource\n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic void setReloadableResourceBundleMessageSource(ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource) {\n\t\tthis.reloadableResourceBundleMessageSource = reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic ReloadableResourceBundleMessageSource getReloadableResourceBundleMessageSource() {\n\t\treturn reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, locale);\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @return String\n\t */\t\n\tpublic String getMessageArgs(String code, Object[] args) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, locale);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "slice": {
+        "endLine": 27,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.service;\n\nimport java.util.List;\n\npublic interface EgovUserDetailsService {\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic Object getAuthenticatedUser();\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t * 예) [ROLE_ADMIN, ROLE_USER, ROLE_A, ROLE_B, ROLE_RESTRICTED, IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED_ANONYMOUSLY]\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic List<String> getAuthorities();\n\t\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\t\n\t */\n\tpublic Boolean isAuthenticated(); \n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovUserDetailsHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "slice": {
+        "endLine": 62,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n *   2009.03.10  sjyoon         최초 생성\n *   2011.07.01\t 서준식          interface 생성후 상세 로직의 분리\n * </pre>\n */\n\npublic class EgovUserDetailsHelper {\n\n\tstatic EgovUserDetailsService egovUserDetailsService;\n\n\tpublic EgovUserDetailsService getEgovUserDetailsService() {\n\t\treturn egovUserDetailsService;\n\t}\n\n\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {\n\t\tEgovUserDetailsHelper.egovUserDetailsService = egovUserDetailsService;\n\t}\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic static Object getAuthenticatedUser() {\n\t\treturn egovUserDetailsService.getAuthenticatedUser();\n\t}\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t *\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic static List<String> getAuthorities() {\n\t\treturn egovUserDetailsService.getAuthorities();\n\t}\n\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\n\t */\n\tpublic static Boolean isAuthenticated() {\n\t\treturn egovUserDetailsService.isAuthenticated();\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCryptoController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sec/pki/web/EgovCryptoController.java — java 파일",
+        "tags": []
+      },
+      "line": 58,
+      "relPath": "src/main/java/egovframework/com/sec/pki/web/EgovCryptoController.java",
+      "slice": {
+        "endLine": 119,
+        "startLine": 48,
+        "text": "\t/** EgovMessageSource */\n    @Resource(name=\"egovMessageSource\")\n    EgovMessageSource egovMessageSource;\n\n    /**\n     * 암호화/복호화 입력 및 요청 페이지를 호출한다.\n     *\n     * @return\n     */\n\t@IncludedInfo(name=\"암호화/복호화\", listUrl=\"/sec/pki/EgovCryptoInfo.do\", order = 2200 ,gid = 90)\n    @RequestMapping(value = \"/sec/pki/EgovCryptoInfo.do\")\n    public String displayCryptoInfo( @RequestParam Map<?, ?> commandMap,\n\t\t\t\t\t\t\t    \t\tModelMap model) throws Exception {\n        // 0. Spring Security 사용자권한 처리\n    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n    \tif(!isAuthenticated) {\n    \t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));\n        \treturn \"redirect:/uat/uia/egovLoginUsr.do\";\n    \t}\n\n    \tString plainText = (String)commandMap.get(\"plainText\");\n\n    \tif ( plainText != null ) {\n\n\t    \tint plainTextLen = plainText.length();\n\t    \tString cryptText = encrypt(plainText);\n\t    \tString decryptText = decrypt(cryptText);\n\t    \tint decryptTextLen = decryptText.length();\n\n\t    \tmodel.addAttribute(\"plainText\", plainText);\n\t    \tmodel.addAttribute(\"plainTextLen\", plainTextLen);\n\t    \tmodel.addAttribute(\"cryptText\", cryptText);\n\t    \tmodel.addAttribute(\"decryptText\", decryptText);\n\t    \tmodel.addAttribute(\"decryptTextLen\", decryptTextLen);\n    \t}\n\n    \treturn \"egovframework/com/sec/pki/EgovCryptoInfo\";\n    }\n\n    /**\n     * 암호화\n     *\n     * @param encrypt\n     */\n    private String encrypt(String encrypt) {\n\n    \ttry {\n    \t\t//return cryptoService.encrypt(encrypt); // Handles URLEncoding.\n\t\t\treturn cryptoService.encryptNone(encrypt); // Does not handle URLEncoding.\n        } catch(IllegalArgumentException e) {\n    \t\tLOGGER.error(\"[IllegalArgumentException] Try/Catch...usingParameters Runing : \"+ e.getMessage());\n        }\n\t\treturn encrypt;\n    }\n\n    /**\n     * 복호화\n     *\n     * @param decrypt\n     */\n    private String decrypt(String decrypt){\n\n    \ttry {\n    \t\t//return cryptoService.decrypt(decrypt); // Handles URLDecoding.\n\t\t\treturn cryptoService.decryptNone(decrypt); // Does not handle URLDecoding.\n        } catch(IllegalArgumentException e) {\n    \t\tLOGGER.error(\"[IllegalArgumentException] Try/Catch...usingParameters Runing : \"+ e.getMessage());\n        }\n\t\treturn decrypt;\n    }\n\n}",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovCryptoController#displayCryptoInfo",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/pki/web/EgovCryptoController.java",
+      "flowId": "flow:ANY /sec/pki/EgovCryptoInfo.do",
+      "line": 58,
+      "stepIds": [
+        "step:ANY /sec/pki/EgovCryptoInfo.do:src/main/java/egovframework/com/sec/pki/web/EgovCryptoController.java",
+        "step:ANY /sec/pki/EgovCryptoInfo.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sec/pki/EgovCryptoInfo.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sec/pki/EgovCryptoInfo.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "sec.pki",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sec/pki/EgovCryptoInfo.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /sec/pki/EgovCryptoInfo.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /sec/pki/EgovCryptoInfo.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sec/pki/web/EgovCryptoController.java",
+      "stepId": "step:ANY /sec/pki/EgovCryptoInfo.do:src/main/java/egovframework/com/sec/pki/web/EgovCryptoController.java"
+    }
+  ]
+}

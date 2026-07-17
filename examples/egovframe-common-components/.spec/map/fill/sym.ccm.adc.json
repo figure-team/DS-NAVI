@@ -1,0 +1,1966 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "n0",
+          "to": "n1"
+        },
+        {
+          "from": "n1",
+          "label": "항목 선택",
+          "to": "n2"
+        },
+        {
+          "from": "n1",
+          "label": "신규 등록",
+          "to": "n3"
+        },
+        {
+          "from": "n1",
+          "label": "다른 업무에서 참조",
+          "to": "n11"
+        },
+        {
+          "from": "n3",
+          "to": "n4"
+        },
+        {
+          "from": "n4",
+          "to": "n13"
+        },
+        {
+          "from": "n2",
+          "label": "수정",
+          "to": "n5"
+        },
+        {
+          "from": "n2",
+          "label": "삭제",
+          "to": "n10"
+        },
+        {
+          "from": "n5",
+          "to": "n6"
+        },
+        {
+          "from": "n6",
+          "label": "존재함",
+          "to": "n7"
+        },
+        {
+          "from": "n6",
+          "label": "존재하지 않음",
+          "to": "n1"
+        },
+        {
+          "from": "n7",
+          "to": "n8"
+        },
+        {
+          "from": "n8",
+          "label": "통과",
+          "to": "n9"
+        },
+        {
+          "from": "n8",
+          "label": "검증 오류",
+          "to": "n5"
+        },
+        {
+          "from": "n9",
+          "to": "n13"
+        },
+        {
+          "from": "n10",
+          "to": "n13"
+        },
+        {
+          "from": "n11",
+          "to": "n12"
+        },
+        {
+          "from": "n12",
+          "to": "n13"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "n0",
+          "kind": "start",
+          "label": "행정코드 관리 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 149,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeList.do",
+          "id": "n1",
+          "kind": "activity",
+          "label": "행정코드 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 130,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeDetail.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeDetail.do",
+          "id": "n2",
+          "kind": "activity",
+          "label": "행정코드 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 80,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeRegistView.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeRegistView.do",
+          "id": "n3",
+          "kind": "activity",
+          "label": "등록 화면 호출"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 98,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeRegist.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 38,
+              "snippet": "\tvoid insertAdministCode(AdministCode administCode) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeRegist.do",
+          "id": "n4",
+          "kind": "activity",
+          "label": "행정코드 등록"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 233,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeModifyView.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeModifyView.do",
+          "id": "n5",
+          "kind": "activity",
+          "label": "수정 화면 호출"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 236,
+              "snippet": "\t\tAdministCode vo = administCodeManageService.selectAdministCodeDetail(administCode);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 237,
+              "snippet": "\t\tif (vo != null) {"
+            }
+          ],
+          "id": "n6",
+          "kind": "decision",
+          "label": "대상 행정코드 존재?"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 256,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeModify.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeModify.do",
+          "id": "n7",
+          "kind": "activity",
+          "label": "행정코드 수정 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 261,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 262,
+              "snippet": "\t\t\treturn \"egovframework/com/sym/ccm/adc/EgovCcmAdministCodeModify\";"
+            }
+          ],
+          "id": "n8",
+          "kind": "decision",
+          "label": "입력값 검증 통과?"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 68,
+              "snippet": "\tvoid updateAdministCode(AdministCode administCode) throws Exception;"
+            }
+          ],
+          "id": "n9",
+          "kind": "activity",
+          "label": "행정코드 수정 반영"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 64,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeRemove.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 31,
+              "snippet": "\tvoid deleteAdministCode(AdministCode administCode) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeRemove.do",
+          "id": "n10",
+          "kind": "activity",
+          "label": "행정코드 삭제"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 183,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodePopup.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodePopup.do",
+          "id": "n11",
+          "kind": "activity",
+          "label": "선택 팝업 호출"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 197,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 214,
+              "snippet": "\t\tList<EgovMap> resultList = administCodeManageService.selectAdministCodeList(searchVO);"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/ccm/adc/EgovCcmAdministCode.do",
+          "id": "n12",
+          "kind": "activity",
+          "label": "팝업 목록 조회"
+        },
+        {
+          "id": "n13",
+          "kind": "end",
+          "label": "행정코드 관리 완료"
+        }
+      ],
+      "title": "행정코드 관리"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+          "line": 32,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+          "line": 33,
+          "snippet": "    private String administZoneSe = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+          "line": 38,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+          "line": 70,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+          "line": 71,
+          "snippet": "    private String useAt = \"\";"
+        }
+      ],
+      "text": "행정구역구분·행정구역코드·사용여부는 반드시 입력해야 하는 필수 항목이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+          "line": 39,
+          "snippet": "\t@Size(max=10)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+          "line": 40,
+          "snippet": "    private String administZoneCode = \"\";"
+        }
+      ],
+      "text": "행정구역코드는 최대 10자리까지만 허용한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 258,
+          "snippet": "\t\t\t@Valid @ModelAttribute(\"administCode\") AdministCode administCode, BindingResult bindingResult,"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 261,
+          "snippet": "\t\tif (bindingResult.hasErrors()) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 262,
+          "snippet": "\t\t\treturn \"egovframework/com/sym/ccm/adc/EgovCcmAdministCodeModify\";"
+        }
+      ],
+      "text": "수정 요청은 입력값 검증 오류가 있으면 저장하지 않고 수정 화면으로 되돌린다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 236,
+          "snippet": "\t\tAdministCode vo = administCodeManageService.selectAdministCodeDetail(administCode);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 237,
+          "snippet": "\t\tif (vo != null) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 241,
+          "snippet": "\t\t\treturn \"redirect:/sym/ccm/adc/EgovCcmAdministCodeList.do\";"
+        }
+      ],
+      "text": "수정 화면 호출 시 대상 행정코드가 존재하지 않으면 목록 화면으로 되돌린다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 201,
+          "snippet": "\t\tsearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 202,
+          "snippet": "\t\tsearchVO.setPageSize(propertiesService.getInt(\"pageSize\"));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 217,
+          "snippet": "\t\tint totCnt = administCodeManageService.selectAdministCodeListTotCnt(searchVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 218,
+          "snippet": "\t\tpaginationInfo.setTotalRecordCount(totCnt);"
+        }
+      ],
+      "text": "목록 조회의 한 페이지 건수와 페이지 크기는 환경설정 값을 따르며, 목록과 총 건수를 함께 조회해 페이징 정보를 구성한다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 198,
+          "snippet": "\tpublic String selectAdministCode(@ModelAttribute(\"loginVO\") LoginVO loginVO,"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        }
+      ],
+      "text": "행정코드 화면 요청은 공통 로그인 사용자 정보를 함께 전달받아 처리자 정보를 확보한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 183,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodePopup.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 197,
+          "snippet": "\t@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 214,
+          "snippet": "\t\tList<EgovMap> resultList = administCodeManageService.selectAdministCodeList(searchVO);"
+        }
+      ],
+      "text": "행정코드 선택 팝업은 다른 업무 화면이 행정코드를 참조·선택하도록 페이징 목록을 제공한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 205,
+          "snippet": "\t\tPaginationInfo paginationInfo = new PaginationInfo();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 214,
+          "snippet": "\t\tList<EgovMap> resultList = administCodeManageService.selectAdministCodeList(searchVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+          "line": 219,
+          "snippet": "\t\tmodel.addAttribute(\"paginationInfo\", paginationInfo);"
+        }
+      ],
+      "text": "목록 조회 결과는 공통 페이징 정보와 공통 결과 형식으로 화면에 전달된다."
+    }
+  ],
+  "domainId": "domain:sym.ccm.adc",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+          "line": 25,
+          "snippet": "public class AdministCode implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+          "line": 33,
+          "snippet": "    private String administZoneSe = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+          "line": 40,
+          "snippet": "    private String administZoneCode = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+          "line": 45,
+          "snippet": "\tprivate String administZoneNm = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+          "line": 50,
+          "snippet": "    private String upperAdministZoneCode = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+          "line": 60,
+          "snippet": "    private String creatDe = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+          "line": 65,
+          "snippet": "    private String ablDe = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+          "line": 71,
+          "snippet": "    private String useAt = \"\";"
+        }
+      ],
+      "text": "행정코드 항목: 행정구역구분·행정구역코드·행정구역명·상위행정구역코드·생성일자·폐기일자·사용여부·등록자·수정자로 구성된 기준정보 한 건."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+          "line": 27,
+          "snippet": "public class AdministCodeVO extends AdministCode implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+          "line": 32,
+          "snippet": "    private String searchCondition = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+          "line": 35,
+          "snippet": "    private String searchKeyword = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+          "line": 38,
+          "snippet": "    private String searchUseYn = \"\";"
+        }
+      ],
+      "text": "행정코드 조회조건: 목록 조회에 사용하는 검색조건·검색어·검색사용여부와 페이징 값을 담는 항목."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 42,
+          "snippet": "\tprivate String id;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 63,
+          "snippet": "\tprivate String orgnztId;"
+        }
+      ],
+      "text": "로그인 사용자: 행정코드 등록·수정 요청을 수행하는 담당자 정보 항목."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCode.do",
+      "name": "행정코드 팝업 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 197,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 214,
+            "snippet": "\t\tList<EgovMap> resultList = administCodeManageService.selectAdministCodeList(searchVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 217,
+            "snippet": "\t\tint totCnt = administCodeManageService.selectAdministCodeListTotCnt(searchVO);"
+          }
+        ],
+        "text": "다른 업무 화면에서 행정코드를 선택하도록 페이징 처리된 팝업용 행정코드 목록을 조회한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeDetail.do",
+      "name": "행정코드 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 130,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeDetail.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+            "line": 46,
+            "snippet": "\tAdministCode selectAdministCodeDetail(AdministCode administCode) throws Exception;"
+          }
+        ],
+        "text": "선택한 행정구역구분과 행정구역코드에 해당하는 행정코드 한 건의 상세 항목을 조회한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeList.do",
+      "name": "행정코드 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 149,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+            "line": 54,
+            "snippet": "\tList<EgovMap> selectAdministCodeList(AdministCodeVO searchVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+            "line": 61,
+            "snippet": "    int selectAdministCodeListTotCnt(AdministCodeVO searchVO) throws Exception;"
+          }
+        ],
+        "text": "검색조건과 페이지 정보를 받아 행정코드 목록과 총 건수를 조회해 목록 화면에 표시한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeModify.do",
+      "name": "행정코드 수정",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 256,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeModify.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 261,
+            "snippet": "\t\tif (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+            "line": 68,
+            "snippet": "\tvoid updateAdministCode(AdministCode administCode) throws Exception;"
+          }
+        ],
+        "text": "입력값 검증을 통과한 경우에만 기존 행정코드 항목을 수정하며, 검증 오류 시 수정 화면으로 되돌린다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeModifyView.do",
+      "name": "행정코드 수정 화면 호출",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 233,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeModifyView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 236,
+            "snippet": "\t\tAdministCode vo = administCodeManageService.selectAdministCodeDetail(administCode);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 241,
+            "snippet": "\t\t\treturn \"redirect:/sym/ccm/adc/EgovCcmAdministCodeList.do\";"
+          }
+        ],
+        "text": "수정 대상 행정코드의 상세 항목을 조회해 수정 화면에 표시하며, 대상이 없으면 목록 화면으로 되돌린다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodePopup.do",
+      "name": "행정코드 선택 팝업 호출",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 183,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodePopup.do\")"
+          }
+        ],
+        "text": "행정코드 선택 팝업 화면을 호출한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeRegist.do",
+      "name": "행정코드 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 98,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeRegist.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+            "line": 38,
+            "snippet": "\tvoid insertAdministCode(AdministCode administCode) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+            "line": 32,
+            "snippet": "\t@EgovNullCheck"
+          }
+        ],
+        "text": "입력받은 행정코드를 필수값 검증 후 신규 등록하며, 요청에는 로그인 사용자 정보가 함께 전달된다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeRegistView.do",
+      "name": "행정코드 등록 화면 호출",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 80,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeRegistView.do\")"
+          }
+        ],
+        "text": "행정코드를 새로 등록하기 위한 입력 화면을 호출한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeRemove.do",
+      "name": "행정코드 삭제",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 64,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeRemove.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+            "line": 31,
+            "snippet": "\tvoid deleteAdministCode(AdministCode administCode) throws Exception;"
+          }
+        ],
+        "text": "선택한 행정코드를 삭제 처리한다."
+      }
+    }
+  ],
+  "name": "행정코드 관리",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+              "line": 32,
+              "snippet": "    private String searchCondition = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+              "line": 35,
+              "snippet": "    private String searchKeyword = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+              "line": 41,
+              "snippet": "    private int pageIndex = 1;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+              "line": 44,
+              "snippet": "    private int pageUnit = 10;"
+            }
+          ],
+          "text": "검색조건·검색어·검색사용여부와 현재페이지·페이지개수·페이지사이즈 등 페이징 값을 가지며, 현재페이지는 1, 한 페이지 건수는 10을 기본값으로 시작한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+              "line": 27,
+              "snippet": "public class AdministCodeVO extends AdministCode implements Serializable {"
+            }
+          ],
+          "text": "행정코드 목록 조회 요청의 검색 조건과 페이징 조건을 담는 조회용 데이터 항목으로, 행정코드 항목을 그대로 물려받는다."
+        }
+      },
+      "name": "행정코드 조회조건",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCode.do:src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+            "line": 27,
+            "snippet": "public class AdministCodeVO extends AdministCode implements Serializable {"
+          }
+        ],
+        "text": "행정코드 목록 조회의 검색 조건과 페이징 조건을 담아 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 38,
+              "snippet": "\tvoid insertAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 68,
+              "snippet": "\tvoid updateAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 31,
+              "snippet": "\tvoid deleteAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 54,
+              "snippet": "\tList<EgovMap> selectAdministCodeList(AdministCodeVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 61,
+              "snippet": "    int selectAdministCodeListTotCnt(AdministCodeVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "행정코드 단건 등록·수정·삭제와 목록 조회를 각각 별도의 업무 작업으로 정의하며, 목록 조회는 검색 조건 항목을 받아 목록과 총 건수를 나누어 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovCcmAdministCodeManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 46,
+              "snippet": "\tAdministCode selectAdministCodeDetail(AdministCode administCode) throws Exception;"
+            }
+          ],
+          "text": "행정코드 등록·수정·삭제·상세 조회·목록 조회·총 건수 조회를 제공하는 행정코드 관리 업무 서비스 계약이다."
+        }
+      },
+      "name": "행정코드 관리 서비스",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCode.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovCcmAdministCodeManageService {"
+          }
+        ],
+        "text": "행정코드의 등록·수정·삭제·조회 업무 작업을 정의하고 수행하는 업무 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 258,
+              "snippet": "\t\t\t@Valid @ModelAttribute(\"administCode\") AdministCode administCode, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 261,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 201,
+              "snippet": "\t\tsearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));"
+            }
+          ],
+          "text": "로그인 정보와 행정코드 입력 항목을 요청 파라미터로 바인딩받으며, 수정 요청에서는 검증 오류가 있으면 저장하지 않고 수정 화면으로 되돌린다. 목록성 요청은 한 페이지 건수와 페이지 크기를 환경설정에서 읽어 페이징 정보를 구성한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 197,
+              "snippet": "\t@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 214,
+              "snippet": "\t\tList<EgovMap> resultList = administCodeManageService.selectAdministCodeList(searchVO);"
+            }
+          ],
+          "text": "행정코드 업무의 웹 진입점으로, 화면에서 들어온 검색조건과 행정코드 입력값을 받아 행정코드 관리 서비스에 위임하고 결과를 화면 모델에 담아 반환한다."
+        }
+      },
+      "name": "행정코드 관리 화면 처리",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCode.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 197,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+          }
+        ],
+        "text": "행정코드 관련 화면 요청을 받아 입력값을 바인딩하고 행정코드 관리 서비스로 위임한 뒤 결과 화면을 지정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 38,
+              "snippet": "\tvoid insertAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 68,
+              "snippet": "\tvoid updateAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 31,
+              "snippet": "\tvoid deleteAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 54,
+              "snippet": "\tList<EgovMap> selectAdministCodeList(AdministCodeVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 61,
+              "snippet": "    int selectAdministCodeListTotCnt(AdministCodeVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "행정코드 단건 등록·수정·삭제와 목록 조회를 각각 별도의 업무 작업으로 정의하며, 목록 조회는 검색 조건 항목을 받아 목록과 총 건수를 나누어 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovCcmAdministCodeManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 46,
+              "snippet": "\tAdministCode selectAdministCodeDetail(AdministCode administCode) throws Exception;"
+            }
+          ],
+          "text": "행정코드 등록·수정·삭제·상세 조회·목록 조회·총 건수 조회를 제공하는 행정코드 관리 업무 서비스 계약이다."
+        }
+      },
+      "name": "행정코드 관리 서비스",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovCcmAdministCodeManageService {"
+          }
+        ],
+        "text": "행정코드의 등록·수정·삭제·조회 업무 작업을 정의하고 수행하는 업무 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 258,
+              "snippet": "\t\t\t@Valid @ModelAttribute(\"administCode\") AdministCode administCode, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 261,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 201,
+              "snippet": "\t\tsearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));"
+            }
+          ],
+          "text": "로그인 정보와 행정코드 입력 항목을 요청 파라미터로 바인딩받으며, 수정 요청에서는 검증 오류가 있으면 저장하지 않고 수정 화면으로 되돌린다. 목록성 요청은 한 페이지 건수와 페이지 크기를 환경설정에서 읽어 페이징 정보를 구성한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 197,
+              "snippet": "\t@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 214,
+              "snippet": "\t\tList<EgovMap> resultList = administCodeManageService.selectAdministCodeList(searchVO);"
+            }
+          ],
+          "text": "행정코드 업무의 웹 진입점으로, 화면에서 들어온 검색조건과 행정코드 입력값을 받아 행정코드 관리 서비스에 위임하고 결과를 화면 모델에 담아 반환한다."
+        }
+      },
+      "name": "행정코드 관리 화면 처리",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 197,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+          }
+        ],
+        "text": "행정코드 관련 화면 요청을 받아 입력값을 바인딩하고 행정코드 관리 서비스로 위임한 뒤 결과 화면을 지정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+              "line": 32,
+              "snippet": "    private String searchCondition = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+              "line": 35,
+              "snippet": "    private String searchKeyword = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+              "line": 41,
+              "snippet": "    private int pageIndex = 1;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+              "line": 44,
+              "snippet": "    private int pageUnit = 10;"
+            }
+          ],
+          "text": "검색조건·검색어·검색사용여부와 현재페이지·페이지개수·페이지사이즈 등 페이징 값을 가지며, 현재페이지는 1, 한 페이지 건수는 10을 기본값으로 시작한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+              "line": 27,
+              "snippet": "public class AdministCodeVO extends AdministCode implements Serializable {"
+            }
+          ],
+          "text": "행정코드 목록 조회 요청의 검색 조건과 페이징 조건을 담는 조회용 데이터 항목으로, 행정코드 항목을 그대로 물려받는다."
+        }
+      },
+      "name": "행정코드 조회조건",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeList.do:src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+            "line": 27,
+            "snippet": "public class AdministCodeVO extends AdministCode implements Serializable {"
+          }
+        ],
+        "text": "행정코드 목록 조회의 검색 조건과 페이징 조건을 담아 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 38,
+              "snippet": "\tvoid insertAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 68,
+              "snippet": "\tvoid updateAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 31,
+              "snippet": "\tvoid deleteAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 54,
+              "snippet": "\tList<EgovMap> selectAdministCodeList(AdministCodeVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 61,
+              "snippet": "    int selectAdministCodeListTotCnt(AdministCodeVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "행정코드 단건 등록·수정·삭제와 목록 조회를 각각 별도의 업무 작업으로 정의하며, 목록 조회는 검색 조건 항목을 받아 목록과 총 건수를 나누어 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovCcmAdministCodeManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 46,
+              "snippet": "\tAdministCode selectAdministCodeDetail(AdministCode administCode) throws Exception;"
+            }
+          ],
+          "text": "행정코드 등록·수정·삭제·상세 조회·목록 조회·총 건수 조회를 제공하는 행정코드 관리 업무 서비스 계약이다."
+        }
+      },
+      "name": "행정코드 관리 서비스",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeList.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovCcmAdministCodeManageService {"
+          }
+        ],
+        "text": "행정코드의 등록·수정·삭제·조회 업무 작업을 정의하고 수행하는 업무 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 258,
+              "snippet": "\t\t\t@Valid @ModelAttribute(\"administCode\") AdministCode administCode, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 261,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 201,
+              "snippet": "\t\tsearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));"
+            }
+          ],
+          "text": "로그인 정보와 행정코드 입력 항목을 요청 파라미터로 바인딩받으며, 수정 요청에서는 검증 오류가 있으면 저장하지 않고 수정 화면으로 되돌린다. 목록성 요청은 한 페이지 건수와 페이지 크기를 환경설정에서 읽어 페이징 정보를 구성한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 197,
+              "snippet": "\t@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 214,
+              "snippet": "\t\tList<EgovMap> resultList = administCodeManageService.selectAdministCodeList(searchVO);"
+            }
+          ],
+          "text": "행정코드 업무의 웹 진입점으로, 화면에서 들어온 검색조건과 행정코드 입력값을 받아 행정코드 관리 서비스에 위임하고 결과를 화면 모델에 담아 반환한다."
+        }
+      },
+      "name": "행정코드 관리 화면 처리",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeList.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 197,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+          }
+        ],
+        "text": "행정코드 관련 화면 요청을 받아 입력값을 바인딩하고 행정코드 관리 서비스로 위임한 뒤 결과 화면을 지정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "\tprivate String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 61,
+              "snippet": "\tprivate String userSe;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디·이름·이메일·사용자구분·조직ID·고유아이디 등을 보유하며 아이디·이름·이메일은 필수값이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "로그인한 업무 담당자 정보를 담는 공통 데이터 항목으로, 행정코드 등록·수정 요청에서 처리자 정보를 전달한다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModify.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "요청을 수행한 로그인 사용자의 정보를 담아 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+              "line": 32,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+              "line": 38,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+              "line": 39,
+              "snippet": "\t@Size(max=10)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+              "line": 70,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+              "line": 45,
+              "snippet": "\tprivate String administZoneNm = \"\";"
+            }
+          ],
+          "text": "행정구역구분·행정구역코드·행정구역명·상위행정구역코드·생성일자·폐기일자·사용여부·최초등록자·최종수정자를 보유한다. 행정구역구분·행정구역코드·사용여부는 필수값이며 행정구역코드는 최대 10자리를 넘을 수 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+              "line": 25,
+              "snippet": "public class AdministCode implements Serializable {"
+            }
+          ],
+          "text": "행정구역 코드 한 건을 표현하는 업무 데이터 항목으로, 등록·수정·삭제·상세 조회 요청에서 대상 행정코드를 실어 나른다."
+        }
+      },
+      "name": "행정코드 항목",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModify.do:src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+            "line": 25,
+            "snippet": "public class AdministCode implements Serializable {"
+          }
+        ],
+        "text": "처리 대상 행정구역 코드 한 건의 업무 항목을 담아 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 38,
+              "snippet": "\tvoid insertAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 68,
+              "snippet": "\tvoid updateAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 31,
+              "snippet": "\tvoid deleteAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 54,
+              "snippet": "\tList<EgovMap> selectAdministCodeList(AdministCodeVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 61,
+              "snippet": "    int selectAdministCodeListTotCnt(AdministCodeVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "행정코드 단건 등록·수정·삭제와 목록 조회를 각각 별도의 업무 작업으로 정의하며, 목록 조회는 검색 조건 항목을 받아 목록과 총 건수를 나누어 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovCcmAdministCodeManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 46,
+              "snippet": "\tAdministCode selectAdministCodeDetail(AdministCode administCode) throws Exception;"
+            }
+          ],
+          "text": "행정코드 등록·수정·삭제·상세 조회·목록 조회·총 건수 조회를 제공하는 행정코드 관리 업무 서비스 계약이다."
+        }
+      },
+      "name": "행정코드 관리 서비스",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModify.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovCcmAdministCodeManageService {"
+          }
+        ],
+        "text": "행정코드의 등록·수정·삭제·조회 업무 작업을 정의하고 수행하는 업무 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 258,
+              "snippet": "\t\t\t@Valid @ModelAttribute(\"administCode\") AdministCode administCode, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 261,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 201,
+              "snippet": "\t\tsearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));"
+            }
+          ],
+          "text": "로그인 정보와 행정코드 입력 항목을 요청 파라미터로 바인딩받으며, 수정 요청에서는 검증 오류가 있으면 저장하지 않고 수정 화면으로 되돌린다. 목록성 요청은 한 페이지 건수와 페이지 크기를 환경설정에서 읽어 페이징 정보를 구성한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 197,
+              "snippet": "\t@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 214,
+              "snippet": "\t\tList<EgovMap> resultList = administCodeManageService.selectAdministCodeList(searchVO);"
+            }
+          ],
+          "text": "행정코드 업무의 웹 진입점으로, 화면에서 들어온 검색조건과 행정코드 입력값을 받아 행정코드 관리 서비스에 위임하고 결과를 화면 모델에 담아 반환한다."
+        }
+      },
+      "name": "행정코드 관리 화면 처리",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModify.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 197,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+          }
+        ],
+        "text": "행정코드 관련 화면 요청을 받아 입력값을 바인딩하고 행정코드 관리 서비스로 위임한 뒤 결과 화면을 지정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 38,
+              "snippet": "\tvoid insertAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 68,
+              "snippet": "\tvoid updateAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 31,
+              "snippet": "\tvoid deleteAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 54,
+              "snippet": "\tList<EgovMap> selectAdministCodeList(AdministCodeVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 61,
+              "snippet": "    int selectAdministCodeListTotCnt(AdministCodeVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "행정코드 단건 등록·수정·삭제와 목록 조회를 각각 별도의 업무 작업으로 정의하며, 목록 조회는 검색 조건 항목을 받아 목록과 총 건수를 나누어 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovCcmAdministCodeManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 46,
+              "snippet": "\tAdministCode selectAdministCodeDetail(AdministCode administCode) throws Exception;"
+            }
+          ],
+          "text": "행정코드 등록·수정·삭제·상세 조회·목록 조회·총 건수 조회를 제공하는 행정코드 관리 업무 서비스 계약이다."
+        }
+      },
+      "name": "행정코드 관리 서비스",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModifyView.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovCcmAdministCodeManageService {"
+          }
+        ],
+        "text": "행정코드의 등록·수정·삭제·조회 업무 작업을 정의하고 수행하는 업무 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 258,
+              "snippet": "\t\t\t@Valid @ModelAttribute(\"administCode\") AdministCode administCode, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 261,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 201,
+              "snippet": "\t\tsearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));"
+            }
+          ],
+          "text": "로그인 정보와 행정코드 입력 항목을 요청 파라미터로 바인딩받으며, 수정 요청에서는 검증 오류가 있으면 저장하지 않고 수정 화면으로 되돌린다. 목록성 요청은 한 페이지 건수와 페이지 크기를 환경설정에서 읽어 페이징 정보를 구성한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 197,
+              "snippet": "\t@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 214,
+              "snippet": "\t\tList<EgovMap> resultList = administCodeManageService.selectAdministCodeList(searchVO);"
+            }
+          ],
+          "text": "행정코드 업무의 웹 진입점으로, 화면에서 들어온 검색조건과 행정코드 입력값을 받아 행정코드 관리 서비스에 위임하고 결과를 화면 모델에 담아 반환한다."
+        }
+      },
+      "name": "행정코드 관리 화면 처리",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModifyView.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 197,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+          }
+        ],
+        "text": "행정코드 관련 화면 요청을 받아 입력값을 바인딩하고 행정코드 관리 서비스로 위임한 뒤 결과 화면을 지정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 258,
+              "snippet": "\t\t\t@Valid @ModelAttribute(\"administCode\") AdministCode administCode, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 261,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 201,
+              "snippet": "\t\tsearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));"
+            }
+          ],
+          "text": "로그인 정보와 행정코드 입력 항목을 요청 파라미터로 바인딩받으며, 수정 요청에서는 검증 오류가 있으면 저장하지 않고 수정 화면으로 되돌린다. 목록성 요청은 한 페이지 건수와 페이지 크기를 환경설정에서 읽어 페이징 정보를 구성한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 197,
+              "snippet": "\t@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 214,
+              "snippet": "\t\tList<EgovMap> resultList = administCodeManageService.selectAdministCodeList(searchVO);"
+            }
+          ],
+          "text": "행정코드 업무의 웹 진입점으로, 화면에서 들어온 검색조건과 행정코드 입력값을 받아 행정코드 관리 서비스에 위임하고 결과를 화면 모델에 담아 반환한다."
+        }
+      },
+      "name": "행정코드 관리 화면 처리",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodePopup.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 197,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+          }
+        ],
+        "text": "행정코드 관련 화면 요청을 받아 입력값을 바인딩하고 행정코드 관리 서비스로 위임한 뒤 결과 화면을 지정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "\tprivate String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 61,
+              "snippet": "\tprivate String userSe;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디·이름·이메일·사용자구분·조직ID·고유아이디 등을 보유하며 아이디·이름·이메일은 필수값이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "로그인한 업무 담당자 정보를 담는 공통 데이터 항목으로, 행정코드 등록·수정 요청에서 처리자 정보를 전달한다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "요청을 수행한 로그인 사용자의 정보를 담아 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+              "line": 32,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+              "line": 38,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+              "line": 39,
+              "snippet": "\t@Size(max=10)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+              "line": 70,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+              "line": 45,
+              "snippet": "\tprivate String administZoneNm = \"\";"
+            }
+          ],
+          "text": "행정구역구분·행정구역코드·행정구역명·상위행정구역코드·생성일자·폐기일자·사용여부·최초등록자·최종수정자를 보유한다. 행정구역구분·행정구역코드·사용여부는 필수값이며 행정구역코드는 최대 10자리를 넘을 수 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+              "line": 25,
+              "snippet": "public class AdministCode implements Serializable {"
+            }
+          ],
+          "text": "행정구역 코드 한 건을 표현하는 업무 데이터 항목으로, 등록·수정·삭제·상세 조회 요청에서 대상 행정코드를 실어 나른다."
+        }
+      },
+      "name": "행정코드 항목",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRegist.do:src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+            "line": 25,
+            "snippet": "public class AdministCode implements Serializable {"
+          }
+        ],
+        "text": "처리 대상 행정구역 코드 한 건의 업무 항목을 담아 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 38,
+              "snippet": "\tvoid insertAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 68,
+              "snippet": "\tvoid updateAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 31,
+              "snippet": "\tvoid deleteAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 54,
+              "snippet": "\tList<EgovMap> selectAdministCodeList(AdministCodeVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 61,
+              "snippet": "    int selectAdministCodeListTotCnt(AdministCodeVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "행정코드 단건 등록·수정·삭제와 목록 조회를 각각 별도의 업무 작업으로 정의하며, 목록 조회는 검색 조건 항목을 받아 목록과 총 건수를 나누어 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovCcmAdministCodeManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 46,
+              "snippet": "\tAdministCode selectAdministCodeDetail(AdministCode administCode) throws Exception;"
+            }
+          ],
+          "text": "행정코드 등록·수정·삭제·상세 조회·목록 조회·총 건수 조회를 제공하는 행정코드 관리 업무 서비스 계약이다."
+        }
+      },
+      "name": "행정코드 관리 서비스",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRegist.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovCcmAdministCodeManageService {"
+          }
+        ],
+        "text": "행정코드의 등록·수정·삭제·조회 업무 작업을 정의하고 수행하는 업무 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 258,
+              "snippet": "\t\t\t@Valid @ModelAttribute(\"administCode\") AdministCode administCode, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 261,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 201,
+              "snippet": "\t\tsearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));"
+            }
+          ],
+          "text": "로그인 정보와 행정코드 입력 항목을 요청 파라미터로 바인딩받으며, 수정 요청에서는 검증 오류가 있으면 저장하지 않고 수정 화면으로 되돌린다. 목록성 요청은 한 페이지 건수와 페이지 크기를 환경설정에서 읽어 페이징 정보를 구성한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 197,
+              "snippet": "\t@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 214,
+              "snippet": "\t\tList<EgovMap> resultList = administCodeManageService.selectAdministCodeList(searchVO);"
+            }
+          ],
+          "text": "행정코드 업무의 웹 진입점으로, 화면에서 들어온 검색조건과 행정코드 입력값을 받아 행정코드 관리 서비스에 위임하고 결과를 화면 모델에 담아 반환한다."
+        }
+      },
+      "name": "행정코드 관리 화면 처리",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRegist.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 197,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+          }
+        ],
+        "text": "행정코드 관련 화면 요청을 받아 입력값을 바인딩하고 행정코드 관리 서비스로 위임한 뒤 결과 화면을 지정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 258,
+              "snippet": "\t\t\t@Valid @ModelAttribute(\"administCode\") AdministCode administCode, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 261,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 201,
+              "snippet": "\t\tsearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));"
+            }
+          ],
+          "text": "로그인 정보와 행정코드 입력 항목을 요청 파라미터로 바인딩받으며, 수정 요청에서는 검증 오류가 있으면 저장하지 않고 수정 화면으로 되돌린다. 목록성 요청은 한 페이지 건수와 페이지 크기를 환경설정에서 읽어 페이징 정보를 구성한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 197,
+              "snippet": "\t@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 214,
+              "snippet": "\t\tList<EgovMap> resultList = administCodeManageService.selectAdministCodeList(searchVO);"
+            }
+          ],
+          "text": "행정코드 업무의 웹 진입점으로, 화면에서 들어온 검색조건과 행정코드 입력값을 받아 행정코드 관리 서비스에 위임하고 결과를 화면 모델에 담아 반환한다."
+        }
+      },
+      "name": "행정코드 관리 화면 처리",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRegistView.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 197,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+          }
+        ],
+        "text": "행정코드 관련 화면 요청을 받아 입력값을 바인딩하고 행정코드 관리 서비스로 위임한 뒤 결과 화면을 지정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 38,
+              "snippet": "\tvoid insertAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 68,
+              "snippet": "\tvoid updateAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 31,
+              "snippet": "\tvoid deleteAdministCode(AdministCode administCode) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 54,
+              "snippet": "\tList<EgovMap> selectAdministCodeList(AdministCodeVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 61,
+              "snippet": "    int selectAdministCodeListTotCnt(AdministCodeVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "행정코드 단건 등록·수정·삭제와 목록 조회를 각각 별도의 업무 작업으로 정의하며, 목록 조회는 검색 조건 항목을 받아 목록과 총 건수를 나누어 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovCcmAdministCodeManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+              "line": 46,
+              "snippet": "\tAdministCode selectAdministCodeDetail(AdministCode administCode) throws Exception;"
+            }
+          ],
+          "text": "행정코드 등록·수정·삭제·상세 조회·목록 조회·총 건수 조회를 제공하는 행정코드 관리 업무 서비스 계약이다."
+        }
+      },
+      "name": "행정코드 관리 서비스",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRemove.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovCcmAdministCodeManageService {"
+          }
+        ],
+        "text": "행정코드의 등록·수정·삭제·조회 업무 작업을 정의하고 수행하는 업무 서비스이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 258,
+              "snippet": "\t\t\t@Valid @ModelAttribute(\"administCode\") AdministCode administCode, BindingResult bindingResult,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 261,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 201,
+              "snippet": "\t\tsearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));"
+            }
+          ],
+          "text": "로그인 정보와 행정코드 입력 항목을 요청 파라미터로 바인딩받으며, 수정 요청에서는 검증 오류가 있으면 저장하지 않고 수정 화면으로 되돌린다. 목록성 요청은 한 페이지 건수와 페이지 크기를 환경설정에서 읽어 페이징 정보를 구성한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 197,
+              "snippet": "\t@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+              "line": 214,
+              "snippet": "\t\tList<EgovMap> resultList = administCodeManageService.selectAdministCodeList(searchVO);"
+            }
+          ],
+          "text": "행정코드 업무의 웹 진입점으로, 화면에서 들어온 검색조건과 행정코드 입력값을 받아 행정코드 관리 서비스에 위임하고 결과를 화면 모델에 담아 반환한다."
+        }
+      },
+      "name": "행정코드 관리 화면 처리",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRemove.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+            "line": 197,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+          }
+        ],
+        "text": "행정코드 관련 화면 요청을 받아 입력값을 바인딩하고 행정코드 관리 서비스로 위임한 뒤 결과 화면을 지정한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCcmAdministCodeManageService {"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+        "line": 197,
+        "snippet": "\t@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+        "line": 46,
+        "snippet": "\tAdministCode selectAdministCodeDetail(AdministCode administCode) throws Exception;"
+      }
+    ],
+    "text": "행정구역 코드를 등록·수정·삭제하고 목록·상세·선택 팝업으로 조회하는 공통 기준정보 관리 업무이다."
+  }
+}

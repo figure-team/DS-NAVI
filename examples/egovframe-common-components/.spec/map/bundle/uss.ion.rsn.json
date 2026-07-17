@@ -1,0 +1,193 @@
+{
+  "domainId": "domain:uss.ion.rsn",
+  "files": [
+    {
+      "className": "EgovWebUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovWebUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "slice": {
+        "endLine": 94,
+        "startLine": 15,
+        "text": " *\t2017-02-07   이정은      시큐어코딩(ES) - 시큐어코딩 경로 조작 및 자원 삽입[CWE-22, CWE-23, CWE-95, CWE-99]\n *  2018.08.17   신용호      filePathBlackList 수정\n *  2018.10.10   신용호      . => \\\\.으로 수정\n *  2022.05.10   정진오      clearXSS() 메소드 추가\n *  2022.06.09   김장하      NSR 보안조치 (removeOSCmdRisk 함수에 윈도우 다중 명령 실행 키워드 추가)\n *  2023.08.10   신용호      removeLDAPInjectionRisk() 오류 수정\n *  2024.12.04   신용호      filePathBlackList() basePath 추가\n * </pre>\n */\n\npublic class EgovWebUtil {\n\tpublic static String clearXSSMinimum(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\"\", \"&#34;\");\n\t\treturnValue = returnValue.replaceAll(\"\\'\", \"&#39;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSSMaximum(String value) {\n\t\tString returnValue = value;\n\t\treturnValue = clearXSSMinimum(returnValue);\n\n\t\treturnValue = returnValue.replace(\"%00\", \"\");\n\n\t\treturnValue = returnValue.replaceAll(\"%\", \"&#37;\");\n\n\t\t// \\\\. => .\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\\\\\\\\\", \"\"); // ..\\\n\t\treturnValue = returnValue.replaceAll(\"\\\\./\", \"\"); // ./\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSS(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3C\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3E\", \"&gt;\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String filePathBlackList(String value) {\n\t\tString returnValue = value;\n\t\tif (returnValue == null || returnValue.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\t/**\n\t * 파일경로 보안취약점 조치\n\t * # 주의사항\n\t * 1. basePath는 반드시 지정해야 한다.\n\t * 2. basePath는 ROOT Path \"/\" 사용 금지 한다.",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovRssService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java — java 파일",
+        "tags": []
+      },
+      "line": 21,
+      "relPath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+      "slice": {
+        "endLine": 56,
+        "startLine": 11,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.07.03  장동한          최초 생성\n *\n * </pre>\n */\npublic interface EgovRssService {\n\n    /**\n     * RSS서비스 테이블을 조회 한다.\n     * @param param -조회할 정보가 담긴 객체\n     * @return List -조회한목록이담긴List\n     * @throws Exception\n     */\n\tpublic List<?> selectRssTagServiceTable(Map<?, ?> param) throws Exception;\n\n    /**\n\t * RSS서비스 목록을 조회한다.\n\t * @param rssInfo -조회할 정보가 담긴 객체\n\t * @return List -조회한목록이담긴List\n\t * @throws Exception\n\t */\n\tpublic List<?> selectRssTagServiceList(RssInfo rssInfo) throws Exception;\n\n    /**\n     * RSS서비스를(을) 목록 전체 건수를(을) 조회한다.\n     * @param rssInfo -조회할 정보가 담긴 객체\n     * @return -조회한건수가담긴Integer\n     * @throws Exception\n     */\n    public int selectRssTagServiceListCnt(RssInfo rssInfo) throws Exception;\n\n     /**\n\t * RSS서비스를(을) 상세조회 한다.\n\t * @param rssInfo -조회할 정보가 담긴 객체\n\t * @return int -조회한건수가담긴Integer\n\t * @throws Exception\n\t */\n\tpublic Map<?, ?> selectRssTagServiceDetail(RssInfo rssInfo) throws Exception;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "RssInfo",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java — java 파일",
+        "tags": []
+      },
+      "line": 19,
+      "relPath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 9,
+        "text": " * @version 1.0\n * @see <pre>\n * &lt;&lt; 개정이력(Modification Information) &gt;&gt;\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.07.03  장동한          최초 생성\n * \n * </pre>\n */\npublic class RssInfo extends ComDefaultVO {\n\n\tprivate static final long serialVersionUID = 1L;\n\n\t/** RSS태그관리 아이디 */\n\tprivate String rssId;\n\t\n\t/** 서비스명 */\n\tprivate String trgetSvcNm;\n\t\n\t/** 서비스TABLE */\n\tprivate String trgetSvcTable;\n\t\n\t/** 헤더 TITLE */\n\tprivate String hderTitle;\n\t\n\t/** 헤더\tLINK */\n\tprivate String hderLink;\n\t\n\t/** 헤더 DESCRIPTION */\n\tprivate String hderDescription;\n\t\n\t/** 헤더 TAG */\n\tprivate String hderTag;\n\t\n\t/** 헤더 ETC */\n\tprivate String hderEtc;\n\t\n\t/** 본문 TITLE */\n\tprivate String bdtTitle;\n\t\n\t/** 본문 LINK */\n\tprivate String bdtLink;\n\t\n\t/** 본문 DESCRIPTION */\n\tprivate String bdtDescription;\n\t\n\t/** 본문 TAG */\n\tprivate String bdtTag;\n\t\n\t/** 본문 ETC */\n\tprivate String bdtEtc;\n\t\n    /** 최초등록시점 */\n    private String frstRegisterPnttm;\n\n    /** 최초등록아이디 */\n    private String frstRegisterId;\n\n    /** 최종수정일 */\n    private String lastUpdusrPnttm;\n\n    /** 최종수정자 아이디 */\n    private String lastUpdusrId;\n\n\t/**\n\t * @return the rssId\n\t */\n\tpublic String getRssId() {\n\t\treturn rssId;\n\t}\n\n\t/**\n\t * @param rssId the rssId to set\n\t */\n\tpublic void setRssId(String rssId) {\n\t\tthis.rssId = rssId;\n\t}\n\n\t/**",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovRssController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java — java 파일",
+        "tags": []
+      },
+      "line": 108,
+      "relPath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+      "slice": {
+        "endLine": 132,
+        "startLine": 98,
+        "text": "\n    /**\n     * RSS서비스 목록을 상세조회 조회한다.\n     * @param rssInfo -RSS서비스 객체\n     * @param commandMap -Request Variable\n     * @param model -Spring 제공하는 ModelMap\n     * @return String -리턴 URL\n     * @throws Exception\n     */\n    @SuppressWarnings(\"unchecked\")\n\t@RequestMapping(value = \"/uss/ion/rsn/detailRssTagService.do\")\n    public String EgovRssTagServiceDetail(\n            RssInfo rssInfo,\n            @RequestParam Map<?, ?> commandMap,\n            ModelMap model) throws Exception {\n\n    \t\tString sRssId = commandMap.get(\"rssId\") == null ? \"\" : (String) commandMap.get(\"rssId\");\n\n    \t\tif(!sRssId.equals(\"\")){\n\n    \t\t\tMap<String, String> mapRssInfo = (Map<String, String>) egovRssService.selectRssTagServiceDetail(rssInfo);\n    \t\t\tmodel.addAttribute(\"mapRssInfo\",mapRssInfo);\n\n    \t\t\tmapRssInfo.put(\"TRGET_SVC_TABLE\", EgovWebUtil.removeSQLInjectionRisk(mapRssInfo.get(\"TRGET_SVC_TABLE\")));\t// 2012.11 KISA 보안조치\n\n    \t\t\tmodel.addAttribute(\"mapRssInfoList\", egovRssService.selectRssTagServiceTable(mapRssInfo));\n\n    \t\t}\n\n        \treturn \"egovframework/com/uss/ion/rsn/EgovRssTagService\";\n    }\n\n\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovRssController#EgovRssTagServiceDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+      "flowId": "flow:ANY /uss/ion/rsn/detailRssTagService.do",
+      "line": 108,
+      "stepIds": [
+        "step:ANY /uss/ion/rsn/detailRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+        "step:ANY /uss/ion/rsn/detailRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+        "step:ANY /uss/ion/rsn/detailRssTagService.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovRssController#EgovRssTagServiceList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+      "flowId": "flow:ANY /uss/ion/rsn/listRssTagService.do",
+      "line": 59,
+      "stepIds": [
+        "step:ANY /uss/ion/rsn/listRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+        "step:ANY /uss/ion/rsn/listRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+        "step:ANY /uss/ion/rsn/listRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "uss.ion.rsn",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "stepId": "step:ANY /uss/ion/rsn/detailRssTagService.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+      "stepId": "step:ANY /uss/ion/rsn/detailRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+      "stepId": "step:ANY /uss/ion/rsn/detailRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+      "stepId": "step:ANY /uss/ion/rsn/listRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+      "stepId": "step:ANY /uss/ion/rsn/listRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+      "stepId": "step:ANY /uss/ion/rsn/listRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java"
+    }
+  ]
+}

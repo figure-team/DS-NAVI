@@ -1,0 +1,1438 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "uss.ion.nts-000",
+  "domainId": "domain:uss.ion.nts",
+  "header": {
+    "name": "보낸쪽지함 관리",
+    "summary": {
+      "text": "시스템 내부에서 주고받는 쪽지 가운데 로그인 사용자 본인이 보낸 쪽지를 관리하는 업무 영역이다. 보낸쪽지 목록을 검색·페이지 단위로 조회하고, 개별 쪽지의 상세 내용과 수신자별 확인 현황을 확인하며, 더 이상 필요 없는 보낸쪽지를 삭제하는 기능을 제공한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+          "line": 69,
+          "snippet": "@RequestMapping(value = \"/uss/ion/nts/listNoteTrnsmit.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+          "line": 166,
+          "snippet": "@RequestMapping(value = \"/uss/ion/nts/detailNoteTrnsmit.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+          "line": 23,
+          "snippet": "public interface EgovNoteTrnsmitService {"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "보낸쪽지: 쪽지 아이디와 쪽지 송신 아이디로 식별되며 제목·내용·첨부파일·송신자 아이디·개봉여부를 보유하고, 최초등록시점과 최종수정자 등 이력 항목을 함께 유지한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+            "line": 27,
+            "snippet": "\tprivate String noteId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+            "line": 42,
+            "snippet": "\tprivate String noteSj;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+            "line": 39,
+            "snippet": "\tprivate String openYn;"
+          }
+        ]
+      },
+      {
+        "text": "쪽지 수신 내역: 보낸쪽지 한 건에 대한 수신자 측 식별자인 쪽지 수신 아이디로 관리되며, 수신자 확인 목록 조회의 대상이 된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+            "line": 33,
+            "snippet": "\tprivate String noteRecptnId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+            "line": 69,
+            "snippet": "\tpublic List<EgovMap> selectNoteTrnsmitCnfirm(NoteTrnsmit noteTrnsmit) throws Exception;"
+          }
+        ]
+      },
+      {
+        "text": "로그인 사용자: 쪽지를 보낸 주체로서 고유아이디와 소속 조직(부서) 정보를 가지며, 이 고유아이디가 쪽지 송신자 조건으로 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "\tprivate String uniqId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 63,
+            "snippet": "\tprivate String orgnztId;"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "보낸쪽지함의 화면 요청은 로그인 인증을 거쳐야 하며, 인증되지 않은 요청은 로그인 실패 안내 문구와 함께 로그인 화면으로 되돌려 보낸다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 177,
+            "snippet": "    \t    Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 180,
+            "snippet": "    \t        return \"redirect:/uat/uia/egovLoginUsr.do\";"
+          }
+        ]
+      },
+      {
+        "text": "조회·삭제 대상은 로그인 사용자 본인이 보낸 쪽지로 제한한다. 로그인 사용자의 고유아이디를 쪽지 송신자 아이디 조건으로 채워 업무 서비스에 넘기며, 로그인 정보가 없으면 빈 값으로 처리한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 192,
+            "snippet": "            \tsearchVO.setTrnsmiterId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));"
+          }
+        ]
+      },
+      {
+        "text": "명령 값이 삭제인 경우에는 상세 화면을 보여주지 않고 해당 보낸쪽지를 삭제한 뒤 보낸쪽지함 목록 화면으로 이동시킨다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 189,
+            "snippet": "            if(sCmd.equals(\"del\")){"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 195,
+            "snippet": "            \tsLocationUrl = \"redirect:/uss/ion/nts/listNoteTrnsmit.do\";"
+          }
+        ]
+      },
+      {
+        "text": "화면에서 넘어오는 쪽지 아이디·쪽지 송신 아이디·쪽지 수신 아이디는 암호화된 값으로 전달되며, 보안 파라미터 묶음에 담기는 시점에 복호화되어 업무 처리에 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+            "line": 44,
+            "snippet": "\t\tcase \"noteId\":"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+            "line": 49,
+            "snippet": "\t\t\tvalue2 = EgovComUtlController.decryptId(value);"
+          }
+        ]
+      },
+      {
+        "text": "삭제는 보낸쪽지 삭제와 받은쪽지 삭제를 서로 다른 업무 기능으로 구분해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+            "line": 54,
+            "snippet": "\tvoid  deleteNoteTrnsmit(NoteTrnsmit noteTrnsmit) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+            "line": 61,
+            "snippet": "\tvoid  deleteNoteRecptn(NoteTrnsmit noteTrnsmit) throws Exception;"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "사용자 인증 영역과 연계한다. 인증 여부 판정과 로그인 사용자 정보 조회를 공통 사용자 인증 확인 기능에 의존하며, 미인증 시 로그인 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 58,
+            "snippet": "\tpublic static Boolean isAuthenticated() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 180,
+            "snippet": "    \t        return \"redirect:/uat/uia/egovLoginUsr.do\";"
+          }
+        ]
+      },
+      {
+        "text": "공통 메시지 영역과 연계한다. 사용자에게 보여줄 안내 문구를 메시지 코드로 조회해 화면 모델에 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 179,
+            "snippet": "    \t        model.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "\tpublic String getMessage(String code) {"
+          }
+        ]
+      },
+      {
+        "text": "공통 보안·유틸리티 영역과 연계한다. 암호화된 쪽지 식별자의 복호화와 값 없음 처리를 공통 기능에 위임한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+            "line": 49,
+            "snippet": "\t\t\tvalue2 = EgovComUtlController.decryptId(value);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "보낸쪽지함 관리",
+        "nodes": [
+          {
+            "id": "n1",
+            "kind": "start",
+            "label": "보낸쪽지함 화면 요청"
+          },
+          {
+            "id": "n2",
+            "kind": "decision",
+            "label": "로그인 인증 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+                "line": 177,
+                "snippet": "    \t    Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+              }
+            ]
+          },
+          {
+            "id": "n3",
+            "kind": "end",
+            "label": "로그인 화면으로 이동"
+          },
+          {
+            "id": "n4",
+            "kind": "activity",
+            "label": "보낸쪽지 목록 조회",
+            "flowRef": "flow:ANY /uss/ion/nts/listNoteTrnsmit.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+                "line": 69,
+                "snippet": "@RequestMapping(value = \"/uss/ion/nts/listNoteTrnsmit.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+                "line": 31,
+                "snippet": "\tpublic List<EgovMap> selectNoteTrnsmitList(NoteTrnsmit noteTrnsmit) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "n5",
+            "kind": "activity",
+            "label": "쪽지 선택 및 식별자 복호화",
+            "flowRef": "flow:ANY /uss/ion/nts/detailNoteTrnsmit.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+                "line": 166,
+                "snippet": "@RequestMapping(value = \"/uss/ion/nts/detailNoteTrnsmit.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+                "line": 186,
+                "snippet": "            securityMap.put(\"noteId\",searchVO.getNoteId());"
+              }
+            ]
+          },
+          {
+            "id": "n6",
+            "kind": "decision",
+            "label": "삭제 명령 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+                "line": 189,
+                "snippet": "            if(sCmd.equals(\"del\")){"
+              }
+            ]
+          },
+          {
+            "id": "n7",
+            "kind": "activity",
+            "label": "보낸쪽지 삭제",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+                "line": 193,
+                "snippet": "            \tegovNoteTrnsmitService.deleteNoteTrnsmit(searchVO);"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+                "line": 54,
+                "snippet": "\tvoid  deleteNoteTrnsmit(NoteTrnsmit noteTrnsmit) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "n8",
+            "kind": "activity",
+            "label": "쪽지 상세 내용 조회",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+                "line": 199,
+                "snippet": "            \tMap<?, ?> noteTrnsmitMap = egovNoteTrnsmitService.selectNoteTrnsmitDetail(searchVO);"
+              }
+            ]
+          },
+          {
+            "id": "n9",
+            "kind": "activity",
+            "label": "수신자 확인 목록 조회",
+            "flowRef": "flow:ANY /uss/ion/nts/selectNoteTrnsmitCnfirm.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+                "line": 220,
+                "snippet": "@RequestMapping(value = \"/uss/ion/nts/selectNoteTrnsmitCnfirm.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+                "line": 205,
+                "snippet": "                List<EgovMap> resultRecptnEmp = egovNoteTrnsmitService.selectNoteTrnsmitCnfirm(noteTrnsmit);"
+              }
+            ]
+          },
+          {
+            "id": "n10",
+            "kind": "end",
+            "label": "목록 화면으로 이동"
+          },
+          {
+            "id": "n11",
+            "kind": "end",
+            "label": "상세 화면 표시"
+          }
+        ],
+        "edges": [
+          {
+            "from": "n1",
+            "to": "n2"
+          },
+          {
+            "from": "n2",
+            "to": "n3",
+            "label": "미인증"
+          },
+          {
+            "from": "n2",
+            "to": "n4",
+            "label": "인증됨"
+          },
+          {
+            "from": "n4",
+            "to": "n5"
+          },
+          {
+            "from": "n5",
+            "to": "n6"
+          },
+          {
+            "from": "n6",
+            "to": "n7",
+            "label": "삭제 명령"
+          },
+          {
+            "from": "n6",
+            "to": "n8",
+            "label": "상세 조회"
+          },
+          {
+            "from": "n7",
+            "to": "n10"
+          },
+          {
+            "from": "n8",
+            "to": "n9"
+          },
+          {
+            "from": "n9",
+            "to": "n11"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/ion/nts/detailNoteTrnsmit.do",
+      "name": "보낸쪽지 상세조회 및 삭제",
+      "summary": {
+        "text": "로그인한 사용자가 보낸쪽지함에서 특정 쪽지를 선택하면 쪽지 상세 내용과 수신자 확인 목록을 함께 보여주고, 삭제 명령으로 들어온 경우에는 상세 화면 대신 해당 보낸쪽지를 삭제한 뒤 목록 화면으로 되돌려 보내는 업무 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 166,
+            "snippet": "@RequestMapping(value = \"/uss/ion/nts/detailNoteTrnsmit.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 189,
+            "snippet": "            if(sCmd.equals(\"del\")){"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 199,
+            "snippet": "            \tMap<?, ?> noteTrnsmitMap = egovNoteTrnsmitService.selectNoteTrnsmitDetail(searchVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/nts/listNoteTrnsmit.do",
+      "name": "보낸쪽지함 목록 조회",
+      "summary": {
+        "text": "로그인한 사용자 본인이 보낸 쪽지 목록을 검색 조건과 페이지 단위로 조회해 화면에 표시하는 업무 흐름이며, 목록 화면에서 선택한 쪽지들을 일괄 삭제하는 명령도 함께 처리한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 69,
+            "snippet": "@RequestMapping(value = \"/uss/ion/nts/listNoteTrnsmit.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+            "line": 31,
+            "snippet": "\tpublic List<EgovMap> selectNoteTrnsmitList(NoteTrnsmit noteTrnsmit) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/nts/selectNoteTrnsmitCnfirm.do",
+      "name": "쪽지 수신자 확인 목록 조회",
+      "summary": {
+        "text": "보낸 쪽지 한 건에 대해 그 쪽지를 받은 수신자 목록과 각 수신자의 확인 현황을 조회해 별도 화면으로 보여주는 업무 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 220,
+            "snippet": "@RequestMapping(value = \"/uss/ion/nts/selectNoteTrnsmitCnfirm.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+            "line": 69,
+            "snippet": "\tpublic List<EgovMap> selectNoteTrnsmitCnfirm(NoteTrnsmit noteTrnsmit) throws Exception;"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "보낸쪽지 상세조회 및 삭제 처리 중 로그인이 필요하다는 등 사용자에게 보여줄 안내 문구를 메시지 코드로 조회해 주는 공통 메시지 창구이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "\tpublic String getMessage(String code) {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면에 노출할 문구를 코드로만 요청받아 다국어 자원에서 해당 문구를 찾아 돌려주는 역할을 한다. 업무 처리 쪽은 문구 원문을 알 필요 없이 코드만 넘기면 되므로 문구 변경이 업무 처리와 분리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 48,
+              "snippet": "\t * 정의된 메세지 조회"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 필요 시 매개변수, 로케일을 받아 자원 묶음에서 해당 언어의 문구를 찾아 돌려준다. 로케일을 지정하지 않으면 시스템 기본 로케일을 적용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "보낸쪽지 상세조회 및 삭제에서 현재 접속한 사용자의 고유아이디·이름·소속 부서 등 신원 정보를 담아 전달하는 로그인 사용자 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "\tprivate String uniqId;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "보낸쪽지 상세조회 및 삭제에서 지금 이 쪽지를 다루는 사람이 누구인지를 나타내는 신원 묶음으로 쓰인다. 여기 담긴 고유아이디가 본인이 보낸 쪽지만 조회·삭제하도록 제한하는 기준이 된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일 등 필수 항목과 사용자구분, 소속 조직(부서) 아이디·명, 고유아이디, 접속 아이피 정보를 보유한다. 아이디·이름·이메일은 비어 있을 수 없는 항목으로 표시되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 63,
+              "snippet": "\tprivate String orgnztId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 71,
+              "snippet": "\tprivate String ip;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+      "name": "암호화 파라미터 복호화 처리",
+      "summary": {
+        "text": "보낸쪽지 상세조회 및 삭제에서 화면으로부터 넘어온 쪽지 식별자 등 민감한 파라미터를 받아 복호화한 값으로 보관해 주는 보안 처리 담당이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+            "line": 29,
+            "snippet": "public class EgovSecurityMap {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+            "line": 49,
+            "snippet": "\t\t\tvalue2 = EgovComUtlController.decryptId(value);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면에서 전달된 요청 파라미터를 이름별로 담아 두는 보관소 역할을 하면서, 지정된 보안 대상 항목에 대해서는 담기는 시점에 자동으로 복호화를 수행해 업무 처리가 원래 값을 쓸 수 있게 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+              "line": 37,
+              "snippet": "\tpublic void put(String key, String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+              "line": 40,
+              "snippet": "\t\t// 특정 암호화된 파라미터 복호화 처리"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "이름과 값 쌍으로 파라미터를 보관하며, 쪽지 아이디·쪽지 송신 아이디·쪽지 수신 아이디 등 지정된 이름으로 들어온 값만 복호화 후 보관하고 그 외 이름은 원래 값 그대로 보관하는 것이 지켜야 할 규칙이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+              "line": 44,
+              "snippet": "\t\tcase \"noteId\":"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+              "line": 45,
+              "snippet": "\t\tcase \"noteTrnsmitId\":"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+              "line": 56,
+              "snippet": "\t\tmap.put(key, value2);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "사용자 인증 확인",
+      "summary": {
+        "text": "보낸쪽지 상세조회 및 삭제 시작 시 현재 요청자가 로그인된 사용자인지 확인하고, 인증된 사용자의 신원 정보와 권한 목록을 꺼내 주는 인증 확인 담당이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 58,
+            "snippet": "\tpublic static Boolean isAuthenticated() {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "업무 처리를 시작하기 전에 요청자가 인증을 마친 사용자인지 판정하고, 인증된 경우 그 사용자 정보와 권한 목록을 업무 처리 쪽에 제공하는 관문 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 정보, 사용자 권한 목록, 인증 여부의 세 가지를 제공하며, 실제 판정은 별도의 사용자 상세 서비스에 위임하는 구조를 지킨다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+      "name": "보낸쪽지함 업무 서비스",
+      "summary": {
+        "text": "보낸쪽지 상세조회 및 삭제의 실제 업무 처리를 담당하며 보낸쪽지 목록 조회, 전체 건수 조회, 상세 조회, 삭제, 수신자 확인 목록 조회의 업무 기능을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+            "line": 23,
+            "snippet": "public interface EgovNoteTrnsmitService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+            "line": 31,
+            "snippet": "\tpublic List<EgovMap> selectNoteTrnsmitList(NoteTrnsmit noteTrnsmit) throws Exception;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "보낸쪽지함 업무의 계약을 정의하는 서비스로, 화면 처리 담당이 요청한 조회·삭제 작업을 받아 데이터 처리 쪽으로 연결한다. 조회 조건과 결과는 보낸쪽지 정보 묶음으로 주고받는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+              "line": 23,
+              "snippet": "public interface EgovNoteTrnsmitService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+              "line": 26,
+              "snippet": "\t * 보낸쪽지함관리 목록을 조회한다."
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록 조회와 별도로 전체 건수 조회를 제공해 페이지 처리를 뒷받침하고, 삭제는 보낸쪽지 삭제와 받은쪽지 삭제를 구분해 각각 제공한다. 수신자 확인 목록 조회는 쪽지 한 건에 대한 수신자 현황을 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+              "line": 39,
+              "snippet": "    public int selectNoteTrnsmitListCnt(NoteTrnsmit noteTrnsmit) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+              "line": 54,
+              "snippet": "\tvoid  deleteNoteTrnsmit(NoteTrnsmit noteTrnsmit) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+              "line": 61,
+              "snippet": "\tvoid  deleteNoteRecptn(NoteTrnsmit noteTrnsmit) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+      "name": "보낸쪽지 정보",
+      "summary": {
+        "text": "보낸쪽지 상세조회 및 삭제에서 쪽지 아이디·제목·내용·송신자·개봉여부와 검색 기간 등 보낸쪽지 업무에 필요한 항목을 담아 오가는 보낸쪽지 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+            "line": 19,
+            "snippet": "public class NoteTrnsmit extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면의 검색 조건과 업무 처리 결과를 함께 담는 정보 묶음으로, 조회 조건 전달과 삭제 대상 지정에 모두 같은 형태가 쓰인다. 공통 조회 정보 묶음을 물려받아 페이지 처리 항목을 함께 갖는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+              "line": 19,
+              "snippet": "public class NoteTrnsmit extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+              "line": 27,
+              "snippet": "\tprivate String noteId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "쪽지 아이디, 쪽지 송신 아이디, 쪽지 수신 아이디, 송신자 아이디, 개봉여부, 제목, 내용, 첨부파일과 보낸 기간 검색용 시작·종료 날짜를 보유하고, 최초등록시점·최초등록아이디·최종수정일·최종수정자 아이디의 이력 항목을 함께 유지한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+              "line": 30,
+              "snippet": "\tprivate String noteTrnsmitId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+              "line": 39,
+              "snippet": "\tprivate String openYn;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+              "line": 42,
+              "snippet": "\tprivate String noteSj;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+              "line": 60,
+              "snippet": "    private String frstRegisterId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+      "name": "보낸쪽지함 화면 처리",
+      "summary": {
+        "text": "보낸쪽지 상세조회 및 삭제의 화면 요청을 받아 인증을 확인하고, 로그인 사용자 기준으로 조회 조건을 채운 뒤 보낸쪽지함 업무 서비스에 처리를 위임하고 결과 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 166,
+            "snippet": "@RequestMapping(value = \"/uss/ion/nts/detailNoteTrnsmit.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 167,
+            "snippet": "    public String EgovNoteTrnsmitDetail("
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "보낸쪽지함 관련 화면 요청의 입구로서, 요청 파라미터를 보낸쪽지 정보 묶음으로 받아 로그인 사용자 기준을 채우고 보낸쪽지함 업무 서비스에 조회·삭제를 위임한 뒤, 결과를 화면 모델에 담아 보여줄 화면 경로를 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 200,
+              "snippet": "            \tmodel.addAttribute(\"noteTrnsmit\", noteTrnsmitMap);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 209,
+              "snippet": "    \t\treturn sLocationUrl;"
+            }
+          ]
+        },
+        "request": {
+          "text": "검색 정보 묶음과 보안 파라미터 묶음을 받아 처리하며, 가장 먼저 로그인 인증 여부를 확인해 인증되지 않은 요청은 로그인 실패 안내 문구와 함께 로그인 화면으로 되돌린다. 인증된 경우에만 로그인 사용자의 고유아이디를 송신자 조건으로 채워 본인 쪽지만 다루도록 제한하고, 명령 값이 삭제이면 삭제 후 목록으로, 아니면 상세 조회 결과를 화면에 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 177,
+              "snippet": "    \t    Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 180,
+              "snippet": "    \t        return \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 189,
+              "snippet": "            if(sCmd.equals(\"del\")){"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 192,
+              "snippet": "            \tsearchVO.setTrnsmiterId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 공통 기능",
+      "summary": {
+        "text": "보낸쪽지 상세조회 및 삭제에서 로그인 사용자의 고유아이디처럼 값이 없을 수 있는 항목을 빈 문자열로 안전하게 바꾸는 등 문자열 처리를 담당하는 공통 기능 모음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "업무 처리 과정에서 값이 없거나 길이가 긴 문자열을 안전한 형태로 다듬어 주는 공통 도구 역할을 한다. 조회 조건을 채울 때 값 없음으로 인한 오류를 막는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 기준값을 상수로 두고, 지정 길이를 초과한 원본 문자열을 잘라 내거나 지정 문자열을 덧붙이는 기능, 문자열이 비었거나 값이 없는지 검증하는 기능을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 109,
+              "snippet": "\t * String이 비었거나(\"\") 혹은 null 인지 검증한다."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "보낸쪽지함 목록 조회 처리 중 로그인이 필요하다는 등 사용자에게 보여줄 안내 문구를 메시지 코드로 조회해 주는 공통 메시지 창구이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "\tpublic String getMessage(String code) {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면에 노출할 문구를 코드로만 요청받아 다국어 자원에서 해당 문구를 찾아 돌려주는 역할을 한다. 업무 처리 쪽은 문구 원문을 알 필요 없이 코드만 넘기면 되므로 문구 변경이 업무 처리와 분리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 48,
+              "snippet": "\t * 정의된 메세지 조회"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 필요 시 매개변수, 로케일을 받아 자원 묶음에서 해당 언어의 문구를 찾아 돌려준다. 로케일을 지정하지 않으면 시스템 기본 로케일을 적용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "보낸쪽지함 목록 조회에서 현재 접속한 사용자의 고유아이디·이름·소속 부서 등 신원 정보를 담아 전달하는 로그인 사용자 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "\tprivate String uniqId;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "보낸쪽지함 목록 조회에서 지금 이 쪽지를 다루는 사람이 누구인지를 나타내는 신원 묶음으로 쓰인다. 여기 담긴 고유아이디가 본인이 보낸 쪽지만 조회·삭제하도록 제한하는 기준이 된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일 등 필수 항목과 사용자구분, 소속 조직(부서) 아이디·명, 고유아이디, 접속 아이피 정보를 보유한다. 아이디·이름·이메일은 비어 있을 수 없는 항목으로 표시되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 63,
+              "snippet": "\tprivate String orgnztId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 71,
+              "snippet": "\tprivate String ip;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+      "name": "암호화 파라미터 복호화 처리",
+      "summary": {
+        "text": "보낸쪽지함 목록 조회에서 화면으로부터 넘어온 쪽지 식별자 등 민감한 파라미터를 받아 복호화한 값으로 보관해 주는 보안 처리 담당이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+            "line": 29,
+            "snippet": "public class EgovSecurityMap {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+            "line": 49,
+            "snippet": "\t\t\tvalue2 = EgovComUtlController.decryptId(value);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면에서 전달된 요청 파라미터를 이름별로 담아 두는 보관소 역할을 하면서, 지정된 보안 대상 항목에 대해서는 담기는 시점에 자동으로 복호화를 수행해 업무 처리가 원래 값을 쓸 수 있게 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+              "line": 37,
+              "snippet": "\tpublic void put(String key, String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+              "line": 40,
+              "snippet": "\t\t// 특정 암호화된 파라미터 복호화 처리"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "이름과 값 쌍으로 파라미터를 보관하며, 쪽지 아이디·쪽지 송신 아이디·쪽지 수신 아이디 등 지정된 이름으로 들어온 값만 복호화 후 보관하고 그 외 이름은 원래 값 그대로 보관하는 것이 지켜야 할 규칙이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+              "line": 44,
+              "snippet": "\t\tcase \"noteId\":"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+              "line": 45,
+              "snippet": "\t\tcase \"noteTrnsmitId\":"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+              "line": 56,
+              "snippet": "\t\tmap.put(key, value2);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "사용자 인증 확인",
+      "summary": {
+        "text": "보낸쪽지함 목록 조회 시작 시 현재 요청자가 로그인된 사용자인지 확인하고, 인증된 사용자의 신원 정보와 권한 목록을 꺼내 주는 인증 확인 담당이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 58,
+            "snippet": "\tpublic static Boolean isAuthenticated() {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "업무 처리를 시작하기 전에 요청자가 인증을 마친 사용자인지 판정하고, 인증된 경우 그 사용자 정보와 권한 목록을 업무 처리 쪽에 제공하는 관문 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 정보, 사용자 권한 목록, 인증 여부의 세 가지를 제공하며, 실제 판정은 별도의 사용자 상세 서비스에 위임하는 구조를 지킨다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+      "name": "보낸쪽지함 업무 서비스",
+      "summary": {
+        "text": "보낸쪽지함 목록 조회의 실제 업무 처리를 담당하며 보낸쪽지 목록 조회, 전체 건수 조회, 상세 조회, 삭제, 수신자 확인 목록 조회의 업무 기능을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+            "line": 23,
+            "snippet": "public interface EgovNoteTrnsmitService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+            "line": 31,
+            "snippet": "\tpublic List<EgovMap> selectNoteTrnsmitList(NoteTrnsmit noteTrnsmit) throws Exception;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "보낸쪽지함 업무의 계약을 정의하는 서비스로, 화면 처리 담당이 요청한 조회·삭제 작업을 받아 데이터 처리 쪽으로 연결한다. 조회 조건과 결과는 보낸쪽지 정보 묶음으로 주고받는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+              "line": 23,
+              "snippet": "public interface EgovNoteTrnsmitService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+              "line": 26,
+              "snippet": "\t * 보낸쪽지함관리 목록을 조회한다."
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록 조회와 별도로 전체 건수 조회를 제공해 페이지 처리를 뒷받침하고, 삭제는 보낸쪽지 삭제와 받은쪽지 삭제를 구분해 각각 제공한다. 수신자 확인 목록 조회는 쪽지 한 건에 대한 수신자 현황을 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+              "line": 39,
+              "snippet": "    public int selectNoteTrnsmitListCnt(NoteTrnsmit noteTrnsmit) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+              "line": 54,
+              "snippet": "\tvoid  deleteNoteTrnsmit(NoteTrnsmit noteTrnsmit) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+              "line": 61,
+              "snippet": "\tvoid  deleteNoteRecptn(NoteTrnsmit noteTrnsmit) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+      "name": "보낸쪽지 정보",
+      "summary": {
+        "text": "보낸쪽지함 목록 조회에서 쪽지 아이디·제목·내용·송신자·개봉여부와 검색 기간 등 보낸쪽지 업무에 필요한 항목을 담아 오가는 보낸쪽지 정보 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+            "line": 19,
+            "snippet": "public class NoteTrnsmit extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "화면의 검색 조건과 업무 처리 결과를 함께 담는 정보 묶음으로, 조회 조건 전달과 삭제 대상 지정에 모두 같은 형태가 쓰인다. 공통 조회 정보 묶음을 물려받아 페이지 처리 항목을 함께 갖는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+              "line": 19,
+              "snippet": "public class NoteTrnsmit extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+              "line": 27,
+              "snippet": "\tprivate String noteId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "쪽지 아이디, 쪽지 송신 아이디, 쪽지 수신 아이디, 송신자 아이디, 개봉여부, 제목, 내용, 첨부파일과 보낸 기간 검색용 시작·종료 날짜를 보유하고, 최초등록시점·최초등록아이디·최종수정일·최종수정자 아이디의 이력 항목을 함께 유지한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+              "line": 30,
+              "snippet": "\tprivate String noteTrnsmitId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+              "line": 39,
+              "snippet": "\tprivate String openYn;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+              "line": 42,
+              "snippet": "\tprivate String noteSj;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+              "line": 60,
+              "snippet": "    private String frstRegisterId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+      "name": "보낸쪽지함 화면 처리",
+      "summary": {
+        "text": "보낸쪽지함 목록 조회의 화면 요청을 받아 인증을 확인하고, 로그인 사용자 기준으로 조회 조건을 채운 뒤 보낸쪽지함 업무 서비스에 처리를 위임하고 결과 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 166,
+            "snippet": "@RequestMapping(value = \"/uss/ion/nts/detailNoteTrnsmit.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 167,
+            "snippet": "    public String EgovNoteTrnsmitDetail("
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "보낸쪽지함 관련 화면 요청의 입구로서, 요청 파라미터를 보낸쪽지 정보 묶음으로 받아 로그인 사용자 기준을 채우고 보낸쪽지함 업무 서비스에 조회·삭제를 위임한 뒤, 결과를 화면 모델에 담아 보여줄 화면 경로를 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 200,
+              "snippet": "            \tmodel.addAttribute(\"noteTrnsmit\", noteTrnsmitMap);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 209,
+              "snippet": "    \t\treturn sLocationUrl;"
+            }
+          ]
+        },
+        "request": {
+          "text": "검색 정보 묶음과 보안 파라미터 묶음을 받아 처리하며, 가장 먼저 로그인 인증 여부를 확인해 인증되지 않은 요청은 로그인 실패 안내 문구와 함께 로그인 화면으로 되돌린다. 인증된 경우에만 로그인 사용자의 고유아이디를 송신자 조건으로 채워 본인 쪽지만 다루도록 제한하고, 명령 값이 삭제이면 삭제 후 목록으로, 아니면 상세 조회 결과를 화면에 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 177,
+              "snippet": "    \t    Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 180,
+              "snippet": "    \t        return \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 189,
+              "snippet": "            if(sCmd.equals(\"del\")){"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 192,
+              "snippet": "            \tsearchVO.setTrnsmiterId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 공통 기능",
+      "summary": {
+        "text": "보낸쪽지함 목록 조회에서 로그인 사용자의 고유아이디처럼 값이 없을 수 있는 항목을 빈 문자열로 안전하게 바꾸는 등 문자열 처리를 담당하는 공통 기능 모음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "업무 처리 과정에서 값이 없거나 길이가 긴 문자열을 안전한 형태로 다듬어 주는 공통 도구 역할을 한다. 조회 조건을 채울 때 값 없음으로 인한 오류를 막는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 기준값을 상수로 두고, 지정 길이를 초과한 원본 문자열을 잘라 내거나 지정 문자열을 덧붙이는 기능, 문자열이 비었거나 값이 없는지 검증하는 기능을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 109,
+              "snippet": "\t * String이 비었거나(\"\") 혹은 null 인지 검증한다."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/selectNoteTrnsmitCnfirm.do:src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+      "name": "보낸쪽지함 업무 서비스",
+      "summary": {
+        "text": "쪽지 수신자 확인 목록 조회의 실제 업무 처리를 담당하며 보낸쪽지 목록 조회, 전체 건수 조회, 상세 조회, 삭제, 수신자 확인 목록 조회의 업무 기능을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+            "line": 23,
+            "snippet": "public interface EgovNoteTrnsmitService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+            "line": 31,
+            "snippet": "\tpublic List<EgovMap> selectNoteTrnsmitList(NoteTrnsmit noteTrnsmit) throws Exception;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "보낸쪽지함 업무의 계약을 정의하는 서비스로, 화면 처리 담당이 요청한 조회·삭제 작업을 받아 데이터 처리 쪽으로 연결한다. 조회 조건과 결과는 보낸쪽지 정보 묶음으로 주고받는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+              "line": 23,
+              "snippet": "public interface EgovNoteTrnsmitService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+              "line": 26,
+              "snippet": "\t * 보낸쪽지함관리 목록을 조회한다."
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록 조회와 별도로 전체 건수 조회를 제공해 페이지 처리를 뒷받침하고, 삭제는 보낸쪽지 삭제와 받은쪽지 삭제를 구분해 각각 제공한다. 수신자 확인 목록 조회는 쪽지 한 건에 대한 수신자 현황을 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+              "line": 39,
+              "snippet": "    public int selectNoteTrnsmitListCnt(NoteTrnsmit noteTrnsmit) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+              "line": 54,
+              "snippet": "\tvoid  deleteNoteTrnsmit(NoteTrnsmit noteTrnsmit) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+              "line": 61,
+              "snippet": "\tvoid  deleteNoteRecptn(NoteTrnsmit noteTrnsmit) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nts/selectNoteTrnsmitCnfirm.do:src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+      "name": "보낸쪽지함 화면 처리",
+      "summary": {
+        "text": "쪽지 수신자 확인 목록 조회의 화면 요청을 받아 인증을 확인하고, 로그인 사용자 기준으로 조회 조건을 채운 뒤 보낸쪽지함 업무 서비스에 처리를 위임하고 결과 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 166,
+            "snippet": "@RequestMapping(value = \"/uss/ion/nts/detailNoteTrnsmit.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+            "line": 167,
+            "snippet": "    public String EgovNoteTrnsmitDetail("
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "보낸쪽지함 관련 화면 요청의 입구로서, 요청 파라미터를 보낸쪽지 정보 묶음으로 받아 로그인 사용자 기준을 채우고 보낸쪽지함 업무 서비스에 조회·삭제를 위임한 뒤, 결과를 화면 모델에 담아 보여줄 화면 경로를 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 200,
+              "snippet": "            \tmodel.addAttribute(\"noteTrnsmit\", noteTrnsmitMap);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 209,
+              "snippet": "    \t\treturn sLocationUrl;"
+            }
+          ]
+        },
+        "request": {
+          "text": "검색 정보 묶음과 보안 파라미터 묶음을 받아 처리하며, 가장 먼저 로그인 인증 여부를 확인해 인증되지 않은 요청은 로그인 실패 안내 문구와 함께 로그인 화면으로 되돌린다. 인증된 경우에만 로그인 사용자의 고유아이디를 송신자 조건으로 채워 본인 쪽지만 다루도록 제한하고, 명령 값이 삭제이면 삭제 후 목록으로, 아니면 상세 조회 결과를 화면에 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 177,
+              "snippet": "    \t    Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 180,
+              "snippet": "    \t        return \"redirect:/uat/uia/egovLoginUsr.do\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 189,
+              "snippet": "            if(sCmd.equals(\"del\")){"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+              "line": 192,
+              "snippet": "            \tsearchVO.setTrnsmiterId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

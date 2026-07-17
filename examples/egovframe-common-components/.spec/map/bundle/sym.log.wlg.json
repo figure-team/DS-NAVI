@@ -1,0 +1,178 @@
+{
+  "domainId": "domain:sym.log.wlg",
+  "files": [
+    {
+      "className": "EgovWebLogService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/log/wlg/service/EgovWebLogService.java — java 파일",
+        "tags": []
+      },
+      "line": 22,
+      "relPath": "src/main/java/egovframework/com/sym/log/wlg/service/EgovWebLogService.java",
+      "slice": {
+        "endLine": 55,
+        "startLine": 12,
+        "text": " *    2009. 3. 11.   이삼섭         최초생성\n *    2011. 7. 01.   이기하         패키지 분리(sym.log -> sym.log.wlg)\n *\n * @author 공통 서비스 개발팀 이삼섭\n * @since 2009. 3. 11.\n * @version\n * @see\n *\n */\n\npublic interface EgovWebLogService {\n\n\t/**\n\t * 웹 로그를 기록한다.\n\t *\n\t * @param WebLog\n\t */\n\tpublic void logInsertWebLog(WebLog webLog) throws Exception;\n\n\t/**\n\t * 웹 로그정보를 요약한다.\n\t *\n\t * @param\n\t */\n\tpublic void logInsertWebLogSummary() throws Exception;\n\n\t/**\n\t * 웹로그 상세정보를 조회한다.\n\t *\n\t * @param webLog\n\t * @return webLog\n\t * @throws Exception\n\t */\n\tpublic WebLog selectWebLog(WebLog webLog) throws Exception;\n\n\t/**\n\t * 웹 로그정보 목록을 조회한다.\n\t *\n\t * @param WebLog\n\t */\n\tpublic Map<String, Object> selectWebLogInf(WebLog webLog) throws Exception;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "WebLog",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/log/wlg/service/WebLog.java — java 파일",
+        "tags": []
+      },
+      "line": 21,
+      "relPath": "src/main/java/egovframework/com/sym/log/wlg/service/WebLog.java",
+      "slice": {
+        "endLine": 90,
+        "startLine": 11,
+        "text": " *    -------        -------     -------------------\n *    2009. 3. 11.   이삼섭         최초생성\n *    2011. 7. 01.   이기하         패키지 분리(sym.log -> sym.log.wlg)\n *    2011.09.14     서준식       화면에 검색일자를 표시하기위한 멤버변수 추가.\n * @author 공통 서비스 개발팀 이삼섭\n * @since 2009. 3. 11.\n * @version\n * @see\n *\n */\npublic class WebLog implements Serializable {\n\n\tprivate static final long serialVersionUID = -7768865822788140496L;\n\n\t/**\n\t * 요청아이디\n\t */\n\tprivate String requstId = \"\";\n\n\t/**\n\t * 발생일자\n\t */\n\tprivate String occrrncDe = \"\";\n\n\t/**\n\t * URL\n\t */\n\tprivate String url = \"\";\n\n\t/**\n\t * 요청자아이디\n\t */\n\tprivate String rqesterId = \"\";\n\n\t/**\n\t * 요청자 이름\n\t */\n\tprivate String rqsterNm = \"\";\n\n\t/**\n\t * 요청아이피\n\t */\n\tprivate String rqesterIp = \"\";\n\n\t/**\n\t * 검색시작일\n\t */\n\tprivate String searchBgnDe = \"\";\n\n\t/**\n\t * 검색조건\n\t */\n\tprivate String searchCnd = \"\";\n\n\t/**\n\t * 검색종료일\n\t */\n\tprivate String searchEndDe = \"\";\n\n\t/**\n\t * 검색단어\n\t */\n\tprivate String searchWrd = \"\";\n\n\t/**\n\t * 정렬순서(DESC,ASC)\n\t */\n\tprivate String sortOrdr = \"\";\n\n\t/** 검색사용여부 */\n    private String searchUseYn = \"\";\n\n    /** 현재페이지 */\n    private int pageIndex = 1;\n\n    /** 페이지개수 */\n    private int pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private int pageSize = 10;",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovWebLogController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/log/wlg/web/EgovWebLogController.java — java 파일",
+        "tags": []
+      },
+      "line": 89,
+      "relPath": "src/main/java/egovframework/com/sym/log/wlg/web/EgovWebLogController.java",
+      "slice": {
+        "endLine": 107,
+        "startLine": 79,
+        "text": "\t}\n\n\t/**\n\t * 웹 로그 상세 조회\n\t *\n\t * @param webLog\n\t * @param model\n\t * @return sym/log/wlg/EgovWebLogInqire\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/sym/log/wlg/SelectWebLogDetail.do\")\n\tpublic String selectWebLog(@ModelAttribute(\"searchVO\") WebLog webLog,\n\t\t\t@RequestParam(\"requstId\") String requstId,\n\t\t\tModelMap model) throws Exception{\n\t\t// 2026.03.23 kisa 보안점검 대응 조치\n\t\t if (ObjectUtils.isEmpty(requstId)) {\n\t\t\tmodel.addAttribute(\"message\", \"잘못된 접근입니다.\");\n\t\t\treturn \"forward:/sym/log/wlg/SelectWebLogList.do\";\n\t\t }\n\n\t\twebLog.setRequstId(requstId.trim());\n\t\t \n\t\tWebLog vo = webLogService.selectWebLog(webLog);\n\t\tmodel.addAttribute(\"result\", vo);\n\t\treturn \"egovframework/com/sym/log/wlg/EgovWebLogDetail\";\n\t}\n\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovWebLogController#selectWebLog",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/log/wlg/web/EgovWebLogController.java",
+      "flowId": "flow:ANY /sym/log/wlg/SelectWebLogDetail.do",
+      "line": 89,
+      "stepIds": [
+        "step:ANY /sym/log/wlg/SelectWebLogDetail.do:src/main/java/egovframework/com/sym/log/wlg/web/EgovWebLogController.java",
+        "step:ANY /sym/log/wlg/SelectWebLogDetail.do:src/main/java/egovframework/com/sym/log/wlg/service/WebLog.java",
+        "step:ANY /sym/log/wlg/SelectWebLogDetail.do:src/main/java/egovframework/com/sym/log/wlg/service/EgovWebLogService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovWebLogController#selectWebLogInf",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/log/wlg/web/EgovWebLogController.java",
+      "flowId": "flow:ANY /sym/log/wlg/SelectWebLogList.do",
+      "line": 55,
+      "stepIds": [
+        "step:ANY /sym/log/wlg/SelectWebLogList.do:src/main/java/egovframework/com/sym/log/wlg/web/EgovWebLogController.java",
+        "step:ANY /sym/log/wlg/SelectWebLogList.do:src/main/java/egovframework/com/sym/log/wlg/service/WebLog.java",
+        "step:ANY /sym/log/wlg/SelectWebLogList.do:src/main/java/egovframework/com/sym/log/wlg/service/EgovWebLogService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "sym.log.wlg",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/log/wlg/service/EgovWebLogService.java",
+      "stepId": "step:ANY /sym/log/wlg/SelectWebLogDetail.do:src/main/java/egovframework/com/sym/log/wlg/service/EgovWebLogService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/log/wlg/service/WebLog.java",
+      "stepId": "step:ANY /sym/log/wlg/SelectWebLogDetail.do:src/main/java/egovframework/com/sym/log/wlg/service/WebLog.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/log/wlg/web/EgovWebLogController.java",
+      "stepId": "step:ANY /sym/log/wlg/SelectWebLogDetail.do:src/main/java/egovframework/com/sym/log/wlg/web/EgovWebLogController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/log/wlg/service/EgovWebLogService.java",
+      "stepId": "step:ANY /sym/log/wlg/SelectWebLogList.do:src/main/java/egovframework/com/sym/log/wlg/service/EgovWebLogService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/log/wlg/service/WebLog.java",
+      "stepId": "step:ANY /sym/log/wlg/SelectWebLogList.do:src/main/java/egovframework/com/sym/log/wlg/service/WebLog.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/log/wlg/web/EgovWebLogController.java",
+      "stepId": "step:ANY /sym/log/wlg/SelectWebLogList.do:src/main/java/egovframework/com/sym/log/wlg/web/EgovWebLogController.java"
+    }
+  ]
+}

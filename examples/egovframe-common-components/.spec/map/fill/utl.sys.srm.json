@@ -1,0 +1,1496 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "a1"
+        },
+        {
+          "from": "a1",
+          "to": "a2"
+        },
+        {
+          "from": "a2",
+          "to": "a3"
+        },
+        {
+          "from": "a3",
+          "to": "a4"
+        },
+        {
+          "from": "a4",
+          "to": "a5"
+        },
+        {
+          "from": "a5",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "운영자 모니터링 조회 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 59,
+              "snippet": "@RequestMapping(value = \"/utl/sys/srm/selectMntrngServerList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 49,
+              "snippet": "\tpublic List<ServerResrceMntrngVO> selectMntrngServerList(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/srm/selectMntrngServerList.do",
+          "id": "a1",
+          "kind": "activity",
+          "label": "대상 서버 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 91,
+              "snippet": "@RequestMapping(value = \"/utl/sys/srm/selectServerResrceMntrngListView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 22,
+              "snippet": "\tprivate String strServerNm;"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/srm/selectServerResrceMntrngListView.do",
+          "id": "a2",
+          "kind": "activity",
+          "label": "로그 목록 화면 진입"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 110,
+              "snippet": "@RequestMapping(value = \"/utl/sys/srm/selectServerResrceMntrngList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 22,
+              "snippet": "\tpublic List<ServerResrceMntrngVO> selectServerResrceMntrngList(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/srm/selectServerResrceMntrngList.do",
+          "id": "a3",
+          "kind": "activity",
+          "label": "기간별 로그 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 155,
+              "snippet": "@RequestMapping(value = \"/utl/sys/srm/getServerResrceMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 36,
+              "snippet": "\tpublic ServerResrceMntrngVO selectServerResrceMntrng(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /utl/sys/srm/getServerResrceMntrng.do",
+          "id": "a4",
+          "kind": "activity",
+          "label": "로그 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 170,
+              "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 172,
+              "snippet": "\t\treturn \"egovframework/com/utl/sys/srm/EgovServerResrceMntrngDetail\";"
+            }
+          ],
+          "id": "a5",
+          "kind": "activity",
+          "label": "조회 결과 안내 메시지 표시"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "조회 종료"
+        }
+      ],
+      "title": "서버자원모니터링 조회"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+          "line": 156,
+          "snippet": "\tpublic String selectServerResrceMntrng(@RequestParam(\"logId\") String logId,"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+          "line": 157,
+          "snippet": "\t\t\t@RequestParam(\"strStartDt\") String strStartDt, @RequestParam(\"strEndDt\") String strEndDt,"
+        }
+      ],
+      "text": "로그 상세 조회는 로그 식별자와 조회 기간(시작일자·종료일자)을 필수로 요구한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+          "line": 22,
+          "snippet": "\tpublic List<ServerResrceMntrngVO> selectServerResrceMntrngList(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+          "line": 29,
+          "snippet": "\tpublic int selectServerResrceMntrngListTotCnt(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+        }
+      ],
+      "text": "목록 조회는 목록과 총 건수를 각각 조회해 페이징 처리를 지원한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+          "line": 161,
+          "snippet": "\t\tserverResrceMntrngVO.setLogId(logId);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+          "line": 172,
+          "snippet": "\t\treturn \"egovframework/com/utl/sys/srm/EgovServerResrceMntrngDetail\";"
+        }
+      ],
+      "text": "상세 조회 후에도 사용자가 입력한 조회 기간을 유지해 목록으로 되돌아갈 수 있게 한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+          "line": 81,
+          "snippet": "\t\tthis.serverResrceMntrngList = Collections.unmodifiableList(serverResrceMntrngList);"
+        }
+      ],
+      "text": "조회 결과 목록은 변경 불가 형태로 보관해 외부에서 임의로 변경하지 못하게 한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+          "line": 10,
+          "snippet": " * - 서버자원모니터링에 대한 등록, 조회 기능을 제공한다."
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+          "line": 42,
+          "snippet": "\tpublic void insertServerResrceMntrng(ServerResrceMntrng serverResrceMntrng) throws Exception;"
+        }
+      ],
+      "text": "서버자원모니터링은 조회뿐 아니라 로그 신규 등록 기능도 제공한다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+          "line": 170,
+          "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+        }
+      ],
+      "text": "공통 메시지 관리와 연계해 조회 성공 등 화면 안내 문구를 코드로 조회한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+          "line": 36,
+          "snippet": "public class EgovDateUtil {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+          "line": 37,
+          "snippet": "    private static final  String SIMPLE_DATE_PATTERN = \"yyyyMMdd\";"
+        }
+      ],
+      "text": "공통 날짜 유틸리티와 연계해 조회 기간 조건을 표준 날짜 형식으로 가공한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 43,
+          "snippet": "public class EgovStringUtil {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 47,
+          "snippet": "\tpublic static final String EMPTY = \"\";"
+        }
+      ],
+      "text": "공통 문자열 유틸리티와 연계해 서버명 등 문자열 조회조건을 정리한다."
+    }
+  ],
+  "domainId": "domain:utl.sys.srm",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+          "line": 36,
+          "snippet": "\tpublic ServerResrceMntrngVO selectServerResrceMntrng(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+          "line": 161,
+          "snippet": "\t\tserverResrceMntrngVO.setLogId(logId);"
+        }
+      ],
+      "text": "서버자원모니터링 로그: 서버별 자원 사용 기록으로, 로그 식별자로 상세를 조회한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+          "line": 49,
+          "snippet": "\tpublic List<ServerResrceMntrngVO> selectMntrngServerList(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+          "line": 56,
+          "snippet": "\tpublic int selectMntrngServerListTotCnt(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+        }
+      ],
+      "text": "모니터링 대상 서버: 자원 모니터링 대상이 되는 서버 목록으로, 총 개수와 함께 조회된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+          "line": 22,
+          "snippet": "\tprivate String strServerNm;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+          "line": 26,
+          "snippet": "\tprivate String strStartDt;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+          "line": 30,
+          "snippet": "\tprivate String strEndDt;"
+        }
+      ],
+      "text": "서버자원모니터링 조회조건: 서버명, 시작일자, 종료일자로 구성된 조회조건이다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /utl/sys/srm/getServerResrceMntrng.do",
+      "name": "서버자원모니터링 로그 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 155,
+            "snippet": "@RequestMapping(value = \"/utl/sys/srm/getServerResrceMntrng.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 161,
+            "snippet": "\t\tserverResrceMntrngVO.setLogId(logId);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 172,
+            "snippet": "\t\treturn \"egovframework/com/utl/sys/srm/EgovServerResrceMntrngDetail\";"
+          }
+        ],
+        "text": "로그 식별자와 조회 기간(시작일자·종료일자)을 받아 해당 서버자원모니터링 로그 한 건의 상세정보를 조회하고, 조회 조건을 유지한 채 상세 화면으로 결과와 성공 메시지를 전달한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/srm/selectMntrngServerList.do",
+      "name": "모니터링 대상 서버 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 59,
+            "snippet": "@RequestMapping(value = \"/utl/sys/srm/selectMntrngServerList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+            "line": 49,
+            "snippet": "\tpublic List<ServerResrceMntrngVO> selectMntrngServerList(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+            "line": 56,
+            "snippet": "\tpublic int selectMntrngServerListTotCnt(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+          }
+        ],
+        "text": "서버자원모니터링의 대상이 되는 서버들의 목록을 조회해 화면에 제공한다. 대상 서버 목록과 총 건수 조회는 서버자원모니터링 서비스가 담당한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/srm/selectServerResrceMntrngList.do",
+      "name": "서버자원모니터링 로그 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 110,
+            "snippet": "@RequestMapping(value = \"/utl/sys/srm/selectServerResrceMntrngList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+            "line": 22,
+            "snippet": "\tpublic List<ServerResrceMntrngVO> selectServerResrceMntrngList(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+            "line": 29,
+            "snippet": "\tpublic int selectServerResrceMntrngListTotCnt(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 146,
+            "snippet": "\t\treturn \"egovframework/com/utl/sys/srm/EgovServerResrceMntrngList\";"
+          }
+        ],
+        "text": "서버명·조회 기간 등 검색조건으로 서버자원모니터링 로그 목록과 총 건수를 조회해 목록 화면에 표시한다. 조회 기간은 날짜 유틸리티로 가공하고 문자열 조건은 문자열 유틸리티로 정리한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/srm/selectServerResrceMntrngListView.do",
+      "name": "서버자원모니터링 로그 목록 화면 진입",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 91,
+            "snippet": "@RequestMapping(value = \"/utl/sys/srm/selectServerResrceMntrngListView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+            "line": 22,
+            "snippet": "\tprivate String strServerNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+            "line": 26,
+            "snippet": "\tprivate String strStartDt;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+            "line": 30,
+            "snippet": "\tprivate String strEndDt;"
+          }
+        ],
+        "text": "서버자원모니터링 로그 목록 화면에 최초 진입할 때 기본 조회조건(서버명, 시작일자, 종료일자)을 준비해 목록 화면을 표시한다."
+      }
+    }
+  ],
+  "name": "서버자원모니터링",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            }
+          ],
+          "text": "메시지 코드로 기본 로케일 문구를 조회하며, 매개변수를 포함한 문구 조회도 지원한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 170,
+              "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+            }
+          ],
+          "text": "조회 성공 등 화면에 표시할 안내 문구를 코드로 조회해 제공하는 다국어 메시지 제공 역할을 맡는다."
+        }
+      },
+      "name": "공통 안내 메시지 제공 - 로그 상세 조회",
+      "stepId": "step:ANY /utl/sys/srm/getServerResrceMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 170,
+            "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+          }
+        ],
+        "text": "로그 상세 조회 결과를 알리는 안내 문구를 메시지 코드로 조회해 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 22,
+              "snippet": "\tpublic List<ServerResrceMntrngVO> selectServerResrceMntrngList(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 29,
+              "snippet": "\tpublic int selectServerResrceMntrngListTotCnt(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 36,
+              "snippet": "\tpublic ServerResrceMntrngVO selectServerResrceMntrng(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 49,
+              "snippet": "\tpublic List<ServerResrceMntrngVO> selectMntrngServerList(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 56,
+              "snippet": "\tpublic int selectMntrngServerListTotCnt(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 42,
+              "snippet": "\tpublic void insertServerResrceMntrng(ServerResrceMntrng serverResrceMntrng) throws Exception;"
+            }
+          ],
+          "text": "로그 목록 조회와 총 건수 조회를 분리해 페이징을 지원하고, 상세 조회는 조회조건 객체를 받아 단건을 돌려주며, 로그 신규 등록 기능도 함께 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 15,
+              "snippet": "public interface EgovServerResrceMntrngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 10,
+              "snippet": " * - 서버자원모니터링에 대한 등록, 조회 기능을 제공한다."
+            }
+          ],
+          "text": "서버자원모니터링 업무의 서비스 계약으로, 로그 목록·총 건수·상세 조회와 대상 서버 목록 조회 기능을 정의한다."
+        }
+      },
+      "name": "서버자원모니터링 서비스 - 로그 상세 조회",
+      "stepId": "step:ANY /utl/sys/srm/getServerResrceMntrng.do:src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+            "line": 15,
+            "snippet": "public interface EgovServerResrceMntrngService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+            "line": 7,
+            "snippet": " * - 서버자원모니터링에 대한 Service Interface를 정의한다."
+          }
+        ],
+        "text": "로그 상세 조회를 수행하는 서버자원모니터링 서비스 계약으로, 조회조건 객체를 받아 결과를 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 22,
+              "snippet": "\tprivate String strServerNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 26,
+              "snippet": "\tprivate String strStartDt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 30,
+              "snippet": "\tprivate String strEndDt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 34,
+              "snippet": "\tprivate List<ServerResrceMntrngVO> serverResrceMntrngList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 81,
+              "snippet": "\t\tthis.serverResrceMntrngList = Collections.unmodifiableList(serverResrceMntrngList);"
+            }
+          ],
+          "text": "서버명 조회조건, 시작일자 검색조건, 종료일자 검색조건과 서버자원모니터링 목록을 보유하며, 목록은 변경 불가 형태로 보관해 외부 변경을 막는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 16,
+              "snippet": "public class ServerResrceMntrngVO extends ServerResrceMntrng {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 11,
+              "snippet": " * - 서버자원모니터링의 목록 항목, 조회조건, 삭제대상 등을 관리한다."
+            }
+          ],
+          "text": "서버자원모니터링 업무의 조회조건과 조회 결과를 담아 화면과 서비스 사이를 오가는 데이터 객체 역할을 한다."
+        }
+      },
+      "name": "서버자원모니터링 조회 정보 객체 - 로그 상세 조회",
+      "stepId": "step:ANY /utl/sys/srm/getServerResrceMntrng.do:src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+            "line": 16,
+            "snippet": "public class ServerResrceMntrngVO extends ServerResrceMntrng {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+            "line": 11,
+            "snippet": " * - 서버자원모니터링의 목록 항목, 조회조건, 삭제대상 등을 관리한다."
+          }
+        ],
+        "text": "로그 상세 조회의 조회조건과 결과 목록을 담아 화면과 서비스 사이에서 전달되는 데이터 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 156,
+              "snippet": "\tpublic String selectServerResrceMntrng(@RequestParam(\"logId\") String logId,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 157,
+              "snippet": "\t\t\t@RequestParam(\"strStartDt\") String strStartDt, @RequestParam(\"strEndDt\") String strEndDt,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 161,
+              "snippet": "\t\tserverResrceMntrngVO.setLogId(logId);"
+            }
+          ],
+          "text": "로그 식별자와 조회 기간을 요청 파라미터로 필수 수신하고, 조회조건 객체에 로그 식별자를 설정한 뒤 상세 조회를 수행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 155,
+              "snippet": "@RequestMapping(value = \"/utl/sys/srm/getServerResrceMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 150,
+              "snippet": "\t * 서버자원모니터링 로그의 상세정보를 조회한다."
+            }
+          ],
+          "text": "서버자원모니터링 업무의 웹 진입점으로, 화면에서 넘어온 조회조건을 받아 서버자원모니터링 서비스에 위임하고 결과와 안내 메시지를 화면 모델에 담아 반환한다."
+        }
+      },
+      "name": "서버자원모니터링 컨트롤러 - 로그 상세 조회",
+      "stepId": "step:ANY /utl/sys/srm/getServerResrceMntrng.do:src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 155,
+            "snippet": "@RequestMapping(value = \"/utl/sys/srm/getServerResrceMntrng.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 162,
+            "snippet": "\t\tServerResrceMntrngVO serverResrceMntrng = egovServerResrceMntrngService"
+          }
+        ],
+        "text": "로그 상세 조회 요청을 받아 조회조건을 정리한 뒤 서버자원모니터링 서비스에 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            }
+          ],
+          "text": "메시지 코드로 기본 로케일 문구를 조회하며, 매개변수를 포함한 문구 조회도 지원한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 170,
+              "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+            }
+          ],
+          "text": "조회 성공 등 화면에 표시할 안내 문구를 코드로 조회해 제공하는 다국어 메시지 제공 역할을 맡는다."
+        }
+      },
+      "name": "공통 안내 메시지 제공 - 대상 서버 목록 조회",
+      "stepId": "step:ANY /utl/sys/srm/selectMntrngServerList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 170,
+            "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+          }
+        ],
+        "text": "대상 서버 목록 조회 결과를 알리는 안내 문구를 메시지 코드로 조회해 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 22,
+              "snippet": "\tpublic List<ServerResrceMntrngVO> selectServerResrceMntrngList(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 29,
+              "snippet": "\tpublic int selectServerResrceMntrngListTotCnt(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 36,
+              "snippet": "\tpublic ServerResrceMntrngVO selectServerResrceMntrng(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 49,
+              "snippet": "\tpublic List<ServerResrceMntrngVO> selectMntrngServerList(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 56,
+              "snippet": "\tpublic int selectMntrngServerListTotCnt(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 42,
+              "snippet": "\tpublic void insertServerResrceMntrng(ServerResrceMntrng serverResrceMntrng) throws Exception;"
+            }
+          ],
+          "text": "로그 목록 조회와 총 건수 조회를 분리해 페이징을 지원하고, 상세 조회는 조회조건 객체를 받아 단건을 돌려주며, 로그 신규 등록 기능도 함께 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 15,
+              "snippet": "public interface EgovServerResrceMntrngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 10,
+              "snippet": " * - 서버자원모니터링에 대한 등록, 조회 기능을 제공한다."
+            }
+          ],
+          "text": "서버자원모니터링 업무의 서비스 계약으로, 로그 목록·총 건수·상세 조회와 대상 서버 목록 조회 기능을 정의한다."
+        }
+      },
+      "name": "서버자원모니터링 서비스 - 대상 서버 목록 조회",
+      "stepId": "step:ANY /utl/sys/srm/selectMntrngServerList.do:src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+            "line": 15,
+            "snippet": "public interface EgovServerResrceMntrngService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+            "line": 7,
+            "snippet": " * - 서버자원모니터링에 대한 Service Interface를 정의한다."
+          }
+        ],
+        "text": "대상 서버 목록 조회를 수행하는 서버자원모니터링 서비스 계약으로, 조회조건 객체를 받아 결과를 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 22,
+              "snippet": "\tprivate String strServerNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 26,
+              "snippet": "\tprivate String strStartDt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 30,
+              "snippet": "\tprivate String strEndDt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 34,
+              "snippet": "\tprivate List<ServerResrceMntrngVO> serverResrceMntrngList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 81,
+              "snippet": "\t\tthis.serverResrceMntrngList = Collections.unmodifiableList(serverResrceMntrngList);"
+            }
+          ],
+          "text": "서버명 조회조건, 시작일자 검색조건, 종료일자 검색조건과 서버자원모니터링 목록을 보유하며, 목록은 변경 불가 형태로 보관해 외부 변경을 막는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 16,
+              "snippet": "public class ServerResrceMntrngVO extends ServerResrceMntrng {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 11,
+              "snippet": " * - 서버자원모니터링의 목록 항목, 조회조건, 삭제대상 등을 관리한다."
+            }
+          ],
+          "text": "서버자원모니터링 업무의 조회조건과 조회 결과를 담아 화면과 서비스 사이를 오가는 데이터 객체 역할을 한다."
+        }
+      },
+      "name": "서버자원모니터링 조회 정보 객체 - 대상 서버 목록 조회",
+      "stepId": "step:ANY /utl/sys/srm/selectMntrngServerList.do:src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+            "line": 16,
+            "snippet": "public class ServerResrceMntrngVO extends ServerResrceMntrng {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+            "line": 11,
+            "snippet": " * - 서버자원모니터링의 목록 항목, 조회조건, 삭제대상 등을 관리한다."
+          }
+        ],
+        "text": "대상 서버 목록 조회의 조회조건과 결과 목록을 담아 화면과 서비스 사이에서 전달되는 데이터 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 156,
+              "snippet": "\tpublic String selectServerResrceMntrng(@RequestParam(\"logId\") String logId,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 157,
+              "snippet": "\t\t\t@RequestParam(\"strStartDt\") String strStartDt, @RequestParam(\"strEndDt\") String strEndDt,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 161,
+              "snippet": "\t\tserverResrceMntrngVO.setLogId(logId);"
+            }
+          ],
+          "text": "로그 식별자와 조회 기간을 요청 파라미터로 필수 수신하고, 조회조건 객체에 로그 식별자를 설정한 뒤 상세 조회를 수행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 155,
+              "snippet": "@RequestMapping(value = \"/utl/sys/srm/getServerResrceMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 150,
+              "snippet": "\t * 서버자원모니터링 로그의 상세정보를 조회한다."
+            }
+          ],
+          "text": "서버자원모니터링 업무의 웹 진입점으로, 화면에서 넘어온 조회조건을 받아 서버자원모니터링 서비스에 위임하고 결과와 안내 메시지를 화면 모델에 담아 반환한다."
+        }
+      },
+      "name": "서버자원모니터링 컨트롤러 - 대상 서버 목록 조회",
+      "stepId": "step:ANY /utl/sys/srm/selectMntrngServerList.do:src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 155,
+            "snippet": "@RequestMapping(value = \"/utl/sys/srm/getServerResrceMntrng.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 162,
+            "snippet": "\t\tServerResrceMntrngVO serverResrceMntrng = egovServerResrceMntrngService"
+          }
+        ],
+        "text": "대상 서버 목록 조회 요청을 받아 조회조건을 정리한 뒤 서버자원모니터링 서비스에 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            }
+          ],
+          "text": "메시지 코드로 기본 로케일 문구를 조회하며, 매개변수를 포함한 문구 조회도 지원한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 170,
+              "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+            }
+          ],
+          "text": "조회 성공 등 화면에 표시할 안내 문구를 코드로 조회해 제공하는 다국어 메시지 제공 역할을 맡는다."
+        }
+      },
+      "name": "공통 안내 메시지 제공 - 로그 목록 조회",
+      "stepId": "step:ANY /utl/sys/srm/selectServerResrceMntrngList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 170,
+            "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+          }
+        ],
+        "text": "로그 목록 조회 결과를 알리는 안내 문구를 메시지 코드로 조회해 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 37,
+              "snippet": "    private static final  String SIMPLE_DATE_PATTERN = \"yyyyMMdd\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 65,
+              "snippet": "\tpublic static String addYearMonthDay(String sDate, int year, int month, int day) {"
+            }
+          ],
+          "text": "날짜 문자열을 표준 형식으로 다루며, 년·월·일 가감 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 37,
+              "snippet": "    private static final  String SIMPLE_DATE_PATTERN = \"yyyyMMdd\";"
+            }
+          ],
+          "text": "조회 기간(시작일자·종료일자) 등 날짜 조건을 정해진 형식으로 가공·검증하는 날짜 유틸리티 역할을 한다."
+        }
+      },
+      "name": "날짜 조건 처리 유틸리티 - 로그 목록 조회",
+      "stepId": "step:ANY /utl/sys/srm/selectServerResrceMntrngList.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+            "line": 36,
+            "snippet": "public class EgovDateUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+            "line": 37,
+            "snippet": "    private static final  String SIMPLE_DATE_PATTERN = \"yyyyMMdd\";"
+          }
+        ],
+        "text": "로그 목록 조회에서 사용하는 조회 기간 등 날짜 조건을 표준 형식으로 가공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            }
+          ],
+          "text": "빈 문자열 상수를 기준으로 값의 유무를 다루고, 지정 길이 초과 문자열을 자르는 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "서버명 등 문자열 조회조건을 다듬는 문자열 유틸리티 역할을 한다."
+        }
+      },
+      "name": "문자열 조건 처리 유틸리티 - 로그 목록 조회",
+      "stepId": "step:ANY /utl/sys/srm/selectServerResrceMntrngList.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 47,
+            "snippet": "\tpublic static final String EMPTY = \"\";"
+          }
+        ],
+        "text": "로그 목록 조회에서 서버명 등 문자열 조회조건을 다듬는 데 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 22,
+              "snippet": "\tpublic List<ServerResrceMntrngVO> selectServerResrceMntrngList(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 29,
+              "snippet": "\tpublic int selectServerResrceMntrngListTotCnt(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 36,
+              "snippet": "\tpublic ServerResrceMntrngVO selectServerResrceMntrng(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 49,
+              "snippet": "\tpublic List<ServerResrceMntrngVO> selectMntrngServerList(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 56,
+              "snippet": "\tpublic int selectMntrngServerListTotCnt(ServerResrceMntrngVO serverResrceMntrngVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 42,
+              "snippet": "\tpublic void insertServerResrceMntrng(ServerResrceMntrng serverResrceMntrng) throws Exception;"
+            }
+          ],
+          "text": "로그 목록 조회와 총 건수 조회를 분리해 페이징을 지원하고, 상세 조회는 조회조건 객체를 받아 단건을 돌려주며, 로그 신규 등록 기능도 함께 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 15,
+              "snippet": "public interface EgovServerResrceMntrngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+              "line": 10,
+              "snippet": " * - 서버자원모니터링에 대한 등록, 조회 기능을 제공한다."
+            }
+          ],
+          "text": "서버자원모니터링 업무의 서비스 계약으로, 로그 목록·총 건수·상세 조회와 대상 서버 목록 조회 기능을 정의한다."
+        }
+      },
+      "name": "서버자원모니터링 서비스 - 로그 목록 조회",
+      "stepId": "step:ANY /utl/sys/srm/selectServerResrceMntrngList.do:src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+            "line": 15,
+            "snippet": "public interface EgovServerResrceMntrngService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+            "line": 7,
+            "snippet": " * - 서버자원모니터링에 대한 Service Interface를 정의한다."
+          }
+        ],
+        "text": "로그 목록 조회를 수행하는 서버자원모니터링 서비스 계약으로, 조회조건 객체를 받아 결과를 돌려준다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 22,
+              "snippet": "\tprivate String strServerNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 26,
+              "snippet": "\tprivate String strStartDt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 30,
+              "snippet": "\tprivate String strEndDt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 34,
+              "snippet": "\tprivate List<ServerResrceMntrngVO> serverResrceMntrngList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 81,
+              "snippet": "\t\tthis.serverResrceMntrngList = Collections.unmodifiableList(serverResrceMntrngList);"
+            }
+          ],
+          "text": "서버명 조회조건, 시작일자 검색조건, 종료일자 검색조건과 서버자원모니터링 목록을 보유하며, 목록은 변경 불가 형태로 보관해 외부 변경을 막는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 16,
+              "snippet": "public class ServerResrceMntrngVO extends ServerResrceMntrng {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 11,
+              "snippet": " * - 서버자원모니터링의 목록 항목, 조회조건, 삭제대상 등을 관리한다."
+            }
+          ],
+          "text": "서버자원모니터링 업무의 조회조건과 조회 결과를 담아 화면과 서비스 사이를 오가는 데이터 객체 역할을 한다."
+        }
+      },
+      "name": "서버자원모니터링 조회 정보 객체 - 로그 목록 조회",
+      "stepId": "step:ANY /utl/sys/srm/selectServerResrceMntrngList.do:src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+            "line": 16,
+            "snippet": "public class ServerResrceMntrngVO extends ServerResrceMntrng {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+            "line": 11,
+            "snippet": " * - 서버자원모니터링의 목록 항목, 조회조건, 삭제대상 등을 관리한다."
+          }
+        ],
+        "text": "로그 목록 조회의 조회조건과 결과 목록을 담아 화면과 서비스 사이에서 전달되는 데이터 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 156,
+              "snippet": "\tpublic String selectServerResrceMntrng(@RequestParam(\"logId\") String logId,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 157,
+              "snippet": "\t\t\t@RequestParam(\"strStartDt\") String strStartDt, @RequestParam(\"strEndDt\") String strEndDt,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 161,
+              "snippet": "\t\tserverResrceMntrngVO.setLogId(logId);"
+            }
+          ],
+          "text": "로그 식별자와 조회 기간을 요청 파라미터로 필수 수신하고, 조회조건 객체에 로그 식별자를 설정한 뒤 상세 조회를 수행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 155,
+              "snippet": "@RequestMapping(value = \"/utl/sys/srm/getServerResrceMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 150,
+              "snippet": "\t * 서버자원모니터링 로그의 상세정보를 조회한다."
+            }
+          ],
+          "text": "서버자원모니터링 업무의 웹 진입점으로, 화면에서 넘어온 조회조건을 받아 서버자원모니터링 서비스에 위임하고 결과와 안내 메시지를 화면 모델에 담아 반환한다."
+        }
+      },
+      "name": "서버자원모니터링 컨트롤러 - 로그 목록 조회",
+      "stepId": "step:ANY /utl/sys/srm/selectServerResrceMntrngList.do:src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 155,
+            "snippet": "@RequestMapping(value = \"/utl/sys/srm/getServerResrceMntrng.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 162,
+            "snippet": "\t\tServerResrceMntrngVO serverResrceMntrng = egovServerResrceMntrngService"
+          }
+        ],
+        "text": "로그 목록 조회 요청을 받아 조회조건을 정리한 뒤 서버자원모니터링 서비스에 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 37,
+              "snippet": "    private static final  String SIMPLE_DATE_PATTERN = \"yyyyMMdd\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 65,
+              "snippet": "\tpublic static String addYearMonthDay(String sDate, int year, int month, int day) {"
+            }
+          ],
+          "text": "날짜 문자열을 표준 형식으로 다루며, 년·월·일 가감 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 37,
+              "snippet": "    private static final  String SIMPLE_DATE_PATTERN = \"yyyyMMdd\";"
+            }
+          ],
+          "text": "조회 기간(시작일자·종료일자) 등 날짜 조건을 정해진 형식으로 가공·검증하는 날짜 유틸리티 역할을 한다."
+        }
+      },
+      "name": "날짜 조건 처리 유틸리티 - 로그 목록 화면 진입",
+      "stepId": "step:ANY /utl/sys/srm/selectServerResrceMntrngListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+            "line": 36,
+            "snippet": "public class EgovDateUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+            "line": 37,
+            "snippet": "    private static final  String SIMPLE_DATE_PATTERN = \"yyyyMMdd\";"
+          }
+        ],
+        "text": "로그 목록 화면 진입에서 사용하는 조회 기간 등 날짜 조건을 표준 형식으로 가공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            }
+          ],
+          "text": "빈 문자열 상수를 기준으로 값의 유무를 다루고, 지정 길이 초과 문자열을 자르는 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "서버명 등 문자열 조회조건을 다듬는 문자열 유틸리티 역할을 한다."
+        }
+      },
+      "name": "문자열 조건 처리 유틸리티 - 로그 목록 화면 진입",
+      "stepId": "step:ANY /utl/sys/srm/selectServerResrceMntrngListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 47,
+            "snippet": "\tpublic static final String EMPTY = \"\";"
+          }
+        ],
+        "text": "로그 목록 화면 진입에서 서버명 등 문자열 조회조건을 다듬는 데 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 22,
+              "snippet": "\tprivate String strServerNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 26,
+              "snippet": "\tprivate String strStartDt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 30,
+              "snippet": "\tprivate String strEndDt;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 34,
+              "snippet": "\tprivate List<ServerResrceMntrngVO> serverResrceMntrngList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 81,
+              "snippet": "\t\tthis.serverResrceMntrngList = Collections.unmodifiableList(serverResrceMntrngList);"
+            }
+          ],
+          "text": "서버명 조회조건, 시작일자 검색조건, 종료일자 검색조건과 서버자원모니터링 목록을 보유하며, 목록은 변경 불가 형태로 보관해 외부 변경을 막는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 16,
+              "snippet": "public class ServerResrceMntrngVO extends ServerResrceMntrng {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+              "line": 11,
+              "snippet": " * - 서버자원모니터링의 목록 항목, 조회조건, 삭제대상 등을 관리한다."
+            }
+          ],
+          "text": "서버자원모니터링 업무의 조회조건과 조회 결과를 담아 화면과 서비스 사이를 오가는 데이터 객체 역할을 한다."
+        }
+      },
+      "name": "서버자원모니터링 조회 정보 객체 - 로그 목록 화면 진입",
+      "stepId": "step:ANY /utl/sys/srm/selectServerResrceMntrngListView.do:src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+            "line": 16,
+            "snippet": "public class ServerResrceMntrngVO extends ServerResrceMntrng {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+            "line": 11,
+            "snippet": " * - 서버자원모니터링의 목록 항목, 조회조건, 삭제대상 등을 관리한다."
+          }
+        ],
+        "text": "로그 목록 화면 진입의 조회조건과 결과 목록을 담아 화면과 서비스 사이에서 전달되는 데이터 객체이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 156,
+              "snippet": "\tpublic String selectServerResrceMntrng(@RequestParam(\"logId\") String logId,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 157,
+              "snippet": "\t\t\t@RequestParam(\"strStartDt\") String strStartDt, @RequestParam(\"strEndDt\") String strEndDt,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 161,
+              "snippet": "\t\tserverResrceMntrngVO.setLogId(logId);"
+            }
+          ],
+          "text": "로그 식별자와 조회 기간을 요청 파라미터로 필수 수신하고, 조회조건 객체에 로그 식별자를 설정한 뒤 상세 조회를 수행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 155,
+              "snippet": "@RequestMapping(value = \"/utl/sys/srm/getServerResrceMntrng.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 150,
+              "snippet": "\t * 서버자원모니터링 로그의 상세정보를 조회한다."
+            }
+          ],
+          "text": "서버자원모니터링 업무의 웹 진입점으로, 화면에서 넘어온 조회조건을 받아 서버자원모니터링 서비스에 위임하고 결과와 안내 메시지를 화면 모델에 담아 반환한다."
+        }
+      },
+      "name": "서버자원모니터링 컨트롤러 - 로그 목록 화면 진입",
+      "stepId": "step:ANY /utl/sys/srm/selectServerResrceMntrngListView.do:src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 155,
+            "snippet": "@RequestMapping(value = \"/utl/sys/srm/getServerResrceMntrng.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "line": 162,
+            "snippet": "\t\tServerResrceMntrngVO serverResrceMntrng = egovServerResrceMntrngService"
+          }
+        ],
+        "text": "로그 목록 화면 진입 요청을 받아 조회조건을 정리한 뒤 서버자원모니터링 서비스에 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+        "line": 7,
+        "snippet": " * - 서버자원모니터링에 대한 Service Interface를 정의한다."
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+        "line": 10,
+        "snippet": " * - 서버자원모니터링에 대한 등록, 조회 기능을 제공한다."
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+        "line": 155,
+        "snippet": "@RequestMapping(value = \"/utl/sys/srm/getServerResrceMntrng.do\")"
+      }
+    ],
+    "text": "대상 서버들의 자원 사용 로그를 수집·보관하고, 운영자가 대상 서버 목록과 기간별 자원모니터링 로그 목록·상세를 조회할 수 있게 하는 시스템 운영 지원 업무이다."
+  }
+}

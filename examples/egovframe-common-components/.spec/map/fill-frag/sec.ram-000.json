@@ -1,0 +1,2505 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "sec.ram-000",
+  "domainId": "domain:sec.ram",
+  "header": {
+    "name": "권한/롤 관리",
+    "summary": {
+      "text": "시스템 접근권한을 등록·수정·삭제하고 각 권한에 롤을 할당해 접근 통제 기준을 관리하는 업무 영역이다. 권한 관리와 권한별 롤 할당 두 갈래의 관리 화면으로 구성된다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+          "line": 65,
+          "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorList.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+          "line": 82,
+          "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleList.do\")"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "권한: 권한코드로 식별되며 권한 명(최대 60자)과 권한코드설명(최대 200자), 권한등록일자를 가진다. 권한코드와 권한 명은 필수 입력이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+            "line": 44,
+            "snippet": "\tprivate String authorCode;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+            "line": 63,
+            "snippet": "\tprivate String authorNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+            "line": 43,
+            "snippet": "\t@Size(max=30)"
+          }
+        ]
+      },
+      {
+        "text": "권한 롤 관계: 권한코드와 롤코드의 짝으로 성립하며 롤명·롤 패턴·롤 설명·롤 타입·롤 순서정렬과 등록여부를 가진다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManage.java",
+            "line": 39,
+            "snippet": "\tprivate String authorCode;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManage.java",
+            "line": 43,
+            "snippet": "\tprivate String roleCode;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManage.java",
+            "line": 67,
+            "snippet": "\tprivate String regYn;"
+          }
+        ]
+      },
+      {
+        "text": "권한 목록: 검색조건에 따라 조회된 권한들의 묶음으로 관리 화면에 표시된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+            "line": 30,
+            "snippet": "\tList<AuthorManageVO> authorManageList;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+            "line": 58,
+            "snippet": "\tpublic List<AuthorManageVO> selectAuthorList(AuthorManageVO authorManageVO) throws Exception;"
+          }
+        ]
+      },
+      {
+        "text": "권한 롤 목록: 특정 권한에 할당된 롤 관계정보들의 묶음이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManageVO.java",
+            "line": 30,
+            "snippet": "\tList<AuthorRoleManageVO> authorRoleList;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+            "line": 31,
+            "snippet": "\tpublic List<AuthorRoleManageVO> selectAuthorRoleList(AuthorRoleManageVO authorRoleManageVO) throws Exception;"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "권한 등록과 수정은 입력항목 정합성 검증을 통과해야만 데이터베이스에 반영되며, 검증에 실패하면 입력 화면으로 되돌아간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 137,
+            "snippet": "\t\tif (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 140,
+            "snippet": "\t\t\tegovAuthorManageService.insertAuthor(authorManage);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 166,
+            "snippet": "\t\t\tegovAuthorManageService.updateAuthor(authorManage);"
+          }
+        ]
+      },
+      {
+        "text": "권한 롤 할당은 등록여부가 Y인 롤만 기존 관계를 지운 뒤 다시 등록하고, Y가 아니면 관계를 삭제만 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+            "line": 139,
+            "snippet": "\t    \t\tif(strRegYns[i].equals(\"Y\")){"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+            "line": 141,
+            "snippet": "\t    \t\t\tegovAuthorRoleManageService.insertAuthorRole(authorRoleManage);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+            "line": 143,
+            "snippet": "\t    \t\t\tegovAuthorRoleManageService.deleteAuthorRole(authorRoleManage);"
+          }
+        ]
+      },
+      {
+        "text": "롤코드 목록이나 등록여부 목록이 비어 있는 롤 할당 요청은 실패 안내 메시지와 함께 목록 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+            "line": 126,
+            "snippet": "\t\tif (ObjectUtils.isEmpty(roleCodes) || ObjectUtils.isEmpty(regYns)) {"
+          }
+        ]
+      },
+      {
+        "text": "권한 롤 관계는 수정 계약을 두지 않고 삭제 후 등록으로 갱신한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+            "line": 38,
+            "snippet": "\tpublic void insertAuthorRole(AuthorRoleManage authorRoleManage) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+            "line": 45,
+            "snippet": "\tpublic void deleteAuthorRole(AuthorRoleManage authorRoleManage) throws Exception;"
+          }
+        ]
+      },
+      {
+        "text": "롤 할당이 반영되면 운영 중인 인증 방식 설정값에 따라 롤 매핑 정보를 다시 읽어들여 즉시 반영한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+            "line": 148,
+            "snippet": "    \tif (\"security\".equals(EgovProperties.getProperty(\"Globals.Auth\").trim())) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 72,
+            "snippet": "\tpublic static String getProperty(String keyName) {"
+          }
+        ]
+      },
+      {
+        "text": "권한 등록·수정 처리가 끝나면 검색조건과 검색어, 페이지 번호를 유지한 채 권한 목록 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 147,
+            "snippet": "\t\t\treturn \"redirect:/sec/ram/EgovAuthorList.do\";"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "처리 결과 안내 문구는 공통 메시지 자원에서 메시지 코드로 조회해 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "\tpublic String getMessage(String code) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 53,
+            "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+          }
+        ]
+      },
+      {
+        "text": "인증 방식 등 전역 환경설정 값은 공통 환경설정 조회 기능을 통해 읽어온다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 72,
+            "snippet": "\tpublic static String getProperty(String keyName) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 64,
+            "snippet": "\tpublic static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+          }
+        ]
+      },
+      {
+        "text": "화면 입력값의 위험 문자 제거와 문자열 가공은 공통 보안·문자열 처리 도구를 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 26,
+            "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 47,
+            "snippet": "\tpublic static final String EMPTY = \"\";"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "권한 관리",
+        "nodes": [
+          {
+            "id": "p1_start",
+            "kind": "start",
+            "label": "권한 관리 시작"
+          },
+          {
+            "id": "p1_list",
+            "kind": "activity",
+            "label": "권한 목록 조회",
+            "flowRef": "flow:ANY /sec/ram/EgovAuthorList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+                "line": 65,
+                "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p1_choice",
+            "kind": "decision",
+            "label": "수행할 작업 선택",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+                "line": 119,
+                "snippet": "@RequestMapping(\"/sec/ram/EgovAuthorInsertView.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+                "line": 102,
+                "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p1_insview",
+            "kind": "activity",
+            "label": "권한 등록화면 이동",
+            "flowRef": "flow:ANY /sec/ram/EgovAuthorInsertView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+                "line": 119,
+                "snippet": "@RequestMapping(\"/sec/ram/EgovAuthorInsertView.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p1_detail",
+            "kind": "activity",
+            "label": "권한 세부정보 조회",
+            "flowRef": "flow:ANY /sec/ram/EgovAuthor.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+                "line": 102,
+                "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p1_valid",
+            "kind": "decision",
+            "label": "입력항목 정합성 확인",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+                "line": 137,
+                "snippet": "\t\tif (bindingResult.hasErrors()) {"
+              }
+            ]
+          },
+          {
+            "id": "p1_insert",
+            "kind": "activity",
+            "label": "권한 등록",
+            "flowRef": "flow:ANY /sec/ram/EgovAuthorInsert.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+                "line": 132,
+                "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorInsert.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+                "line": 140,
+                "snippet": "\t\t\tegovAuthorManageService.insertAuthor(authorManage);"
+              }
+            ]
+          },
+          {
+            "id": "p1_update",
+            "kind": "activity",
+            "label": "권한 수정",
+            "flowRef": "flow:ANY /sec/ram/EgovAuthorUpdate.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+                "line": 158,
+                "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorUpdate.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+                "line": 166,
+                "snippet": "\t\t\tegovAuthorManageService.updateAuthor(authorManage);"
+              }
+            ]
+          },
+          {
+            "id": "p1_delete",
+            "kind": "activity",
+            "label": "권한 삭제",
+            "flowRef": "flow:ANY /sec/ram/EgovAuthorDelete.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+                "line": 183,
+                "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorDelete.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p1_listdel",
+            "kind": "activity",
+            "label": "권한 목록 일괄 삭제",
+            "flowRef": "flow:ANY /sec/ram/EgovAuthorListDelete.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+                "line": 203,
+                "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorListDelete.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p1_back",
+            "kind": "activity",
+            "label": "입력 화면으로 되돌림",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+                "line": 137,
+                "snippet": "\t\tif (bindingResult.hasErrors()) {"
+              }
+            ]
+          },
+          {
+            "id": "p1_end",
+            "kind": "end",
+            "label": "권한 목록으로 복귀"
+          }
+        ],
+        "edges": [
+          {
+            "from": "p1_start",
+            "to": "p1_list"
+          },
+          {
+            "from": "p1_list",
+            "to": "p1_choice"
+          },
+          {
+            "from": "p1_choice",
+            "to": "p1_insview",
+            "label": "신규 등록"
+          },
+          {
+            "from": "p1_choice",
+            "to": "p1_detail",
+            "label": "기존 권한 선택"
+          },
+          {
+            "from": "p1_choice",
+            "to": "p1_listdel",
+            "label": "일괄 삭제"
+          },
+          {
+            "from": "p1_insview",
+            "to": "p1_valid"
+          },
+          {
+            "from": "p1_detail",
+            "to": "p1_valid"
+          },
+          {
+            "from": "p1_detail",
+            "to": "p1_delete",
+            "label": "삭제 선택"
+          },
+          {
+            "from": "p1_valid",
+            "to": "p1_insert",
+            "label": "검증 통과(신규)"
+          },
+          {
+            "from": "p1_valid",
+            "to": "p1_update",
+            "label": "검증 통과(수정)"
+          },
+          {
+            "from": "p1_valid",
+            "to": "p1_back",
+            "label": "검증 실패"
+          },
+          {
+            "from": "p1_back",
+            "to": "p1_end"
+          },
+          {
+            "from": "p1_insert",
+            "to": "p1_end"
+          },
+          {
+            "from": "p1_update",
+            "to": "p1_end"
+          },
+          {
+            "from": "p1_delete",
+            "to": "p1_end"
+          },
+          {
+            "from": "p1_listdel",
+            "to": "p1_end"
+          }
+        ]
+      },
+      {
+        "title": "권한 롤 할당 관리",
+        "nodes": [
+          {
+            "id": "p2_start",
+            "kind": "start",
+            "label": "롤 할당 시작"
+          },
+          {
+            "id": "p2_view",
+            "kind": "activity",
+            "label": "권한 롤 목록 화면 이동",
+            "flowRef": "flow:ANY /sec/ram/EgovAuthorRoleListView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+                "line": 70,
+                "snippet": "@RequestMapping(\"/sec/ram/EgovAuthorRoleListView.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p2_list",
+            "kind": "activity",
+            "label": "권한 롤 목록 조회",
+            "flowRef": "flow:ANY /sec/ram/EgovAuthorRoleList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+                "line": 82,
+                "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p2_submit",
+            "kind": "activity",
+            "label": "롤 할당 등록 요청",
+            "flowRef": "flow:ANY /sec/ram/EgovAuthorRoleInsert.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+                "line": 118,
+                "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleInsert.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p2_empty",
+            "kind": "decision",
+            "label": "롤 선택값 존재 확인",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+                "line": 126,
+                "snippet": "\t\tif (ObjectUtils.isEmpty(roleCodes) || ObjectUtils.isEmpty(regYns)) {"
+              }
+            ]
+          },
+          {
+            "id": "p2_fail",
+            "kind": "activity",
+            "label": "실패 안내 후 목록 복귀",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+                "line": 126,
+                "snippet": "\t\tif (ObjectUtils.isEmpty(roleCodes) || ObjectUtils.isEmpty(regYns)) {"
+              }
+            ]
+          },
+          {
+            "id": "p2_regyn",
+            "kind": "decision",
+            "label": "롤 등록여부 확인",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+                "line": 139,
+                "snippet": "\t    \t\tif(strRegYns[i].equals(\"Y\")){"
+              }
+            ]
+          },
+          {
+            "id": "p2_reg",
+            "kind": "activity",
+            "label": "기존 관계 삭제 후 재등록",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+                "line": 141,
+                "snippet": "\t    \t\t\tegovAuthorRoleManageService.insertAuthorRole(authorRoleManage);"
+              }
+            ]
+          },
+          {
+            "id": "p2_del",
+            "kind": "activity",
+            "label": "롤 관계 해제",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+                "line": 143,
+                "snippet": "\t    \t\t\tegovAuthorRoleManageService.deleteAuthorRole(authorRoleManage);"
+              }
+            ]
+          },
+          {
+            "id": "p2_reload",
+            "kind": "activity",
+            "label": "롤 매핑 재적재",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+                "line": 148,
+                "snippet": "    \tif (\"security\".equals(EgovProperties.getProperty(\"Globals.Auth\").trim())) {"
+              }
+            ]
+          },
+          {
+            "id": "p2_end",
+            "kind": "end",
+            "label": "롤 목록으로 복귀"
+          }
+        ],
+        "edges": [
+          {
+            "from": "p2_start",
+            "to": "p2_view"
+          },
+          {
+            "from": "p2_view",
+            "to": "p2_list"
+          },
+          {
+            "from": "p2_list",
+            "to": "p2_submit"
+          },
+          {
+            "from": "p2_submit",
+            "to": "p2_empty"
+          },
+          {
+            "from": "p2_empty",
+            "to": "p2_fail",
+            "label": "선택값 없음"
+          },
+          {
+            "from": "p2_empty",
+            "to": "p2_regyn",
+            "label": "선택값 있음"
+          },
+          {
+            "from": "p2_regyn",
+            "to": "p2_reg",
+            "label": "등록여부 Y"
+          },
+          {
+            "from": "p2_regyn",
+            "to": "p2_del",
+            "label": "등록여부 N"
+          },
+          {
+            "from": "p2_reg",
+            "to": "p2_reload"
+          },
+          {
+            "from": "p2_del",
+            "to": "p2_reload"
+          },
+          {
+            "from": "p2_reload",
+            "to": "p2_end"
+          },
+          {
+            "from": "p2_fail",
+            "to": "p2_end"
+          }
+        ]
+      },
+      {
+        "title": "접근 거부 처리",
+        "nodes": [
+          {
+            "id": "p3_start",
+            "kind": "start",
+            "label": "보호 기능 접근"
+          },
+          {
+            "id": "p3_denied",
+            "kind": "activity",
+            "label": "접근 거부 안내 표시",
+            "flowRef": "flow:ANY /sec/ram/accessDenied.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+                "line": 232,
+                "snippet": "@RequestMapping(\"/sec/ram/accessDenied.do\")"
+              }
+            ]
+          },
+          {
+            "id": "p3_end",
+            "kind": "end",
+            "label": "안내 화면 종료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "p3_start",
+            "to": "p3_denied"
+          },
+          {
+            "from": "p3_denied",
+            "to": "p3_end"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthor.do",
+      "name": "권한 세부정보 조회",
+      "summary": {
+        "text": "운영자가 목록에서 권한코드를 선택하면 해당 권한의 세부정보를 조회해 수정 화면에 표시하고 조회 성공 안내 메시지를 함께 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 102,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 109,
+            "snippet": "    \tmodel.addAttribute(\"authorManage\", egovAuthorManageService.selectAuthor(authorManageVO));"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorDelete.do",
+      "name": "권한 삭제",
+      "summary": {
+        "text": "운영자가 선택한 권한 한 건의 삭제를 요청하면 권한 관리 서비스가 해당 권한정보를 데이터베이스에서 제거하고 목록 화면으로 돌아간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 183,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorDelete.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+            "line": 36,
+            "snippet": "\tpublic void deleteAuthor(AuthorManage authorManage) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorInsert.do",
+      "name": "권한 등록",
+      "summary": {
+        "text": "운영자가 입력한 신규 권한정보를 입력항목 정합성 검증 후 저장하고, 성공 시 검색조건을 유지한 채 권한 목록 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 132,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorInsert.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 137,
+            "snippet": "\t\tif (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 140,
+            "snippet": "\t\t\tegovAuthorManageService.insertAuthor(authorManage);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 147,
+            "snippet": "\t\t\treturn \"redirect:/sec/ram/EgovAuthorList.do\";"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorInsertView.do",
+      "name": "권한 등록화면 이동",
+      "summary": {
+        "text": "권한 등록에 필요한 입력 화면을 열어 빈 권한정보 입력 폼을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 119,
+            "snippet": "@RequestMapping(\"/sec/ram/EgovAuthorInsertView.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorList.do",
+      "name": "권한 목록 조회",
+      "summary": {
+        "text": "검색조건과 검색어, 페이지 번호를 받아 등록된 권한 목록을 조회해 관리 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 65,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+            "line": 58,
+            "snippet": "\tpublic List<AuthorManageVO> selectAuthorList(AuthorManageVO authorManageVO) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorListDelete.do",
+      "name": "권한 목록 일괄 삭제",
+      "summary": {
+        "text": "운영자가 목록에서 여러 권한을 선택해 일괄 삭제를 요청하면 선택된 권한들을 차례로 삭제한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 203,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorListDelete.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+            "line": 36,
+            "snippet": "\tpublic void deleteAuthor(AuthorManage authorManage) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorRoleInsert.do",
+      "name": "권한 롤 할당 등록",
+      "summary": {
+        "text": "특정 권한에 롤 목록을 할당한다. 등록여부가 Y인 롤만 기존 관계를 지운 뒤 다시 등록하고 나머지는 해제하며, 반영 후 운영 중인 인증 방식에 따라 롤 매핑 정보를 다시 읽어들인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+            "line": 118,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleInsert.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+            "line": 139,
+            "snippet": "\t    \t\tif(strRegYns[i].equals(\"Y\")){"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+            "line": 141,
+            "snippet": "\t    \t\t\tegovAuthorRoleManageService.insertAuthorRole(authorRoleManage);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+            "line": 148,
+            "snippet": "    \tif (\"security\".equals(EgovProperties.getProperty(\"Globals.Auth\").trim())) {"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorRoleList.do",
+      "name": "권한 롤 목록 조회",
+      "summary": {
+        "text": "선택한 권한에 할당된 롤 관계정보 목록을 조회해 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+            "line": 82,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+            "line": 31,
+            "snippet": "\tpublic List<AuthorRoleManageVO> selectAuthorRoleList(AuthorRoleManageVO authorRoleManageVO) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorRoleListView.do",
+      "name": "권한 롤 목록 화면 이동",
+      "summary": {
+        "text": "권한별 롤 할당 현황을 확인할 수 있는 목록 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+            "line": 70,
+            "snippet": "@RequestMapping(\"/sec/ram/EgovAuthorRoleListView.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorUpdate.do",
+      "name": "권한 수정",
+      "summary": {
+        "text": "화면에서 수정한 권한정보를 입력항목 정합성 검증 후 데이터베이스에 반영하고 권한 목록 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 158,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorUpdate.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 137,
+            "snippet": "\t\tif (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 166,
+            "snippet": "\t\t\tegovAuthorManageService.updateAuthor(authorManage);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/accessDenied.do",
+      "name": "접근 거부 안내",
+      "summary": {
+        "text": "권한이 없는 사용자가 보호된 기능에 접근했을 때 접근 거부 안내 화면을 보여준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 232,
+            "snippet": "@RequestMapping(\"/sec/ram/accessDenied.do\")"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthor.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "권한 세부정보 조회 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 세부정보 조회 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 로케일, 매개변수를 받아 재적재 가능한 메시지 자원에서 문구를 찾아 돌려준다. 로케일을 지정하지 않으면 시스템 기본 로케일을 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthor.do:src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+      "name": "권한 조회 결과 구조",
+      "summary": {
+        "text": "권한 세부정보 조회 처리에서 조회된 권한 목록을 담아 화면으로 전달하는 데이터 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+            "line": 26,
+            "snippet": "public class AuthorManageVO extends AuthorManage {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 세부정보 조회 처리에서 조회된 권한 목록을 담아 화면으로 전달하는 데이터 구조이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+              "line": 26,
+              "snippet": "public class AuthorManageVO extends AuthorManage {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "권한 정보 구조를 확장하여 검색조건을 그대로 이어받고, 조회 결과인 권한 목록을 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+              "line": 30,
+              "snippet": "\tList<AuthorManageVO> authorManageList;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthor.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "name": "권한 관리 서비스",
+      "summary": {
+        "text": "권한 세부정보 조회 처리에서 권한정보의 조회·등록·수정·삭제 업무를 조율하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovAuthorManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 세부정보 조회 처리에서 권한정보의 조회·등록·수정·삭제 업무를 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovAuthorManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "권한 목록 조회와 개별 권한 조회, 권한 등록·수정·삭제 업무를 각각의 계약으로 나누어 제공한다. 등록·수정은 입력항목 정합성을 확인한 뒤 데이터베이스에 반영하는 것을 원칙으로 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 43,
+              "snippet": "\tpublic void insertAuthor(AuthorManage authorManage) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 50,
+              "snippet": "\tpublic AuthorManageVO selectAuthor(AuthorManageVO authorManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 65,
+              "snippet": "\tpublic void updateAuthor(AuthorManage authorManage) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthor.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "name": "권한 관리 요청 접수",
+      "summary": {
+        "text": "권한 관리 화면에서 들어온 권한 세부정보 조회 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 102,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 관리 화면에서 들어온 권한 세부정보 조회 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 102,
+              "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터로 권한코드와 검색조건, 페이지 번호를 받는다. 등록·수정 요청은 입력값 정합성 검증에 실패하면 입력 화면으로 되돌리고, 검증을 통과한 경우에만 서비스 처리를 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 137,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 140,
+              "snippet": "\t\t\tegovAuthorManageService.insertAuthor(authorManage);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "권한 삭제 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 삭제 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 로케일, 매개변수를 받아 재적재 가능한 메시지 자원에서 문구를 찾아 돌려준다. 로케일을 지정하지 않으면 시스템 기본 로케일을 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorDelete.do:src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+      "name": "권한 정보 구조",
+      "summary": {
+        "text": "권한 삭제 처리에서 화면과 서비스 사이를 오가는 권한 한 건의 정보를 담는 데이터 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+            "line": 29,
+            "snippet": "public class AuthorManage extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 삭제 처리에서 화면과 서비스 사이를 오가는 권한 한 건의 정보를 담는 데이터 구조이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 29,
+              "snippet": "public class AuthorManage extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "권한코드와 권한 명은 필수 입력이며 각각 최대 30자, 60자로 제한된다. 권한코드설명은 최대 200자이고 권한등록일자를 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 43,
+              "snippet": "\t@Size(max=30)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 44,
+              "snippet": "\tprivate String authorCode;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 63,
+              "snippet": "\tprivate String authorNm;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorDelete.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "name": "권한 관리 서비스",
+      "summary": {
+        "text": "권한 삭제 처리에서 권한정보의 조회·등록·수정·삭제 업무를 조율하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovAuthorManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 삭제 처리에서 권한정보의 조회·등록·수정·삭제 업무를 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovAuthorManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "권한 목록 조회와 개별 권한 조회, 권한 등록·수정·삭제 업무를 각각의 계약으로 나누어 제공한다. 등록·수정은 입력항목 정합성을 확인한 뒤 데이터베이스에 반영하는 것을 원칙으로 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 43,
+              "snippet": "\tpublic void insertAuthor(AuthorManage authorManage) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 50,
+              "snippet": "\tpublic AuthorManageVO selectAuthor(AuthorManageVO authorManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 65,
+              "snippet": "\tpublic void updateAuthor(AuthorManage authorManage) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorDelete.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "name": "권한 관리 요청 접수",
+      "summary": {
+        "text": "권한 관리 화면에서 들어온 권한 삭제 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 102,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 관리 화면에서 들어온 권한 삭제 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 102,
+              "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터로 권한코드와 검색조건, 페이지 번호를 받는다. 등록·수정 요청은 입력값 정합성 검증에 실패하면 입력 화면으로 되돌리고, 검증을 통과한 경우에만 서비스 처리를 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 137,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 140,
+              "snippet": "\t\t\tegovAuthorManageService.insertAuthor(authorManage);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorInsert.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "권한 등록 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 등록 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 로케일, 매개변수를 받아 재적재 가능한 메시지 자원에서 문구를 찾아 돌려준다. 로케일을 지정하지 않으면 시스템 기본 로케일을 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorInsert.do:src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+      "name": "권한 정보 구조",
+      "summary": {
+        "text": "권한 등록 처리에서 화면과 서비스 사이를 오가는 권한 한 건의 정보를 담는 데이터 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+            "line": 29,
+            "snippet": "public class AuthorManage extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 등록 처리에서 화면과 서비스 사이를 오가는 권한 한 건의 정보를 담는 데이터 구조이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 29,
+              "snippet": "public class AuthorManage extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "권한코드와 권한 명은 필수 입력이며 각각 최대 30자, 60자로 제한된다. 권한코드설명은 최대 200자이고 권한등록일자를 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 43,
+              "snippet": "\t@Size(max=30)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 44,
+              "snippet": "\tprivate String authorCode;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 63,
+              "snippet": "\tprivate String authorNm;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorInsert.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "name": "권한 관리 서비스",
+      "summary": {
+        "text": "권한 등록 처리에서 권한정보의 조회·등록·수정·삭제 업무를 조율하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovAuthorManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 등록 처리에서 권한정보의 조회·등록·수정·삭제 업무를 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovAuthorManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "권한 목록 조회와 개별 권한 조회, 권한 등록·수정·삭제 업무를 각각의 계약으로 나누어 제공한다. 등록·수정은 입력항목 정합성을 확인한 뒤 데이터베이스에 반영하는 것을 원칙으로 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 43,
+              "snippet": "\tpublic void insertAuthor(AuthorManage authorManage) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 50,
+              "snippet": "\tpublic AuthorManageVO selectAuthor(AuthorManageVO authorManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 65,
+              "snippet": "\tpublic void updateAuthor(AuthorManage authorManage) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorInsert.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "name": "권한 관리 요청 접수",
+      "summary": {
+        "text": "권한 관리 화면에서 들어온 권한 등록 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 102,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 관리 화면에서 들어온 권한 등록 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 102,
+              "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터로 권한코드와 검색조건, 페이지 번호를 받는다. 등록·수정 요청은 입력값 정합성 검증에 실패하면 입력 화면으로 되돌리고, 검증을 통과한 경우에만 서비스 처리를 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 137,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 140,
+              "snippet": "\t\t\tegovAuthorManageService.insertAuthor(authorManage);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorInsertView.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "name": "권한 관리 요청 접수",
+      "summary": {
+        "text": "권한 관리 화면에서 들어온 권한 등록화면 이동 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 102,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 관리 화면에서 들어온 권한 등록화면 이동 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 102,
+              "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터로 권한코드와 검색조건, 페이지 번호를 받는다. 등록·수정 요청은 입력값 정합성 검증에 실패하면 입력 화면으로 되돌리고, 검증을 통과한 경우에만 서비스 처리를 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 137,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 140,
+              "snippet": "\t\t\tegovAuthorManageService.insertAuthor(authorManage);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "권한 목록 조회 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 목록 조회 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 로케일, 매개변수를 받아 재적재 가능한 메시지 자원에서 문구를 찾아 돌려준다. 로케일을 지정하지 않으면 시스템 기본 로케일을 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorList.do:src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+      "name": "권한 조회 결과 구조",
+      "summary": {
+        "text": "권한 목록 조회 처리에서 조회된 권한 목록을 담아 화면으로 전달하는 데이터 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+            "line": 26,
+            "snippet": "public class AuthorManageVO extends AuthorManage {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 목록 조회 처리에서 조회된 권한 목록을 담아 화면으로 전달하는 데이터 구조이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+              "line": 26,
+              "snippet": "public class AuthorManageVO extends AuthorManage {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "권한 정보 구조를 확장하여 검색조건을 그대로 이어받고, 조회 결과인 권한 목록을 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+              "line": 30,
+              "snippet": "\tList<AuthorManageVO> authorManageList;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorList.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "name": "권한 관리 서비스",
+      "summary": {
+        "text": "권한 목록 조회 처리에서 권한정보의 조회·등록·수정·삭제 업무를 조율하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovAuthorManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 목록 조회 처리에서 권한정보의 조회·등록·수정·삭제 업무를 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovAuthorManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "권한 목록 조회와 개별 권한 조회, 권한 등록·수정·삭제 업무를 각각의 계약으로 나누어 제공한다. 등록·수정은 입력항목 정합성을 확인한 뒤 데이터베이스에 반영하는 것을 원칙으로 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 43,
+              "snippet": "\tpublic void insertAuthor(AuthorManage authorManage) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 50,
+              "snippet": "\tpublic AuthorManageVO selectAuthor(AuthorManageVO authorManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 65,
+              "snippet": "\tpublic void updateAuthor(AuthorManage authorManage) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorList.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "name": "권한 관리 요청 접수",
+      "summary": {
+        "text": "권한 관리 화면에서 들어온 권한 목록 조회 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 102,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 관리 화면에서 들어온 권한 목록 조회 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 102,
+              "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터로 권한코드와 검색조건, 페이지 번호를 받는다. 등록·수정 요청은 입력값 정합성 검증에 실패하면 입력 화면으로 되돌리고, 검증을 통과한 경우에만 서비스 처리를 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 137,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 140,
+              "snippet": "\t\t\tegovAuthorManageService.insertAuthor(authorManage);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorListDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "권한 목록 일괄 삭제 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 목록 일괄 삭제 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 로케일, 매개변수를 받아 재적재 가능한 메시지 자원에서 문구를 찾아 돌려준다. 로케일을 지정하지 않으면 시스템 기본 로케일을 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorListDelete.do:src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+      "name": "권한 정보 구조",
+      "summary": {
+        "text": "권한 목록 일괄 삭제 처리에서 화면과 서비스 사이를 오가는 권한 한 건의 정보를 담는 데이터 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+            "line": 29,
+            "snippet": "public class AuthorManage extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 목록 일괄 삭제 처리에서 화면과 서비스 사이를 오가는 권한 한 건의 정보를 담는 데이터 구조이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 29,
+              "snippet": "public class AuthorManage extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "권한코드와 권한 명은 필수 입력이며 각각 최대 30자, 60자로 제한된다. 권한코드설명은 최대 200자이고 권한등록일자를 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 43,
+              "snippet": "\t@Size(max=30)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 44,
+              "snippet": "\tprivate String authorCode;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 63,
+              "snippet": "\tprivate String authorNm;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorListDelete.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "name": "권한 관리 서비스",
+      "summary": {
+        "text": "권한 목록 일괄 삭제 처리에서 권한정보의 조회·등록·수정·삭제 업무를 조율하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovAuthorManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 목록 일괄 삭제 처리에서 권한정보의 조회·등록·수정·삭제 업무를 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovAuthorManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "권한 목록 조회와 개별 권한 조회, 권한 등록·수정·삭제 업무를 각각의 계약으로 나누어 제공한다. 등록·수정은 입력항목 정합성을 확인한 뒤 데이터베이스에 반영하는 것을 원칙으로 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 43,
+              "snippet": "\tpublic void insertAuthor(AuthorManage authorManage) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 50,
+              "snippet": "\tpublic AuthorManageVO selectAuthor(AuthorManageVO authorManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 65,
+              "snippet": "\tpublic void updateAuthor(AuthorManage authorManage) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorListDelete.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "name": "권한 관리 요청 접수",
+      "summary": {
+        "text": "권한 관리 화면에서 들어온 권한 목록 일괄 삭제 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 102,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 관리 화면에서 들어온 권한 목록 일괄 삭제 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 102,
+              "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터로 권한코드와 검색조건, 페이지 번호를 받는다. 등록·수정 요청은 입력값 정합성 검증에 실패하면 입력 화면으로 되돌리고, 검증을 통과한 경우에만 서비스 처리를 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 137,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 140,
+              "snippet": "\t\t\tegovAuthorManageService.insertAuthor(authorManage);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "권한 롤 할당 등록 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 롤 할당 등록 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 로케일, 매개변수를 받아 재적재 가능한 메시지 자원에서 문구를 찾아 돌려준다. 로케일을 지정하지 않으면 시스템 기본 로케일을 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "웹 입력값 보안 처리",
+      "summary": {
+        "text": "권한 롤 할당 등록 처리에서 화면으로부터 들어온 입력값의 위험 문자를 걸러내는 보안 처리 도구이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 롤 할당 등록 처리에서 화면으로부터 들어온 입력값의 위험 문자를 걸러내는 보안 처리 도구이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "입력 문자열의 꺾쇠·따옴표·앰퍼샌드 등 위험 문자를 표시용 문자로 치환하고, 파일 경로에서 상위 경로 이동 표기를 제거하는 처리를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 26,
+              "snippet": "\tpublic static String clearXSSMinimum(String value) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "name": "인증 방식 환경설정 조회",
+      "summary": {
+        "text": "권한 롤 할당 등록 처리에서 운영 중인 인증 방식 등 전역 환경설정 값을 키로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 롤 할당 등록 처리에서 운영 중인 인증 방식 등 전역 환경설정 값을 키로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "전역 설정 파일의 위치를 상대경로 기준으로 조합해 두고, 키 이름으로 설정값을 찾아 문자열로 돌려준다. 롤 할당 후 재적재 대상을 고르는 판단에 이 설정값이 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 64,
+              "snippet": "\tpublic static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "\tpublic static String getProperty(String keyName) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/sec/ram/service/AuthorRoleManage.java",
+      "name": "권한 롤 정보 구조",
+      "summary": {
+        "text": "권한 롤 할당 등록 처리에서 권한과 롤의 관계 한 건을 담는 데이터 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManage.java",
+            "line": 26,
+            "snippet": "public class AuthorRoleManage extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 롤 할당 등록 처리에서 권한과 롤의 관계 한 건을 담는 데이터 구조이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManage.java",
+              "line": 26,
+              "snippet": "public class AuthorRoleManage extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "권한코드와 롤코드로 관계를 식별하고, 롤명·롤 패턴·롤 설명·롤 타입·롤 순서정렬과 등록여부, 등록일자를 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManage.java",
+              "line": 39,
+              "snippet": "\tprivate String authorCode;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManage.java",
+              "line": 43,
+              "snippet": "\tprivate String roleCode;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManage.java",
+              "line": 67,
+              "snippet": "\tprivate String regYn;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+      "name": "권한 롤 관리 서비스",
+      "summary": {
+        "text": "권한 롤 할당 등록 처리에서 권한과 롤의 관계정보를 조회·등록·삭제하는 업무를 담당하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+            "line": 23,
+            "snippet": "public interface EgovAuthorRoleManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 롤 할당 등록 처리에서 권한과 롤의 관계정보를 조회·등록·삭제하는 업무를 담당하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+              "line": 23,
+              "snippet": "public interface EgovAuthorRoleManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "권한 롤 관계정보 목록 조회, 관계 등록, 관계 삭제 업무를 제공한다. 수정 계약은 별도로 두지 않고 삭제 후 등록으로 갱신하는 방식이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+              "line": 31,
+              "snippet": "\tpublic List<AuthorRoleManageVO> selectAuthorRoleList(AuthorRoleManageVO authorRoleManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+              "line": 38,
+              "snippet": "\tpublic void insertAuthorRole(AuthorRoleManage authorRoleManage) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+              "line": 45,
+              "snippet": "\tpublic void deleteAuthorRole(AuthorRoleManage authorRoleManage) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+      "name": "권한 롤 요청 접수",
+      "summary": {
+        "text": "권한별 롤 할당 화면에서 들어온 권한 롤 할당 등록 요청을 받아 롤 관계정보 처리를 권한 롤 관리 서비스에 위임하고, 처리 후 롤 목록 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+            "line": 118,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleInsert.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한별 롤 할당 화면에서 들어온 권한 롤 할당 등록 요청을 받아 롤 관계정보 처리를 권한 롤 관리 서비스에 위임하고, 처리 후 롤 목록 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+              "line": 118,
+              "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleInsert.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "권한코드와 롤코드 목록, 등록여부 목록을 요청 파라미터로 받는다. 롤코드나 등록여부가 비어 있으면 실패 안내 메시지와 함께 목록으로 되돌리는 보안 점검 조치가 적용되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+              "line": 126,
+              "snippet": "\t\tif (ObjectUtils.isEmpty(roleCodes) || ObjectUtils.isEmpty(regYns)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+              "line": 166,
+              "snippet": "    \treturn \"redirect:/sec/ram/EgovAuthorRoleList.do?searchKeyword=\"+authorCode;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 도구",
+      "summary": {
+        "text": "권한 롤 할당 등록 처리에서 값의 빈 문자열 여부 확인과 자르기 등 공통 문자열 가공을 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 롤 할당 등록 처리에서 값의 빈 문자열 여부 확인과 자르기 등 공통 문자열 가공을 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 상수와 함께 지정 길이 초과 시 자르기, 널 여부 검증 등 공통 가공 기능을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "권한 롤 목록 조회 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 롤 목록 조회 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 로케일, 매개변수를 받아 재적재 가능한 메시지 자원에서 문구를 찾아 돌려준다. 로케일을 지정하지 않으면 시스템 기본 로케일을 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleList.do:src/main/java/egovframework/com/sec/ram/service/AuthorRoleManageVO.java",
+      "name": "권한 롤 목록 구조",
+      "summary": {
+        "text": "권한 롤 목록 조회 처리에서 조회된 권한 롤 관계 목록을 담아 화면으로 전달하는 데이터 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManageVO.java",
+            "line": 26,
+            "snippet": "public class AuthorRoleManageVO extends AuthorRoleManage {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 롤 목록 조회 처리에서 조회된 권한 롤 관계 목록을 담아 화면으로 전달하는 데이터 구조이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManageVO.java",
+              "line": 26,
+              "snippet": "public class AuthorRoleManageVO extends AuthorRoleManage {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "권한 롤 정보 구조를 확장하여 검색조건을 이어받고, 조회 결과인 롤 관계 목록을 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManageVO.java",
+              "line": 30,
+              "snippet": "\tList<AuthorRoleManageVO> authorRoleList;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleList.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+      "name": "권한 롤 관리 서비스",
+      "summary": {
+        "text": "권한 롤 목록 조회 처리에서 권한과 롤의 관계정보를 조회·등록·삭제하는 업무를 담당하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+            "line": 23,
+            "snippet": "public interface EgovAuthorRoleManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 롤 목록 조회 처리에서 권한과 롤의 관계정보를 조회·등록·삭제하는 업무를 담당하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+              "line": 23,
+              "snippet": "public interface EgovAuthorRoleManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "권한 롤 관계정보 목록 조회, 관계 등록, 관계 삭제 업무를 제공한다. 수정 계약은 별도로 두지 않고 삭제 후 등록으로 갱신하는 방식이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+              "line": 31,
+              "snippet": "\tpublic List<AuthorRoleManageVO> selectAuthorRoleList(AuthorRoleManageVO authorRoleManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+              "line": 38,
+              "snippet": "\tpublic void insertAuthorRole(AuthorRoleManage authorRoleManage) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+              "line": 45,
+              "snippet": "\tpublic void deleteAuthorRole(AuthorRoleManage authorRoleManage) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleList.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+      "name": "권한 롤 요청 접수",
+      "summary": {
+        "text": "권한별 롤 할당 화면에서 들어온 권한 롤 목록 조회 요청을 받아 롤 관계정보 처리를 권한 롤 관리 서비스에 위임하고, 처리 후 롤 목록 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+            "line": 118,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleInsert.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한별 롤 할당 화면에서 들어온 권한 롤 목록 조회 요청을 받아 롤 관계정보 처리를 권한 롤 관리 서비스에 위임하고, 처리 후 롤 목록 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+              "line": 118,
+              "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleInsert.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "권한코드와 롤코드 목록, 등록여부 목록을 요청 파라미터로 받는다. 롤코드나 등록여부가 비어 있으면 실패 안내 메시지와 함께 목록으로 되돌리는 보안 점검 조치가 적용되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+              "line": 126,
+              "snippet": "\t\tif (ObjectUtils.isEmpty(roleCodes) || ObjectUtils.isEmpty(regYns)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+              "line": 166,
+              "snippet": "    \treturn \"redirect:/sec/ram/EgovAuthorRoleList.do?searchKeyword=\"+authorCode;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleListView.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+      "name": "권한 롤 요청 접수",
+      "summary": {
+        "text": "권한별 롤 할당 화면에서 들어온 권한 롤 목록 화면 이동 요청을 받아 롤 관계정보 처리를 권한 롤 관리 서비스에 위임하고, 처리 후 롤 목록 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+            "line": 118,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleInsert.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한별 롤 할당 화면에서 들어온 권한 롤 목록 화면 이동 요청을 받아 롤 관계정보 처리를 권한 롤 관리 서비스에 위임하고, 처리 후 롤 목록 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+              "line": 118,
+              "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleInsert.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "권한코드와 롤코드 목록, 등록여부 목록을 요청 파라미터로 받는다. 롤코드나 등록여부가 비어 있으면 실패 안내 메시지와 함께 목록으로 되돌리는 보안 점검 조치가 적용되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+              "line": 126,
+              "snippet": "\t\tif (ObjectUtils.isEmpty(roleCodes) || ObjectUtils.isEmpty(regYns)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+              "line": 166,
+              "snippet": "    \treturn \"redirect:/sec/ram/EgovAuthorRoleList.do?searchKeyword=\"+authorCode;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorUpdate.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "권한 수정 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 수정 처리 결과를 사용자에게 알리기 위한 안내 메시지를 메시지 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 로케일, 매개변수를 받아 재적재 가능한 메시지 자원에서 문구를 찾아 돌려준다. 로케일을 지정하지 않으면 시스템 기본 로케일을 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorUpdate.do:src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+      "name": "권한 정보 구조",
+      "summary": {
+        "text": "권한 수정 처리에서 화면과 서비스 사이를 오가는 권한 한 건의 정보를 담는 데이터 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+            "line": 29,
+            "snippet": "public class AuthorManage extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 수정 처리에서 화면과 서비스 사이를 오가는 권한 한 건의 정보를 담는 데이터 구조이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 29,
+              "snippet": "public class AuthorManage extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "권한코드와 권한 명은 필수 입력이며 각각 최대 30자, 60자로 제한된다. 권한코드설명은 최대 200자이고 권한등록일자를 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 43,
+              "snippet": "\t@Size(max=30)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 44,
+              "snippet": "\tprivate String authorCode;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+              "line": 63,
+              "snippet": "\tprivate String authorNm;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorUpdate.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "name": "권한 관리 서비스",
+      "summary": {
+        "text": "권한 수정 처리에서 권한정보의 조회·등록·수정·삭제 업무를 조율하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovAuthorManageService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 수정 처리에서 권한정보의 조회·등록·수정·삭제 업무를 조율하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovAuthorManageService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "권한 목록 조회와 개별 권한 조회, 권한 등록·수정·삭제 업무를 각각의 계약으로 나누어 제공한다. 등록·수정은 입력항목 정합성을 확인한 뒤 데이터베이스에 반영하는 것을 원칙으로 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 43,
+              "snippet": "\tpublic void insertAuthor(AuthorManage authorManage) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 50,
+              "snippet": "\tpublic AuthorManageVO selectAuthor(AuthorManageVO authorManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+              "line": 65,
+              "snippet": "\tpublic void updateAuthor(AuthorManage authorManage) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorUpdate.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "name": "권한 관리 요청 접수",
+      "summary": {
+        "text": "권한 관리 화면에서 들어온 권한 수정 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 102,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 관리 화면에서 들어온 권한 수정 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 102,
+              "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터로 권한코드와 검색조건, 페이지 번호를 받는다. 등록·수정 요청은 입력값 정합성 검증에 실패하면 입력 화면으로 되돌리고, 검증을 통과한 경우에만 서비스 처리를 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 137,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 140,
+              "snippet": "\t\t\tegovAuthorManageService.insertAuthor(authorManage);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/accessDenied.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "name": "권한 관리 요청 접수",
+      "summary": {
+        "text": "권한 관리 화면에서 들어온 접근 거부 안내 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+            "line": 102,
+            "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "권한 관리 화면에서 들어온 접근 거부 안내 요청을 받아 권한 관리 서비스에 처리를 위임하고, 처리 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 102,
+              "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터로 권한코드와 검색조건, 페이지 번호를 받는다. 등록·수정 요청은 입력값 정합성 검증에 실패하면 입력 화면으로 되돌리고, 검증을 통과한 경우에만 서비스 처리를 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 137,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+              "line": 140,
+              "snippet": "\t\t\tegovAuthorManageService.insertAuthor(authorManage);"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

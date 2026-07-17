@@ -1,0 +1,2781 @@
+{
+ "schemaVersion": 1,
+ "chunkId": "uss.ion.lsi-000",
+ "domainId": "domain:uss.ion.lsi",
+ "header": {
+  "name": "로그인화면이미지 관리",
+  "summary": {
+   "text": "로그인 화면에 노출할 이미지를 관리자가 등록·조회·수정·삭제하고 특정 화면에 반영 여부를 관리하는 업무이다. 이미지 파일 저장은 공통 첨부파일 관리 기능에 위임한다.",
+   "citations": [
+    {
+     "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+     "line": 8,
+     "snippet": "* - 로그인화면이미지의 조회기능은 목록조회, 상세조회로 구분된다."
+    },
+    {
+     "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+     "line": 18,
+     "snippet": "public interface EgovLoginScrinImageService {"
+    },
+    {
+     "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+     "line": 90,
+     "snippet": "@RequestMapping(value = \"/uss/ion/lsi/selectLoginScrinImageList.do\")"
+    }
+   ]
+  },
+  "entities": [
+   {
+    "text": "로그인화면이미지 — 이미지 ID로 식별하며 이미지명, 로그인 이미지, 이미지 설명, 반영여부, 등록자 아이디, 등록일자를 가지는 이 업무의 중심 정보이다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+      "line": 40,
+      "snippet": "public class LoginScrinImageVO extends ComDefaultVO {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+      "line": 50,
+      "snippet": "private String imageId;"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+      "line": 57,
+      "snippet": "private String imageNm;"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+      "line": 73,
+      "snippet": "private String imageDc;"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+      "line": 78,
+      "snippet": "private String reflctAt;"
+     }
+    ]
+   },
+   {
+    "text": "첨부 이미지 파일 — 첨부파일 아이디로 묶이며 원파일명, 저장파일명, 파일확장자, 파일크기, 파일저장경로를 가지는 업로드 파일 정보이다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "line": 21,
+      "snippet": "public class FileVO extends ComDefaultVO {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "line": 26,
+      "snippet": "public String atchFileId = \"\";"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "line": 54,
+      "snippet": "public String orignlFileNm = \"\";"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "line": 58,
+      "snippet": "public String streFileNm = \"\";"
+     }
+    ]
+   },
+   {
+    "text": "로그인 사용자 — 인증된 관리자 정보로, 이 업무에서는 아이디가 로그인화면이미지의 등록자로 기록된다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "line": 33,
+      "snippet": "public class LoginVO implements Serializable{"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "line": 42,
+      "snippet": "private String id;"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 215,
+      "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+     }
+    ]
+   }
+  ],
+  "businessRules": [
+   {
+    "text": "이미지명과 로그인 이미지는 반드시 입력해야 하며, 이미지명은 10자를 넘을 수 없다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+      "line": 55,
+      "snippet": "@EgovNullCheck"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+      "line": 56,
+      "snippet": "@Size(max=10)"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+      "line": 62,
+      "snippet": "@EgovNullCheck"
+     }
+    ]
+   },
+   {
+    "text": "등록 요청의 입력값 검증에 실패하면 저장하지 않고 등록 화면을 다시 표시한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 160,
+      "snippet": "if (bindingResult.hasErrors()) {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 161,
+      "snippet": "return \"egovframework/com/uss/ion/lsi/EgovLoginScrinImageRegist\";"
+     }
+    ]
+   },
+   {
+    "text": "이미지 파일이 선택되지 않았거나 파일명이 비어 있으면 로그인 이미지와 첨부파일 아이디를 빈 값으로 두고 등록을 계속 진행한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 173,
+      "snippet": "if(!files.isEmpty()){"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 186,
+      "snippet": "if (hasFile) {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 206,
+      "snippet": "image = \"\";"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 211,
+      "snippet": "image = \"\";"
+     }
+    ]
+   },
+   {
+    "text": "파일 처리가 실패해 첨부파일 정보를 만들지 못하면 로그인 이미지와 첨부파일 아이디를 빈 값으로 되돌린다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 199,
+      "snippet": "if (vo == null) {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 201,
+      "snippet": "image = \"\";"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 202,
+      "snippet": "atchFileId = \"\";"
+     }
+    ]
+   },
+   {
+    "text": "등록 시 이미지 ID는 시스템이 자동 채번하고 등록자 아이디는 인증된 사용자에서 가져오되, 인증 정보가 없으면 빈 값으로 기록한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 217,
+      "snippet": "loginScrinImageVO.setImageId(egovLoginScrinImageIdGnrService.getNextStringId());"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 215,
+      "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 220,
+      "snippet": "loginScrinImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+     }
+    ]
+   },
+   {
+    "text": "로그인화면이미지의 조회 기능은 목록 조회와 상세 조회로 구분되며, 목록 조회는 총 건수 조회를 함께 제공한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+      "line": 8,
+      "snippet": "* - 로그인화면이미지의 조회기능은 목록조회, 상세조회로 구분된다."
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+      "line": 25,
+      "snippet": "public List<LoginScrinImageVO> selectLoginScrinImageList(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+      "line": 32,
+      "snippet": "public int selectLoginScrinImageListTotCnt(LoginScrinImageVO loginScrinImageVO) throws Exception ;"
+     }
+    ]
+   },
+   {
+    "text": "삭제는 로그인화면이미지 정보 삭제와 첨부 이미지 파일 삭제를 별도 작업으로 수행하며, 목록에서 선택한 여러 건을 일괄 삭제 대상으로 넘길 수 있다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+      "line": 57,
+      "snippet": "public void deleteLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+      "line": 63,
+      "snippet": "public void deleteLoginScrinImageFile(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+      "line": 103,
+      "snippet": "private String[] delYn;"
+     }
+    ]
+   }
+  ],
+  "crossDomainInteractions": [
+   {
+    "text": "공통 첨부파일 관리 업무에 이미지 파일 정보의 등록·수정·삭제·조회를 위임한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "line": 21,
+      "snippet": "public interface EgovFileMngService {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "line": 38,
+      "snippet": "public String insertFileInf(FileVO fvo) throws Exception;"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 188,
+      "snippet": "atchFileId = fileMngService.insertFileInfs(result);"
+     }
+    ]
+   },
+   {
+    "text": "공통 파일 업로드 처리를 통해 이미지 파일을 저장 경로에 저장하고 첨부파일 목록 정보를 넘겨받는다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "line": 60,
+      "snippet": "@Component(\"EgovFileMngUtil\")"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "line": 76,
+      "snippet": "public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 187,
+      "snippet": "result = fileUtil.parseFileInf(files, \"LSI_\", 0, \"\", uploadFolder);"
+     }
+    ]
+   },
+   {
+    "text": "인증 업무에서 현재 로그인한 사용자 정보를 가져와 등록자 아이디로 사용한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "line": 25,
+      "snippet": "public class EgovUserDetailsHelper {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "line": 41,
+      "snippet": "public static Object getAuthenticatedUser() {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 215,
+      "snippet": "LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+     }
+    ]
+   },
+   {
+    "text": "공통 메시지 업무에서 처리 결과 안내 문구를 메시지 코드로 조회한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "line": 26,
+      "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "line": 52,
+      "snippet": "public String getMessage(String code) {"
+     }
+    ]
+   },
+   {
+    "text": "공통 문자열 처리 업무를 이용해 값이 없을 수 있는 사용자 아이디를 안전한 문자열로 보정한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "line": 43,
+      "snippet": "public class EgovStringUtil {"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "line": 47,
+      "snippet": "public static final String EMPTY = \"\";"
+     },
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 220,
+      "snippet": "loginScrinImageVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+     }
+    ]
+   }
+  ],
+  "businessFlows": [
+   {
+    "title": "로그인화면이미지 관리",
+    "nodes": [
+     {
+      "id": "s",
+      "kind": "start",
+      "label": "관리자 이미지 관리 시작"
+     },
+     {
+      "id": "a1",
+      "kind": "activity",
+      "label": "이미지 목록 화면 열기",
+      "flowRef": "flow:ANY /uss/ion/lsi/selectLoginScrinImageListView.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+        "line": 78,
+        "snippet": "@RequestMapping(\"/uss/ion/lsi/selectLoginScrinImageListView.do\")"
+       }
+      ]
+     },
+     {
+      "id": "a2",
+      "kind": "activity",
+      "label": "이미지 목록 조회",
+      "flowRef": "flow:ANY /uss/ion/lsi/selectLoginScrinImageList.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+        "line": 90,
+        "snippet": "@RequestMapping(value = \"/uss/ion/lsi/selectLoginScrinImageList.do\")"
+       }
+      ]
+     },
+     {
+      "id": "a3",
+      "kind": "activity",
+      "label": "등록 화면 표시",
+      "flowRef": "flow:ANY /uss/ion/lsi/addViewLoginScrinImage.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+        "line": 142,
+        "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addViewLoginScrinImage.do\")"
+       }
+      ]
+     },
+     {
+      "id": "a4",
+      "kind": "activity",
+      "label": "이미지 등록 요청",
+      "flowRef": "flow:ANY /uss/ion/lsi/addLoginScrinImage.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+        "line": 153,
+        "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+       }
+      ]
+     },
+     {
+      "id": "d1",
+      "kind": "decision",
+      "label": "입력값 검증 통과 여부",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+        "line": 160,
+        "snippet": "if (bindingResult.hasErrors()) {"
+       }
+      ]
+     },
+     {
+      "id": "d2",
+      "kind": "decision",
+      "label": "첨부 이미지 파일 존재 여부",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+        "line": 186,
+        "snippet": "if (hasFile) {"
+       }
+      ]
+     },
+     {
+      "id": "a5",
+      "kind": "activity",
+      "label": "이미지 파일 저장",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+        "line": 187,
+        "snippet": "result = fileUtil.parseFileInf(files, \"LSI_\", 0, \"\", uploadFolder);"
+       },
+       {
+        "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+        "line": 188,
+        "snippet": "atchFileId = fileMngService.insertFileInfs(result);"
+       }
+      ]
+     },
+     {
+      "id": "a6",
+      "kind": "activity",
+      "label": "이미지 정보 저장",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+        "line": 217,
+        "snippet": "loginScrinImageVO.setImageId(egovLoginScrinImageIdGnrService.getNextStringId());"
+       },
+       {
+        "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+        "line": 218,
+        "snippet": "loginScrinImageVO.setImage(image);"
+       }
+      ]
+     },
+     {
+      "id": "a7",
+      "kind": "activity",
+      "label": "이미지 상세 조회",
+      "flowRef": "flow:ANY /uss/ion/lsi/getLoginScrinImage.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+        "line": 123,
+        "snippet": "@RequestMapping(value = \"/uss/ion/lsi/getLoginScrinImage.do\")"
+       }
+      ]
+     },
+     {
+      "id": "a8",
+      "kind": "activity",
+      "label": "이미지 정보 수정",
+      "flowRef": "flow:ANY /uss/ion/lsi/updtLoginScrinImage.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+        "line": 237,
+        "snippet": "@RequestMapping(value = \"/uss/ion/lsi/updtLoginScrinImage.do\")"
+       }
+      ]
+     },
+     {
+      "id": "a9",
+      "kind": "activity",
+      "label": "이미지 단건 삭제",
+      "flowRef": "flow:ANY /uss/ion/lsi/removeLoginScrinImage.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+        "line": 313,
+        "snippet": "@RequestMapping(value = \"/uss/ion/lsi/removeLoginScrinImage.do\")"
+       }
+      ]
+     },
+     {
+      "id": "a10",
+      "kind": "activity",
+      "label": "이미지 일괄 삭제",
+      "flowRef": "flow:ANY /uss/ion/lsi/removeLoginScrinImageList.do",
+      "citations": [
+       {
+        "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+        "line": 334,
+        "snippet": "@RequestMapping(value = \"/uss/ion/lsi/removeLoginScrinImageList.do\")"
+       }
+      ]
+     },
+     {
+      "id": "e",
+      "kind": "end",
+      "label": "관리 작업 완료"
+     }
+    ],
+    "edges": [
+     {
+      "from": "s",
+      "to": "a1"
+     },
+     {
+      "from": "a1",
+      "to": "a2"
+     },
+     {
+      "from": "a2",
+      "to": "a3"
+     },
+     {
+      "from": "a3",
+      "to": "a4"
+     },
+     {
+      "from": "a4",
+      "to": "d1"
+     },
+     {
+      "from": "d1",
+      "to": "a3",
+      "label": "검증 실패"
+     },
+     {
+      "from": "d1",
+      "to": "d2",
+      "label": "검증 통과"
+     },
+     {
+      "from": "d2",
+      "to": "a5",
+      "label": "파일 있음"
+     },
+     {
+      "from": "d2",
+      "to": "a6",
+      "label": "파일 없음"
+     },
+     {
+      "from": "a5",
+      "to": "a6"
+     },
+     {
+      "from": "a6",
+      "to": "e"
+     },
+     {
+      "from": "a2",
+      "to": "a7"
+     },
+     {
+      "from": "a7",
+      "to": "a8"
+     },
+     {
+      "from": "a8",
+      "to": "e"
+     },
+     {
+      "from": "a7",
+      "to": "a9"
+     },
+     {
+      "from": "a9",
+      "to": "e"
+     },
+     {
+      "from": "a2",
+      "to": "a10"
+     },
+     {
+      "from": "a10",
+      "to": "e"
+     }
+    ]
+   }
+  ]
+ },
+ "flows": [
+  {
+   "flowId": "flow:ANY /uss/ion/lsi/addLoginScrinImage.do",
+   "name": "로그인화면이미지 등록",
+   "summary": {
+    "text": "입력값 검증과 이미지 파일 업로드를 거쳐 로그인화면이미지 정보를 신규로 등록한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 153,
+      "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /uss/ion/lsi/addViewLoginScrinImage.do",
+   "name": "로그인화면이미지 등록 화면 열기",
+   "summary": {
+    "text": "로그인화면이미지를 새로 등록하기 위한 입력 화면을 반환한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 142,
+      "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addViewLoginScrinImage.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /uss/ion/lsi/getLoginScrinImage.do",
+   "name": "로그인화면이미지 상세 조회",
+   "summary": {
+    "text": "선택한 로그인화면이미지 한 건의 상세 정보를 조회해 상세 화면에 표시한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 123,
+      "snippet": "@RequestMapping(value = \"/uss/ion/lsi/getLoginScrinImage.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /uss/ion/lsi/removeLoginScrinImage.do",
+   "name": "로그인화면이미지 삭제",
+   "summary": {
+    "text": "선택한 로그인화면이미지 한 건과 관련 첨부 이미지 정보를 삭제한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 313,
+      "snippet": "@RequestMapping(value = \"/uss/ion/lsi/removeLoginScrinImage.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /uss/ion/lsi/removeLoginScrinImageList.do",
+   "name": "로그인화면이미지 일괄 삭제",
+   "summary": {
+    "text": "목록에서 선택한 여러 건의 로그인화면이미지를 한 번에 삭제한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 334,
+      "snippet": "@RequestMapping(value = \"/uss/ion/lsi/removeLoginScrinImageList.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /uss/ion/lsi/selectLoginScrinImageList.do",
+   "name": "로그인화면이미지 목록 조회",
+   "summary": {
+    "text": "등록된 로그인화면이미지 목록을 조회 조건과 페이지 기준으로 조회해 관리 목록에 표시한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 90,
+      "snippet": "@RequestMapping(value = \"/uss/ion/lsi/selectLoginScrinImageList.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /uss/ion/lsi/selectLoginScrinImageListView.do",
+   "name": "로그인화면이미지 목록 화면 열기",
+   "summary": {
+    "text": "관리자가 로그인화면이미지 관리 목록 화면을 요청하면 조회 조건 입력용 목록 화면을 반환한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 78,
+      "snippet": "@RequestMapping(\"/uss/ion/lsi/selectLoginScrinImageListView.do\")"
+     }
+    ]
+   }
+  },
+  {
+   "flowId": "flow:ANY /uss/ion/lsi/updtLoginScrinImage.do",
+   "name": "로그인화면이미지 수정",
+   "summary": {
+    "text": "기 등록된 로그인화면이미지의 이미지명·설명·반영여부와 첨부 이미지 파일을 수정한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 237,
+      "snippet": "@RequestMapping(value = \"/uss/ion/lsi/updtLoginScrinImage.do\")"
+     }
+    ]
+   }
+  }
+ ],
+ "steps": [
+  {
+   "stepId": "step:ANY /uss/ion/lsi/addLoginScrinImage.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+   "name": "로그인 사용자 정보",
+   "summary": {
+    "text": "인증된 사용자의 아이디 등 정보를 담아 로그인화면이미지의 등록자 아이디를 채우는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "line": 33,
+      "snippet": "public class LoginVO implements Serializable{"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "인증된 사용자 한 명의 정보를 담는 데이터 구조로, 이 흐름에서는 사용자 아이디를 꺼내 로그인화면이미지의 등록자로 기록하는 데 쓰인다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 33,
+       "snippet": "public class LoginVO implements Serializable{"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 42,
+       "snippet": "private String id;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "아이디·이름·이메일은 반드시 있어야 하고 이메일은 형식 검증을 받으며, 그 밖에 비밀번호와 힌트·정답, 사용자구분, 조직 아이디와 조직명, 고유아이디, 접속 아이피 등을 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 41,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 44,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 49,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 50,
+       "snippet": "@EgovEmailCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 61,
+       "snippet": "private String userSe;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 63,
+       "snippet": "private String orgnztId;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/addLoginScrinImage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+   "name": "공통 첨부파일 관리 서비스",
+   "summary": {
+    "text": "업로드된 로그인화면 이미지 파일의 정보를 등록·수정·삭제·조회하는 공통 첨부파일 기능을 제공한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "line": 21,
+      "snippet": "public interface EgovFileMngService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지에 첨부되는 이미지 파일의 속성과 상세 정보를 등록·수정·삭제·조회하는 공통 첨부파일 관리 기능으로, 이 도메인은 파일 저장 자체를 직접 구현하지 않고 이 공통 기능에 위임한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 21,
+       "snippet": "public interface EgovFileMngService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 30,
+       "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 79,
+       "snippet": "public FileVO selectFileInf(FileVO fvo) throws Exception;"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "여러 개의 파일 정보를 한 번에 등록해 첨부파일 아이디를 돌려주고, 여러 건 수정과 단건·다건 삭제를 지원하며 파일 구분자의 최대값을 계산해 파일 연번을 관리한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 38,
+       "snippet": "public String insertFileInf(FileVO fvo) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 46,
+       "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 54,
+       "snippet": "public void updateFileInfs(List<FileVO> fvoList) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 62,
+       "snippet": "public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 88,
+       "snippet": "public int getMaxFileSN(FileVO fvo) throws Exception;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/addLoginScrinImage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+   "name": "첨부파일 업로드 처리",
+   "summary": {
+    "text": "멀티파트 요청의 이미지 파일을 지정 저장 경로에 저장하고 첨부파일 목록 정보를 만들어 준다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "line": 60,
+      "snippet": "@Component(\"EgovFileMngUtil\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "업로드된 이미지 파일을 서버의 파일 저장 경로에 옮겨 담고 원파일명·저장파일명·확장자·크기 등 첨부파일 목록 정보를 만들어 반환하는 공통 처리 기능이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 60,
+       "snippet": "@Component(\"EgovFileMngUtil\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 76,
+       "snippet": "public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 126,
+       "snippet": "fvo = new FileVO();"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "저장 경로가 지정되지 않으면 전역 파일 저장 경로를 사용하고 첨부파일 아이디가 없으면 새로 채번하며, 저장 폴더가 없으면 생성한다. 파일명이 비어 있는 항목은 건너뛰고 키 문자열과 시각 값을 조합한 저장파일명으로 저장한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 83,
+       "snippet": "if (storePath == null || \"\".equals(storePath)) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 89,
+       "snippet": "if (atchFileId == null || \"\".equals(atchFileId)) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 97,
+       "snippet": "if (!saveFolder.exists() || saveFolder.isFile()) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 115,
+       "snippet": "if (StringUtils.isEmpty(orginFileName)) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 121,
+       "snippet": "String newName = keyStr + getTimeStamp() + fileKey;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/addLoginScrinImage.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+   "name": "첨부파일 정보",
+   "summary": {
+    "text": "첨부파일 아이디, 원파일명, 저장파일명, 확장자, 크기 등 업로드된 이미지 파일의 정보를 담는다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "line": 20,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "업로드된 로그인화면 이미지 파일 한 건의 정보를 담는 데이터 구조로, 파일 저장 결과를 등록 처리 쪽으로 전달하는 역할을 한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 21,
+       "snippet": "public class FileVO extends ComDefaultVO {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 26,
+       "snippet": "public String atchFileId = \"\";"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "첨부파일 아이디와 파일 연번으로 파일을 식별하고 원파일명·저장파일명·파일저장경로·파일확장자·파일크기·생성일자·파일내용을 가지며, 모든 항목은 빈 문자열로 초기화된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 26,
+       "snippet": "public String atchFileId = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 38,
+       "snippet": "public String fileExtsn = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 46,
+       "snippet": "public String fileSn = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 50,
+       "snippet": "public String fileStreCours = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 54,
+       "snippet": "public String orignlFileNm = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 58,
+       "snippet": "public String streFileNm = \"\";"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/addLoginScrinImage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+   "name": "인증 사용자 확인",
+   "summary": {
+    "text": "현재 로그인한 사용자 정보를 가져와 로그인화면이미지의 등록자·수정자로 사용하게 한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "line": 25,
+      "snippet": "public class EgovUserDetailsHelper {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "현재 인증된 사용자의 정보와 권한을 꺼내 주는 공통 협력 객체로, 이 흐름에서는 로그인화면이미지의 등록자·수정자 아이디를 확정하는 데 쓰인다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 25,
+       "snippet": "public class EgovUserDetailsHelper {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 41,
+       "snippet": "public static Object getAuthenticatedUser() {"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "인증된 사용자 객체, 사용자 권한 정보 목록, 인증 여부를 제공하며 실제 조회는 사용자 상세 서비스에 위임한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 41,
+       "snippet": "public static Object getAuthenticatedUser() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 50,
+       "snippet": "public static List<String> getAuthorities() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 58,
+       "snippet": "public static Boolean isAuthenticated() {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/addLoginScrinImage.do:src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+   "name": "로그인화면이미지 정보",
+   "summary": {
+    "text": "이미지 ID, 이미지명, 로그인 이미지, 설명, 반영여부, 등록자, 등록일자 등 로그인화면이미지 한 건의 업무 데이터를 담아 흐름 전 구간을 오간다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+      "line": 40,
+      "snippet": "public class LoginScrinImageVO extends ComDefaultVO {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 한 건의 업무 데이터를 담아 화면과 서비스 사이를 오가는 정보 객체이며, 목록 조회 결과와 일괄 삭제 대상 목록도 함께 실어 나른다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 40,
+       "snippet": "public class LoginScrinImageVO extends ComDefaultVO {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 98,
+       "snippet": "private List<LoginScrinImageVO> loginScrinImageList;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 103,
+       "snippet": "private String[] delYn;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "이미지 ID로 건을 식별하고 이미지명과 로그인 이미지는 반드시 입력해야 하며 이미지명은 10자를 넘을 수 없다. 그 밖에 이미지 파일, 이미지 설명, 반영여부, 사용자 ID, 등록일자, 파일첨부여부를 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 50,
+       "snippet": "private String imageId;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 55,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 56,
+       "snippet": "@Size(max=10)"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 62,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 78,
+       "snippet": "private String reflctAt;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/addLoginScrinImage.do:src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+   "name": "로그인화면이미지 관리 화면 처리",
+   "summary": {
+    "text": "이 흐름의 진입점으로 관리자 요청을 받아 입력값을 검증하고 로그인화면이미지 서비스와 공통 파일관리로 작업을 위임한 뒤 결과 화면을 반환한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 153,
+      "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 관리 요청을 받는 웹 진입점으로, 요청 파라미터를 로그인화면이미지 정보 객체에 담아 검증한 후 조회·등록·수정·삭제 작업을 업무 서비스와 공통 파일관리 기능에 위임하고 이동할 화면 이름을 돌려준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 153,
+       "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 154,
+       "snippet": "public String insertLoginScrinImage(final MultipartHttpServletRequest multiRequest,"
+      }
+     ]
+    },
+    "request": {
+     "text": "요청은 로그인화면이미지 정보 객체로 바인딩되며 검증 규칙 위반이 있으면 등록 화면을 다시 표시하고, 정상일 때만 후속 처리를 진행한다. 첨부 이미지 파일은 멀티파트 요청의 파일 목록에서 꺼내 쓴다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 155,
+       "snippet": "@Valid @ModelAttribute(\"loginScrinImageVO\") LoginScrinImageVO loginScrinImageVO,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 160,
+       "snippet": "if (bindingResult.hasErrors()) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 171,
+       "snippet": "final Map<String, MultipartFile> files = multiRequest.getFileMap();"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/addLoginScrinImage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+   "name": "문자열 처리 지원",
+   "summary": {
+    "text": "등록자 아이디 등 값이 없을 때 빈 문자열로 바꿔 주는 등 문자열 보정 처리를 담당한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "line": 43,
+      "snippet": "public class EgovStringUtil {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "문자열을 다루는 공통 지원 객체로, 이 흐름에서는 인증 사용자 아이디처럼 값이 없을 수 있는 항목을 안전한 문자열로 바꾸는 데 쓰인다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 43,
+       "snippet": "public class EgovStringUtil {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 47,
+       "snippet": "public static final String EMPTY = \"\";"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "빈 문자열 상수를 기준값으로 두고 지정 길이를 넘는 문자열을 자르거나 뒤에 문구를 덧붙이는 처리를 제공하며, 원본이 없으면 결과도 만들지 않는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 47,
+       "snippet": "public static final String EMPTY = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 77,
+       "snippet": "public static String cutString(String source, String output, int slength) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 79,
+       "snippet": "if (source != null) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 95,
+       "snippet": "public static String cutString(String source, int slength) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 97,
+       "snippet": "if (source != null) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/addViewLoginScrinImage.do:src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+   "name": "로그인화면이미지 관리 화면 처리",
+   "summary": {
+    "text": "이 흐름의 진입점으로 관리자 요청을 받아 입력값을 검증하고 로그인화면이미지 서비스와 공통 파일관리로 작업을 위임한 뒤 결과 화면을 반환한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 153,
+      "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 관리 요청을 받는 웹 진입점으로, 요청 파라미터를 로그인화면이미지 정보 객체에 담아 검증한 후 조회·등록·수정·삭제 작업을 업무 서비스와 공통 파일관리 기능에 위임하고 이동할 화면 이름을 돌려준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 153,
+       "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 154,
+       "snippet": "public String insertLoginScrinImage(final MultipartHttpServletRequest multiRequest,"
+      }
+     ]
+    },
+    "request": {
+     "text": "요청은 로그인화면이미지 정보 객체로 바인딩되며 검증 규칙 위반이 있으면 등록 화면을 다시 표시하고, 정상일 때만 후속 처리를 진행한다. 첨부 이미지 파일은 멀티파트 요청의 파일 목록에서 꺼내 쓴다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 155,
+       "snippet": "@Valid @ModelAttribute(\"loginScrinImageVO\") LoginScrinImageVO loginScrinImageVO,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 160,
+       "snippet": "if (bindingResult.hasErrors()) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 171,
+       "snippet": "final Map<String, MultipartFile> files = multiRequest.getFileMap();"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/getLoginScrinImage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+   "name": "안내 메시지 조회",
+   "summary": {
+    "text": "처리 결과와 오류 상황에서 화면에 표시할 안내 메시지를 메시지 코드로 조회해 준다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "line": 26,
+      "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "메시지 코드에 대응하는 안내 문구를 자원 파일에서 찾아 주는 공통 서비스로, 이 흐름의 처리 결과 안내에 사용된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 26,
+       "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 52,
+       "snippet": "public String getMessage(String code) {"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "메시지 코드만으로 조회하면 시스템 기본 로케일을 사용하고, 로케일이나 매개변수를 함께 넘기면 해당 로케일과 값이 반영된 문구를 돌려준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 52,
+       "snippet": "public String getMessage(String code) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 53,
+       "snippet": "return getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 62,
+       "snippet": "public String getMessage(String code, Locale locale) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 72,
+       "snippet": "public String getMessageArgs(String code, Object[] args) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 83,
+       "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/getLoginScrinImage.do:src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+   "name": "로그인화면이미지 업무 서비스",
+   "summary": {
+    "text": "로그인화면이미지의 목록 조회, 상세 조회, 등록, 수정, 삭제와 첨부 이미지 파일 삭제 등 핵심 업무 작업을 정의한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+      "line": 18,
+      "snippet": "public interface EgovLoginScrinImageService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 업무의 계약을 정의하는 서비스로, 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제, 첨부 이미지 파일 삭제, 화면 반영 결과 조회를 제공한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 18,
+       "snippet": "public interface EgovLoginScrinImageService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 25,
+       "snippet": "public List<LoginScrinImageVO> selectLoginScrinImageList(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 39,
+       "snippet": "public LoginScrinImageVO selectLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "조회 기능은 목록 조회와 상세 조회로 구분되며, 등록은 로그인화면이미지 정보를 신규로 저장하고 수정·삭제는 기 등록된 정보를 대상으로 한다. 삭제는 정보 삭제와 첨부 이미지 파일 삭제가 별도 작업으로 나뉜다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 8,
+       "snippet": "* - 로그인화면이미지의 조회기능은 목록조회, 상세조회로 구분된다."
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 45,
+       "snippet": "public LoginScrinImageVO insertLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 51,
+       "snippet": "public void updateLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 57,
+       "snippet": "public void deleteLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 63,
+       "snippet": "public void deleteLoginScrinImageFile(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/getLoginScrinImage.do:src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+   "name": "로그인화면이미지 정보",
+   "summary": {
+    "text": "이미지 ID, 이미지명, 로그인 이미지, 설명, 반영여부, 등록자, 등록일자 등 로그인화면이미지 한 건의 업무 데이터를 담아 흐름 전 구간을 오간다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+      "line": 40,
+      "snippet": "public class LoginScrinImageVO extends ComDefaultVO {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 한 건의 업무 데이터를 담아 화면과 서비스 사이를 오가는 정보 객체이며, 목록 조회 결과와 일괄 삭제 대상 목록도 함께 실어 나른다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 40,
+       "snippet": "public class LoginScrinImageVO extends ComDefaultVO {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 98,
+       "snippet": "private List<LoginScrinImageVO> loginScrinImageList;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 103,
+       "snippet": "private String[] delYn;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "이미지 ID로 건을 식별하고 이미지명과 로그인 이미지는 반드시 입력해야 하며 이미지명은 10자를 넘을 수 없다. 그 밖에 이미지 파일, 이미지 설명, 반영여부, 사용자 ID, 등록일자, 파일첨부여부를 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 50,
+       "snippet": "private String imageId;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 55,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 56,
+       "snippet": "@Size(max=10)"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 62,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 78,
+       "snippet": "private String reflctAt;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/getLoginScrinImage.do:src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+   "name": "로그인화면이미지 관리 화면 처리",
+   "summary": {
+    "text": "이 흐름의 진입점으로 관리자 요청을 받아 입력값을 검증하고 로그인화면이미지 서비스와 공통 파일관리로 작업을 위임한 뒤 결과 화면을 반환한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 153,
+      "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 관리 요청을 받는 웹 진입점으로, 요청 파라미터를 로그인화면이미지 정보 객체에 담아 검증한 후 조회·등록·수정·삭제 작업을 업무 서비스와 공통 파일관리 기능에 위임하고 이동할 화면 이름을 돌려준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 153,
+       "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 154,
+       "snippet": "public String insertLoginScrinImage(final MultipartHttpServletRequest multiRequest,"
+      }
+     ]
+    },
+    "request": {
+     "text": "요청은 로그인화면이미지 정보 객체로 바인딩되며 검증 규칙 위반이 있으면 등록 화면을 다시 표시하고, 정상일 때만 후속 처리를 진행한다. 첨부 이미지 파일은 멀티파트 요청의 파일 목록에서 꺼내 쓴다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 155,
+       "snippet": "@Valid @ModelAttribute(\"loginScrinImageVO\") LoginScrinImageVO loginScrinImageVO,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 160,
+       "snippet": "if (bindingResult.hasErrors()) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 171,
+       "snippet": "final Map<String, MultipartFile> files = multiRequest.getFileMap();"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/removeLoginScrinImage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+   "name": "안내 메시지 조회",
+   "summary": {
+    "text": "처리 결과와 오류 상황에서 화면에 표시할 안내 메시지를 메시지 코드로 조회해 준다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "line": 26,
+      "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "메시지 코드에 대응하는 안내 문구를 자원 파일에서 찾아 주는 공통 서비스로, 이 흐름의 처리 결과 안내에 사용된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 26,
+       "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 52,
+       "snippet": "public String getMessage(String code) {"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "메시지 코드만으로 조회하면 시스템 기본 로케일을 사용하고, 로케일이나 매개변수를 함께 넘기면 해당 로케일과 값이 반영된 문구를 돌려준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 52,
+       "snippet": "public String getMessage(String code) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 53,
+       "snippet": "return getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 62,
+       "snippet": "public String getMessage(String code, Locale locale) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 72,
+       "snippet": "public String getMessageArgs(String code, Object[] args) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 83,
+       "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/removeLoginScrinImage.do:src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+   "name": "로그인화면이미지 업무 서비스",
+   "summary": {
+    "text": "로그인화면이미지의 목록 조회, 상세 조회, 등록, 수정, 삭제와 첨부 이미지 파일 삭제 등 핵심 업무 작업을 정의한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+      "line": 18,
+      "snippet": "public interface EgovLoginScrinImageService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 업무의 계약을 정의하는 서비스로, 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제, 첨부 이미지 파일 삭제, 화면 반영 결과 조회를 제공한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 18,
+       "snippet": "public interface EgovLoginScrinImageService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 25,
+       "snippet": "public List<LoginScrinImageVO> selectLoginScrinImageList(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 39,
+       "snippet": "public LoginScrinImageVO selectLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "조회 기능은 목록 조회와 상세 조회로 구분되며, 등록은 로그인화면이미지 정보를 신규로 저장하고 수정·삭제는 기 등록된 정보를 대상으로 한다. 삭제는 정보 삭제와 첨부 이미지 파일 삭제가 별도 작업으로 나뉜다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 8,
+       "snippet": "* - 로그인화면이미지의 조회기능은 목록조회, 상세조회로 구분된다."
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 45,
+       "snippet": "public LoginScrinImageVO insertLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 51,
+       "snippet": "public void updateLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 57,
+       "snippet": "public void deleteLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 63,
+       "snippet": "public void deleteLoginScrinImageFile(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/removeLoginScrinImage.do:src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+   "name": "로그인화면이미지 정보",
+   "summary": {
+    "text": "이미지 ID, 이미지명, 로그인 이미지, 설명, 반영여부, 등록자, 등록일자 등 로그인화면이미지 한 건의 업무 데이터를 담아 흐름 전 구간을 오간다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+      "line": 40,
+      "snippet": "public class LoginScrinImageVO extends ComDefaultVO {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 한 건의 업무 데이터를 담아 화면과 서비스 사이를 오가는 정보 객체이며, 목록 조회 결과와 일괄 삭제 대상 목록도 함께 실어 나른다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 40,
+       "snippet": "public class LoginScrinImageVO extends ComDefaultVO {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 98,
+       "snippet": "private List<LoginScrinImageVO> loginScrinImageList;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 103,
+       "snippet": "private String[] delYn;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "이미지 ID로 건을 식별하고 이미지명과 로그인 이미지는 반드시 입력해야 하며 이미지명은 10자를 넘을 수 없다. 그 밖에 이미지 파일, 이미지 설명, 반영여부, 사용자 ID, 등록일자, 파일첨부여부를 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 50,
+       "snippet": "private String imageId;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 55,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 56,
+       "snippet": "@Size(max=10)"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 62,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 78,
+       "snippet": "private String reflctAt;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/removeLoginScrinImage.do:src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+   "name": "로그인화면이미지 관리 화면 처리",
+   "summary": {
+    "text": "이 흐름의 진입점으로 관리자 요청을 받아 입력값을 검증하고 로그인화면이미지 서비스와 공통 파일관리로 작업을 위임한 뒤 결과 화면을 반환한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 153,
+      "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 관리 요청을 받는 웹 진입점으로, 요청 파라미터를 로그인화면이미지 정보 객체에 담아 검증한 후 조회·등록·수정·삭제 작업을 업무 서비스와 공통 파일관리 기능에 위임하고 이동할 화면 이름을 돌려준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 153,
+       "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 154,
+       "snippet": "public String insertLoginScrinImage(final MultipartHttpServletRequest multiRequest,"
+      }
+     ]
+    },
+    "request": {
+     "text": "요청은 로그인화면이미지 정보 객체로 바인딩되며 검증 규칙 위반이 있으면 등록 화면을 다시 표시하고, 정상일 때만 후속 처리를 진행한다. 첨부 이미지 파일은 멀티파트 요청의 파일 목록에서 꺼내 쓴다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 155,
+       "snippet": "@Valid @ModelAttribute(\"loginScrinImageVO\") LoginScrinImageVO loginScrinImageVO,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 160,
+       "snippet": "if (bindingResult.hasErrors()) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 171,
+       "snippet": "final Map<String, MultipartFile> files = multiRequest.getFileMap();"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/removeLoginScrinImageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+   "name": "안내 메시지 조회",
+   "summary": {
+    "text": "처리 결과와 오류 상황에서 화면에 표시할 안내 메시지를 메시지 코드로 조회해 준다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "line": 26,
+      "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "메시지 코드에 대응하는 안내 문구를 자원 파일에서 찾아 주는 공통 서비스로, 이 흐름의 처리 결과 안내에 사용된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 26,
+       "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 52,
+       "snippet": "public String getMessage(String code) {"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "메시지 코드만으로 조회하면 시스템 기본 로케일을 사용하고, 로케일이나 매개변수를 함께 넘기면 해당 로케일과 값이 반영된 문구를 돌려준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 52,
+       "snippet": "public String getMessage(String code) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 53,
+       "snippet": "return getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 62,
+       "snippet": "public String getMessage(String code, Locale locale) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 72,
+       "snippet": "public String getMessageArgs(String code, Object[] args) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 83,
+       "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/removeLoginScrinImageList.do:src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+   "name": "로그인화면이미지 업무 서비스",
+   "summary": {
+    "text": "로그인화면이미지의 목록 조회, 상세 조회, 등록, 수정, 삭제와 첨부 이미지 파일 삭제 등 핵심 업무 작업을 정의한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+      "line": 18,
+      "snippet": "public interface EgovLoginScrinImageService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 업무의 계약을 정의하는 서비스로, 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제, 첨부 이미지 파일 삭제, 화면 반영 결과 조회를 제공한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 18,
+       "snippet": "public interface EgovLoginScrinImageService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 25,
+       "snippet": "public List<LoginScrinImageVO> selectLoginScrinImageList(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 39,
+       "snippet": "public LoginScrinImageVO selectLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "조회 기능은 목록 조회와 상세 조회로 구분되며, 등록은 로그인화면이미지 정보를 신규로 저장하고 수정·삭제는 기 등록된 정보를 대상으로 한다. 삭제는 정보 삭제와 첨부 이미지 파일 삭제가 별도 작업으로 나뉜다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 8,
+       "snippet": "* - 로그인화면이미지의 조회기능은 목록조회, 상세조회로 구분된다."
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 45,
+       "snippet": "public LoginScrinImageVO insertLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 51,
+       "snippet": "public void updateLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 57,
+       "snippet": "public void deleteLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 63,
+       "snippet": "public void deleteLoginScrinImageFile(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/removeLoginScrinImageList.do:src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+   "name": "로그인화면이미지 정보",
+   "summary": {
+    "text": "이미지 ID, 이미지명, 로그인 이미지, 설명, 반영여부, 등록자, 등록일자 등 로그인화면이미지 한 건의 업무 데이터를 담아 흐름 전 구간을 오간다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+      "line": 40,
+      "snippet": "public class LoginScrinImageVO extends ComDefaultVO {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 한 건의 업무 데이터를 담아 화면과 서비스 사이를 오가는 정보 객체이며, 목록 조회 결과와 일괄 삭제 대상 목록도 함께 실어 나른다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 40,
+       "snippet": "public class LoginScrinImageVO extends ComDefaultVO {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 98,
+       "snippet": "private List<LoginScrinImageVO> loginScrinImageList;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 103,
+       "snippet": "private String[] delYn;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "이미지 ID로 건을 식별하고 이미지명과 로그인 이미지는 반드시 입력해야 하며 이미지명은 10자를 넘을 수 없다. 그 밖에 이미지 파일, 이미지 설명, 반영여부, 사용자 ID, 등록일자, 파일첨부여부를 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 50,
+       "snippet": "private String imageId;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 55,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 56,
+       "snippet": "@Size(max=10)"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 62,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 78,
+       "snippet": "private String reflctAt;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/removeLoginScrinImageList.do:src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+   "name": "로그인화면이미지 관리 화면 처리",
+   "summary": {
+    "text": "이 흐름의 진입점으로 관리자 요청을 받아 입력값을 검증하고 로그인화면이미지 서비스와 공통 파일관리로 작업을 위임한 뒤 결과 화면을 반환한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 153,
+      "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 관리 요청을 받는 웹 진입점으로, 요청 파라미터를 로그인화면이미지 정보 객체에 담아 검증한 후 조회·등록·수정·삭제 작업을 업무 서비스와 공통 파일관리 기능에 위임하고 이동할 화면 이름을 돌려준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 153,
+       "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 154,
+       "snippet": "public String insertLoginScrinImage(final MultipartHttpServletRequest multiRequest,"
+      }
+     ]
+    },
+    "request": {
+     "text": "요청은 로그인화면이미지 정보 객체로 바인딩되며 검증 규칙 위반이 있으면 등록 화면을 다시 표시하고, 정상일 때만 후속 처리를 진행한다. 첨부 이미지 파일은 멀티파트 요청의 파일 목록에서 꺼내 쓴다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 155,
+       "snippet": "@Valid @ModelAttribute(\"loginScrinImageVO\") LoginScrinImageVO loginScrinImageVO,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 160,
+       "snippet": "if (bindingResult.hasErrors()) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 171,
+       "snippet": "final Map<String, MultipartFile> files = multiRequest.getFileMap();"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/selectLoginScrinImageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+   "name": "안내 메시지 조회",
+   "summary": {
+    "text": "처리 결과와 오류 상황에서 화면에 표시할 안내 메시지를 메시지 코드로 조회해 준다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "line": 26,
+      "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "메시지 코드에 대응하는 안내 문구를 자원 파일에서 찾아 주는 공통 서비스로, 이 흐름의 처리 결과 안내에 사용된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 26,
+       "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 52,
+       "snippet": "public String getMessage(String code) {"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "메시지 코드만으로 조회하면 시스템 기본 로케일을 사용하고, 로케일이나 매개변수를 함께 넘기면 해당 로케일과 값이 반영된 문구를 돌려준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 52,
+       "snippet": "public String getMessage(String code) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 53,
+       "snippet": "return getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 62,
+       "snippet": "public String getMessage(String code, Locale locale) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 72,
+       "snippet": "public String getMessageArgs(String code, Object[] args) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+       "line": 83,
+       "snippet": "public String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/selectLoginScrinImageList.do:src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+   "name": "로그인화면이미지 업무 서비스",
+   "summary": {
+    "text": "로그인화면이미지의 목록 조회, 상세 조회, 등록, 수정, 삭제와 첨부 이미지 파일 삭제 등 핵심 업무 작업을 정의한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+      "line": 18,
+      "snippet": "public interface EgovLoginScrinImageService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 업무의 계약을 정의하는 서비스로, 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제, 첨부 이미지 파일 삭제, 화면 반영 결과 조회를 제공한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 18,
+       "snippet": "public interface EgovLoginScrinImageService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 25,
+       "snippet": "public List<LoginScrinImageVO> selectLoginScrinImageList(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 39,
+       "snippet": "public LoginScrinImageVO selectLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "조회 기능은 목록 조회와 상세 조회로 구분되며, 등록은 로그인화면이미지 정보를 신규로 저장하고 수정·삭제는 기 등록된 정보를 대상으로 한다. 삭제는 정보 삭제와 첨부 이미지 파일 삭제가 별도 작업으로 나뉜다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 8,
+       "snippet": "* - 로그인화면이미지의 조회기능은 목록조회, 상세조회로 구분된다."
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 45,
+       "snippet": "public LoginScrinImageVO insertLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 51,
+       "snippet": "public void updateLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 57,
+       "snippet": "public void deleteLoginScrinImage(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/EgovLoginScrinImageService.java",
+       "line": 63,
+       "snippet": "public void deleteLoginScrinImageFile(LoginScrinImageVO loginScrinImageVO) throws Exception;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/selectLoginScrinImageList.do:src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+   "name": "로그인화면이미지 정보",
+   "summary": {
+    "text": "이미지 ID, 이미지명, 로그인 이미지, 설명, 반영여부, 등록자, 등록일자 등 로그인화면이미지 한 건의 업무 데이터를 담아 흐름 전 구간을 오간다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+      "line": 40,
+      "snippet": "public class LoginScrinImageVO extends ComDefaultVO {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 한 건의 업무 데이터를 담아 화면과 서비스 사이를 오가는 정보 객체이며, 목록 조회 결과와 일괄 삭제 대상 목록도 함께 실어 나른다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 40,
+       "snippet": "public class LoginScrinImageVO extends ComDefaultVO {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 98,
+       "snippet": "private List<LoginScrinImageVO> loginScrinImageList;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 103,
+       "snippet": "private String[] delYn;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "이미지 ID로 건을 식별하고 이미지명과 로그인 이미지는 반드시 입력해야 하며 이미지명은 10자를 넘을 수 없다. 그 밖에 이미지 파일, 이미지 설명, 반영여부, 사용자 ID, 등록일자, 파일첨부여부를 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 50,
+       "snippet": "private String imageId;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 55,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 56,
+       "snippet": "@Size(max=10)"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 62,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 78,
+       "snippet": "private String reflctAt;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/selectLoginScrinImageList.do:src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+   "name": "로그인화면이미지 관리 화면 처리",
+   "summary": {
+    "text": "이 흐름의 진입점으로 관리자 요청을 받아 입력값을 검증하고 로그인화면이미지 서비스와 공통 파일관리로 작업을 위임한 뒤 결과 화면을 반환한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 153,
+      "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 관리 요청을 받는 웹 진입점으로, 요청 파라미터를 로그인화면이미지 정보 객체에 담아 검증한 후 조회·등록·수정·삭제 작업을 업무 서비스와 공통 파일관리 기능에 위임하고 이동할 화면 이름을 돌려준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 153,
+       "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 154,
+       "snippet": "public String insertLoginScrinImage(final MultipartHttpServletRequest multiRequest,"
+      }
+     ]
+    },
+    "request": {
+     "text": "요청은 로그인화면이미지 정보 객체로 바인딩되며 검증 규칙 위반이 있으면 등록 화면을 다시 표시하고, 정상일 때만 후속 처리를 진행한다. 첨부 이미지 파일은 멀티파트 요청의 파일 목록에서 꺼내 쓴다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 155,
+       "snippet": "@Valid @ModelAttribute(\"loginScrinImageVO\") LoginScrinImageVO loginScrinImageVO,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 160,
+       "snippet": "if (bindingResult.hasErrors()) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 171,
+       "snippet": "final Map<String, MultipartFile> files = multiRequest.getFileMap();"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/selectLoginScrinImageListView.do:src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+   "name": "로그인화면이미지 관리 화면 처리",
+   "summary": {
+    "text": "이 흐름의 진입점으로 관리자 요청을 받아 입력값을 검증하고 로그인화면이미지 서비스와 공통 파일관리로 작업을 위임한 뒤 결과 화면을 반환한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 153,
+      "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 관리 요청을 받는 웹 진입점으로, 요청 파라미터를 로그인화면이미지 정보 객체에 담아 검증한 후 조회·등록·수정·삭제 작업을 업무 서비스와 공통 파일관리 기능에 위임하고 이동할 화면 이름을 돌려준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 153,
+       "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 154,
+       "snippet": "public String insertLoginScrinImage(final MultipartHttpServletRequest multiRequest,"
+      }
+     ]
+    },
+    "request": {
+     "text": "요청은 로그인화면이미지 정보 객체로 바인딩되며 검증 규칙 위반이 있으면 등록 화면을 다시 표시하고, 정상일 때만 후속 처리를 진행한다. 첨부 이미지 파일은 멀티파트 요청의 파일 목록에서 꺼내 쓴다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 155,
+       "snippet": "@Valid @ModelAttribute(\"loginScrinImageVO\") LoginScrinImageVO loginScrinImageVO,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 160,
+       "snippet": "if (bindingResult.hasErrors()) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 171,
+       "snippet": "final Map<String, MultipartFile> files = multiRequest.getFileMap();"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/updtLoginScrinImage.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+   "name": "로그인 사용자 정보",
+   "summary": {
+    "text": "인증된 사용자의 아이디 등 정보를 담아 로그인화면이미지의 등록자 아이디를 채우는 데 쓰인다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "line": 33,
+      "snippet": "public class LoginVO implements Serializable{"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "인증된 사용자 한 명의 정보를 담는 데이터 구조로, 이 흐름에서는 사용자 아이디를 꺼내 로그인화면이미지의 등록자로 기록하는 데 쓰인다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 33,
+       "snippet": "public class LoginVO implements Serializable{"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 42,
+       "snippet": "private String id;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "아이디·이름·이메일은 반드시 있어야 하고 이메일은 형식 검증을 받으며, 그 밖에 비밀번호와 힌트·정답, 사용자구분, 조직 아이디와 조직명, 고유아이디, 접속 아이피 등을 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 41,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 44,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 49,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 50,
+       "snippet": "@EgovEmailCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 61,
+       "snippet": "private String userSe;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+       "line": 63,
+       "snippet": "private String orgnztId;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/updtLoginScrinImage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+   "name": "공통 첨부파일 관리 서비스",
+   "summary": {
+    "text": "업로드된 로그인화면 이미지 파일의 정보를 등록·수정·삭제·조회하는 공통 첨부파일 기능을 제공한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "line": 21,
+      "snippet": "public interface EgovFileMngService {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지에 첨부되는 이미지 파일의 속성과 상세 정보를 등록·수정·삭제·조회하는 공통 첨부파일 관리 기능으로, 이 도메인은 파일 저장 자체를 직접 구현하지 않고 이 공통 기능에 위임한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 21,
+       "snippet": "public interface EgovFileMngService {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 30,
+       "snippet": "public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 79,
+       "snippet": "public FileVO selectFileInf(FileVO fvo) throws Exception;"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "여러 개의 파일 정보를 한 번에 등록해 첨부파일 아이디를 돌려주고, 여러 건 수정과 단건·다건 삭제를 지원하며 파일 구분자의 최대값을 계산해 파일 연번을 관리한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 38,
+       "snippet": "public String insertFileInf(FileVO fvo) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 46,
+       "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 54,
+       "snippet": "public void updateFileInfs(List<FileVO> fvoList) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 62,
+       "snippet": "public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+       "line": 88,
+       "snippet": "public int getMaxFileSN(FileVO fvo) throws Exception;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/updtLoginScrinImage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+   "name": "첨부파일 업로드 처리",
+   "summary": {
+    "text": "멀티파트 요청의 이미지 파일을 지정 저장 경로에 저장하고 첨부파일 목록 정보를 만들어 준다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "line": 60,
+      "snippet": "@Component(\"EgovFileMngUtil\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "업로드된 이미지 파일을 서버의 파일 저장 경로에 옮겨 담고 원파일명·저장파일명·확장자·크기 등 첨부파일 목록 정보를 만들어 반환하는 공통 처리 기능이다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 60,
+       "snippet": "@Component(\"EgovFileMngUtil\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 76,
+       "snippet": "public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 126,
+       "snippet": "fvo = new FileVO();"
+      }
+     ]
+    },
+    "businessLogic": {
+     "text": "저장 경로가 지정되지 않으면 전역 파일 저장 경로를 사용하고 첨부파일 아이디가 없으면 새로 채번하며, 저장 폴더가 없으면 생성한다. 파일명이 비어 있는 항목은 건너뛰고 키 문자열과 시각 값을 조합한 저장파일명으로 저장한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 83,
+       "snippet": "if (storePath == null || \"\".equals(storePath)) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 89,
+       "snippet": "if (atchFileId == null || \"\".equals(atchFileId)) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 97,
+       "snippet": "if (!saveFolder.exists() || saveFolder.isFile()) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 115,
+       "snippet": "if (StringUtils.isEmpty(orginFileName)) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+       "line": 121,
+       "snippet": "String newName = keyStr + getTimeStamp() + fileKey;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/updtLoginScrinImage.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+   "name": "첨부파일 정보",
+   "summary": {
+    "text": "첨부파일 아이디, 원파일명, 저장파일명, 확장자, 크기 등 업로드된 이미지 파일의 정보를 담는다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "line": 20,
+      "snippet": "@SuppressWarnings(\"serial\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "업로드된 로그인화면 이미지 파일 한 건의 정보를 담는 데이터 구조로, 파일 저장 결과를 등록 처리 쪽으로 전달하는 역할을 한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 21,
+       "snippet": "public class FileVO extends ComDefaultVO {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 26,
+       "snippet": "public String atchFileId = \"\";"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "첨부파일 아이디와 파일 연번으로 파일을 식별하고 원파일명·저장파일명·파일저장경로·파일확장자·파일크기·생성일자·파일내용을 가지며, 모든 항목은 빈 문자열로 초기화된다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 26,
+       "snippet": "public String atchFileId = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 38,
+       "snippet": "public String fileExtsn = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 46,
+       "snippet": "public String fileSn = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 50,
+       "snippet": "public String fileStreCours = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 54,
+       "snippet": "public String orignlFileNm = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+       "line": 58,
+       "snippet": "public String streFileNm = \"\";"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/updtLoginScrinImage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+   "name": "인증 사용자 확인",
+   "summary": {
+    "text": "현재 로그인한 사용자 정보를 가져와 로그인화면이미지의 등록자·수정자로 사용하게 한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "line": 25,
+      "snippet": "public class EgovUserDetailsHelper {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "현재 인증된 사용자의 정보와 권한을 꺼내 주는 공통 협력 객체로, 이 흐름에서는 로그인화면이미지의 등록자·수정자 아이디를 확정하는 데 쓰인다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 25,
+       "snippet": "public class EgovUserDetailsHelper {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 41,
+       "snippet": "public static Object getAuthenticatedUser() {"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "인증된 사용자 객체, 사용자 권한 정보 목록, 인증 여부를 제공하며 실제 조회는 사용자 상세 서비스에 위임한다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 41,
+       "snippet": "public static Object getAuthenticatedUser() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 50,
+       "snippet": "public static List<String> getAuthorities() {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+       "line": 58,
+       "snippet": "public static Boolean isAuthenticated() {"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/updtLoginScrinImage.do:src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+   "name": "로그인화면이미지 정보",
+   "summary": {
+    "text": "이미지 ID, 이미지명, 로그인 이미지, 설명, 반영여부, 등록자, 등록일자 등 로그인화면이미지 한 건의 업무 데이터를 담아 흐름 전 구간을 오간다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+      "line": 40,
+      "snippet": "public class LoginScrinImageVO extends ComDefaultVO {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 한 건의 업무 데이터를 담아 화면과 서비스 사이를 오가는 정보 객체이며, 목록 조회 결과와 일괄 삭제 대상 목록도 함께 실어 나른다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 40,
+       "snippet": "public class LoginScrinImageVO extends ComDefaultVO {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 98,
+       "snippet": "private List<LoginScrinImageVO> loginScrinImageList;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 103,
+       "snippet": "private String[] delYn;"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "이미지 ID로 건을 식별하고 이미지명과 로그인 이미지는 반드시 입력해야 하며 이미지명은 10자를 넘을 수 없다. 그 밖에 이미지 파일, 이미지 설명, 반영여부, 사용자 ID, 등록일자, 파일첨부여부를 가진다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 50,
+       "snippet": "private String imageId;"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 55,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 56,
+       "snippet": "@Size(max=10)"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 62,
+       "snippet": "@EgovNullCheck"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/service/LoginScrinImageVO.java",
+       "line": 78,
+       "snippet": "private String reflctAt;"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/updtLoginScrinImage.do:src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+   "name": "로그인화면이미지 관리 화면 처리",
+   "summary": {
+    "text": "이 흐름의 진입점으로 관리자 요청을 받아 입력값을 검증하고 로그인화면이미지 서비스와 공통 파일관리로 작업을 위임한 뒤 결과 화면을 반환한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+      "line": 153,
+      "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "로그인화면이미지 관리 요청을 받는 웹 진입점으로, 요청 파라미터를 로그인화면이미지 정보 객체에 담아 검증한 후 조회·등록·수정·삭제 작업을 업무 서비스와 공통 파일관리 기능에 위임하고 이동할 화면 이름을 돌려준다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 153,
+       "snippet": "@RequestMapping(value = \"/uss/ion/lsi/addLoginScrinImage.do\")"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 154,
+       "snippet": "public String insertLoginScrinImage(final MultipartHttpServletRequest multiRequest,"
+      }
+     ]
+    },
+    "request": {
+     "text": "요청은 로그인화면이미지 정보 객체로 바인딩되며 검증 규칙 위반이 있으면 등록 화면을 다시 표시하고, 정상일 때만 후속 처리를 진행한다. 첨부 이미지 파일은 멀티파트 요청의 파일 목록에서 꺼내 쓴다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 155,
+       "snippet": "@Valid @ModelAttribute(\"loginScrinImageVO\") LoginScrinImageVO loginScrinImageVO,"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 160,
+       "snippet": "if (bindingResult.hasErrors()) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/uss/ion/lsi/web/EgovLoginScrinImageController.java",
+       "line": 171,
+       "snippet": "final Map<String, MultipartFile> files = multiRequest.getFileMap();"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "stepId": "step:ANY /uss/ion/lsi/updtLoginScrinImage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+   "name": "문자열 처리 지원",
+   "summary": {
+    "text": "등록자 아이디 등 값이 없을 때 빈 문자열로 바꿔 주는 등 문자열 보정 처리를 담당한다.",
+    "citations": [
+     {
+      "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "line": 43,
+      "snippet": "public class EgovStringUtil {"
+     }
+    ]
+   },
+   "detail": {
+    "role": {
+     "text": "문자열을 다루는 공통 지원 객체로, 이 흐름에서는 인증 사용자 아이디처럼 값이 없을 수 있는 항목을 안전한 문자열로 바꾸는 데 쓰인다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 43,
+       "snippet": "public class EgovStringUtil {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 47,
+       "snippet": "public static final String EMPTY = \"\";"
+      }
+     ]
+    },
+    "dataShape": {
+     "text": "빈 문자열 상수를 기준값으로 두고 지정 길이를 넘는 문자열을 자르거나 뒤에 문구를 덧붙이는 처리를 제공하며, 원본이 없으면 결과도 만들지 않는다.",
+     "citations": [
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 47,
+       "snippet": "public static final String EMPTY = \"\";"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 77,
+       "snippet": "public static String cutString(String source, String output, int slength) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 79,
+       "snippet": "if (source != null) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 95,
+       "snippet": "public static String cutString(String source, int slength) {"
+      },
+      {
+       "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+       "line": 97,
+       "snippet": "if (source != null) {"
+      }
+     ]
+    }
+   }
+  }
+ ]
+}

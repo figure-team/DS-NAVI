@@ -1,0 +1,1144 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "s1",
+          "to": "a1"
+        },
+        {
+          "from": "a1",
+          "label": "수신 요청",
+          "to": "a2"
+        },
+        {
+          "from": "a1",
+          "label": "상세 보기",
+          "to": "a6"
+        },
+        {
+          "from": "a2",
+          "to": "d1"
+        },
+        {
+          "from": "d1",
+          "label": "YES",
+          "to": "a3"
+        },
+        {
+          "from": "d1",
+          "label": "NO",
+          "to": "a5"
+        },
+        {
+          "from": "a3",
+          "to": "a4"
+        },
+        {
+          "from": "a4",
+          "to": "e1"
+        },
+        {
+          "from": "a5",
+          "to": "a1"
+        },
+        {
+          "from": "a6",
+          "to": "a7"
+        },
+        {
+          "from": "a7",
+          "to": "e1"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s1",
+          "kind": "start",
+          "label": "기관코드수신 화면 진입"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 137,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/icr/getInsttCodeRecptnList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/ccm/icr/getInsttCodeRecptnList.do",
+          "id": "a1",
+          "kind": "activity",
+          "label": "기관코드수신 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 71,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/icr/addInsttCode.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/ccm/icr/addInsttCode.do",
+          "id": "a2",
+          "kind": "activity",
+          "label": "기관코드 수신 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 78,
+              "snippet": "if   (sCmd.equals(\"\")) {"
+            }
+          ],
+          "id": "d1",
+          "kind": "decision",
+          "label": "명령 구분값이 비었는가"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 79,
+              "snippet": "insttCodeManageService.insertInsttCodeRecptn();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 32,
+              "snippet": "void insertInsttCodeRecptn() throws Exception;"
+            }
+          ],
+          "id": "a3",
+          "kind": "activity",
+          "label": "기관코드수신 처리 수행"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 81,
+              "snippet": "return \"egovframework/com/sym/ccm/icr/EgovInsttCodeRegist_TEST\";"
+            }
+          ],
+          "id": "a4",
+          "kind": "activity",
+          "label": "수신 등록 화면 표시"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 83,
+              "snippet": "return \"forward:/sym/ccm/icr/getInsttCodeRecptnList.do\";"
+            }
+          ],
+          "id": "a5",
+          "kind": "activity",
+          "label": "목록 화면으로 이동"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 95,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/icr/getInsttCodeDetail.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 101,
+              "snippet": "InsttCodeRecptn vo = insttCodeManageService.selectInsttCodeDetail(insttCode);"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/ccm/icr/getInsttCodeDetail.do",
+          "id": "a6",
+          "kind": "activity",
+          "label": "기관코드 상세내역 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 114,
+              "snippet": "List<CmmnDetailCode> changeSeCodeList = cmmUseService.selectCmmCodeDetail(comCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 119,
+              "snippet": "List<CmmnDetailCode> processSeList = cmmUseService.selectCmmCodeDetail(comCodeVO);"
+            }
+          ],
+          "id": "a7",
+          "kind": "activity",
+          "label": "구분코드 목록 조회"
+        },
+        {
+          "id": "e1",
+          "kind": "end",
+          "label": "화면 표시 종료"
+        }
+      ],
+      "title": "기관코드수신 관리"
+    },
+    {
+      "edges": [
+        {
+          "from": "m0",
+          "to": "m1"
+        },
+        {
+          "from": "m1",
+          "to": "m2"
+        },
+        {
+          "from": "m2",
+          "to": "m3"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "m0",
+          "kind": "start",
+          "label": "메인 화면 진입"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 173,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/icr/getInsttCodeRecptnMainList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/ccm/icr/getInsttCodeRecptnMainList.do",
+          "id": "m1",
+          "kind": "activity",
+          "label": "메인 기관코드수신 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 48,
+              "snippet": "List<EgovMap> selectInsttCodeRecptnList(InsttCodeRecptnVO searchVO) throws Exception;"
+            }
+          ],
+          "id": "m2",
+          "kind": "activity",
+          "label": "수신 내역 목록 반환"
+        },
+        {
+          "id": "m3",
+          "kind": "end",
+          "label": "메인 현황 표시 종료"
+        }
+      ],
+      "title": "메인 기관코드수신 현황"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+          "line": 78,
+          "snippet": "if   (sCmd.equals(\"\")) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+          "line": 79,
+          "snippet": "insttCodeManageService.insertInsttCodeRecptn();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+          "line": 83,
+          "snippet": "return \"forward:/sym/ccm/icr/getInsttCodeRecptnList.do\";"
+        }
+      ],
+      "text": "기관코드 수신 요청은 명령 구분값이 비어 있을 때만 실제 수신 처리를 수행하고 수신 등록 화면을 보여준다. 명령 구분값이 있으면 수신 처리 없이 기관코드수신 목록 화면으로 넘긴다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+          "line": 105,
+          "snippet": "insttCodeRecptnVO.setRecordCountPerPage(9999999);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+          "line": 106,
+          "snippet": "insttCodeRecptnVO.setFirstIndex(0);"
+        }
+      ],
+      "text": "상세내역 화면은 기관코드수신 내역을 페이지 나눔 없이 전량 보여주기 위해 페이지당 건수를 사실상 무제한으로, 시작 위치를 처음으로 다시 지정한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+          "line": 122,
+          "snippet": "insttCodeRecptnVO.setSearchCondition(\"CodeList\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+          "line": 123,
+          "snippet": "List<EgovMap> insttCodeRecptnList = insttCodeManageService.selectInsttCodeRecptnList(insttCodeRecptnVO);"
+        }
+      ],
+      "text": "상세내역 화면의 기관코드수신 내역은 조회조건을 코드목록 조회로 고정한 상태에서 가져온다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+          "line": 136,
+          "snippet": "@IncludedInfo(name=\"기관코드수신\", listUrl=\"/sym/ccm/icr/getInsttCodeRecptnList.do\", order = 1020 ,gid = 60)"
+        }
+      ],
+      "text": "기관코드수신 목록은 시스템 메뉴에 기관코드수신 항목으로 등록되어 목록 화면이 이 업무의 진입 화면이 된다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 34,
+          "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+          "line": 113,
+          "snippet": "comCodeVO.setCodeId(\"COM043\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+          "line": 118,
+          "snippet": "comCodeVO.setCodeId(\"COM044\");"
+        }
+      ],
+      "text": "공통코드 업무에 의존한다. 상세내역 화면은 공통코드 조회 기능으로 변경구분코드와 처리구분코드 목록을 받아 화면 선택 항목으로 내려준다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+          "line": 136,
+          "snippet": "@IncludedInfo(name=\"기관코드수신\", listUrl=\"/sym/ccm/icr/getInsttCodeRecptnList.do\", order = 1020 ,gid = 60)"
+        }
+      ],
+      "text": "메뉴·화면 구성 업무에 기관코드수신 목록 화면을 노출 항목으로 등록해 연동한다."
+    }
+  ],
+  "domainId": "domain:sym.ccm.icr",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+          "line": 28,
+          "snippet": "public class InsttCodeRecptnVO extends InsttCodeRecptn implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+          "line": 33,
+          "snippet": "private String searchCondition = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+          "line": 45,
+          "snippet": "private int pageUnit = 10;"
+        }
+      ],
+      "text": "기관코드수신 조회조건: 검색조건·검색어·사용여부와 페이지 번호, 페이지당 건수 등 목록 조회를 위한 조회조건 정보를 담는다. 기관코드 정보를 상속하여 조회조건을 덧붙인 구조다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 31,
+          "snippet": "private String codeId = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 43,
+          "snippet": "private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+        }
+      ],
+      "text": "공통코드 조회조건: 코드 ID와 상세코드, 코드명, 코드설명 등을 담아 공통코드 목록을 조회할 때 사용하는 조회조건 정보다. 상세내역 화면에서 변경구분코드·처리구분코드를 끌어올 때 쓰인다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+          "line": 32,
+          "snippet": "void insertInsttCodeRecptn() throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+          "line": 48,
+          "snippet": "List<EgovMap> selectInsttCodeRecptnList(InsttCodeRecptnVO searchVO) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+          "line": 63,
+          "snippet": "List<EgovMap> selectInsttCodeList(InsttCodeRecptnVO searchVO) throws Exception;"
+        }
+      ],
+      "text": "기관코드수신 업무 서비스: 기관코드수신 처리, 기관코드 상세내역 조회, 기관코드수신 목록과 총 건수 조회, 기관코드 목록과 총 건수 조회의 업무 기능을 규정한 업무 계약이다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /sym/ccm/icr/addInsttCode.do",
+      "name": "기관코드 수신 요청",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+            "line": 71,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/icr/addInsttCode.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+            "line": 78,
+            "snippet": "if   (sCmd.equals(\"\")) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+            "line": 79,
+            "snippet": "insttCodeManageService.insertInsttCodeRecptn();"
+          }
+        ],
+        "text": "기관코드 수신 요청을 받아 명령 구분값이 비어 있으면 기관코드수신 처리를 수행하고 수신 등록 화면을 보여주며, 명령 구분값이 있으면 기관코드수신 목록 화면으로 넘긴다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/icr/getInsttCodeDetail.do",
+      "name": "기관코드 상세내역 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+            "line": 95,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/icr/getInsttCodeDetail.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+            "line": 101,
+            "snippet": "InsttCodeRecptn vo = insttCodeManageService.selectInsttCodeDetail(insttCode);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+            "line": 123,
+            "snippet": "List<EgovMap> insttCodeRecptnList = insttCodeManageService.selectInsttCodeRecptnList(insttCodeRecptnVO);"
+          }
+        ],
+        "text": "선택한 기관코드의 상세내역을 조회하고, 변경구분코드·처리구분코드 등 공통코드 목록과 해당 기관코드의 수신 내역을 함께 모아 상세 화면에 내려준다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/icr/getInsttCodeRecptnList.do",
+      "name": "기관코드수신 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/icr/getInsttCodeRecptnList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+            "line": 136,
+            "snippet": "@IncludedInfo(name=\"기관코드수신\", listUrl=\"/sym/ccm/icr/getInsttCodeRecptnList.do\", order = 1020 ,gid = 60)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+            "line": 48,
+            "snippet": "List<EgovMap> selectInsttCodeRecptnList(InsttCodeRecptnVO searchVO) throws Exception;"
+          }
+        ],
+        "text": "검색조건과 페이지 정보를 받아 기관코드수신 내역 목록과 총 건수를 조회해 목록 화면에 표시한다. 이 화면이 기관코드수신 업무의 메뉴 진입 화면이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/icr/getInsttCodeRecptnMainList.do",
+      "name": "메인 기관코드수신 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+            "line": 173,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/icr/getInsttCodeRecptnMainList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+            "line": 48,
+            "snippet": "List<EgovMap> selectInsttCodeRecptnList(InsttCodeRecptnVO searchVO) throws Exception;"
+          }
+        ],
+        "text": "메인 화면에 보여줄 기관코드수신 내역 목록을 조회조건 정보로 조회해 내려준다."
+      }
+    }
+  ],
+  "name": "기관코드수신",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 32,
+              "snippet": "void insertInsttCodeRecptn() throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 40,
+              "snippet": "InsttCodeRecptn selectInsttCodeDetail(InsttCodeRecptn insttCodeRecptn) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 48,
+              "snippet": "List<EgovMap> selectInsttCodeRecptnList(InsttCodeRecptnVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "기관코드수신 처리 기능은 입력 인자 없이 호출되어 수신 대상 기관코드를 스스로 가져와 적재한다. 같은 계약 안에 기관코드 상세내역 조회와 기관코드수신 목록 조회 기능이 함께 놓여 수신·조회가 한 업무 단위로 묶인다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 25,
+              "snippet": "public interface EgovInsttCodeRecptnService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 32,
+              "snippet": "void insertInsttCodeRecptn() throws Exception;"
+            }
+          ],
+          "text": "수신 요청 흐름에서 기관코드수신 처리 자체를 맡는 업무 서비스다. 화면 처리기는 판단만 하고 실제 수신 적재 작업은 이 서비스의 기관코드수신 처리 기능으로 전부 위임한다."
+        }
+      },
+      "name": "기관코드수신 업무 서비스",
+      "stepId": "step:ANY /sym/ccm/icr/addInsttCode.do:src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+            "line": 25,
+            "snippet": "public interface EgovInsttCodeRecptnService {"
+          }
+        ],
+        "text": "기관코드 수신 처리 업무를 규정한 업무 계약으로, 수신 요청 흐름에서 실제 기관코드수신 적재 작업을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 77,
+              "snippet": "String sCmd = commandMap.get(\"cmd\") == null ? \"\" : (String)commandMap.get(\"cmd\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 78,
+              "snippet": "if   (sCmd.equals(\"\")) {"
+            }
+          ],
+          "text": "기관코드 정보와 요청 파라미터 묶음을 함께 받는다. 파라미터 묶음에서 명령 구분값을 꺼내되 값이 없으면 빈 값으로 간주하고, 빈 값일 때만 수신 처리를 수행한다. 별도의 입력 검증이나 권한 확인은 이 처리기에서 수행하지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 71,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/icr/addInsttCode.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 79,
+              "snippet": "insttCodeManageService.insertInsttCodeRecptn();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 83,
+              "snippet": "return \"forward:/sym/ccm/icr/getInsttCodeRecptnList.do\";"
+            }
+          ],
+          "text": "기관코드 수신 요청 화면의 진입점이다. 요청에 실려온 명령 구분값을 확인해 수신 처리를 업무 서비스에 위임하고, 결과에 따라 수신 등록 화면을 보여주거나 기관코드수신 목록 화면으로 넘긴다."
+        }
+      },
+      "name": "기관코드 수신 요청 처리기",
+      "stepId": "step:ANY /sym/ccm/icr/addInsttCode.do:src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+            "line": 71,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/icr/addInsttCode.do\")"
+          }
+        ],
+        "text": "기관코드 수신 요청을 받아 명령 구분값에 따라 수신 처리 후 등록 화면을 보여줄지, 목록 화면으로 넘길지 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID, 상세코드, 코드명, 코드설명과 특정 테이블명을 가진다. 특정 테이블명은 특정 테이블에서 코드정보를 추출할 때만 쓰이고, 상세 조건 여부는 기본이 아니오이며 모든 문자열 항목은 빈 값으로 시작한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 113,
+              "snippet": "comCodeVO.setCodeId(\"COM043\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 118,
+              "snippet": "comCodeVO.setCodeId(\"COM044\");"
+            }
+          ],
+          "text": "상세내역 조회 흐름에서 공통코드 업무로 넘길 조회조건을 담는 데이터 구조다. 화면 처리기가 코드 ID만 바꿔 가며 재사용해 변경구분코드와 처리구분코드 목록을 차례로 받아온다."
+        }
+      },
+      "name": "공통코드 조회조건",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeDetail.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "상세 화면에서 변경구분코드·처리구분코드 목록을 가져올 때 코드 ID 등 조회조건을 담아 공통코드 조회에 전달하는 정보 묶음이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "public Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            }
+          ],
+          "text": "공통코드 조회조건을 받아 코드 목록을 돌려주는 단건 조회 기능을 제공하며, 여러 조회조건을 한꺼번에 받아 코드 목록들을 묶음으로 돌려주는 기능과 조직정보·그룹정보를 코드 형태로 돌려주는 기능도 함께 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 114,
+              "snippet": "List<CmmnDetailCode> changeSeCodeList = cmmUseService.selectCmmCodeDetail(comCodeVO);"
+            }
+          ],
+          "text": "기관코드 상세내역 조회 흐름에서 화면 선택 항목으로 쓸 공통코드를 공급하는 외부 업무 서비스다. 기관코드수신 업무는 코드 값의 관리 책임을 지지 않고 이 서비스에 조회만 요청한다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeDetail.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "공통코드를 조회하는 업무 계약으로, 상세내역 화면에 필요한 변경구분코드·처리구분코드 목록을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 40,
+              "snippet": "InsttCodeRecptn selectInsttCodeDetail(InsttCodeRecptn insttCodeRecptn) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 48,
+              "snippet": "List<EgovMap> selectInsttCodeRecptnList(InsttCodeRecptnVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "기관코드 정보를 받아 기관코드 상세내역 한 건을 돌려주는 기능과, 조회조건 정보를 받아 기관코드수신 목록을 돌려주는 기능을 규정한다. 상세 화면은 두 기능을 연달아 호출해 상세와 내역을 한 화면에 모은다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 25,
+              "snippet": "public interface EgovInsttCodeRecptnService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 101,
+              "snippet": "InsttCodeRecptn vo = insttCodeManageService.selectInsttCodeDetail(insttCode);"
+            }
+          ],
+          "text": "상세내역 조회 흐름에서 기관코드 한 건의 상세 정보와 그 기관코드의 수신 내역 목록을 조달하는 업무 서비스다. 화면 처리기는 조회 결과를 화면 항목으로 묶는 일만 한다."
+        }
+      },
+      "name": "기관코드 상세내역 조회 서비스",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeDetail.do:src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+            "line": 25,
+            "snippet": "public interface EgovInsttCodeRecptnService {"
+          }
+        ],
+        "text": "기관코드 상세내역과 해당 기관코드의 수신 내역 목록을 조회해 상세 화면에 공급하는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+              "line": 33,
+              "snippet": "private String searchCondition = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+              "line": 45,
+              "snippet": "private int pageUnit = 10;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 105,
+              "snippet": "insttCodeRecptnVO.setRecordCountPerPage(9999999);"
+            }
+          ],
+          "text": "검색조건·검색어·검색사용여부와 현재 페이지, 페이지당 건수 등 페이지 나눔 항목을 가진다. 페이지 항목은 기본이 첫 페이지에 열 건이지만, 상세 화면은 전량 조회를 위해 페이지당 건수와 시작 위치를 덮어써 기본 불변식을 의도적으로 벗어난다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+              "line": 28,
+              "snippet": "public class InsttCodeRecptnVO extends InsttCodeRecptn implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 122,
+              "snippet": "insttCodeRecptnVO.setSearchCondition(\"CodeList\");"
+            }
+          ],
+          "text": "상세내역 조회 흐름에서 기관코드수신 내역 조회의 조건과 범위를 나르는 데이터 구조다. 기관코드 정보를 상속하므로 코드 값과 조회조건을 함께 담아 서비스로 넘길 수 있다."
+        }
+      },
+      "name": "기관코드수신 조회조건",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeDetail.do:src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+            "line": 28,
+            "snippet": "public class InsttCodeRecptnVO extends InsttCodeRecptn implements Serializable {"
+          }
+        ],
+        "text": "상세 화면에서 해당 기관코드의 수신 내역을 전량 가져오기 위해 조회조건과 조회 범위를 담는 정보 묶음이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 96,
+              "snippet": "public String selectInsttCodeDetail (@ModelAttribute(\"insttCode\") InsttCodeRecptn insttCode"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 105,
+              "snippet": "insttCodeRecptnVO.setRecordCountPerPage(9999999);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 122,
+              "snippet": "insttCodeRecptnVO.setSearchCondition(\"CodeList\");"
+            }
+          ],
+          "text": "화면에서 기관코드 정보와 기관코드수신 조회조건을 함께 받는다. 받은 조회조건은 전량 조회가 되도록 페이지당 건수와 시작 위치를 다시 지정하고 조회조건을 코드목록으로 고정한 뒤 사용한다. 별도의 입력 검증이나 권한 확인은 이 처리기에서 수행하지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 101,
+              "snippet": "InsttCodeRecptn vo = insttCodeManageService.selectInsttCodeDetail(insttCode);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 119,
+              "snippet": "List<CmmnDetailCode> processSeList = cmmUseService.selectCmmCodeDetail(comCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 126,
+              "snippet": "return \"egovframework/com/sym/ccm/icr/EgovInsttCodeDetail\";"
+            }
+          ],
+          "text": "기관코드 상세 화면의 진입점이다. 기관코드 상세내역을 업무 서비스로 조회하고, 공통코드 업무에서 변경구분코드와 처리구분코드 목록을 받아온 뒤 해당 기관코드의 수신 내역까지 모아 상세 화면 항목으로 내려준다."
+        }
+      },
+      "name": "기관코드 상세내역 조회 처리기",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeDetail.do:src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+            "line": 95,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/icr/getInsttCodeDetail.do\")"
+          }
+        ],
+        "text": "기관코드 상세내역과 구분코드 목록, 수신 내역을 모아 상세 화면에 내려주는 화면 처리기다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 48,
+              "snippet": "List<EgovMap> selectInsttCodeRecptnList(InsttCodeRecptnVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 63,
+              "snippet": "List<EgovMap> selectInsttCodeList(InsttCodeRecptnVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "조회조건 정보를 받아 기관코드수신 목록과 총 건수를 돌려주며, 이와 별개로 기관코드 자체의 목록과 총 건수를 돌려주는 기능도 규정해 수신 내역 목록과 기관코드 목록을 업무상 구분한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 48,
+              "snippet": "List<EgovMap> selectInsttCodeRecptnList(InsttCodeRecptnVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 55,
+              "snippet": "int selectInsttCodeRecptnListTotCnt(InsttCodeRecptnVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "목록 조회 흐름에서 기관코드수신 내역과 총 건수를 조달하는 업무 서비스다. 페이지 나눔을 화면에서 계산할 수 있도록 목록과 총 건수를 별도 기능으로 나누어 제공한다."
+        }
+      },
+      "name": "기관코드수신 목록 조회 서비스",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeRecptnList.do:src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+            "line": 25,
+            "snippet": "public interface EgovInsttCodeRecptnService {"
+          }
+        ],
+        "text": "조회조건에 맞는 기관코드수신 목록과 총 건수를 돌려주는 업무 계약으로, 목록 화면의 데이터를 공급한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+              "line": 33,
+              "snippet": "private String searchCondition = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+              "line": 42,
+              "snippet": "private int pageIndex = 1;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+              "line": 45,
+              "snippet": "private int pageUnit = 10;"
+            }
+          ],
+          "text": "검색조건, 검색어, 검색사용여부와 현재 페이지, 페이지당 건수, 페이지 사이즈를 가진다. 현재 페이지는 첫 페이지, 페이지당 건수와 페이지 사이즈는 열 건이 기본값이므로 화면이 값을 주지 않아도 목록 조회가 성립한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+              "line": 28,
+              "snippet": "public class InsttCodeRecptnVO extends InsttCodeRecptn implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 48,
+              "snippet": "List<EgovMap> selectInsttCodeRecptnList(InsttCodeRecptnVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "목록 조회 흐름에서 화면이 입력한 검색조건과 페이지 정보를 업무 서비스로 나르는 데이터 구조다. 목록과 총 건수 조회 모두 같은 조회조건을 사용한다."
+        }
+      },
+      "name": "기관코드수신 목록 조회조건",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeRecptnList.do:src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+            "line": 28,
+            "snippet": "public class InsttCodeRecptnVO extends InsttCodeRecptn implements Serializable {"
+          }
+        ],
+        "text": "목록 화면의 검색조건과 검색어, 페이지 정보를 담아 기관코드수신 목록 조회에 전달하는 정보 묶음이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 138,
+              "snippet": "public String selectInsttCodeRecptnList (@ModelAttribute(\"searchVO\") InsttCodeRecptnVO searchVO"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 139,
+              "snippet": ", ModelMap model"
+            }
+          ],
+          "text": "화면에서 검색조건과 페이지 정보를 담은 조회조건 정보를 받아 처리한다. 별도의 입력 검증이나 권한 확인 없이 조회조건을 그대로 업무 서비스로 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 136,
+              "snippet": "@IncludedInfo(name=\"기관코드수신\", listUrl=\"/sym/ccm/icr/getInsttCodeRecptnList.do\", order = 1020 ,gid = 60)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 137,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/icr/getInsttCodeRecptnList.do\")"
+            }
+          ],
+          "text": "기관코드수신 목록 화면의 진입점이며, 시스템 메뉴에 기관코드수신 항목으로 등록되어 이 업무의 대표 화면 역할을 한다. 받은 검색조건을 업무 서비스에 넘겨 목록을 조회하고 목록 화면으로 결과를 내려준다."
+        }
+      },
+      "name": "기관코드수신 목록 조회 처리기",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeRecptnList.do:src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/icr/getInsttCodeRecptnList.do\")"
+          }
+        ],
+        "text": "검색조건을 받아 기관코드수신 목록을 조회하고 목록 화면에 내려주는 화면 처리기로, 이 업무의 메뉴 진입 화면을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 48,
+              "snippet": "List<EgovMap> selectInsttCodeRecptnList(InsttCodeRecptnVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 55,
+              "snippet": "int selectInsttCodeRecptnListTotCnt(InsttCodeRecptnVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "조회조건 정보를 받아 기관코드수신 목록을 돌려주며, 필요 시 총 건수를 별도로 조회할 수 있게 총 개수 조회 기능을 함께 규정한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 25,
+              "snippet": "public interface EgovInsttCodeRecptnService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 48,
+              "snippet": "List<EgovMap> selectInsttCodeRecptnList(InsttCodeRecptnVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "메인 화면 목록 조회 흐름에서 기관코드수신 내역을 조달하는 업무 서비스다. 메인 화면 전용 기능을 따로 두지 않고 목록 화면과 같은 조회 기능을 함께 사용한다."
+        }
+      },
+      "name": "메인 기관코드수신 목록 조회 서비스",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeRecptnMainList.do:src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+            "line": 25,
+            "snippet": "public interface EgovInsttCodeRecptnService {"
+          }
+        ],
+        "text": "메인 화면에 표시할 기관코드수신 내역 목록을 조회조건에 맞추어 돌려주는 업무 계약이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+              "line": 36,
+              "snippet": "private String searchKeyword = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+              "line": 42,
+              "snippet": "private int pageIndex = 1;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+              "line": 45,
+              "snippet": "private int pageUnit = 10;"
+            }
+          ],
+          "text": "검색조건과 검색어, 검색사용여부에 더해 현재 페이지와 페이지당 건수 같은 조회 범위 항목을 가진다. 값을 주지 않으면 첫 페이지 열 건이 적용된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+              "line": 28,
+              "snippet": "public class InsttCodeRecptnVO extends InsttCodeRecptn implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 174,
+              "snippet": "public String selectInsttCodeRecptnMainList (@ModelAttribute(\"searchVO\") InsttCodeRecptnVO searchVO"
+            }
+          ],
+          "text": "메인 화면 목록 조회 흐름에서 조회조건을 업무 서비스로 나르는 데이터 구조다. 목록 화면과 동일한 조회조건 구조를 그대로 사용한다."
+        }
+      },
+      "name": "메인 목록 조회조건",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeRecptnMainList.do:src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+            "line": 28,
+            "snippet": "public class InsttCodeRecptnVO extends InsttCodeRecptn implements Serializable {"
+          }
+        ],
+        "text": "메인 화면 목록 조회에 쓰이는 검색조건과 페이지 정보를 담는 정보 묶음이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 174,
+              "snippet": "public String selectInsttCodeRecptnMainList (@ModelAttribute(\"searchVO\") InsttCodeRecptnVO searchVO"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 175,
+              "snippet": ", ModelMap model"
+            }
+          ],
+          "text": "화면에서 검색조건과 페이지 정보를 담은 조회조건 정보를 받고 화면 전달용 모델을 함께 받는다. 별도의 입력 검증이나 권한 확인 없이 조회조건을 업무 서비스로 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+              "line": 173,
+              "snippet": "@RequestMapping(value = \"/sym/ccm/icr/getInsttCodeRecptnMainList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+              "line": 48,
+              "snippet": "List<EgovMap> selectInsttCodeRecptnList(InsttCodeRecptnVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "메인 화면용 기관코드수신 목록 요청의 진입점이다. 목록 화면과 별도의 주소를 두되 같은 기관코드수신 업무 서비스에 조회를 위임해 메인 화면에 보여줄 내역을 받아온다."
+        }
+      },
+      "name": "메인 기관코드수신 목록 처리기",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeRecptnMainList.do:src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+            "line": 173,
+            "snippet": "@RequestMapping(value = \"/sym/ccm/icr/getInsttCodeRecptnMainList.do\")"
+          }
+        ],
+        "text": "메인 화면에서 기관코드수신 내역 목록 요청을 받아 조회 결과를 내려주는 화면 처리기다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+        "line": 136,
+        "snippet": "@IncludedInfo(name=\"기관코드수신\", listUrl=\"/sym/ccm/icr/getInsttCodeRecptnList.do\", order = 1020 ,gid = 60)"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+        "line": 25,
+        "snippet": "public interface EgovInsttCodeRecptnService {"
+      }
+    ],
+    "text": "행정기관 기관코드를 외부로부터 수신하여 적재하고, 수신된 기관코드 내역을 목록·상세로 조회하는 업무 영역이다. 수신 처리 요청, 기관코드수신 목록 조회, 메인 화면용 목록 조회, 상세내역 조회의 네 가지 화면 요청을 하나의 담당 화면 처리기가 받아 기관코드수신 업무 서비스로 위임한다."
+  }
+}

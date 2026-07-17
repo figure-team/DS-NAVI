@@ -1,0 +1,181 @@
+{
+  "domainId": "domain:cop.com",
+  "files": [
+    {
+      "className": "EgovUserInfManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/com/service/EgovUserInfManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 22,
+      "relPath": "src/main/java/egovframework/com/cop/com/service/EgovUserInfManageService.java",
+      "slice": {
+        "endLine": 87,
+        "startLine": 12,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.4.6  이삼섭          최초 생성\n *\n * </pre>\n */\npublic interface EgovUserInfManageService {\n\n\t/**\n\t * 사용자 정보에 대한 목록을 조회한다.\n\t *\n\t * @param userVO\n\t * @return\n\t * @throws Exception\n\t */\n\tpublic Map<String, Object> selectUserList(UserInfVO userVO) throws Exception;\n\n\t/**\n\t * 커뮤니티 사용자 목록을 조회한다.\n\t *\n\t * @param userVO\n\t * @return\n\t * @throws Exception\n\t */\n\tpublic Map<String, Object> selectCmmntyUserList(UserInfVO userVO) throws Exception;\n\n\t/**\n\t * 커뮤니티 관리자 목록을 조회한다.\n\t *\n\t * @param userVO\n\t * @return\n\t * @throws Exception\n\t */\n\tpublic Map<String, Object> selectCmmntyMngrList(UserInfVO userVO) throws Exception;\n\n\t/**\n\t * 동호회 사용자 목록을 조회한다.\n\t *\n\t * @param userVO\n\t * @return\n\t * @throws Exception\n\t */\n\tpublic Map<String, Object> selectClubUserList(UserInfVO userVO) throws Exception;\n\n\t/**\n\t * 동호회 운영자 목록을 조회한다.\n\t *\n\t * @param userVO\n\t * @return\n\t * @throws Exception\n\t */\n\tpublic Map<String, Object> selectClubOprtrList(UserInfVO userVO) throws Exception;\n\n\t/**\n\t * 동호회에 대한 모든 사용자 목록을 조회한다.\n\t *\n\t * @param userVO\n\t * @return\n\t * @throws Exception\n\t */\n\tpublic List<UserInfVO> selectAllClubUser(UserInfVO userVO) throws Exception;\n\n\t/**\n\t * 커뮤니티에 대한 모든 사용자 목록을 조회한다.\n\t *\n\t * @param userVO\n\t * @return\n\t * @throws Exception\n\t */\n\tpublic List<UserInfVO> selectAllCmmntyUser(UserInfVO userVO) throws Exception;\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "UserInfVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/com/service/UserInfVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cop/com/service/UserInfVO.java",
+      "slice": {
+        "endLine": 95,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.4.6  이삼섭          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class UserInfVO implements Serializable {\n\n\t/** 유일 아이디 */\n\tprivate String uniqId = \"\";\n\n\t/** 사용자 아이디 */\n\tprivate String userId = \"\";\n\n\t/** 사용자 명 */\n\tprivate String userNm = \"\";\n\n\t/** 사용자 우편번호 */\n\tprivate String userZip = \"\";\n\n\t/** 사용자 주소 */\n\tprivate String userAdres = \"\";\n\n\t/** 사용자 이메일 */\n\tprivate String userEmail = \"\";\n\n\t/** 검색시작일 */\n\tprivate String searchBgnDe = \"\";\n\n\t/** 검색조건 */\n\tprivate String searchCnd = \"\";\n\n\t/** 검색종료일 */\n\tprivate String searchEndDe = \"\";\n\n\t/** 검색단어 */\n\tprivate String searchWrd = \"\";\n\n\t/** 정렬순서(DESC,ASC) */\n\tprivate String sortOrdr = \"\";\n\n\t/** 검색사용여부 */\n\tprivate String searchUseYn = \"\";\n\n\t/** 현재페이지 */\n\tprivate int pageIndex = 1;\n\n\t/** 페이지개수 */\n\tprivate int pageUnit = 10;\n\n\t/** 페이지사이즈 */\n\tprivate int pageSize = 10;\n\n\t/** 첫페이지 인덱스 */\n\tprivate int firstIndex = 1;\n\n\t/** 마지막페이지 인덱스 */\n\tprivate int lastIndex = 1;\n\n\t/** 페이지당 레코드 개수 */\n\tprivate int recordCountPerPage = 10;\n\n\t/** 레코드 번호 */\n\tprivate int rowNo = 0;\n\n\t/** 대상 아이디 */\n\tprivate String trgetId = \"\";\n\n\t/** 사용여부 */\n\tprivate String useAt = \"Y\";\n\n\t/** 커뮤니티 아이디 */\n\tprivate String cmmntyId = \"\";",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCopUserInfController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java — java 파일",
+        "tags": []
+      },
+      "line": 52,
+      "relPath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+      "slice": {
+        "endLine": 89,
+        "startLine": 42,
+        "text": "\n\t/**\n\t * 사용자 정보에 대한 목록을 조회한다.\n\t *\n\t * @param userVO\n\t * @param sessionVO\n\t * @param model\n\t * @return\n\t * @throws Exception\n\t */\n\t@RequestMapping(\"/cop/com/selectUserList.do\")\n\tpublic String selectUserList(@ModelAttribute(\"searchVO\") UserInfVO userVO, @RequestParam Map<String, Object> commandMap, ModelMap model) throws Exception {\n\t\tString popFlag = (String) commandMap.get(\"PopFlag\");\n\t\tString returnUrl = \"egovframework/com/cop/com/EgovUserList\";\n\n\t\tif (\"Y\".equals(popFlag)) {\n\t\t\treturnUrl = \"egovframework/com/cop/com/EgovUserListPop\";\n\t\t}\n\n\t\tuserVO.setPageUnit(propertyService.getInt(\"pageUnit\"));\n\t\tuserVO.setPageSize(propertyService.getInt(\"pageSize\"));\n\n\t\tPaginationInfo paginationInfo = new PaginationInfo();\n\n\t\tpaginationInfo.setCurrentPageNo(userVO.getPageIndex());\n\t\tpaginationInfo.setRecordCountPerPage(userVO.getPageUnit());\n\t\tpaginationInfo.setPageSize(userVO.getPageSize());\n\n\t\tuserVO.setFirstIndex(paginationInfo.getFirstRecordIndex());\n\t\tuserVO.setLastIndex(paginationInfo.getLastRecordIndex());\n\t\tuserVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());\n\n\t\tMap<String, Object> map = userInfService.selectUserList(userVO);\n\t\tint totCnt = Integer.parseInt((String) map.get(\"resultCnt\"));\n\n\t\tpaginationInfo.setTotalRecordCount(totCnt);\n\n\t\tmodel.addAttribute(\"resultList\", map.get(\"resultList\"));\n\t\tmodel.addAttribute(\"resultCnt\", map.get(\"resultCnt\"));\n\t\tmodel.addAttribute(\"targetMethod\", \"selectUserList\");\n\t\tmodel.addAttribute(\"trgetId\", \"\");\n\t\tmodel.addAttribute(\"paginationInfo\", paginationInfo);\n\n\t\treturn returnUrl;\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCopViewController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java — java 파일",
+        "tags": []
+      },
+      "line": 38,
+      "relPath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+      "slice": {
+        "endLine": 68,
+        "startLine": 28,
+        "text": "\n\t/**\n\t * 팝업 페이지를 호출한다.\n\t *\n\t * @param userVO\n\t * @param sessionVO\n\t * @param model\n\t * @return\n\t * @throws Exception\n\t */\n\t@RequestMapping(\"/cop/com/openPopup.do\")\n\tpublic String openPopupWindow(@RequestParam Map<String, Object> commandMap, ModelMap model) throws Exception {\n\n\t\tString requestUrl = (String) commandMap.get(\"requestUrl\");\n\t\tString trgetId = (String) commandMap.get(\"trgetId\");\n\t\tString width = (String) commandMap.get(\"width\");\n\t\tString height = (String) commandMap.get(\"height\");\n\t\tString typeFlag = (String) commandMap.get(\"typeFlag\");\n\n\t\tif (trgetId != null && !trgetId.isEmpty()) {\n\t\t\tif (typeFlag != null && !typeFlag.isEmpty()) {\n\t\t\t\tmodel.addAttribute(\"requestUrl\", requestUrl + \"?trgetId=\" + trgetId + \"&PopFlag=Y&typeFlag=\" + typeFlag);\n\t\t\t} else {\n\t\t\t\tmodel.addAttribute(\"requestUrl\", requestUrl + \"?trgetId=\" + trgetId + \"&PopFlag=Y\");\n\t\t\t}\n\t\t} else {\n\t\t\tif (typeFlag != null && !typeFlag.isEmpty()) {\n\t\t\t\tmodel.addAttribute(\"requestUrl\", requestUrl + \"?PopFlag=Y&typeFlag=\" + typeFlag);\n\t\t\t} else {\n\t\t\t\tmodel.addAttribute(\"requestUrl\", requestUrl + \"?PopFlag=Y\");\n\t\t\t}\n\n\t\t}\n\n\t\tmodel.addAttribute(\"width\", width);\n\t\tmodel.addAttribute(\"height\", height);\n\n\t\treturn \"egovframework/com/cop/com/EgovModalPopupFrame\";\n\t}\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovCopViewController#openPopupWindow",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+      "flowId": "flow:ANY /cop/com/openPopup.do",
+      "line": 38,
+      "stepIds": [
+        "step:ANY /cop/com/openPopup.do:src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCopUserInfController#selectUserList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+      "flowId": "flow:ANY /cop/com/selectUserList.do",
+      "line": 52,
+      "stepIds": [
+        "step:ANY /cop/com/selectUserList.do:src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+        "step:ANY /cop/com/selectUserList.do:src/main/java/egovframework/com/cop/com/service/UserInfVO.java",
+        "step:ANY /cop/com/selectUserList.do:src/main/java/egovframework/com/cop/com/service/EgovUserInfManageService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "cop.com",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java",
+      "stepId": "step:ANY /cop/com/openPopup.do:src/main/java/egovframework/com/cop/com/web/EgovCopViewController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/com/service/EgovUserInfManageService.java",
+      "stepId": "step:ANY /cop/com/selectUserList.do:src/main/java/egovframework/com/cop/com/service/EgovUserInfManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/com/service/UserInfVO.java",
+      "stepId": "step:ANY /cop/com/selectUserList.do:src/main/java/egovframework/com/cop/com/service/UserInfVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java",
+      "stepId": "step:ANY /cop/com/selectUserList.do:src/main/java/egovframework/com/cop/com/web/EgovCopUserInfController.java"
+    }
+  ]
+}

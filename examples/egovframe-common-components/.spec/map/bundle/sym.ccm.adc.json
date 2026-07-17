@@ -1,0 +1,367 @@
+{
+  "domainId": "domain:sym.ccm.adc",
+  "files": [
+    {
+      "className": "LoginVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/LoginVO.java — java 파일",
+        "tags": []
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 21,
+        "text": " *   2009.03.03     박지욱     최초 생성\n *   2021.05.30     정진오     디지털원패스 사용자키/세션값 추가\n *</pre>\n *\n *  @author 공통서비스 개발팀 박지욱\n *  @since 2009.03.03\n *  @version 1.0\n *  @see\n *\n */\n@Getter\n@Setter\npublic class LoginVO implements Serializable{\n\n\t/**\n\t *\n\t */\n\tprivate static final long serialVersionUID = -8274004534207618049L;\n\n\t/** 아이디 */\n\t@EgovNullCheck\n\tprivate String id;\n\t/** 이름 */\n\t@EgovNullCheck\n\tprivate String name;\n\t/** 주민등록번호 */\n\tprivate String ihidNum;\n\t/** 이메일주소 */\n\t@EgovNullCheck\n\t@EgovEmailCheck\n\tprivate String email;\n\t/** 비밀번호 */\n\tprivate String password;\n\t/** 비밀번호 힌트 */\n\t@EgovNullCheck\n\tprivate String passwordHint;\n\t/** 비밀번호 정답 */\n\t@EgovNullCheck\n\tprivate String passwordCnsr;\n\t/** 사용자구분 */\n\tprivate String userSe;\n\t/** 조직(부서)ID */\n\tprivate String orgnztId;\n\t/** 조직(부서)명 */\n\tprivate String orgnztNm;\n\t/** 고유아이디 */\n\tprivate String uniqId;\n\t/** 로그인 후 이동할 페이지 */\n\tprivate String url;\n\t/** 사용자 IP정보 */\n\tprivate String ip;\n\t/** GPKI인증 DN */\n\tprivate String dn;\n\t/** 디지털원패스 사용자키 */\n\tprivate String onepassUserkey;\n\t/** 디지털원패스 사용자세션값 */\n\tprivate String onepassIntfToken;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "AdministCode",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+      "slice": {
+        "endLine": 94,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호\t\t\t최초 생성\n *   2024.10.29  권태성\t\t\t필수값 BindingResult 검증을 위한 @EgovNullCheck 추가\n *\n * </pre>\n */\npublic class AdministCode implements Serializable {\n\n\tprivate static final long serialVersionUID = -3716488129294074398L;\n\n\t/*\n\t * 행정구역구분\n\t */\n\t@EgovNullCheck\n    private String administZoneSe = \"\";\n\n    /*\n     * 행정구역코드\n     */\n\t@EgovNullCheck\n\t@Size(max=10)\n    private String administZoneCode = \"\";\n\n    /*\n     * 행정구역명\n     */\n\tprivate String administZoneNm = \"\";\n\n\t/*\n\t * 상위행정구역코드\n\t */\n    private String upperAdministZoneCode = \"\";\n\n\t/*\n\t * 상위행정구역명\n\t */\n    private String upperAdministZoneNm = \"\";\n\n    /*\n\t * 생성일자\n\t */\n    private String creatDe = \"\";\n\n    /*\n\t * 폐기일자\n\t */\n    private String ablDe = \"\";\n\n    /*\n\t * 사용여부\n\t */\n\t@EgovNullCheck\n    private String useAt = \"\";\n\n    /*\n     * 최초등록자ID\n     */\n    private String frstRegisterId = \"\";\n\n    /*\n     * 최종수정자ID\n     */\n    private String lastUpdusrId   = \"\";\n\n\t/**\n\t * administZoneSe attribute 를 리턴한다.\n\t * @return String\n\t */\n\tpublic String getAdministZoneSe() {\n\t\treturn administZoneSe;\n\t}\n\n\t/**\n\t * administZoneSe attribute 값을 설정한다.\n\t * @param administZoneSe String\n\t */",
+        "truncated": true
+      }
+    },
+    {
+      "className": "AdministCodeVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+      "slice": {
+        "endLine": 59,
+        "startLine": 15,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\npublic class AdministCodeVO extends AdministCode implements Serializable {\n\n\tprivate static final long serialVersionUID = 3232859721751526210L;\n\n\t/** 검색조건 */\n    private String searchCondition = \"\";\n\n    /** 검색Keyword */\n    private String searchKeyword = \"\";\n\n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n\n    /** 현재페이지 */\n    private int pageIndex = 1;\n\n    /** 페이지개수 */\n    private int pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private int pageSize = 10;\n\n    /** firstIndex */\n    private int firstIndex = 1;\n\n    /** lastIndex */\n    private int lastIndex = 1;\n\n    /** recordCountPerPage */\n    private int recordCountPerPage = 10;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCcmAdministCodeManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 24,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+      "slice": {
+        "endLine": 71,
+        "startLine": 14,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호          최초 생성\n *\n * </pre>\n */\npublic interface EgovCcmAdministCodeManageService {\n\n\t/**\n\t * 행정코드를 삭제한다.\n\t * @param administCode\n\t * @throws Exception\n\t */\n\tvoid deleteAdministCode(AdministCode administCode) throws Exception;\n\n\t/**\n\t * 행정코드를 등록한다.\n\t * @param administCode\n\t * @throws Exception\n\t */\n\tvoid insertAdministCode(AdministCode administCode) throws Exception;\n\n\t/**\n\t * 행정코드 상세항목을 조회한다.\n\t * @param administCode\n\t * @return AdministCode(행정코드)\n\t * @throws Exception\n\t */\n\tAdministCode selectAdministCodeDetail(AdministCode administCode) throws Exception;\n\n\t/**\n\t * 행정코드 목록을 조회한다.\n\t * @param searchVO\n\t * @return List(행정코드 목록)\n\t * @throws Exception\n\t */\n\tList<EgovMap> selectAdministCodeList(AdministCodeVO searchVO) throws Exception;\n\n    /**\n\t * 행정코드 총 개수를 조회한다.\n     * @param searchVO\n     * @return int(행정코드 총 개수)\n     */\n    int selectAdministCodeListTotCnt(AdministCodeVO searchVO) throws Exception;\n\n\t/**\n\t * 행정코드를 수정한다.\n\t * @param administCode\n\t * @throws Exception\n\t */\n\tvoid updateAdministCode(AdministCode administCode) throws Exception;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCcmAdministCodeManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 197,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "slice": {
+        "endLine": 266,
+        "startLine": 187,
+        "text": "\n\t/**\n\t * 행정코드 팝업 목록을 조회한다.\n\t * \n\t * @param loginVO\n\t * @param searchVO\n\t * @param model\n\t * @return \"egovframework/com/sym/ccm/adc/EgovCcmAdministCode\"\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCode.do\")\n\tpublic String selectAdministCode(@ModelAttribute(\"loginVO\") LoginVO loginVO,\n\t\t\t@ModelAttribute(\"searchVO\") AdministCodeVO searchVO, ModelMap model) throws Exception {\n\t\t/** EgovPropertyService.sample */\n\t\tsearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));\n\t\tsearchVO.setPageSize(propertiesService.getInt(\"pageSize\"));\n\n\t\t/** pageing */\n\t\tPaginationInfo paginationInfo = new PaginationInfo();\n\t\tpaginationInfo.setCurrentPageNo(searchVO.getPageIndex());\n\t\tpaginationInfo.setRecordCountPerPage(searchVO.getPageUnit());\n\t\tpaginationInfo.setPageSize(searchVO.getPageSize());\n\n\t\tsearchVO.setFirstIndex(paginationInfo.getFirstRecordIndex());\n\t\tsearchVO.setLastIndex(paginationInfo.getLastRecordIndex());\n\t\tsearchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());\n\n\t\tList<EgovMap> resultList = administCodeManageService.selectAdministCodeList(searchVO);\n\t\tmodel.addAttribute(\"resultList\", resultList);\n\n\t\tint totCnt = administCodeManageService.selectAdministCodeListTotCnt(searchVO);\n\t\tpaginationInfo.setTotalRecordCount(totCnt);\n\t\tmodel.addAttribute(\"paginationInfo\", paginationInfo);\n\n\t\treturn \"egovframework/com/sym/ccm/adc/EgovCcmAdministCode\";\n\t}\n\n\t/**\n\t * 행정코드 수정화면\n\t * \n\t * @param loginVO\n\t * @param administCode\n\t * @param model\n\t * @return \"egovframework/com/sym/ccm/adc/EgovCcmAdministCodeModify\"\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeModifyView.do\")\n\tpublic String updateAdministCodeView(@ModelAttribute(\"loginVO\") LoginVO loginVO,\n\t\t\t@ModelAttribute(\"administCode\") AdministCode administCode, ModelMap model) throws Exception {\n\t\tAdministCode vo = administCodeManageService.selectAdministCodeDetail(administCode);\n\t\tif (vo != null) {\n\t\t\tmodel.addAttribute(\"administCode\", vo);\n\t\t\treturn \"egovframework/com/sym/ccm/adc/EgovCcmAdministCodeModify\";\n\t\t} else {\n\t\t\treturn \"redirect:/sym/ccm/adc/EgovCcmAdministCodeList.do\";\n\t\t}\n\t}\n\n\t/**\n\t * 행정코드를 수정한다.\n\t * \n\t * @param loginVO\n\t * @param administCode\n\t * @param bindingResult\n\t * @param commandMap\n\t * @param model\n\t * @return\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/sym/ccm/adc/EgovCcmAdministCodeModify.do\")\n\tpublic String updateAdministCode(@ModelAttribute(\"loginVO\") LoginVO loginVO,\n\t\t\t@Valid @ModelAttribute(\"administCode\") AdministCode administCode, BindingResult bindingResult,\n\t\t\t@RequestParam Map<?, ?> commandMap, ModelMap model) throws Exception {\n\n\t\tif (bindingResult.hasErrors()) {\n\t\t\treturn \"egovframework/com/sym/ccm/adc/EgovCcmAdministCodeModify\";\n\t\t}\n\n\t\tAdministCode vo = administCodeManageService.selectAdministCodeDetail(administCode);\n\t\tif (vo != null) {",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovCcmAdministCodeManageController#selectAdministCode",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCode.do",
+      "line": 197,
+      "stepIds": [
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCode.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCode.do:src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCode.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmAdministCodeManageController#selectAdministCodeDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeDetail.do",
+      "line": 130,
+      "stepIds": [
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmAdministCodeManageController#selectAdministCodeList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeList.do",
+      "line": 149,
+      "stepIds": [
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeList.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeList.do:src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeList.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmAdministCodeManageController#updateAdministCode",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeModify.do",
+      "line": 256,
+      "stepIds": [
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModify.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModify.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModify.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModify.do:src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmAdministCodeManageController#updateAdministCodeView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeModifyView.do",
+      "line": 233,
+      "stepIds": [
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModifyView.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModifyView.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmAdministCodeManageController#callAdministCodePopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodePopup.do",
+      "line": 183,
+      "stepIds": [
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodePopup.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmAdministCodeManageController#insertAdministCode",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeRegist.do",
+      "line": 98,
+      "stepIds": [
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRegist.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRegist.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRegist.do:src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmAdministCodeManageController#insertAdministCodeView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeRegistView.do",
+      "line": 80,
+      "stepIds": [
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRegistView.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCcmAdministCodeManageController#deleteAdministCode",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "flowId": "flow:ANY /sym/ccm/adc/EgovCcmAdministCodeRemove.do",
+      "line": 64,
+      "stepIds": [
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRemove.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+        "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRemove.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "sym.ccm.adc",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCode.do:src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCode.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCode.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeList.do:src/main/java/egovframework/com/sym/ccm/adc/service/AdministCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeList.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeList.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModify.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModify.do:src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModify.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModify.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModifyView.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeModifyView.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodePopup.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRegist.do:src/main/java/egovframework/com/sym/ccm/adc/service/AdministCode.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRegist.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRegist.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRegistView.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRemove.do:src/main/java/egovframework/com/sym/ccm/adc/service/EgovCcmAdministCodeManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java",
+      "stepId": "step:ANY /sym/ccm/adc/EgovCcmAdministCodeRemove.do:src/main/java/egovframework/com/sym/ccm/adc/web/EgovCcmAdministCodeManageController.java"
+    }
+  ]
+}

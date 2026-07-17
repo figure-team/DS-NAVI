@@ -1,0 +1,199 @@
+{
+  "domainId": "domain:sym.log.ulg",
+  "files": [
+    {
+      "className": "EgovMessageSource",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovMessageSource.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이문준          최초 생성\n *   2017.07.21  장동한 \t\t\targs, locale 설정\n *\n * </pre>\n */\n\npublic class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {\n\n\tprivate ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;\n\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @param reloadableResourceBundleMessageSource - resource MessageSource\n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic void setReloadableResourceBundleMessageSource(ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource) {\n\t\tthis.reloadableResourceBundleMessageSource = reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic ReloadableResourceBundleMessageSource getReloadableResourceBundleMessageSource() {\n\t\treturn reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, locale);\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @return String\n\t */\t\n\tpublic String getMessageArgs(String code, Object[] args) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, locale);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserLogService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/log/ulg/service/EgovUserLogService.java — java 파일",
+        "tags": []
+      },
+      "line": 24,
+      "relPath": "src/main/java/egovframework/com/sym/log/ulg/service/EgovUserLogService.java",
+      "slice": {
+        "endLine": 49,
+        "startLine": 14,
+        "text": " *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이삼섭          최초 생성\n *   2011.07.01  이기하          패키지 분리(sym.log -> sym.log.ulg)\n *   2025.07.14  이백행          2025년 컨트리뷰션 PMD로 소프트웨어 보안약점 진단하고 제거하기-LocalVariableNamingConventions(final이 아닌 변수는 밑줄을 포함할 수 없음)\n *\n *      </pre>\n */\npublic interface EgovUserLogService {\n\n\t/**\n\t * 사용자 로그정보를 생성한다.\n\t *\n\t * @param\n\t */\n\tpublic void logInsertUserLog() throws Exception;\n\n\t/**\n\t * 사용자로그 상세정보를 조회한다.\n\t *\n\t * @param userLog\n\t * @return userLog\n\t * @throws Exception\n\t */\n\tpublic UserLog selectUserLog(UserLog userLog) throws Exception;\n\n\t/**\n\t * 사용자 로그정보 목록을 조회한다.\n\t *\n\t * @param UserLog\n\t */\n\tpublic Map<String, Object> selectUserLogInf(UserLog userLog) throws Exception;\n\n}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "UserLog",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/log/ulg/service/UserLog.java — java 파일",
+        "tags": []
+      },
+      "line": 23,
+      "relPath": "src/main/java/egovframework/com/sym/log/ulg/service/UserLog.java",
+      "slice": {
+        "endLine": 92,
+        "startLine": 13,
+        "text": " *    -------         -------     -------------------\n *    2009. 3. 11.    이삼섭        최초생성\n *    2011. 7. 01.    이기하        패키지 분리(sym.log -> sym.log.ulg)\n *    2011.09.14       서준식      화면에 검색일자를 표시하기위한 멤버변수 추가.\n * @author 공통 서비스 개발팀 이삼섭\n * @since 2009. 3. 11.\n * @version\n * @see\n *\n */\npublic class UserLog implements Serializable {\n\n\tprivate static final long serialVersionUID = -3030641254553776910L;\n\t/**\n\t * 발생일자\n\t */\n\tprivate String occrrncDe = \"\";\n\t/**\n\t * 요청자아이디\n\t */\n\tprivate String rqesterId = \"\";\n\t/**\n\t * 요청자 이름\n\t */\n\tprivate String rqsterNm = \"\";\n\t/**\n\t * 메서드명\n\t */\n\tprivate String methodNm = \"\";\n\t/**\n\t * 서비스명\n\t */\n\tprivate String srvcNm = \"\";\n\t/**\n\t * 생성횟수\n\t */\n\tprivate String creatCo = \"\";\n\t/**\n\t * 수정횟수\n\t */\n\tprivate String updtCo = \"\";\n\t/**\n\t * 조회횟수\n\t */\n\tprivate String rdCnt = \"\";\n\t/**\n\t * 삭제횟수\n\t */\n\tprivate String deleteCo = \"\";\n\t/**\n\t * 출력횟수\n\t */\n\tprivate String outptCo = \"\";\n\t/**\n\t * 에러횟수\n\t */\n\tprivate String errorCo = \"\";\n\t/**\n\t * 검색시작일\n\t */\n\tprivate String searchBgnDe = \"\";\n\t/**\n\t * 검색조건\n\t */\n\tprivate String searchCnd = \"\";\n\t/**\n\t * 검색종료일\n\t */\n\tprivate String searchEndDe = \"\";\n\t/**\n\t * 검색단어\n\t */\n\tprivate String searchWrd = \"\";\n\t/**\n\t * 정렬순서(DESC,ASC)\n\t */\n\tprivate String sortOrdr = \"\";\n\n\t/** 검색사용여부 */\n    private String searchUseYn = \"\";",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserLogController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/log/ulg/web/EgovUserLogController.java — java 파일",
+        "tags": []
+      },
+      "line": 100,
+      "relPath": "src/main/java/egovframework/com/sym/log/ulg/web/EgovUserLogController.java",
+      "slice": {
+        "endLine": 122,
+        "startLine": 90,
+        "text": "\t}\n\n\t/**\n\t * 사용자 로그 상세 조회\n\t *\n\t * @param userLog\n\t * @param model\n\t * @return sym/log/ulg/EgovUserLogInqire\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/sym/log/ulg/SelectUserLogDetail.do\")\n\tpublic String selectUserLog(@ModelAttribute(\"searchVO\") UserLog userLog,\n\t\t\t@RequestParam(\"occrrncDe\") String occrrncDe, @RequestParam(\"rqesterId\") String rqesterId,\n\t\t\t@RequestParam(\"srvcNm\") String srvcNm, @RequestParam(\"methodNm\") String methodNm, ModelMap model)\n\t\t\tthrows Exception {\n\n\t\t// 2026.03.23 kisa 보안점검 대응 조치\n\t\tif (ObjectUtils.isEmpty(occrrncDe) || ObjectUtils.isEmpty(rqesterId) || ObjectUtils.isEmpty(srvcNm) || ObjectUtils.isEmpty(methodNm)) {\n\t\t\tmodel.addAttribute(\"message\",  egovMessageSource.getMessage(\"fail.request.msg\"));\n\t\t\treturn \"forward:/sym/log/ulg/SelectUserLogList.do\";\n\t\t}\n\t\tuserLog.setOccrrncDe(occrrncDe.trim());\n\t\tuserLog.setRqesterId(rqesterId.trim());\n\t\tuserLog.setSrvcNm(srvcNm.trim());\n\t\tuserLog.setMethodNm(methodNm.trim());\n\n\t\tUserLog vo = userLogService.selectUserLog(userLog);\n\t\tmodel.addAttribute(\"result\", vo);\n\t\treturn \"egovframework/com/sym/log/ulg/EgovUserLogDetail\";\n\t}\n\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovUserLogController#selectUserLog",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/log/ulg/web/EgovUserLogController.java",
+      "flowId": "flow:ANY /sym/log/ulg/SelectUserLogDetail.do",
+      "line": 100,
+      "stepIds": [
+        "step:ANY /sym/log/ulg/SelectUserLogDetail.do:src/main/java/egovframework/com/sym/log/ulg/web/EgovUserLogController.java",
+        "step:ANY /sym/log/ulg/SelectUserLogDetail.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/log/ulg/SelectUserLogDetail.do:src/main/java/egovframework/com/sym/log/ulg/service/UserLog.java",
+        "step:ANY /sym/log/ulg/SelectUserLogDetail.do:src/main/java/egovframework/com/sym/log/ulg/service/EgovUserLogService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovUserLogController#selectUserLogInf",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/log/ulg/web/EgovUserLogController.java",
+      "flowId": "flow:ANY /sym/log/ulg/SelectUserLogList.do",
+      "line": 62,
+      "stepIds": [
+        "step:ANY /sym/log/ulg/SelectUserLogList.do:src/main/java/egovframework/com/sym/log/ulg/web/EgovUserLogController.java",
+        "step:ANY /sym/log/ulg/SelectUserLogList.do:src/main/java/egovframework/com/sym/log/ulg/service/UserLog.java",
+        "step:ANY /sym/log/ulg/SelectUserLogList.do:src/main/java/egovframework/com/sym/log/ulg/service/EgovUserLogService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "sym.log.ulg",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sym/log/ulg/SelectUserLogDetail.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/log/ulg/service/EgovUserLogService.java",
+      "stepId": "step:ANY /sym/log/ulg/SelectUserLogDetail.do:src/main/java/egovframework/com/sym/log/ulg/service/EgovUserLogService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/log/ulg/service/UserLog.java",
+      "stepId": "step:ANY /sym/log/ulg/SelectUserLogDetail.do:src/main/java/egovframework/com/sym/log/ulg/service/UserLog.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/log/ulg/web/EgovUserLogController.java",
+      "stepId": "step:ANY /sym/log/ulg/SelectUserLogDetail.do:src/main/java/egovframework/com/sym/log/ulg/web/EgovUserLogController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/log/ulg/service/EgovUserLogService.java",
+      "stepId": "step:ANY /sym/log/ulg/SelectUserLogList.do:src/main/java/egovframework/com/sym/log/ulg/service/EgovUserLogService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/log/ulg/service/UserLog.java",
+      "stepId": "step:ANY /sym/log/ulg/SelectUserLogList.do:src/main/java/egovframework/com/sym/log/ulg/service/UserLog.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/log/ulg/web/EgovUserLogController.java",
+      "stepId": "step:ANY /sym/log/ulg/SelectUserLogList.do:src/main/java/egovframework/com/sym/log/ulg/web/EgovUserLogController.java"
+    }
+  ]
+}

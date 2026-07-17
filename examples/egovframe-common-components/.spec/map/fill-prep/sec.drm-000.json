@@ -1,0 +1,566 @@
+{
+  "chunkId": "sec.drm-000",
+  "domainId": "domain:sec.drm",
+  "domainName": "",
+  "files": [
+    {
+      "className": "EgovMessageSource",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovMessageSource.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이문준          최초 생성\n *   2017.07.21  장동한 \t\t\targs, locale 설정\n *\n * </pre>\n */\n\npublic class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {\n\n\tprivate ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;\n\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @param reloadableResourceBundleMessageSource - resource MessageSource\n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic void setReloadableResourceBundleMessageSource(ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource) {\n\t\tthis.reloadableResourceBundleMessageSource = reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic ReloadableResourceBundleMessageSource getReloadableResourceBundleMessageSource() {\n\t\treturn reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, locale);\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @return String\n\t */\t\n\tpublic String getMessageArgs(String code, Object[] args) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, locale);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "DeptAuthor",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sec/drm/service/DeptAuthor.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/sec/drm/service/DeptAuthor.java",
+      "slice": {
+        "endLine": 70,
+        "startLine": 15,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.20  이문준          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\npublic class DeptAuthor extends ComDefaultVO {\n\t/**\n\t * serialVersionUID\n\t */\n\tprivate static final long serialVersionUID = 1L;\n\t/**\n\t * 권한그룹관리\n\t */\n\tprivate AuthorGroup authorGroup;\n\t/**\n\t * 설정대상 사용자 ID\n\t */\n\tprivate String userId;\n\t/**\n\t * 설정대상 사용자 명\n\t */\n\tprivate String userNm;\n\t/**\n\t * 설정대상 그룹 ID\n\t */\n\tprivate String groupId;\n\t/**\n\t * 설정대상 사용자 유형 코드\n\t */\n\tprivate String mberTyCode;\n\t/**\n\t * 설정대상 사용자 유형 명\n\t */\n\tprivate String mberTyNm;\n\t/**\n\t * 권한코드\n\t */\n\tprivate String authorCode;\n\t/**\n\t * 등록 여부\n\t */\n\tprivate String regYn;\n\t/**\n\t * Uniq ID\n\t */\n\tprivate String uniqId;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "DeptAuthorVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sec/drm/service/DeptAuthorVO.java — java 파일",
+        "tags": []
+      },
+      "line": 24,
+      "relPath": "src/main/java/egovframework/com/sec/drm/service/DeptAuthorVO.java",
+      "slice": {
+        "endLine": 48,
+        "startLine": 14,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.20  이문준          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\npublic class DeptAuthorVO extends DeptAuthor {\n\t/**\n\t * serialVersionUID\n\t */\n\tprivate static final long serialVersionUID = 1L;\n\t/**\n\t * 부서권한목록\n\t */\n\tList<DeptAuthorVO> deptAuthorList;\n\t/**\n\t * 부서목록\n\t */\n\tList<DeptAuthorVO> deptList;\n\t/**\n\t * 부서코드\n\t */\n\tprivate String deptCode;\n\t/**\n\t * 부서 명\n\t */\n\tprivate String deptNm;\n\n}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovDeptAuthorService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java — java 파일",
+        "tags": []
+      },
+      "line": 23,
+      "relPath": "src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java",
+      "slice": {
+        "endLine": 77,
+        "startLine": 13,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.20  이문준          최초 생성\n *\n * </pre>\n */\n\npublic interface EgovDeptAuthorService {\n\n\t/**\n\t * 부서별 할당된 권한목록 조회\n\t * @param deptAuthorVO DeptAuthorVO\n\t * @return List<DeptAuthorVO>\n\t * @exception Exception\n\t */\n\tpublic List<DeptAuthorVO> selectDeptAuthorList(DeptAuthorVO deptAuthorVO) throws Exception;\n\n\t/**\n\t * 부서에 해당하는 사용자에게 시스템 메뉴/접근권한을 일괄 할당\n\t * @param deptAuthor DeptAuthor\n\t * @exception Exception\n\t */\n\tpublic void insertDeptAuthor(DeptAuthor deptAuthor) throws Exception;\n\n\t/**\n\t * 부서별 시스템 메뉴 접근권한을 수정하여 항목의 정합성을 체크하고 수정된 데이터를 데이터베이스에 반영\n\t * @param deptAuthor\n\t * @exception Exception\n\t */\n\tpublic void updateDeptAuthor(DeptAuthor deptAuthor) throws Exception;\n\n\t/**\n\t * 불필요한 부서권한를 조회하여 데이터베이스에서 삭제\n\t * @param deptAuthor DeptAuthor\n\t * @exception Exception\n\t */\n\tpublic void deleteDeptAuthor(DeptAuthor deptAuthor) throws Exception;\n\n    /**\n\t * 부서권한 목록조회 카운트를 반환한다\n\t * @param deptAuthorVO DeptAuthorVO\n\t * @return int\n\t * @exception Exception\n\t */\n\tpublic int selectDeptAuthorListTotCnt(DeptAuthorVO deptAuthorVO) throws Exception;\t\t\n\t\n\t/**\n\t * 부서목록 조회\n\t * @param deptAuthorVO DeptAuthorVO\n\t * @return List<DeptAuthorVO>\n\t * @exception Exception\n\t */\n\tpublic List<DeptAuthorVO> selectDeptList(DeptAuthorVO deptAuthorVO) throws Exception;\t\n\t\n    /**\n\t * 부서 목록조회 카운트를 반환한다\n\t * @param deptAuthorVO DeptAuthorVO\n\t * @return int\n\t * @exception Exception\n\t */\n\tpublic int selectDeptListTotCnt(DeptAuthorVO deptAuthorVO) throws Exception;\t\n}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovDeptAuthorController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java — java 파일",
+        "tags": []
+      },
+      "line": 158,
+      "relPath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+      "slice": {
+        "endLine": 221,
+        "startLine": 148,
+        "text": "\t\treturn \"forward:/sec/drm/EgovDeptAuthorList.do\";\n\t}\n\n\t/**\n\t * 부서별 할당된 시스템 메뉴 접근권한을 삭제\n\t * @param userIds String\n\t * @param deptAuthor DeptAuthor\n\t * @return String\n\t * @exception Exception\n\t */\n\t@RequestMapping(value = \"/sec/drm/EgovDeptAuthorDelete.do\")\n\tpublic String deleteDeptAuthor (@RequestParam(\"userIds\") String userIds,\n\t\t\t                        @ModelAttribute(\"deptAuthor\") DeptAuthor deptAuthor,\n                                     ModelMap model) throws Exception {\n\t\t\n\t\t// 2026.03.23 kisa 보안점검 대응 조치\n\t\tif (ObjectUtils.isEmpty(userIds)) {\n\t\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.delete\"));\n\t\t\treturn \"forward:/sec/drm/EgovDeptAuthorList.do\";\n\t\t}\n\t\t\n    \tString [] strUserIds = userIds.split(\";\");\n    \tfor (String strUserId : strUserIds) {\n    \t\tdeptAuthor.setUniqId(strUserId);\n    \t\tegovDeptAuthorService.deleteDeptAuthor(deptAuthor);\n    \t}\n\t\t\n\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.delete\"));\n\t\treturn \"forward:/sec/drm/EgovDeptAuthorList.do\";\n\t}\n\n    /**\n\t * 부서조회 팝업 이동\n\t * @return String\n\t * @exception Exception\n\t */\n    @RequestMapping(\"/sec/drm/EgovDeptSearchView.do\")\n    public String selectDeptListView() throws Exception {\n        return \"egovframework/com/sec/drm/EgovDeptSearch\";\n    }\n\n\t/**\n\t * 부서별 할당된 권한목록 조회\n\t * @param deptAuthorVO DeptAuthorVO\n\t * @return String\n\t * @exception Exception\n\t */\n    //@IncludedInfo(name=\"부서목록관리\", order = 101)\n    @RequestMapping(value = \"/sec/drm/EgovDeptSearchList.do\")\n\tpublic String selectDeptList(@ModelAttribute(\"deptAuthorVO\") DeptAuthorVO deptAuthorVO,\n\t\t\t                             ModelMap model) throws Exception {\n\n    \t/** paging */\n    \tPaginationInfo paginationInfo = new PaginationInfo();\n\t\tpaginationInfo.setCurrentPageNo(deptAuthorVO.getPageIndex());\n\t\tpaginationInfo.setRecordCountPerPage(deptAuthorVO.getPageUnit());\n\t\tpaginationInfo.setPageSize(deptAuthorVO.getPageSize());\n\n\t\tdeptAuthorVO.setFirstIndex(paginationInfo.getFirstRecordIndex());\n\t\tdeptAuthorVO.setLastIndex(paginationInfo.getLastRecordIndex());\n\t\tdeptAuthorVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());\n\n\t\tdeptAuthorVO.setDeptList(egovDeptAuthorService.selectDeptList(deptAuthorVO));\n        model.addAttribute(\"deptList\", deptAuthorVO.getDeptList());\n\n        int totCnt = egovDeptAuthorService.selectDeptListTotCnt(deptAuthorVO);\n\t\tpaginationInfo.setTotalRecordCount(totCnt);\n        model.addAttribute(\"paginationInfo\", paginationInfo);\n\n        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));\n\n        return \"egovframework/com/sec/drm/EgovDeptSearch\";\n\t}\n}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "AuthorManageVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java — java 파일",
+        "tags": []
+      },
+      "line": 24,
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+      "slice": {
+        "endLine": 32,
+        "startLine": 14,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.20  이문준          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\npublic class AuthorManageVO extends AuthorManage {\n\n\tprivate static final long serialVersionUID = 1L;\n\n\tList<AuthorManageVO> authorManageList;\n\n}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovAuthorManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 22,
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "slice": {
+        "endLine": 76,
+        "startLine": 12,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.20  이문준          최초 생성\n *\n * </pre>\n */\n\npublic interface EgovAuthorManageService {\n    /**\n\t * 모든 권한목록을 조회한다.\n\t * @param authorManageVO AuthorManageVO\n\t * @return List<AuthorManageVO>\n\t * @exception Exception\n\t */\n\tpublic List<AuthorManageVO> selectAuthorAllList(AuthorManageVO authorManageVO) throws Exception;\n\t\n\t/**\n\t * 시스템 사용자중 불필요한 시스템권한정보를 화면에 조회하여 데이터베이스에서 삭제\n\t * @param authorManage AuthorManage\n\t * @exception Exception\n\t */\n\tpublic void deleteAuthor(AuthorManage authorManage) throws Exception;\n\n\t/**\n\t * 사용자의 시스테접근권한를 화면에서 입력하여 입력항목의 정합성을 체크하고 데이터베이스에 저장\n\t * @param authorManage AuthorManage\n\t * @exception Exception\n\t */\n\tpublic void insertAuthor(AuthorManage authorManage) throws Exception;\n\n\t/**\n\t * 개별사용자에게 할당된 권한 조회\n\t * @param authorManageVO AuthorManageVO\n\t * @exception Exception\n\t */\n\tpublic AuthorManageVO selectAuthor(AuthorManageVO authorManageVO) throws Exception;\n\n\t/**\n\t * 개별사용자에게 할당된 권한리스트 조회\n\t * @param authorManageVO AuthorManageVO\n\t * @return List<AuthorManageVO>\n\t * @exception Exception\n\t */\n\tpublic List<AuthorManageVO> selectAuthorList(AuthorManageVO authorManageVO) throws Exception;\n\n\t/**\n\t * 화면에 조회된 사용자권한정보를 수정하여 항목의 정합성을 체크하고 수정된 데이터를 데이터베이스에 반영\n \t * @param authorManage AuthorManage\n\t * @exception Exception\n\t */\n\tpublic void updateAuthor(AuthorManage authorManage) throws Exception;\n\t\n    /**\n\t * 목록조회 카운트를 반환한다\n\t * @param authorManageVO AuthorManageVO\n\t * @return int\n\t * @exception Exception\n\t */\n\tpublic int selectAuthorListTotCnt(AuthorManageVO authorManageVO) throws Exception;\t\n\t\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovDeptAuthorController#deleteDeptAuthor",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+      "flowId": "flow:ANY /sec/drm/EgovDeptAuthorDelete.do",
+      "line": 158,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "line": 158,
+        "snippet": "@RequestMapping(value = \"/sec/drm/EgovDeptAuthorDelete.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sec/drm/EgovDeptAuthorDelete.do:src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "step:ANY /sec/drm/EgovDeptAuthorDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sec/drm/EgovDeptAuthorDelete.do:src/main/java/egovframework/com/sec/drm/service/DeptAuthor.java",
+        "step:ANY /sec/drm/EgovDeptAuthorDelete.do:src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovDeptAuthorController#insertDeptAuthor",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+      "flowId": "flow:ANY /sec/drm/EgovDeptAuthorInsert.do",
+      "line": 120,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "line": 120,
+        "snippet": "@RequestMapping(value = \"/sec/drm/EgovDeptAuthorInsert.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sec/drm/EgovDeptAuthorInsert.do:src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "step:ANY /sec/drm/EgovDeptAuthorInsert.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sec/drm/EgovDeptAuthorInsert.do:src/main/java/egovframework/com/sec/drm/service/DeptAuthor.java",
+        "step:ANY /sec/drm/EgovDeptAuthorInsert.do:src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovDeptAuthorController#selectDeptAuthorList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+      "flowId": "flow:ANY /sec/drm/EgovDeptAuthorList.do",
+      "line": 79,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "line": 79,
+        "snippet": "@RequestMapping(value = \"/sec/drm/EgovDeptAuthorList.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sec/drm/EgovDeptAuthorList.do:src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "step:ANY /sec/drm/EgovDeptAuthorList.do:src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java",
+        "step:ANY /sec/drm/EgovDeptAuthorList.do:src/main/java/egovframework/com/sec/drm/service/DeptAuthorVO.java",
+        "step:ANY /sec/drm/EgovDeptAuthorList.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+        "step:ANY /sec/drm/EgovDeptAuthorList.do:src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+        "step:ANY /sec/drm/EgovDeptAuthorList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovDeptAuthorController#selectDeptAuthorListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+      "flowId": "flow:ANY /sec/drm/EgovDeptAuthorListView.do",
+      "line": 65,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "line": 65,
+        "snippet": "@RequestMapping(\"/sec/drm/EgovDeptAuthorListView.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sec/drm/EgovDeptAuthorListView.do:src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovDeptAuthorController#selectDeptList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+      "flowId": "flow:ANY /sec/drm/EgovDeptSearchList.do",
+      "line": 196,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "line": 196,
+        "snippet": "@RequestMapping(value = \"/sec/drm/EgovDeptSearchList.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sec/drm/EgovDeptSearchList.do:src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "step:ANY /sec/drm/EgovDeptSearchList.do:src/main/java/egovframework/com/sec/drm/service/DeptAuthorVO.java",
+        "step:ANY /sec/drm/EgovDeptSearchList.do:src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java",
+        "step:ANY /sec/drm/EgovDeptSearchList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovDeptAuthorController#selectDeptListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+      "flowId": "flow:ANY /sec/drm/EgovDeptSearchView.do",
+      "line": 184,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "line": 184,
+        "snippet": "@RequestMapping(\"/sec/drm/EgovDeptSearchView.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sec/drm/EgovDeptSearchView.do:src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "header": {
+    "flowIndex": [
+      {
+        "entryPoint": "EgovDeptAuthorController#deleteDeptAuthor",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "flowId": "flow:ANY /sec/drm/EgovDeptAuthorDelete.do",
+        "line": 158,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+          "line": 158,
+          "snippet": "@RequestMapping(value = \"/sec/drm/EgovDeptAuthorDelete.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovDeptAuthorController#insertDeptAuthor",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "flowId": "flow:ANY /sec/drm/EgovDeptAuthorInsert.do",
+        "line": 120,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+          "line": 120,
+          "snippet": "@RequestMapping(value = \"/sec/drm/EgovDeptAuthorInsert.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovDeptAuthorController#selectDeptAuthorList",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "flowId": "flow:ANY /sec/drm/EgovDeptAuthorList.do",
+        "line": 79,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+          "line": 79,
+          "snippet": "@RequestMapping(value = \"/sec/drm/EgovDeptAuthorList.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovDeptAuthorController#selectDeptAuthorListView",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "flowId": "flow:ANY /sec/drm/EgovDeptAuthorListView.do",
+        "line": 65,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+          "line": 65,
+          "snippet": "@RequestMapping(\"/sec/drm/EgovDeptAuthorListView.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovDeptAuthorController#selectDeptList",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "flowId": "flow:ANY /sec/drm/EgovDeptSearchList.do",
+        "line": 196,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+          "line": 196,
+          "snippet": "@RequestMapping(value = \"/sec/drm/EgovDeptSearchList.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovDeptAuthorController#selectDeptListView",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "flowId": "flow:ANY /sec/drm/EgovDeptSearchView.do",
+        "line": 184,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+          "line": 184,
+          "snippet": "@RequestMapping(\"/sec/drm/EgovDeptSearchView.do\")"
+        }
+      }
+    ]
+  },
+  "isHeaderChunk": true,
+  "key": "sec.drm",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptAuthorDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/service/DeptAuthor.java",
+        "line": 27,
+        "snippet": "public class DeptAuthor extends ComDefaultVO {"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/drm/service/DeptAuthor.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptAuthorDelete.do:src/main/java/egovframework/com/sec/drm/service/DeptAuthor.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java",
+        "line": 23,
+        "snippet": "public interface EgovDeptAuthorService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptAuthorDelete.do:src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "line": 158,
+        "snippet": "@RequestMapping(value = \"/sec/drm/EgovDeptAuthorDelete.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptAuthorDelete.do:src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptAuthorInsert.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/service/DeptAuthor.java",
+        "line": 27,
+        "snippet": "public class DeptAuthor extends ComDefaultVO {"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/drm/service/DeptAuthor.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptAuthorInsert.do:src/main/java/egovframework/com/sec/drm/service/DeptAuthor.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java",
+        "line": 23,
+        "snippet": "public interface EgovDeptAuthorService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptAuthorInsert.do:src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "line": 158,
+        "snippet": "@RequestMapping(value = \"/sec/drm/EgovDeptAuthorDelete.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptAuthorInsert.do:src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptAuthorList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/service/DeptAuthorVO.java",
+        "line": 26,
+        "snippet": "public class DeptAuthorVO extends DeptAuthor {"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/drm/service/DeptAuthorVO.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptAuthorList.do:src/main/java/egovframework/com/sec/drm/service/DeptAuthorVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java",
+        "line": 23,
+        "snippet": "public interface EgovDeptAuthorService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptAuthorList.do:src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "line": 158,
+        "snippet": "@RequestMapping(value = \"/sec/drm/EgovDeptAuthorDelete.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptAuthorList.do:src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+        "line": 26,
+        "snippet": "public class AuthorManageVO extends AuthorManage {"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptAuthorList.do:src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovAuthorManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptAuthorList.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "line": 158,
+        "snippet": "@RequestMapping(value = \"/sec/drm/EgovDeptAuthorDelete.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptAuthorListView.do:src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptSearchList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/service/DeptAuthorVO.java",
+        "line": 26,
+        "snippet": "public class DeptAuthorVO extends DeptAuthor {"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/drm/service/DeptAuthorVO.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptSearchList.do:src/main/java/egovframework/com/sec/drm/service/DeptAuthorVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java",
+        "line": 23,
+        "snippet": "public interface EgovDeptAuthorService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptSearchList.do:src/main/java/egovframework/com/sec/drm/service/EgovDeptAuthorService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "line": 158,
+        "snippet": "@RequestMapping(value = \"/sec/drm/EgovDeptAuthorDelete.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptSearchList.do:src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+        "line": 158,
+        "snippet": "@RequestMapping(value = \"/sec/drm/EgovDeptAuthorDelete.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java",
+      "stepId": "step:ANY /sec/drm/EgovDeptSearchView.do:src/main/java/egovframework/com/sec/drm/web/EgovDeptAuthorController.java"
+    }
+  ]
+}

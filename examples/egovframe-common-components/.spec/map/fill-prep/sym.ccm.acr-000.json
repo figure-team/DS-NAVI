@@ -1,0 +1,407 @@
+{
+  "chunkId": "sym.ccm.acr-000",
+  "domainId": "domain:sym.ccm.acr",
+  "domainName": "",
+  "files": [
+    {
+      "className": "ComDefaultCodeVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "slice": {
+        "endLine": 58,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------       --------    ---------------------------\n *   2009.3.11   이삼섭          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class ComDefaultCodeVO implements Serializable {\n    /** 코드 ID */\n    private String codeId = \"\";\n\n    /** 상세코드 */\n    private String code = \"\";\n\n    /** 코드명 */\n    private String codeNm = \"\";\n\n    /** 코드설명 */\n    private String codeDc = \"\";\n\n    /** 특정테이블명 */\n    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용\n\n    /** 상세 조건 여부 */\n    private String haveDetailCondition = \"N\";\n\n    /** 상세 조건 */\n    private String detailCondition = \"\";\n\n    /**\n     * toString 메소드를 대치한다.\n     */\n    public String toString() {\n    \treturn ToStringBuilder.reflectionToString(this);\n    }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCmmUseService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "slice": {
+        "endLine": 60,
+        "startLine": 16,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이삼섭          최초 생성\n *   2025.07.16  이백행          2025년 컨트리뷰션 `throws Exception` 제거\n *\n *      </pre>\n */\npublic interface EgovCmmUseService {\n\n\t/**\n\t * 공통코드를 조회한다.\n\t *\n\t * @param comDefaultCodeVO\n\t * @return List(코드)\n\t */\n\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * ComDefaultCodeVO의 리스트를 받아서 여러개의 코드 리스트를 맵에 담아서 리턴한다.\n\t *\n\t * @param comDefaultCodeVOs\n\t * @return Map(코드)\n\t */\n\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);\n\n\t/**\n\t * 조직정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 조직정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * 그룹정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 그룹정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "AdministCodeRecptnVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java",
+      "slice": {
+        "endLine": 60,
+        "startLine": 16,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호          최초 생성\n *\n * Copyright (C) 2009 by MOPAS  All rights reserved.\n * </pre>\n */\n@Getter\n@Setter\npublic class AdministCodeRecptnVO extends AdministCodeRecptn implements Serializable {\n\n\tprivate static final long serialVersionUID = 8718522735836192467L;\n\n\t/** 검색조건 */\n    private String searchCondition = \"\";\n\n    /** 검색Keyword */\n    private String searchKeyword = \"\";\n\n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n\n    /** 현재페이지 */\n    private int pageIndex = 1;\n\n    /** 페이지개수 */\n    private int pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private int pageSize = 10;\n\n    /** firstIndex */\n    private int firstIndex = 1;\n\n    /** lastIndex */\n    private int lastIndex = 1;\n\n    /** recordCountPerPage */\n    private int recordCountPerPage = 10;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovAdministCodeRecptnService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+      "slice": {
+        "endLine": 72,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호          최초 생성\n *\n * Copyright (C) 2009 by MOPAS  All rights reserved.\n * </pre>\n */\npublic interface EgovAdministCodeRecptnService {\n\n\t/**\n\t * 법정동코드수신을 처리한다.\n\t * @param administCode\n\t * @throws Exception\n\t */\n\tvoid insertAdministCodeRecptn() throws Exception;\n\n\t/**\n\t * 법정동코드 상세내역을 조회한다.\n\t * @param administCode\n\t * @return AdministCode(법정동코드)\n\t * @throws Exception\n\t */\n\tAdministCodeRecptn selectAdministCodeDetail(AdministCodeRecptn administCodeRecptn) throws Exception;\n\n\t/**\n\t * 법정동코드수신 목록을 조회한다.\n\t * @param searchVO\n\t * @return List(법정동코드 목록)\n\t * @throws Exception\n\t */\n\tList<EgovMap> selectAdministCodeRecptnList(AdministCodeRecptnVO searchVO) throws Exception;\n\n    /**\n\t * 법정동코드수신 총 개수를 조회한다.\n     * @param searchVO\n     * @return int(법정동코드 총 개수)\n     */\n    int selectAdministCodeRecptnListTotCnt(AdministCodeRecptnVO searchVO) throws Exception;\n\n\t/**\n\t * 법정동코드 목록을 조회한다.\n\t * @param searchVO\n\t * @return List(법정동코드 목록)\n\t * @throws Exception\n\t */\n\tList<EgovMap> selectAdministCodeList(AdministCodeRecptnVO searchVO) throws Exception;\n\n    /**\n\t * 법정동코드 총 개수를 조회한다.\n     * @param searchVO\n     * @return int(법정동코드 총 개수)\n     */\n    int selectAdministCodeListTotCnt(AdministCodeRecptnVO searchVO) throws Exception;\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovAdministCodeRecptnController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java — java 파일",
+        "tags": []
+      },
+      "line": 69,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+      "slice": {
+        "endLine": 138,
+        "startLine": 59,
+        "text": "\t * TEST 용 Controller\n\t * 실 적용시 Job Scheduler 에 등록하여 처리한다.\n\t * 법정동코드를 수신처리한다.\n\t * @param loginVO\n\t * @param administCode\n\t * @param bindingResult\n\t * @param model\n\t * @return \"egovframework/com/sym/ccm/adc/EgovCcmAdministCodeRegist\"\n\t * @throws Exception\n\t */\n    @RequestMapping(value = \"/sym/ccm/acr/addAdministCode.do\")\n\tpublic String insertAdministCodeRecptn (AdministCodeRecptn administCodeRecptn\n\t\t\t, BindingResult bindingResult\n\t\t\t, @RequestParam Map<?, ?> commandMap\n\t\t\t, ModelMap model\n\t\t\t) throws Exception {\n\t\tString sCmd = commandMap.get(\"cmd\") == null ? \"\" : (String)commandMap.get(\"cmd\");\n    \tif   (sCmd.equals(\"\")) {\n\n\t    \tadministCodeManageService.insertAdministCodeRecptn();\n\n    \t\treturn \"egovframework/com/sym/ccm/acr/EgovAdministCodeRegist_TEST\";\n    \t} else {\n\t        return \"forward:/sym/ccm/acr/getAdministCodeRecptnList.do\";\n    \t}\n    }\n\n\t/**\n\t * 법정동코드 상세내역을 조회한다.\n\t * @param loginVO\n\t * @param administCode\n\t * @param model\n\t * @return \"egovframework/com/sym/ccm/adc/EgovCcmAdministCodeDetail\"\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/sym/ccm/acr/getAdministCodeDetail.do\")\n \tpublic String selectAdministCodeDetail (@ModelAttribute(\"administCode\") AdministCodeRecptn administCode\n\t\t\t, @ModelAttribute(\"administCodeRecptnVO\") AdministCodeRecptnVO administCodeRecptnVO\n\t\t\t, ModelMap model\n \t\t\t) throws Exception {\n\t\t/* 법정동코드 조회 */\n\t\tAdministCodeRecptn vo = administCodeManageService.selectAdministCodeDetail(administCode);\n\t\tmodel.addAttribute(\"result\", vo);\n\n    \t/* 법정동코드수신 리스트 */\n    \tadministCodeRecptnVO.setRecordCountPerPage(9999999);\n    \tadministCodeRecptnVO.setFirstIndex(0);\n\n\n    \t/* 공통코드처리 */\n    \tComDefaultCodeVO comCodeVO = new ComDefaultCodeVO();\n\n    \t/* 변경구분코드 */\n    \tcomCodeVO.setCodeId(\"COM043\");\n        List<CmmnDetailCode> changeSeCodeList = cmmUseService.selectCmmCodeDetail(comCodeVO);\n        model.addAttribute(\"changeSeCodeList\", changeSeCodeList);\n\n    \t/* 처리구분코드 */\n        comCodeVO.setCodeId(\"COM044\");\n        List<CmmnDetailCode> processSeList = cmmUseService.selectCmmCodeDetail(comCodeVO);\n        model.addAttribute(\"processSeList\", processSeList);\n\n        administCodeRecptnVO.setSearchCondition(\"CodeList\");\n        List<EgovMap> administCodeRecptnList = administCodeManageService.selectAdministCodeRecptnList(administCodeRecptnVO);\n        model.addAttribute(\"administCodeRecptnList\", administCodeRecptnList);\n\n\t\treturn \"egovframework/com/sym/ccm/acr/EgovAdministCodeDetail\";\n\t}\n\n    /**\n\t * 법정동코드수신 목록을 조회한다.\n     * @param loginVO\n     * @param searchVO\n     * @param model\n     * @return \"egovframework/com/sym/ccm/adc/EgovCcmAdministCodeList\"\n     * @throws Exception\n     */\n\t@IncludedInfo(name=\"행정코드관리\", listUrl=\"/sym/ccm/acr/getAdministCodeRecptnList.do\", order = 1010 ,gid = 60)\n    @RequestMapping(value = \"/sym/ccm/acr/getAdministCodeRecptnList.do\")\n\tpublic String selectAdministCodeRecptnList (@ModelAttribute(\"searchVO\") AdministCodeRecptnVO searchVO",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovAdministCodeRecptnController#insertAdministCodeRecptn",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+      "flowId": "flow:ANY /sym/ccm/acr/addAdministCode.do",
+      "line": 69,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "line": 69,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/acr/addAdministCode.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/acr/addAdministCode.do:src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "step:ANY /sym/ccm/acr/addAdministCode.do:src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovAdministCodeRecptnController#selectAdministCodeDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+      "flowId": "flow:ANY /sym/ccm/acr/getAdministCodeDetail.do",
+      "line": 94,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "line": 94,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/acr/getAdministCodeDetail.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+        "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java",
+        "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovAdministCodeRecptnController#selectAdministCodeRecptnList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+      "flowId": "flow:ANY /sym/ccm/acr/getAdministCodeRecptnList.do",
+      "line": 137,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "line": 137,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/acr/getAdministCodeRecptnList.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/acr/getAdministCodeRecptnList.do:src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "step:ANY /sym/ccm/acr/getAdministCodeRecptnList.do:src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java",
+        "step:ANY /sym/ccm/acr/getAdministCodeRecptnList.do:src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovAdministCodeRecptnController#selectAdministCodeRecptnMainList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+      "flowId": "flow:ANY /sym/ccm/acr/getAdministCodeRecptnMainList.do",
+      "line": 173,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "line": 173,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/acr/getAdministCodeRecptnMainList.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/ccm/acr/getAdministCodeRecptnMainList.do:src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "step:ANY /sym/ccm/acr/getAdministCodeRecptnMainList.do:src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java",
+        "step:ANY /sym/ccm/acr/getAdministCodeRecptnMainList.do:src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "header": {
+    "flowIndex": [
+      {
+        "entryPoint": "EgovAdministCodeRecptnController#insertAdministCodeRecptn",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "flowId": "flow:ANY /sym/ccm/acr/addAdministCode.do",
+        "line": 69,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+          "line": 69,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/acr/addAdministCode.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovAdministCodeRecptnController#selectAdministCodeDetail",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "flowId": "flow:ANY /sym/ccm/acr/getAdministCodeDetail.do",
+        "line": 94,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+          "line": 94,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/acr/getAdministCodeDetail.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovAdministCodeRecptnController#selectAdministCodeRecptnList",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "flowId": "flow:ANY /sym/ccm/acr/getAdministCodeRecptnList.do",
+        "line": 137,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+          "line": 137,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/acr/getAdministCodeRecptnList.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovAdministCodeRecptnController#selectAdministCodeRecptnMainList",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "flowId": "flow:ANY /sym/ccm/acr/getAdministCodeRecptnMainList.do",
+        "line": 173,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+          "line": 173,
+          "snippet": "@RequestMapping(value = \"/sym/ccm/acr/getAdministCodeRecptnMainList.do\")"
+        }
+      }
+    ]
+  },
+  "isHeaderChunk": true,
+  "key": "sym.ccm.acr",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+        "line": 25,
+        "snippet": "public interface EgovAdministCodeRecptnService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+      "stepId": "step:ANY /sym/ccm/acr/addAdministCode.do:src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "line": 69,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/acr/addAdministCode.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+      "stepId": "step:ANY /sym/ccm/acr/addAdministCode.do:src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java",
+        "line": 28,
+        "snippet": "public class AdministCodeRecptnVO extends AdministCodeRecptn implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java",
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+        "line": 25,
+        "snippet": "public interface EgovAdministCodeRecptnService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "line": 69,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/acr/addAdministCode.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java",
+        "line": 28,
+        "snippet": "public class AdministCodeRecptnVO extends AdministCodeRecptn implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java",
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeRecptnList.do:src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+        "line": 25,
+        "snippet": "public interface EgovAdministCodeRecptnService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeRecptnList.do:src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "line": 69,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/acr/addAdministCode.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeRecptnList.do:src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java",
+        "line": 28,
+        "snippet": "public class AdministCodeRecptnVO extends AdministCodeRecptn implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java",
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeRecptnMainList.do:src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+        "line": 25,
+        "snippet": "public interface EgovAdministCodeRecptnService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeRecptnMainList.do:src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "line": 69,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/acr/addAdministCode.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeRecptnMainList.do:src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java"
+    }
+  ]
+}

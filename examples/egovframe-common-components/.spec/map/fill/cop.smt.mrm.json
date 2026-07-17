@@ -1,0 +1,3393 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "a1"
+        },
+        {
+          "from": "a1",
+          "to": "a2"
+        },
+        {
+          "from": "a2",
+          "to": "d1"
+        },
+        {
+          "from": "d1",
+          "label": "YES",
+          "to": "a4"
+        },
+        {
+          "from": "d1",
+          "label": "NO",
+          "to": "a3"
+        },
+        {
+          "from": "a3",
+          "to": "e2"
+        },
+        {
+          "from": "a4",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "메모보고 작성 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 90,
+              "snippet": "\t@RequestMapping(\"/cop/smt/mrm/selectReportrListPopup.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/mrm/selectReportrListPopup.do",
+          "id": "a1",
+          "kind": "activity",
+          "label": "보고자 선택 팝업 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "\t@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/mrm/addMemoReprt.do",
+          "id": "a2",
+          "kind": "activity",
+          "label": "등록화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 236,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            }
+          ],
+          "id": "d1",
+          "kind": "decision",
+          "label": "로그인 사용자인가"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 238,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ],
+          "id": "a3",
+          "kind": "activity",
+          "label": "로그인 화면으로 이동"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 383,
+              "snippet": "\t@RequestMapping(\"/cop/smt/mrm/insertMemoReprt.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/mrm/insertMemoReprt.do",
+          "id": "a4",
+          "kind": "activity",
+          "label": "메모보고 등록"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "등록 완료"
+        },
+        {
+          "id": "e2",
+          "kind": "end",
+          "label": "로그인 필요"
+        }
+      ],
+      "title": "메모보고 작성·등록"
+    },
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "b1"
+        },
+        {
+          "from": "b1",
+          "to": "b2"
+        },
+        {
+          "from": "b2",
+          "to": "d1"
+        },
+        {
+          "from": "d1",
+          "label": "수정",
+          "to": "b3"
+        },
+        {
+          "from": "d1",
+          "label": "삭제",
+          "to": "b5"
+        },
+        {
+          "from": "b3",
+          "to": "b4"
+        },
+        {
+          "from": "b4",
+          "to": "e"
+        },
+        {
+          "from": "b5",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "메모보고 관리 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 143,
+              "snippet": "\t@RequestMapping(\"/cop/smt/mrm/selectMemoReprtList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/mrm/selectMemoReprtList.do",
+          "id": "b1",
+          "kind": "activity",
+          "label": "메모보고 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 189,
+              "snippet": "\t@RequestMapping(\"/cop/smt/mrm/selectMemoReprt.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/mrm/selectMemoReprt.do",
+          "id": "b2",
+          "kind": "activity",
+          "label": "메모보고 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 266,
+              "snippet": "\t@RequestMapping(\"/cop/smt/mrm/modifyMemoReprt.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 445,
+              "snippet": "\t@RequestMapping(\"/cop/smt/mrm/deleteMemoReprt.do\")"
+            }
+          ],
+          "id": "d1",
+          "kind": "decision",
+          "label": "수정인가 삭제인가"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 266,
+              "snippet": "\t@RequestMapping(\"/cop/smt/mrm/modifyMemoReprt.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/mrm/modifyMemoReprt.do",
+          "id": "b3",
+          "kind": "activity",
+          "label": "수정화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 303,
+              "snippet": "\t@RequestMapping(\"/cop/smt/mrm/updateMemoReprt.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/mrm/updateMemoReprt.do",
+          "id": "b4",
+          "kind": "activity",
+          "label": "수정내용 저장"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 445,
+              "snippet": "\t@RequestMapping(\"/cop/smt/mrm/deleteMemoReprt.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/mrm/deleteMemoReprt.do",
+          "id": "b5",
+          "kind": "activity",
+          "label": "메모보고 삭제"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "관리 완료"
+        }
+      ],
+      "title": "메모보고 조회·수정·삭제"
+    },
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "c1"
+        },
+        {
+          "from": "c1",
+          "to": "c2"
+        },
+        {
+          "from": "c2",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "보고자 열람 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 189,
+              "snippet": "\t@RequestMapping(\"/cop/smt/mrm/selectMemoReprt.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/mrm/selectMemoReprt.do",
+          "id": "c1",
+          "kind": "activity",
+          "label": "보고받은 메모보고 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 361,
+              "snippet": "\t@RequestMapping(\"/cop/smt/mrm/updateMemoReprtDrctMatter.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/mrm/updateMemoReprtDrctMatter.do",
+          "id": "c2",
+          "kind": "activity",
+          "label": "지시사항 등록"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "지시사항 등록 완료"
+        }
+      ],
+      "title": "보고자 지시사항 등록"
+    },
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "r1"
+        },
+        {
+          "from": "r1",
+          "to": "r2"
+        },
+        {
+          "from": "r2",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "보고자 검색 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 90,
+              "snippet": "\t@RequestMapping(\"/cop/smt/mrm/selectReportrListPopup.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/mrm/selectReportrListPopup.do",
+          "id": "r1",
+          "kind": "activity",
+          "label": "보고자 선택 팝업 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 104,
+              "snippet": "\t@RequestMapping(\"/cop/smt/mrm/selectReportrList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/smt/mrm/selectReportrList.do",
+          "id": "r2",
+          "kind": "activity",
+          "label": "보고자 목록 조회"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "보고자 선택 완료"
+        }
+      ],
+      "title": "보고자 목록 조회"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+          "line": 236,
+          "snippet": "\t\tif (!isAuthenticated) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+          "line": 238,
+          "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+        }
+      ],
+      "text": "모든 메모보고 화면은 로그인한 사용자만 이용할 수 있으며, 미인증이면 로그인 안내 메시지를 남기고 로그인 화면으로 돌려보낸다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprt.java",
+          "line": 34,
+          "snippet": "\t@Size(max=255)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprt.java",
+          "line": 55,
+          "snippet": "\t@Size(max=2500)"
+        }
+      ],
+      "text": "보고서제목은 최대 255자, 보고내용은 최대 2500자까지만 입력할 수 있다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprt.java",
+          "line": 33,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprt.java",
+          "line": 54,
+          "snippet": "\t@EgovNullCheck"
+        }
+      ],
+      "text": "보고서제목·보고일자·작성자명·보고자명·보고내용은 반드시 입력해야 하는 필수 항목이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+          "line": 244,
+          "snippet": "\t\tjava.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat(\"yyyy-MM-dd\", java.util.Locale.KOREA);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+          "line": 242,
+          "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+        }
+      ],
+      "text": "등록화면의 보고일자는 서버의 오늘 날짜로 자동 채워지고, 작성자 아이디·이름은 로그인 사용자 정보로 자동 설정된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+          "line": 231,
+          "snippet": "\t\tString whiteListFileUploadExtensions = EgovProperties.getProperty(\"Globals.fileUpload.Extensions\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+          "line": 232,
+          "snippet": "\t\tString fileUploadMaxSize = EgovProperties.getProperty(\"Globals.fileUpload.maxSize\");"
+        }
+      ],
+      "text": "첨부파일은 전역 설정에 등록된 허용 확장자와 최대 크기 범위 안에서만 올릴 수 있다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+          "line": 67,
+          "snippet": "    private int recordCountPerPage = 10;"
+        }
+      ],
+      "text": "메모보고 목록은 페이지 단위로 조회하며 기본 페이지당 10건을 보여준다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 58,
+          "snippet": "\tpublic static Boolean isAuthenticated() {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 11,
+          "snippet": "\tpublic Object getAuthenticatedUser();"
+        }
+      ],
+      "text": "인증·권한 영역과 연동해 로그인 여부와 인증 사용자 정보를 확인한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+          "line": 21,
+          "snippet": "public interface EgovFileMngService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+          "line": 46,
+          "snippet": "    public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+        }
+      ],
+      "text": "공통 첨부파일 관리 영역에 메모보고 첨부파일의 등록·수정·삭제를 위임한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 52,
+          "snippet": "\tpublic String getMessage(String code) {"
+        }
+      ],
+      "text": "공통 메시지 영역에서 사용자 안내·오류 문구를 메시지 코드로 조회한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+          "line": 49,
+          "snippet": "public class EgovProperties {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+          "line": 64,
+          "snippet": "\tprivate static final String FILE_STORE_PATH = EgovProperties.getProperty(\"Globals.fileStorePath\");"
+        }
+      ],
+      "text": "공통 환경설정 영역에서 첨부파일 저장경로·허용 확장자·최대 크기 등 운영 설정값을 읽어온다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+          "line": 90,
+          "snippet": "\t\t\tatchFileIdString = idgenService.getNextStringId();"
+        }
+      ],
+      "text": "공통 채번 영역에서 첨부파일ID를 발번받는다."
+    }
+  ],
+  "domainId": "domain:cop.smt.mrm",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprt.java",
+          "line": 30,
+          "snippet": "\t/** 보고서ID */"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprt.java",
+          "line": 65,
+          "snippet": "\t/** 보고서상태 */"
+        }
+      ],
+      "text": "메모보고: 보고서ID로 식별되며 보고서제목·보고일자·작성자·보고자·보고내용·첨부파일ID·지시사항·보고자조회일시·보고서상태를 갖는 이 도메인의 중심 정보이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+          "line": 32,
+          "snippet": "\tpublic Map<String, Object> selectReportrList(ReportrVO reportrVO) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/ReportrVO.java",
+          "line": 30,
+          "snippet": "    /** 검색조건 */"
+        }
+      ],
+      "text": "보고자: 메모보고를 받는 대상으로, 검색조건으로 목록을 조회해 선택한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+          "line": 24,
+          "snippet": "     * 첨부파일 아이디"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprt.java",
+          "line": 57,
+          "snippet": "\t/** 첨부파일ID */"
+        }
+      ],
+      "text": "첨부파일: 메모보고에 딸린 파일로 첨부파일 아이디·원파일명·저장파일명·확장자·크기·저장경로로 관리한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprt.java",
+          "line": 59,
+          "snippet": "\t/** 지시사항 */"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+          "line": 84,
+          "snippet": "\tpublic void updateMemoReprtDrctMatter(MemoReprt memoReprt) throws Exception;"
+        }
+      ],
+      "text": "지시사항: 보고자가 메모보고에 남기는 의견으로 등록일시와 함께 보관된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        }
+      ],
+      "text": "로그인 사용자: 작성자 식별과 조회조건에 쓰이는 인증 사용자 정보로 고유아이디·이름·조직 정보를 갖는다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /cop/smt/mrm/addMemoReprt.do",
+      "name": "메모보고 등록화면 열기",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 225,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 231,
+            "snippet": "\t\tString whiteListFileUploadExtensions = EgovProperties.getProperty(\"Globals.fileUpload.Extensions\");"
+          }
+        ],
+        "text": "로그인한 사용자를 확인한 뒤 오늘 날짜와 작성자 이름·직급을 채운 메모보고 등록화면을 열고, 첨부파일 허용 확장자와 최대 크기를 함께 내려준다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/mrm/deleteMemoReprt.do",
+      "name": "메모보고 삭제",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 445,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/deleteMemoReprt.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 62,
+            "snippet": "    public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+          }
+        ],
+        "text": "선택한 메모보고를 삭제하면서 해당 보고에 딸린 첨부파일 정보도 함께 정리한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/mrm/insertMemoReprt.do",
+      "name": "메모보고 신규 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 383,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/insertMemoReprt.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+            "line": 92,
+            "snippet": "\tpublic void insertMemoReprt(MemoReprt memoReprt) throws Exception;"
+          }
+        ],
+        "text": "작성자가 입력한 보고 제목·보고일자·보고내용과 첨부파일을 저장하여 새 메모보고를 등록한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/mrm/modifyMemoReprt.do",
+      "name": "메모보고 수정화면 열기",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 266,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/modifyMemoReprt.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 270,
+            "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+          }
+        ],
+        "text": "기존 메모보고 내용을 조회해 수정화면에 채워 보여주며, 목록으로 돌아갈 때 쓸 검색조건과 페이지 위치를 함께 유지한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/mrm/selectMemoReprt.do",
+      "name": "메모보고 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 189,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/selectMemoReprt.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprt.java",
+            "line": 63,
+            "snippet": "\t/** 보고자조회일시 */"
+          }
+        ],
+        "text": "선택한 메모보고의 상세 내용을 조회해 보여주며, 보고자가 열람한 경우 조회일시가 기록되는 대상이 된다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/mrm/selectMemoReprtList.do",
+      "name": "메모보고 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 143,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/selectMemoReprtList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+            "line": 51,
+            "snippet": "\tpublic Map<String, Object> selectMemoReprtList(MemoReprtVO memoReprtVO) throws Exception;"
+          }
+        ],
+        "text": "검색조건과 기간·상태 조건으로 메모보고 목록을 페이지 단위로 조회한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/mrm/selectReportrList.do",
+      "name": "보고자 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 104,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/selectReportrList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+            "line": 32,
+            "snippet": "\tpublic Map<String, Object> selectReportrList(ReportrVO reportrVO) throws Exception;"
+          }
+        ],
+        "text": "메모보고를 받을 보고자를 검색조건으로 조회해 목록으로 제공한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/mrm/selectReportrListPopup.do",
+      "name": "보고자 선택 팝업 열기",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 90,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/selectReportrListPopup.do\")"
+          }
+        ],
+        "text": "보고자를 고르기 위한 선택 팝업 화면을 연다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/mrm/updateMemoReprt.do",
+      "name": "메모보고 수정 저장",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 303,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/updateMemoReprt.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 46,
+            "snippet": "    public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+          }
+        ],
+        "text": "수정한 메모보고 내용을 저장하고 첨부파일 추가·교체 내역을 함께 반영한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/mrm/updateMemoReprtDrctMatter.do",
+      "name": "지시사항 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 361,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/updateMemoReprtDrctMatter.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+            "line": 84,
+            "snippet": "\tpublic void updateMemoReprtDrctMatter(MemoReprt memoReprt) throws Exception;"
+          }
+        ],
+        "text": "보고자가 메모보고에 대한 지시사항을 작성해 등록한다."
+      }
+    }
+  ],
+  "name": "메모보고",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "메시지 코드를 받아 기본 로케일 기준 메시지를 반환하며, 로케일과 매개변수를 함께 받는 조회 방식도 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "화면에 보여줄 안내·오류 메시지를 메시지 코드로 조회해 돌려주는 공통 창구 역할을 한다. 로그인이 필요한 상황 등에서 사용자에게 표시할 문구를 이 경로로 가져온다."
+        }
+      },
+      "name": "공통 메시지 조회",
+      "stepId": "step:ANY /cop/smt/mrm/addMemoReprt.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "메시지 코드를 받아 기본 로케일 기준 메시지를 반환하며, 로케일과 매개변수를 함께 받는 조회 방식도 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            }
+          ],
+          "text": "아이디·이름·이메일·고유아이디·조직 정보 등 사용자 신원 항목을 보유하며 일부 항목은 필수값 검증 대상이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "인증된 사용자의 신원 정보를 담아 흐름 전반에 전달하는 데이터 구조 역할을 한다. 작성자 식별과 조회조건 설정에 이 정보가 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /cop/smt/mrm/addMemoReprt.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "아이디·이름·이메일·고유아이디·조직 정보 등 사용자 신원 항목을 보유하며 일부 항목은 필수값 검증 대상이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "\tpublic static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "설정 키를 받아 전역 설정파일에서 해당 값을 찾아 문자열로 반환하며, 상대경로 값을 절대경로로 바꿔주는 방식도 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            }
+          ],
+          "text": "첨부파일 저장경로·허용 확장자·최대 크기 같은 운영 환경설정 값을 읽어오는 협력 객체 역할을 한다."
+        }
+      },
+      "name": "환경설정 값 조회",
+      "stepId": "step:ANY /cop/smt/mrm/addMemoReprt.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "설정 키를 받아 전역 설정파일에서 해당 값을 찾아 문자열로 반환하며, 상대경로 값을 절대경로로 바꿔주는 방식도 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "현재 사용자가 로그인 상태인지 확인하고 인증된 사용자 정보를 꺼내오는 공통 확인 창구 역할을 한다. 모든 메모보고 화면 진입 전 이 확인을 거친다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /cop/smt/mrm/addMemoReprt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 24,
+              "snippet": "public interface EgovMemoReprtService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 92,
+              "snippet": "\tpublic void insertMemoReprt(MemoReprt memoReprt) throws Exception;"
+            }
+          ],
+          "text": "보고자 목록 조회, 작성자 직급명 조회, 메모보고 목록·상세 조회, 조회일시 기록, 수정, 지시사항 등록, 신규 등록을 업무 규약으로 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 24,
+              "snippet": "public interface EgovMemoReprtService {"
+            }
+          ],
+          "text": "메모보고 목록·상세 조회, 등록·수정, 보고자 조회일시 기록, 지시사항 등록 등 메모보고 업무 전반을 조율하는 역할을 한다."
+        }
+      },
+      "name": "메모보고 업무 처리",
+      "stepId": "step:ANY /cop/smt/mrm/addMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+            "line": 24,
+            "snippet": "public interface EgovMemoReprtService {"
+          }
+        ],
+        "text": "보고자 목록 조회, 작성자 직급명 조회, 메모보고 목록·상세 조회, 조회일시 기록, 수정, 지시사항 등록, 신규 등록을 업무 규약으로 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 30,
+              "snippet": "    /** 검색조건 */"
+            }
+          ],
+          "text": "검색조건·검색단어·사용자ID·기간(시작·종료일자)·보고서상태·지시사항 등록여부 조회조건과 페이지 위치·크기 항목을 보유하며 메모보고 항목 전체를 이어받는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "메모보고 검색조건과 페이지 정보를 담아 조회 요청을 전달하는 데이터 구조 역할을 한다."
+        }
+      },
+      "name": "메모보고 조회조건",
+      "stepId": "step:ANY /cop/smt/mrm/addMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+            "line": 27,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "검색조건·검색단어·사용자ID·기간(시작·종료일자)·보고서상태·지시사항 등록여부 조회조건과 페이지 위치·크기 항목을 보유하며 메모보고 항목 전체를 이어받는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 235,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 237,
+              "snippet": "\t\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 251,
+              "snippet": "\t\tmodel.addAttribute(\"fileUploadExtensions\", whiteListFileUploadExtensions);"
+            }
+          ],
+          "text": "등록화면 요청을 받으면 먼저 로그인 여부를 확인하고, 미인증이면 로그인 안내 메시지와 함께 로그인 화면으로 되돌린다. 인증되면 인증 사용자 정보에서 작성자 아이디·이름을 채우고 첨부파일 허용 확장자와 최대 크기를 화면에 함께 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            }
+          ],
+          "text": "이 흐름에서 사용자의 요청을 가장 먼저 받아 인증 확인과 입력값 검증을 수행하고, 실제 처리는 메모보고 업무 처리와 첨부파일 관리로 위임한 뒤 결과 화면을 지정하는 역할을 한다."
+        }
+      },
+      "name": "메모보고 등록화면 열기 요청 처리",
+      "stepId": "step:ANY /cop/smt/mrm/addMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 225,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+          }
+        ],
+        "text": "메모보고 화면 요청을 받아 로그인 여부와 입력값을 확인한 뒤 메모보고 업무 처리로 위임하고, 처리 결과를 화면으로 돌려주는 진입 지점이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "빈 문자열 상수를 두고, 지정 길이 초과 시 잘라내기, 빈 값·널 여부 검증 등 문자열 처리 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "사용자 정보 등 값이 없을 때 빈 문자열로 바꾸거나 길이를 다듬는 등 문자열을 안전하게 다루도록 돕는 협력 객체 역할을 한다."
+        }
+      },
+      "name": "문자열 처리 지원",
+      "stepId": "step:ANY /cop/smt/mrm/addMemoReprt.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "빈 문자열 상수를 두고, 지정 길이 초과 시 잘라내기, 빈 값·널 여부 검증 등 문자열 처리 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "메시지 코드를 받아 기본 로케일 기준 메시지를 반환하며, 로케일과 매개변수를 함께 받는 조회 방식도 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "화면에 보여줄 안내·오류 메시지를 메시지 코드로 조회해 돌려주는 공통 창구 역할을 한다. 로그인이 필요한 상황 등에서 사용자에게 표시할 문구를 이 경로로 가져온다."
+        }
+      },
+      "name": "공통 메시지 조회",
+      "stepId": "step:ANY /cop/smt/mrm/deleteMemoReprt.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "메시지 코드를 받아 기본 로케일 기준 메시지를 반환하며, 로케일과 매개변수를 함께 받는 조회 방식도 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            }
+          ],
+          "text": "아이디·이름·이메일·고유아이디·조직 정보 등 사용자 신원 항목을 보유하며 일부 항목은 필수값 검증 대상이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "인증된 사용자의 신원 정보를 담아 흐름 전반에 전달하는 데이터 구조 역할을 한다. 작성자 식별과 조회조건 설정에 이 정보가 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /cop/smt/mrm/deleteMemoReprt.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "아이디·이름·이메일·고유아이디·조직 정보 등 사용자 신원 항목을 보유하며 일부 항목은 필수값 검증 대상이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 62,
+              "snippet": "    public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+            }
+          ],
+          "text": "파일 목록·상세 조회, 단건·다건 등록, 다건 수정, 단건·다건 삭제, 파일 구분자 최대값 조회를 업무 규약으로 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            }
+          ],
+          "text": "메모보고에 딸린 첨부파일의 등록·수정·삭제·조회를 담당하는 공통 업무 규약 역할을 한다."
+        }
+      },
+      "name": "첨부파일 관리",
+      "stepId": "step:ANY /cop/smt/mrm/deleteMemoReprt.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ],
+        "text": "파일 목록·상세 조회, 단건·다건 등록, 다건 수정, 단건·다건 삭제, 파일 구분자 최대값 조회를 업무 규약으로 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 24,
+              "snippet": "     * 첨부파일 아이디"
+            }
+          ],
+          "text": "첨부파일 아이디·파일연번·원파일명·저장파일명·파일확장자·파일크기·파일저장경로·생성일자를 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "첨부파일 한 건의 속성을 담아 전달하는 데이터 구조 역할을 한다."
+        }
+      },
+      "name": "첨부파일 정보",
+      "stepId": "step:ANY /cop/smt/mrm/deleteMemoReprt.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "첨부파일 아이디·파일연번·원파일명·저장파일명·파일확장자·파일크기·파일저장경로·생성일자를 보유한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "현재 사용자가 로그인 상태인지 확인하고 인증된 사용자 정보를 꺼내오는 공통 확인 창구 역할을 한다. 모든 메모보고 화면 진입 전 이 확인을 거친다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /cop/smt/mrm/deleteMemoReprt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 30,
+              "snippet": "    /** 검색조건 */"
+            }
+          ],
+          "text": "검색조건·검색단어·사용자ID·기간(시작·종료일자)·보고서상태·지시사항 등록여부 조회조건과 페이지 위치·크기 항목을 보유하며 메모보고 항목 전체를 이어받는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "메모보고 검색조건과 페이지 정보를 담아 조회 요청을 전달하는 데이터 구조 역할을 한다."
+        }
+      },
+      "name": "메모보고 조회조건",
+      "stepId": "step:ANY /cop/smt/mrm/deleteMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+            "line": 27,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "검색조건·검색단어·사용자ID·기간(시작·종료일자)·보고서상태·지시사항 등록여부 조회조건과 페이지 위치·크기 항목을 보유하며 메모보고 항목 전체를 이어받는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 235,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "요청 파라미터를 메모보고 조회조건 객체로 받아 검증한 뒤, 로그인 여부 확인을 거쳐 메모보고 업무 처리로 위임하고 결과를 화면에 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            }
+          ],
+          "text": "이 흐름에서 사용자의 요청을 가장 먼저 받아 인증 확인과 입력값 검증을 수행하고, 실제 처리는 메모보고 업무 처리와 첨부파일 관리로 위임한 뒤 결과 화면을 지정하는 역할을 한다."
+        }
+      },
+      "name": "메모보고 삭제 요청 처리",
+      "stepId": "step:ANY /cop/smt/mrm/deleteMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 225,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+          }
+        ],
+        "text": "메모보고 화면 요청을 받아 로그인 여부와 입력값을 확인한 뒤 메모보고 업무 처리로 위임하고, 처리 결과를 화면으로 돌려주는 진입 지점이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "빈 문자열 상수를 두고, 지정 길이 초과 시 잘라내기, 빈 값·널 여부 검증 등 문자열 처리 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "사용자 정보 등 값이 없을 때 빈 문자열로 바꾸거나 길이를 다듬는 등 문자열을 안전하게 다루도록 돕는 협력 객체 역할을 한다."
+        }
+      },
+      "name": "문자열 처리 지원",
+      "stepId": "step:ANY /cop/smt/mrm/deleteMemoReprt.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "빈 문자열 상수를 두고, 지정 길이 초과 시 잘라내기, 빈 값·널 여부 검증 등 문자열 처리 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "메시지 코드를 받아 기본 로케일 기준 메시지를 반환하며, 로케일과 매개변수를 함께 받는 조회 방식도 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "화면에 보여줄 안내·오류 메시지를 메시지 코드로 조회해 돌려주는 공통 창구 역할을 한다. 로그인이 필요한 상황 등에서 사용자에게 표시할 문구를 이 경로로 가져온다."
+        }
+      },
+      "name": "공통 메시지 조회",
+      "stepId": "step:ANY /cop/smt/mrm/insertMemoReprt.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "메시지 코드를 받아 기본 로케일 기준 메시지를 반환하며, 로케일과 매개변수를 함께 받는 조회 방식도 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            }
+          ],
+          "text": "아이디·이름·이메일·고유아이디·조직 정보 등 사용자 신원 항목을 보유하며 일부 항목은 필수값 검증 대상이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "인증된 사용자의 신원 정보를 담아 흐름 전반에 전달하는 데이터 구조 역할을 한다. 작성자 식별과 조회조건 설정에 이 정보가 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /cop/smt/mrm/insertMemoReprt.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "아이디·이름·이메일·고유아이디·조직 정보 등 사용자 신원 항목을 보유하며 일부 항목은 필수값 검증 대상이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 62,
+              "snippet": "    public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+            }
+          ],
+          "text": "파일 목록·상세 조회, 단건·다건 등록, 다건 수정, 단건·다건 삭제, 파일 구분자 최대값 조회를 업무 규약으로 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            }
+          ],
+          "text": "메모보고에 딸린 첨부파일의 등록·수정·삭제·조회를 담당하는 공통 업무 규약 역할을 한다."
+        }
+      },
+      "name": "첨부파일 관리",
+      "stepId": "step:ANY /cop/smt/mrm/insertMemoReprt.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ],
+        "text": "파일 목록·상세 조회, 단건·다건 등록, 다건 수정, 단건·다건 삭제, 파일 구분자 최대값 조회를 업무 규약으로 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 60,
+              "snippet": "@Component(\"EgovFileMngUtil\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 90,
+              "snippet": "\t\t\tatchFileIdString = idgenService.getNextStringId();"
+            }
+          ],
+          "text": "저장경로가 없으면 전역 설정의 기본 저장경로를 쓰고, 첨부파일ID가 없으면 새 ID를 발번하며, 저장 폴더가 없으면 만들고, 파일마다 확장자·크기·저장경로를 기록한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 60,
+              "snippet": "@Component(\"EgovFileMngUtil\")"
+            }
+          ],
+          "text": "업로드된 첨부파일을 저장경로에 실제로 옮기고 파일 속성 목록을 만들어 주는 역할을 한다."
+        }
+      },
+      "name": "첨부파일 저장 처리",
+      "stepId": "step:ANY /cop/smt/mrm/insertMemoReprt.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          }
+        ],
+        "text": "저장경로가 없으면 전역 설정의 기본 저장경로를 쓰고, 첨부파일ID가 없으면 새 ID를 발번하며, 저장 폴더가 없으면 만들고, 파일마다 확장자·크기·저장경로를 기록한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 72,
+              "snippet": "\tpublic static String getProperty(String keyName) {"
+            }
+          ],
+          "text": "설정 키를 받아 전역 설정파일에서 해당 값을 찾아 문자열로 반환하며, 상대경로 값을 절대경로로 바꿔주는 방식도 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+              "line": 49,
+              "snippet": "public class EgovProperties {"
+            }
+          ],
+          "text": "첨부파일 저장경로·허용 확장자·최대 크기 같은 운영 환경설정 값을 읽어오는 협력 객체 역할을 한다."
+        }
+      },
+      "name": "환경설정 값 조회",
+      "stepId": "step:ANY /cop/smt/mrm/insertMemoReprt.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ],
+        "text": "설정 키를 받아 전역 설정파일에서 해당 값을 찾아 문자열로 반환하며, 상대경로 값을 절대경로로 바꿔주는 방식도 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "현재 사용자가 로그인 상태인지 확인하고 인증된 사용자 정보를 꺼내오는 공통 확인 창구 역할을 한다. 모든 메모보고 화면 진입 전 이 확인을 거친다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /cop/smt/mrm/insertMemoReprt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 30,
+              "snippet": "    /** 검색조건 */"
+            }
+          ],
+          "text": "검색조건·검색단어·사용자ID·기간(시작·종료일자)·보고서상태·지시사항 등록여부 조회조건과 페이지 위치·크기 항목을 보유하며 메모보고 항목 전체를 이어받는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "메모보고 검색조건과 페이지 정보를 담아 조회 요청을 전달하는 데이터 구조 역할을 한다."
+        }
+      },
+      "name": "메모보고 조회조건",
+      "stepId": "step:ANY /cop/smt/mrm/insertMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+            "line": 27,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "검색조건·검색단어·사용자ID·기간(시작·종료일자)·보고서상태·지시사항 등록여부 조회조건과 페이지 위치·크기 항목을 보유하며 메모보고 항목 전체를 이어받는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 235,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "요청 파라미터를 메모보고 조회조건 객체로 받아 검증한 뒤, 로그인 여부 확인을 거쳐 메모보고 업무 처리로 위임하고 결과를 화면에 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            }
+          ],
+          "text": "이 흐름에서 사용자의 요청을 가장 먼저 받아 인증 확인과 입력값 검증을 수행하고, 실제 처리는 메모보고 업무 처리와 첨부파일 관리로 위임한 뒤 결과 화면을 지정하는 역할을 한다."
+        }
+      },
+      "name": "메모보고 신규 등록 요청 처리",
+      "stepId": "step:ANY /cop/smt/mrm/insertMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 225,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+          }
+        ],
+        "text": "메모보고 화면 요청을 받아 로그인 여부와 입력값을 확인한 뒤 메모보고 업무 처리로 위임하고, 처리 결과를 화면으로 돌려주는 진입 지점이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            }
+          ],
+          "text": "메시지 코드를 받아 기본 로케일 기준 메시지를 반환하며, 로케일과 매개변수를 함께 받는 조회 방식도 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "화면에 보여줄 안내·오류 메시지를 메시지 코드로 조회해 돌려주는 공통 창구 역할을 한다. 로그인이 필요한 상황 등에서 사용자에게 표시할 문구를 이 경로로 가져온다."
+        }
+      },
+      "name": "공통 메시지 조회",
+      "stepId": "step:ANY /cop/smt/mrm/modifyMemoReprt.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "메시지 코드를 받아 기본 로케일 기준 메시지를 반환하며, 로케일과 매개변수를 함께 받는 조회 방식도 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            }
+          ],
+          "text": "아이디·이름·이메일·고유아이디·조직 정보 등 사용자 신원 항목을 보유하며 일부 항목은 필수값 검증 대상이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "인증된 사용자의 신원 정보를 담아 흐름 전반에 전달하는 데이터 구조 역할을 한다. 작성자 식별과 조회조건 설정에 이 정보가 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /cop/smt/mrm/modifyMemoReprt.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "아이디·이름·이메일·고유아이디·조직 정보 등 사용자 신원 항목을 보유하며 일부 항목은 필수값 검증 대상이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증 사용자 조회·권한 목록 조회·인증 여부 확인을 업무 규약으로 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 제공하는 업무 규약 역할을 한다."
+        }
+      },
+      "name": "사용자 인증 정보 제공",
+      "stepId": "step:ANY /cop/smt/mrm/modifyMemoReprt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증 사용자 조회·권한 목록 조회·인증 여부 확인을 업무 규약으로 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "현재 사용자가 로그인 상태인지 확인하고 인증된 사용자 정보를 꺼내오는 공통 확인 창구 역할을 한다. 모든 메모보고 화면 진입 전 이 확인을 거친다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /cop/smt/mrm/modifyMemoReprt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 24,
+              "snippet": "public interface EgovMemoReprtService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 92,
+              "snippet": "\tpublic void insertMemoReprt(MemoReprt memoReprt) throws Exception;"
+            }
+          ],
+          "text": "보고자 목록 조회, 작성자 직급명 조회, 메모보고 목록·상세 조회, 조회일시 기록, 수정, 지시사항 등록, 신규 등록을 업무 규약으로 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 24,
+              "snippet": "public interface EgovMemoReprtService {"
+            }
+          ],
+          "text": "메모보고 목록·상세 조회, 등록·수정, 보고자 조회일시 기록, 지시사항 등록 등 메모보고 업무 전반을 조율하는 역할을 한다."
+        }
+      },
+      "name": "메모보고 업무 처리",
+      "stepId": "step:ANY /cop/smt/mrm/modifyMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+            "line": 24,
+            "snippet": "public interface EgovMemoReprtService {"
+          }
+        ],
+        "text": "보고자 목록 조회, 작성자 직급명 조회, 메모보고 목록·상세 조회, 조회일시 기록, 수정, 지시사항 등록, 신규 등록을 업무 규약으로 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 30,
+              "snippet": "    /** 검색조건 */"
+            }
+          ],
+          "text": "검색조건·검색단어·사용자ID·기간(시작·종료일자)·보고서상태·지시사항 등록여부 조회조건과 페이지 위치·크기 항목을 보유하며 메모보고 항목 전체를 이어받는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "메모보고 검색조건과 페이지 정보를 담아 조회 요청을 전달하는 데이터 구조 역할을 한다."
+        }
+      },
+      "name": "메모보고 조회조건",
+      "stepId": "step:ANY /cop/smt/mrm/modifyMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+            "line": 27,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "검색조건·검색단어·사용자ID·기간(시작·종료일자)·보고서상태·지시사항 등록여부 조회조건과 페이지 위치·크기 항목을 보유하며 메모보고 항목 전체를 이어받는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 270,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 272,
+              "snippet": "\t\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 277,
+              "snippet": "\t\tLoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ],
+          "text": "수정화면 요청을 받으면 로그인 여부를 확인하고 미인증이면 로그인 화면으로 되돌린다. 인증되면 인증 사용자 고유아이디를 조회조건으로 넣어 대상 메모보고를 조회하고, 이전 검색조건과 페이지 위치를 결과에 되살려 화면으로 넘긴다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            }
+          ],
+          "text": "이 흐름에서 사용자의 요청을 가장 먼저 받아 인증 확인과 입력값 검증을 수행하고, 실제 처리는 메모보고 업무 처리와 첨부파일 관리로 위임한 뒤 결과 화면을 지정하는 역할을 한다."
+        }
+      },
+      "name": "메모보고 수정화면 열기 요청 처리",
+      "stepId": "step:ANY /cop/smt/mrm/modifyMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 225,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+          }
+        ],
+        "text": "메모보고 화면 요청을 받아 로그인 여부와 입력값을 확인한 뒤 메모보고 업무 처리로 위임하고, 처리 결과를 화면으로 돌려주는 진입 지점이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "빈 문자열 상수를 두고, 지정 길이 초과 시 잘라내기, 빈 값·널 여부 검증 등 문자열 처리 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "사용자 정보 등 값이 없을 때 빈 문자열로 바꾸거나 길이를 다듬는 등 문자열을 안전하게 다루도록 돕는 협력 객체 역할을 한다."
+        }
+      },
+      "name": "문자열 처리 지원",
+      "stepId": "step:ANY /cop/smt/mrm/modifyMemoReprt.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "빈 문자열 상수를 두고, 지정 길이 초과 시 잘라내기, 빈 값·널 여부 검증 등 문자열 처리 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            }
+          ],
+          "text": "아이디·이름·이메일·고유아이디·조직 정보 등 사용자 신원 항목을 보유하며 일부 항목은 필수값 검증 대상이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "인증된 사용자의 신원 정보를 담아 흐름 전반에 전달하는 데이터 구조 역할을 한다. 작성자 식별과 조회조건 설정에 이 정보가 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /cop/smt/mrm/selectMemoReprt.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "아이디·이름·이메일·고유아이디·조직 정보 등 사용자 신원 항목을 보유하며 일부 항목은 필수값 검증 대상이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증 사용자 조회·권한 목록 조회·인증 여부 확인을 업무 규약으로 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 제공하는 업무 규약 역할을 한다."
+        }
+      },
+      "name": "사용자 인증 정보 제공",
+      "stepId": "step:ANY /cop/smt/mrm/selectMemoReprt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증 사용자 조회·권한 목록 조회·인증 여부 확인을 업무 규약으로 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "현재 사용자가 로그인 상태인지 확인하고 인증된 사용자 정보를 꺼내오는 공통 확인 창구 역할을 한다. 모든 메모보고 화면 진입 전 이 확인을 거친다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /cop/smt/mrm/selectMemoReprt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 24,
+              "snippet": "public interface EgovMemoReprtService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 92,
+              "snippet": "\tpublic void insertMemoReprt(MemoReprt memoReprt) throws Exception;"
+            }
+          ],
+          "text": "보고자 목록 조회, 작성자 직급명 조회, 메모보고 목록·상세 조회, 조회일시 기록, 수정, 지시사항 등록, 신규 등록을 업무 규약으로 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 24,
+              "snippet": "public interface EgovMemoReprtService {"
+            }
+          ],
+          "text": "메모보고 목록·상세 조회, 등록·수정, 보고자 조회일시 기록, 지시사항 등록 등 메모보고 업무 전반을 조율하는 역할을 한다."
+        }
+      },
+      "name": "메모보고 업무 처리",
+      "stepId": "step:ANY /cop/smt/mrm/selectMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+            "line": 24,
+            "snippet": "public interface EgovMemoReprtService {"
+          }
+        ],
+        "text": "보고자 목록 조회, 작성자 직급명 조회, 메모보고 목록·상세 조회, 조회일시 기록, 수정, 지시사항 등록, 신규 등록을 업무 규약으로 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprt.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprt.java",
+              "line": 55,
+              "snippet": "\t@Size(max=2500)"
+            }
+          ],
+          "text": "보고서ID·제목·보고일자·작성자·보고자·보고내용·첨부파일ID·지시사항·보고자조회일시·보고서상태를 보유하며, 제목은 255자, 보고내용은 2500자로 길이가 제한되고 제목·보고일자·보고내용은 필수값이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprt.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "메모보고 한 건의 업무 내용을 담는 데이터 구조 역할을 한다."
+        }
+      },
+      "name": "메모보고 정보",
+      "stepId": "step:ANY /cop/smt/mrm/selectMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprt.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprt.java",
+            "line": 27,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "보고서ID·제목·보고일자·작성자·보고자·보고내용·첨부파일ID·지시사항·보고자조회일시·보고서상태를 보유하며, 제목은 255자, 보고내용은 2500자로 길이가 제한되고 제목·보고일자·보고내용은 필수값이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 30,
+              "snippet": "    /** 검색조건 */"
+            }
+          ],
+          "text": "검색조건·검색단어·사용자ID·기간(시작·종료일자)·보고서상태·지시사항 등록여부 조회조건과 페이지 위치·크기 항목을 보유하며 메모보고 항목 전체를 이어받는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "메모보고 검색조건과 페이지 정보를 담아 조회 요청을 전달하는 데이터 구조 역할을 한다."
+        }
+      },
+      "name": "메모보고 조회조건",
+      "stepId": "step:ANY /cop/smt/mrm/selectMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+            "line": 27,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "검색조건·검색단어·사용자ID·기간(시작·종료일자)·보고서상태·지시사항 등록여부 조회조건과 페이지 위치·크기 항목을 보유하며 메모보고 항목 전체를 이어받는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 235,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "요청 파라미터를 메모보고 조회조건 객체로 받아 검증한 뒤, 로그인 여부 확인을 거쳐 메모보고 업무 처리로 위임하고 결과를 화면에 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            }
+          ],
+          "text": "이 흐름에서 사용자의 요청을 가장 먼저 받아 인증 확인과 입력값 검증을 수행하고, 실제 처리는 메모보고 업무 처리와 첨부파일 관리로 위임한 뒤 결과 화면을 지정하는 역할을 한다."
+        }
+      },
+      "name": "메모보고 상세 조회 요청 처리",
+      "stepId": "step:ANY /cop/smt/mrm/selectMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 225,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+          }
+        ],
+        "text": "메모보고 화면 요청을 받아 로그인 여부와 입력값을 확인한 뒤 메모보고 업무 처리로 위임하고, 처리 결과를 화면으로 돌려주는 진입 지점이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "빈 문자열 상수를 두고, 지정 길이 초과 시 잘라내기, 빈 값·널 여부 검증 등 문자열 처리 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "사용자 정보 등 값이 없을 때 빈 문자열로 바꾸거나 길이를 다듬는 등 문자열을 안전하게 다루도록 돕는 협력 객체 역할을 한다."
+        }
+      },
+      "name": "문자열 처리 지원",
+      "stepId": "step:ANY /cop/smt/mrm/selectMemoReprt.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "빈 문자열 상수를 두고, 지정 길이 초과 시 잘라내기, 빈 값·널 여부 검증 등 문자열 처리 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            }
+          ],
+          "text": "아이디·이름·이메일·고유아이디·조직 정보 등 사용자 신원 항목을 보유하며 일부 항목은 필수값 검증 대상이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "인증된 사용자의 신원 정보를 담아 흐름 전반에 전달하는 데이터 구조 역할을 한다. 작성자 식별과 조회조건 설정에 이 정보가 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /cop/smt/mrm/selectMemoReprtList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "아이디·이름·이메일·고유아이디·조직 정보 등 사용자 신원 항목을 보유하며 일부 항목은 필수값 검증 대상이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증 사용자 조회·권한 목록 조회·인증 여부 확인을 업무 규약으로 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 제공하는 업무 규약 역할을 한다."
+        }
+      },
+      "name": "사용자 인증 정보 제공",
+      "stepId": "step:ANY /cop/smt/mrm/selectMemoReprtList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증 사용자 조회·권한 목록 조회·인증 여부 확인을 업무 규약으로 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "현재 사용자가 로그인 상태인지 확인하고 인증된 사용자 정보를 꺼내오는 공통 확인 창구 역할을 한다. 모든 메모보고 화면 진입 전 이 확인을 거친다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /cop/smt/mrm/selectMemoReprtList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 24,
+              "snippet": "public interface EgovMemoReprtService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 92,
+              "snippet": "\tpublic void insertMemoReprt(MemoReprt memoReprt) throws Exception;"
+            }
+          ],
+          "text": "보고자 목록 조회, 작성자 직급명 조회, 메모보고 목록·상세 조회, 조회일시 기록, 수정, 지시사항 등록, 신규 등록을 업무 규약으로 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 24,
+              "snippet": "public interface EgovMemoReprtService {"
+            }
+          ],
+          "text": "메모보고 목록·상세 조회, 등록·수정, 보고자 조회일시 기록, 지시사항 등록 등 메모보고 업무 전반을 조율하는 역할을 한다."
+        }
+      },
+      "name": "메모보고 업무 처리",
+      "stepId": "step:ANY /cop/smt/mrm/selectMemoReprtList.do:src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+            "line": 24,
+            "snippet": "public interface EgovMemoReprtService {"
+          }
+        ],
+        "text": "보고자 목록 조회, 작성자 직급명 조회, 메모보고 목록·상세 조회, 조회일시 기록, 수정, 지시사항 등록, 신규 등록을 업무 규약으로 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 30,
+              "snippet": "    /** 검색조건 */"
+            }
+          ],
+          "text": "검색조건·검색단어·사용자ID·기간(시작·종료일자)·보고서상태·지시사항 등록여부 조회조건과 페이지 위치·크기 항목을 보유하며 메모보고 항목 전체를 이어받는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "메모보고 검색조건과 페이지 정보를 담아 조회 요청을 전달하는 데이터 구조 역할을 한다."
+        }
+      },
+      "name": "메모보고 조회조건",
+      "stepId": "step:ANY /cop/smt/mrm/selectMemoReprtList.do:src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+            "line": 27,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "검색조건·검색단어·사용자ID·기간(시작·종료일자)·보고서상태·지시사항 등록여부 조회조건과 페이지 위치·크기 항목을 보유하며 메모보고 항목 전체를 이어받는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 235,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "요청 파라미터를 메모보고 조회조건 객체로 받아 검증한 뒤, 로그인 여부 확인을 거쳐 메모보고 업무 처리로 위임하고 결과를 화면에 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            }
+          ],
+          "text": "이 흐름에서 사용자의 요청을 가장 먼저 받아 인증 확인과 입력값 검증을 수행하고, 실제 처리는 메모보고 업무 처리와 첨부파일 관리로 위임한 뒤 결과 화면을 지정하는 역할을 한다."
+        }
+      },
+      "name": "메모보고 목록 조회 요청 처리",
+      "stepId": "step:ANY /cop/smt/mrm/selectMemoReprtList.do:src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 225,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+          }
+        ],
+        "text": "메모보고 화면 요청을 받아 로그인 여부와 입력값을 확인한 뒤 메모보고 업무 처리로 위임하고, 처리 결과를 화면으로 돌려주는 진입 지점이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            }
+          ],
+          "text": "빈 문자열 상수를 두고, 지정 길이 초과 시 잘라내기, 빈 값·널 여부 검증 등 문자열 처리 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ],
+          "text": "사용자 정보 등 값이 없을 때 빈 문자열로 바꾸거나 길이를 다듬는 등 문자열을 안전하게 다루도록 돕는 협력 객체 역할을 한다."
+        }
+      },
+      "name": "문자열 처리 지원",
+      "stepId": "step:ANY /cop/smt/mrm/selectMemoReprtList.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "빈 문자열 상수를 두고, 지정 길이 초과 시 잘라내기, 빈 값·널 여부 검증 등 문자열 처리 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 24,
+              "snippet": "public interface EgovMemoReprtService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 92,
+              "snippet": "\tpublic void insertMemoReprt(MemoReprt memoReprt) throws Exception;"
+            }
+          ],
+          "text": "보고자 목록 조회, 작성자 직급명 조회, 메모보고 목록·상세 조회, 조회일시 기록, 수정, 지시사항 등록, 신규 등록을 업무 규약으로 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 24,
+              "snippet": "public interface EgovMemoReprtService {"
+            }
+          ],
+          "text": "메모보고 목록·상세 조회, 등록·수정, 보고자 조회일시 기록, 지시사항 등록 등 메모보고 업무 전반을 조율하는 역할을 한다."
+        }
+      },
+      "name": "메모보고 업무 처리",
+      "stepId": "step:ANY /cop/smt/mrm/selectReportrList.do:src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+            "line": 24,
+            "snippet": "public interface EgovMemoReprtService {"
+          }
+        ],
+        "text": "보고자 목록 조회, 작성자 직급명 조회, 메모보고 목록·상세 조회, 조회일시 기록, 수정, 지시사항 등록, 신규 등록을 업무 규약으로 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/ReportrVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/ReportrVO.java",
+              "line": 30,
+              "snippet": "    /** 검색조건 */"
+            }
+          ],
+          "text": "검색조건·검색단어와 현재페이지·페이지크기 등 페이지 항목을 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/ReportrVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "보고자 검색조건과 페이지 정보를 담아 보고자 목록 조회 요청을 전달하는 데이터 구조 역할을 한다."
+        }
+      },
+      "name": "보고자 조회조건",
+      "stepId": "step:ANY /cop/smt/mrm/selectReportrList.do:src/main/java/egovframework/com/cop/smt/mrm/service/ReportrVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/ReportrVO.java",
+            "line": 27,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "검색조건·검색단어와 현재페이지·페이지크기 등 페이지 항목을 보유한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 235,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "요청 파라미터를 메모보고 조회조건 객체로 받아 검증한 뒤, 로그인 여부 확인을 거쳐 메모보고 업무 처리로 위임하고 결과를 화면에 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            }
+          ],
+          "text": "이 흐름에서 사용자의 요청을 가장 먼저 받아 인증 확인과 입력값 검증을 수행하고, 실제 처리는 메모보고 업무 처리와 첨부파일 관리로 위임한 뒤 결과 화면을 지정하는 역할을 한다."
+        }
+      },
+      "name": "보고자 목록 조회 요청 처리",
+      "stepId": "step:ANY /cop/smt/mrm/selectReportrList.do:src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 225,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+          }
+        ],
+        "text": "메모보고 화면 요청을 받아 로그인 여부와 입력값을 확인한 뒤 메모보고 업무 처리로 위임하고, 처리 결과를 화면으로 돌려주는 진입 지점이다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 235,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "요청 파라미터를 메모보고 조회조건 객체로 받아 검증한 뒤, 로그인 여부 확인을 거쳐 메모보고 업무 처리로 위임하고 결과를 화면에 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            }
+          ],
+          "text": "이 흐름에서 사용자의 요청을 가장 먼저 받아 인증 확인과 입력값 검증을 수행하고, 실제 처리는 메모보고 업무 처리와 첨부파일 관리로 위임한 뒤 결과 화면을 지정하는 역할을 한다."
+        }
+      },
+      "name": "보고자 선택 팝업 열기 요청 처리",
+      "stepId": "step:ANY /cop/smt/mrm/selectReportrListPopup.do:src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 225,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+          }
+        ],
+        "text": "메모보고 화면 요청을 받아 로그인 여부와 입력값을 확인한 뒤 메모보고 업무 처리로 위임하고, 처리 결과를 화면으로 돌려주는 진입 지점이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            }
+          ],
+          "text": "아이디·이름·이메일·고유아이디·조직 정보 등 사용자 신원 항목을 보유하며 일부 항목은 필수값 검증 대상이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ],
+          "text": "인증된 사용자의 신원 정보를 담아 흐름 전반에 전달하는 데이터 구조 역할을 한다. 작성자 식별과 조회조건 설정에 이 정보가 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /cop/smt/mrm/updateMemoReprt.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "아이디·이름·이메일·고유아이디·조직 정보 등 사용자 신원 항목을 보유하며 일부 항목은 필수값 검증 대상이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 62,
+              "snippet": "    public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+            }
+          ],
+          "text": "파일 목록·상세 조회, 단건·다건 등록, 다건 수정, 단건·다건 삭제, 파일 구분자 최대값 조회를 업무 규약으로 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            }
+          ],
+          "text": "메모보고에 딸린 첨부파일의 등록·수정·삭제·조회를 담당하는 공통 업무 규약 역할을 한다."
+        }
+      },
+      "name": "첨부파일 관리",
+      "stepId": "step:ANY /cop/smt/mrm/updateMemoReprt.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ],
+        "text": "파일 목록·상세 조회, 단건·다건 등록, 다건 수정, 단건·다건 삭제, 파일 구분자 최대값 조회를 업무 규약으로 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 60,
+              "snippet": "@Component(\"EgovFileMngUtil\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 90,
+              "snippet": "\t\t\tatchFileIdString = idgenService.getNextStringId();"
+            }
+          ],
+          "text": "저장경로가 없으면 전역 설정의 기본 저장경로를 쓰고, 첨부파일ID가 없으면 새 ID를 발번하며, 저장 폴더가 없으면 만들고, 파일마다 확장자·크기·저장경로를 기록한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 60,
+              "snippet": "@Component(\"EgovFileMngUtil\")"
+            }
+          ],
+          "text": "업로드된 첨부파일을 저장경로에 실제로 옮기고 파일 속성 목록을 만들어 주는 역할을 한다."
+        }
+      },
+      "name": "첨부파일 저장 처리",
+      "stepId": "step:ANY /cop/smt/mrm/updateMemoReprt.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          }
+        ],
+        "text": "저장경로가 없으면 전역 설정의 기본 저장경로를 쓰고, 첨부파일ID가 없으면 새 ID를 발번하며, 저장 폴더가 없으면 만들고, 파일마다 확장자·크기·저장경로를 기록한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 24,
+              "snippet": "     * 첨부파일 아이디"
+            }
+          ],
+          "text": "첨부파일 아이디·파일연번·원파일명·저장파일명·파일확장자·파일크기·파일저장경로·생성일자를 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "첨부파일 한 건의 속성을 담아 전달하는 데이터 구조 역할을 한다."
+        }
+      },
+      "name": "첨부파일 정보",
+      "stepId": "step:ANY /cop/smt/mrm/updateMemoReprt.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "첨부파일 아이디·파일연번·원파일명·저장파일명·파일확장자·파일크기·파일저장경로·생성일자를 보유한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "현재 사용자가 로그인 상태인지 확인하고 인증된 사용자 정보를 꺼내오는 공통 확인 창구 역할을 한다. 모든 메모보고 화면 진입 전 이 확인을 거친다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /cop/smt/mrm/updateMemoReprt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 24,
+              "snippet": "public interface EgovMemoReprtService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 92,
+              "snippet": "\tpublic void insertMemoReprt(MemoReprt memoReprt) throws Exception;"
+            }
+          ],
+          "text": "보고자 목록 조회, 작성자 직급명 조회, 메모보고 목록·상세 조회, 조회일시 기록, 수정, 지시사항 등록, 신규 등록을 업무 규약으로 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 24,
+              "snippet": "public interface EgovMemoReprtService {"
+            }
+          ],
+          "text": "메모보고 목록·상세 조회, 등록·수정, 보고자 조회일시 기록, 지시사항 등록 등 메모보고 업무 전반을 조율하는 역할을 한다."
+        }
+      },
+      "name": "메모보고 업무 처리",
+      "stepId": "step:ANY /cop/smt/mrm/updateMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+            "line": 24,
+            "snippet": "public interface EgovMemoReprtService {"
+          }
+        ],
+        "text": "보고자 목록 조회, 작성자 직급명 조회, 메모보고 목록·상세 조회, 조회일시 기록, 수정, 지시사항 등록, 신규 등록을 업무 규약으로 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 30,
+              "snippet": "    /** 검색조건 */"
+            }
+          ],
+          "text": "검색조건·검색단어·사용자ID·기간(시작·종료일자)·보고서상태·지시사항 등록여부 조회조건과 페이지 위치·크기 항목을 보유하며 메모보고 항목 전체를 이어받는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+              "line": 27,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ],
+          "text": "메모보고 검색조건과 페이지 정보를 담아 조회 요청을 전달하는 데이터 구조 역할을 한다."
+        }
+      },
+      "name": "메모보고 조회조건",
+      "stepId": "step:ANY /cop/smt/mrm/updateMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/MemoReprtVO.java",
+            "line": 27,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "검색조건·검색단어·사용자ID·기간(시작·종료일자)·보고서상태·지시사항 등록여부 조회조건과 페이지 위치·크기 항목을 보유하며 메모보고 항목 전체를 이어받는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 235,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "요청 파라미터를 메모보고 조회조건 객체로 받아 검증한 뒤, 로그인 여부 확인을 거쳐 메모보고 업무 처리로 위임하고 결과를 화면에 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            }
+          ],
+          "text": "이 흐름에서 사용자의 요청을 가장 먼저 받아 인증 확인과 입력값 검증을 수행하고, 실제 처리는 메모보고 업무 처리와 첨부파일 관리로 위임한 뒤 결과 화면을 지정하는 역할을 한다."
+        }
+      },
+      "name": "메모보고 수정 저장 요청 처리",
+      "stepId": "step:ANY /cop/smt/mrm/updateMemoReprt.do:src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 225,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+          }
+        ],
+        "text": "메모보고 화면 요청을 받아 로그인 여부와 입력값을 확인한 뒤 메모보고 업무 처리로 위임하고, 처리 결과를 화면으로 돌려주는 진입 지점이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증 사용자 조회·권한 목록 조회·인증 여부 확인을 업무 규약으로 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ],
+          "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 제공하는 업무 규약 역할을 한다."
+        }
+      },
+      "name": "사용자 인증 정보 제공",
+      "stepId": "step:ANY /cop/smt/mrm/updateMemoReprtDrctMatter.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "인증 사용자 조회·권한 목록 조회·인증 여부 확인을 업무 규약으로 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ],
+          "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ],
+          "text": "현재 사용자가 로그인 상태인지 확인하고 인증된 사용자 정보를 꺼내오는 공통 확인 창구 역할을 한다. 모든 메모보고 화면 진입 전 이 확인을 거친다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /cop/smt/mrm/updateMemoReprtDrctMatter.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "인증 여부 확인, 인증 사용자 객체 조회, 사용자 권한 목록 조회의 세 가지 확인 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 24,
+              "snippet": "public interface EgovMemoReprtService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 92,
+              "snippet": "\tpublic void insertMemoReprt(MemoReprt memoReprt) throws Exception;"
+            }
+          ],
+          "text": "보고자 목록 조회, 작성자 직급명 조회, 메모보고 목록·상세 조회, 조회일시 기록, 수정, 지시사항 등록, 신규 등록을 업무 규약으로 정의한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+              "line": 24,
+              "snippet": "public interface EgovMemoReprtService {"
+            }
+          ],
+          "text": "메모보고 목록·상세 조회, 등록·수정, 보고자 조회일시 기록, 지시사항 등록 등 메모보고 업무 전반을 조율하는 역할을 한다."
+        }
+      },
+      "name": "메모보고 업무 처리",
+      "stepId": "step:ANY /cop/smt/mrm/updateMemoReprtDrctMatter.do:src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+            "line": 24,
+            "snippet": "public interface EgovMemoReprtService {"
+          }
+        ],
+        "text": "보고자 목록 조회, 작성자 직급명 조회, 메모보고 목록·상세 조회, 조회일시 기록, 수정, 지시사항 등록, 신규 등록을 업무 규약으로 정의한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 235,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "요청 파라미터를 메모보고 조회조건 객체로 받아 검증한 뒤, 로그인 여부 확인을 거쳐 메모보고 업무 처리로 위임하고 결과를 화면에 전달한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+              "line": 225,
+              "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+            }
+          ],
+          "text": "이 흐름에서 사용자의 요청을 가장 먼저 받아 인증 확인과 입력값 검증을 수행하고, 실제 처리는 메모보고 업무 처리와 첨부파일 관리로 위임한 뒤 결과 화면을 지정하는 역할을 한다."
+        }
+      },
+      "name": "지시사항 등록 요청 처리",
+      "stepId": "step:ANY /cop/smt/mrm/updateMemoReprtDrctMatter.do:src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+            "line": 225,
+            "snippet": "@RequestMapping(\"/cop/smt/mrm/addMemoReprt.do\")"
+          }
+        ],
+        "text": "메모보고 화면 요청을 받아 로그인 여부와 입력값을 확인한 뒤 메모보고 업무 처리로 위임하고, 처리 결과를 화면으로 돌려주는 진입 지점이다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/cop/smt/mrm/web/EgovMemoReprtController.java",
+        "line": 143,
+        "snippet": "\t@RequestMapping(\"/cop/smt/mrm/selectMemoReprtList.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/cop/smt/mrm/service/EgovMemoReprtService.java",
+        "line": 24,
+        "snippet": "public interface EgovMemoReprtService {"
+      }
+    ],
+    "text": "상급자에게 올리는 메모보고를 작성·등록하고, 보고자가 열람한 뒤 지시사항을 남기는 업무를 다룬다. 보고자 선택, 메모보고 목록·상세 조회, 등록·수정·삭제, 첨부파일 관리, 지시사항 등록을 포함한다."
+  }
+}

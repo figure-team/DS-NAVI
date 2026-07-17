@@ -1,0 +1,2473 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "uss.ion.sit-000",
+  "domainId": "domain:uss.ion.sit",
+  "header": {
+    "name": "사이트 관리",
+    "summary": {
+      "text": "기관 포털에 노출할 사이트 정보를 등록·조회·수정·삭제하는 업무 영역이다. 사이트 URL과 사이트명, 사이트설명, 주제분류를 관리하고 활성여부·사용여부로 노출을 통제하며, 등록·수정 시 인증된 사용자를 등록자·수정자로 남긴다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+          "line": 220,
+          "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+          "line": 43,
+          "snippet": "private String siteUrl;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+          "line": 48,
+          "snippet": "private String siteNm;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+          "line": 57,
+          "snippet": "private String siteThemaClCode;"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "사이트: 사이트 식별자로 구분되며 사이트 URL·사이트명·사이트설명·주제분류코드와 활성여부·사용여부, 등록·수정 이력을 가지는 핵심 업무 대상이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 33,
+            "snippet": "public class SiteVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 38,
+            "snippet": "private String siteId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 43,
+            "snippet": "private String siteUrl;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 63,
+            "snippet": "private String actvtyAt;"
+          }
+        ]
+      },
+      {
+        "text": "사이트 주제분류: 사이트를 분류하는 공통코드 값으로, 코드와 코드명 형태로 화면 선택 항목에 제공된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 57,
+            "snippet": "private String siteThemaClCode;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 60,
+            "snippet": "private String siteThemaClNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 34,
+            "snippet": "private String code = \"\";"
+          }
+        ]
+      },
+      {
+        "text": "로그인 사용자: 사이트 등록·수정 시 등록자·수정자로 기록되는 인증 주체로, 고유아이디와 소속 조직 정보를 가진다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "private String uniqId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 63,
+            "snippet": "private String orgnztId;"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "사이트 URL과 사이트명은 필수값이며 각각 100자를 초과할 수 없다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 41,
+            "snippet": "@EgovNullCheck"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 42,
+            "snippet": "@Size(max=100)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 43,
+            "snippet": "private String siteUrl;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 48,
+            "snippet": "private String siteNm;"
+          }
+        ]
+      },
+      {
+        "text": "사이트설명은 필수값이며 1000자를 초과할 수 없다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 51,
+            "snippet": "@EgovNullCheck"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 52,
+            "snippet": "@Size(max=1000)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 53,
+            "snippet": "private String siteDc;"
+          }
+        ]
+      },
+      {
+        "text": "사이트주제분류코드는 반드시 지정되어야 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 56,
+            "snippet": "@EgovNullCheck"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 57,
+            "snippet": "private String siteThemaClCode;"
+          }
+        ]
+      },
+      {
+        "text": "사이트 등록은 사이트 식별자 채번 과정에서 실패할 수 있으며, 이 경우 업무 처리가 중단된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 15,
+            "snippet": "void insertSite(SiteVO siteVO) throws FdlException;"
+          }
+        ]
+      },
+      {
+        "text": "사이트 삭제 처리 후에는 사이트 목록 조회로 이동해 갱신된 목록을 보여준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 214,
+            "snippet": "* 사이트정보를 삭제처리한다."
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 224,
+            "snippet": "return \"forward:/uss/ion/sit/selectSiteList.do\";"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "공통코드 업무와 연동한다. 사이트 등록·수정 화면의 주제분류 선택 항목을 공통코드 상세코드 조회로 채운다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          }
+        ]
+      },
+      {
+        "text": "사용자 인증 업무와 연동한다. 인증된 사용자 정보와 권한을 확인해 사이트 등록자·수정자를 확정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "public static Object getAuthenticatedUser() {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 58,
+            "snippet": "public static Boolean isAuthenticated() {"
+          }
+        ]
+      },
+      {
+        "text": "공통 유틸리티 업무와 연동한다. 입력 문자열의 널·공백 검증과 길이 가공에 공통 문자열 처리를 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 47,
+            "snippet": "public static final String EMPTY = \"\";"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "사이트 관리",
+        "nodes": [
+          {
+            "id": "n0",
+            "kind": "start",
+            "label": "사이트 관리 시작"
+          },
+          {
+            "id": "n1",
+            "kind": "activity",
+            "label": "사이트 목록 조회",
+            "flowRef": "flow:ANY /uss/ion/sit/selectSiteList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+                "line": 80,
+                "snippet": "@RequestMapping(value = \"/uss/ion/sit/selectSiteList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n2",
+            "kind": "decision",
+            "label": "수행할 작업 선택",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+                "line": 220,
+                "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+                "line": 148,
+                "snippet": "@RequestMapping(\"/uss/ion/sit/insertSite.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n3",
+            "kind": "activity",
+            "label": "사이트 상세 조회",
+            "flowRef": "flow:ANY /uss/ion/sit/selectSiteDetail.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+                "line": 115,
+                "snippet": "@RequestMapping(\"/uss/ion/sit/selectSiteDetail.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n4",
+            "kind": "activity",
+            "label": "사이트 등록 화면 조회",
+            "flowRef": "flow:ANY /uss/ion/sit/insertSiteView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+                "line": 131,
+                "snippet": "@RequestMapping(\"/uss/ion/sit/insertSiteView.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n5",
+            "kind": "activity",
+            "label": "사이트 등록",
+            "flowRef": "flow:ANY /uss/ion/sit/insertSite.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+                "line": 148,
+                "snippet": "@RequestMapping(\"/uss/ion/sit/insertSite.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n6",
+            "kind": "activity",
+            "label": "사이트 수정 화면 조회",
+            "flowRef": "flow:ANY /uss/ion/sit/updateSiteView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+                "line": 177,
+                "snippet": "@RequestMapping(\"/uss/ion/sit/updateSiteView.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n7",
+            "kind": "activity",
+            "label": "사이트 수정",
+            "flowRef": "flow:ANY /uss/ion/sit/updateSite.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+                "line": 193,
+                "snippet": "@RequestMapping(\"/uss/ion/sit/updateSite.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n8",
+            "kind": "activity",
+            "label": "사이트 삭제",
+            "flowRef": "flow:ANY /uss/ion/sit/deleteSite.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+                "line": 220,
+                "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n9",
+            "kind": "end",
+            "label": "사이트 관리 종료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "n0",
+            "to": "n1"
+          },
+          {
+            "from": "n1",
+            "to": "n2"
+          },
+          {
+            "from": "n2",
+            "to": "n3",
+            "label": "상세 조회"
+          },
+          {
+            "from": "n2",
+            "to": "n4",
+            "label": "신규 등록"
+          },
+          {
+            "from": "n2",
+            "to": "n6",
+            "label": "수정"
+          },
+          {
+            "from": "n2",
+            "to": "n8",
+            "label": "삭제"
+          },
+          {
+            "from": "n4",
+            "to": "n5"
+          },
+          {
+            "from": "n6",
+            "to": "n7"
+          },
+          {
+            "from": "n3",
+            "to": "n9"
+          },
+          {
+            "from": "n5",
+            "to": "n1",
+            "label": "목록 재조회"
+          },
+          {
+            "from": "n7",
+            "to": "n1",
+            "label": "목록 재조회"
+          },
+          {
+            "from": "n8",
+            "to": "n1",
+            "label": "목록 재조회"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/ion/sit/deleteSite.do",
+      "name": "사이트 삭제",
+      "summary": {
+        "text": "선택한 사이트를 삭제하는 흐름이다. 삭제 요청을 받아 사이트 업무의 삭제를 호출하고, 처리 후 사이트 목록 조회로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 220,
+            "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 19,
+            "snippet": "void deleteSite(SiteVO siteVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 224,
+            "snippet": "return \"forward:/uss/ion/sit/selectSiteList.do\";"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/sit/insertSite.do",
+      "name": "사이트 등록",
+      "summary": {
+        "text": "입력받은 사이트 정보를 신규로 등록하는 흐름이다. 인증된 사용자 정보에서 등록자를 확인하고 사이트 정보의 필수값·길이 제약을 검증한 뒤 사이트 업무의 등록을 호출한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 148,
+            "snippet": "@RequestMapping(\"/uss/ion/sit/insertSite.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 15,
+            "snippet": "void insertSite(SiteVO siteVO) throws FdlException;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "public static Object getAuthenticatedUser() {"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/sit/insertSiteView.do",
+      "name": "사이트 등록 화면 조회",
+      "summary": {
+        "text": "사이트를 새로 등록하기 위한 입력 화면을 여는 흐름이다. 사이트 주제분류 등 선택 항목을 채우기 위해 공통코드 조회 조건을 구성하고 공통코드 업무에서 상세코드 목록을 받아 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 131,
+            "snippet": "@RequestMapping(\"/uss/ion/sit/insertSiteView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/sit/selectSiteDetail.do",
+      "name": "사이트 상세 조회",
+      "summary": {
+        "text": "선택한 사이트 한 건의 상세 정보를 조회하는 흐름이다. 사이트 식별자를 담은 조회 조건으로 사이트 업무의 상세 조회를 호출해 사이트 정보를 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 115,
+            "snippet": "@RequestMapping(\"/uss/ion/sit/selectSiteDetail.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 13,
+            "snippet": "SiteVO selectSiteDetail(SiteVO siteVO) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/sit/selectSiteList.do",
+      "name": "사이트 목록 조회",
+      "summary": {
+        "text": "등록된 사이트를 검색조건에 따라 목록으로 조회하는 흐름이다. 목록 조회 요청을 받아 사이트 조회 조건을 담은 사이트 정보로 사이트 업무의 목록 조회와 건수 조회를 호출한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 80,
+            "snippet": "@RequestMapping(value = \"/uss/ion/sit/selectSiteList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 9,
+            "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 11,
+            "snippet": "int selectSiteListCnt(SiteVO siteVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/sit/updateSite.do",
+      "name": "사이트 수정",
+      "summary": {
+        "text": "기존 사이트 정보를 변경하는 흐름이다. 인증된 사용자 정보로 수정자를 확인하고 변경된 사이트 정보의 필수값·길이 제약을 검증한 뒤 사이트 업무의 수정을 호출한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 193,
+            "snippet": "@RequestMapping(\"/uss/ion/sit/updateSite.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 17,
+            "snippet": "void updateSite(SiteVO siteVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "public static Object getAuthenticatedUser() {"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/sit/updateSiteView.do",
+      "name": "사이트 수정 화면 조회",
+      "summary": {
+        "text": "기존 사이트를 수정하기 위한 화면을 여는 흐름이다. 사이트 업무로 대상 사이트의 상세 정보를 조회하고, 주제분류 선택 항목을 위한 공통코드 목록을 함께 조회해 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 177,
+            "snippet": "@RequestMapping(\"/uss/ion/sit/updateSiteView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 13,
+            "snippet": "SiteVO selectSiteDetail(SiteVO siteVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /uss/ion/sit/deleteSite.do:src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+      "name": "사이트 삭제 사이트 업무 처리",
+      "summary": {
+        "text": "사이트 업무의 처리 계약을 정의하며 사이트 삭제에 필요한 사이트 조회·등록·수정·삭제 작업을 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 7,
+            "snippet": "public interface EgovSiteService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 9,
+            "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 업무의 처리 계약을 정의하며 사이트 삭제에 필요한 사이트 조회·등록·수정·삭제 작업을 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 7,
+              "snippet": "public interface EgovSiteService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 9,
+              "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "사이트 목록 조회와 목록 건수 조회, 사이트 상세 조회, 사이트 등록·수정·삭제를 각각 별도의 업무 작업으로 제공한다. 사이트 등록은 사이트 식별자 채번 실패 시 예외로 처리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 9,
+              "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 11,
+              "snippet": "int selectSiteListCnt(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 13,
+              "snippet": "SiteVO selectSiteDetail(SiteVO siteVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 15,
+              "snippet": "void insertSite(SiteVO siteVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 17,
+              "snippet": "void updateSite(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 19,
+              "snippet": "void deleteSite(SiteVO siteVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/deleteSite.do:src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+      "name": "사이트 삭제 요청 접수",
+      "summary": {
+        "text": "사이트 관리 화면의 요청 창구로서 사이트 삭제 요청을 받아 사이트 정보에 담고 사이트 업무에 처리를 위임한 뒤, 처리 결과를 화면 또는 목록 조회로 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 220,
+            "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 214,
+            "snippet": "* 사이트정보를 삭제처리한다."
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 관리 화면의 요청 창구로서 사이트 삭제 요청을 받아 사이트 정보에 담고 사이트 업무에 처리를 위임한 뒤, 처리 결과를 화면 또는 목록 조회로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 220,
+              "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 214,
+              "snippet": "* 사이트정보를 삭제처리한다."
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터는 사이트 정보로 바인딩되어 넘어오며, 사이트 삭제 처리는 사이트 업무 호출로 위임된다. 처리 후에는 사이트 목록 조회로 되돌려 갱신된 목록을 보여준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 220,
+              "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 221,
+              "snippet": "public String deleteSite(@ModelAttribute(\"siteVO\") SiteVO siteVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 224,
+              "snippet": "return \"forward:/uss/ion/sit/selectSiteList.do\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/insertSite.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "사이트 등록 공통코드 조회 조건",
+      "summary": {
+        "text": "사이트 등록에서 사이트 주제분류 등 선택 항목을 채우기 위한 공통코드 조회 조건을 담는 데이터 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 31,
+            "snippet": "private String codeId = \"\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 등록에서 사이트 주제분류 등 선택 항목을 채우기 위한 공통코드 조회 조건을 담는 데이터 구조이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드 ID와 상세코드, 코드명·코드설명을 가지며, 특정 테이블에서 코드를 뽑을 때 쓰는 테이블명과 상세 조건 사용 여부·상세 조건을 함께 가진다. 상세 조건 여부는 기본값이 미사용이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 34,
+              "snippet": "private String code = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/insertSite.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "사이트 등록 로그인 사용자 정보",
+      "summary": {
+        "text": "사이트 등록에서 등록자·수정자를 확정하기 위해 인증된 사용자의 신원 정보를 담아 전달하는 데이터 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "private String uniqId;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 등록에서 등록자·수정자를 확정하기 위해 인증된 사용자의 신원 정보를 담아 전달하는 데이터 구조이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "private String uniqId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일 등 사용자 신원 항목과 소속 조직 정보, 고유아이디를 가진다. 아이디·이름·이메일은 필수값이며 이메일은 형식 검증 대상이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "private String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "private String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 50,
+              "snippet": "@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 51,
+              "snippet": "private String email;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 63,
+              "snippet": "private String orgnztId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "private String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/insertSite.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "사이트 등록 공통코드 제공",
+      "summary": {
+        "text": "사이트 등록에서 화면의 선택 항목으로 쓸 공통코드를 조회해 제공하는 업무이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 등록에서 화면의 선택 항목으로 쓸 공통코드를 조회해 제공하는 업무이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "조회 조건 한 건으로 상세코드 목록을 조회하거나, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 제공한다. 조직정보·그룹정보도 코드 형태로 조회할 수 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "public Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/insertSite.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "사이트 등록 인증 사용자 확인",
+      "summary": {
+        "text": "사이트 등록에서 현재 인증된 사용자와 그 권한을 확인해 주는 협력 객체로서, 등록자·수정자 확정과 권한 확인의 근거를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "public static Object getAuthenticatedUser() {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 등록에서 현재 인증된 사용자와 그 권한을 확인해 주는 협력 객체로서, 등록자·수정자 확정과 권한 확인의 근거를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 정보, 사용자 권한 목록, 인증 여부 세 가지를 제공한다. 이 확인은 사용자 상세정보 업무에 위임되어 이루어진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "public static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/insertSite.do:src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+      "name": "사이트 등록 사이트 업무 처리",
+      "summary": {
+        "text": "사이트 업무의 처리 계약을 정의하며 사이트 등록에 필요한 사이트 조회·등록·수정·삭제 작업을 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 7,
+            "snippet": "public interface EgovSiteService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 9,
+            "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 업무의 처리 계약을 정의하며 사이트 등록에 필요한 사이트 조회·등록·수정·삭제 작업을 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 7,
+              "snippet": "public interface EgovSiteService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 9,
+              "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "사이트 목록 조회와 목록 건수 조회, 사이트 상세 조회, 사이트 등록·수정·삭제를 각각 별도의 업무 작업으로 제공한다. 사이트 등록은 사이트 식별자 채번 실패 시 예외로 처리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 9,
+              "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 11,
+              "snippet": "int selectSiteListCnt(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 13,
+              "snippet": "SiteVO selectSiteDetail(SiteVO siteVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 15,
+              "snippet": "void insertSite(SiteVO siteVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 17,
+              "snippet": "void updateSite(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 19,
+              "snippet": "void deleteSite(SiteVO siteVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/insertSite.do:src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+      "name": "사이트 등록 사이트 정보",
+      "summary": {
+        "text": "사이트 등록에서 주고받는 사이트 정보를 담는 데이터 구조로서, 조회 조건과 사이트 등록·수정 입력값을 함께 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 33,
+            "snippet": "public class SiteVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 38,
+            "snippet": "private String siteId;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 등록에서 주고받는 사이트 정보를 담는 데이터 구조로서, 조회 조건과 사이트 등록·수정 입력값을 함께 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 33,
+              "snippet": "public class SiteVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 38,
+              "snippet": "private String siteId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "사이트 식별자, 사이트 URL, 사이트명, 사이트설명, 사이트주제분류코드와 활성여부·사용여부, 등록·수정 이력 항목을 가진다. 사이트 URL·사이트명은 각각 100자, 사이트설명은 1000자를 넘을 수 없고 주제분류코드는 필수값이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 38,
+              "snippet": "private String siteId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 41,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 42,
+              "snippet": "@Size(max=100)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 43,
+              "snippet": "private String siteUrl;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 48,
+              "snippet": "private String siteNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 52,
+              "snippet": "@Size(max=1000)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 53,
+              "snippet": "private String siteDc;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 57,
+              "snippet": "private String siteThemaClCode;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 63,
+              "snippet": "private String actvtyAt;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/insertSite.do:src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+      "name": "사이트 등록 요청 접수",
+      "summary": {
+        "text": "사이트 관리 화면의 요청 창구로서 사이트 등록 요청을 받아 사이트 정보에 담고 사이트 업무에 처리를 위임한 뒤, 처리 결과를 화면 또는 목록 조회로 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 220,
+            "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 214,
+            "snippet": "* 사이트정보를 삭제처리한다."
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 관리 화면의 요청 창구로서 사이트 등록 요청을 받아 사이트 정보에 담고 사이트 업무에 처리를 위임한 뒤, 처리 결과를 화면 또는 목록 조회로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 220,
+              "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 214,
+              "snippet": "* 사이트정보를 삭제처리한다."
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터는 사이트 정보로 바인딩되어 넘어오며, 사이트 등록 처리는 사이트 업무 호출로 위임된다. 처리 후에는 사이트 목록 조회로 되돌려 갱신된 목록을 보여준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 220,
+              "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 221,
+              "snippet": "public String deleteSite(@ModelAttribute(\"siteVO\") SiteVO siteVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 224,
+              "snippet": "return \"forward:/uss/ion/sit/selectSiteList.do\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/insertSite.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "사이트 등록 문자열 처리 지원",
+      "summary": {
+        "text": "사이트 등록에서 입력 문자열의 공백·널 여부 확인과 길이 자르기 등 문자열 가공을 담당하는 협력 객체이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 47,
+            "snippet": "public static final String EMPTY = \"\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 등록에서 입력 문자열의 공백·널 여부 확인과 길이 자르기 등 문자열 가공을 담당하는 협력 객체이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 상수를 기준으로 문자열이 비었거나 없는지 검증하고, 지정 길이를 넘는 문자열을 잘라내는 처리를 제공한다. 무작위 값 생성은 보안 난수를 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 50,
+              "snippet": "private static SecureRandom rnd = new SecureRandom();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/insertSiteView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "사이트 등록 화면 조회 공통코드 조회 조건",
+      "summary": {
+        "text": "사이트 등록 화면 조회에서 사이트 주제분류 등 선택 항목을 채우기 위한 공통코드 조회 조건을 담는 데이터 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 31,
+            "snippet": "private String codeId = \"\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 등록 화면 조회에서 사이트 주제분류 등 선택 항목을 채우기 위한 공통코드 조회 조건을 담는 데이터 구조이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드 ID와 상세코드, 코드명·코드설명을 가지며, 특정 테이블에서 코드를 뽑을 때 쓰는 테이블명과 상세 조건 사용 여부·상세 조건을 함께 가진다. 상세 조건 여부는 기본값이 미사용이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 34,
+              "snippet": "private String code = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/insertSiteView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "사이트 등록 화면 조회 공통코드 제공",
+      "summary": {
+        "text": "사이트 등록 화면 조회에서 화면의 선택 항목으로 쓸 공통코드를 조회해 제공하는 업무이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 등록 화면 조회에서 화면의 선택 항목으로 쓸 공통코드를 조회해 제공하는 업무이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "조회 조건 한 건으로 상세코드 목록을 조회하거나, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 제공한다. 조직정보·그룹정보도 코드 형태로 조회할 수 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "public Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/insertSiteView.do:src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+      "name": "사이트 등록 화면 조회 요청 접수",
+      "summary": {
+        "text": "사이트 관리 화면의 요청 창구로서 사이트 등록 화면 조회 요청을 받아 사이트 정보에 담고 사이트 업무에 처리를 위임한 뒤, 처리 결과를 화면 또는 목록 조회로 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 220,
+            "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 214,
+            "snippet": "* 사이트정보를 삭제처리한다."
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 관리 화면의 요청 창구로서 사이트 등록 화면 조회 요청을 받아 사이트 정보에 담고 사이트 업무에 처리를 위임한 뒤, 처리 결과를 화면 또는 목록 조회로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 220,
+              "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 214,
+              "snippet": "* 사이트정보를 삭제처리한다."
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터는 사이트 정보로 바인딩되어 넘어오며, 사이트 등록 화면 조회 처리는 사이트 업무 호출로 위임된다. 처리 후에는 사이트 목록 조회로 되돌려 갱신된 목록을 보여준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 220,
+              "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 221,
+              "snippet": "public String deleteSite(@ModelAttribute(\"siteVO\") SiteVO siteVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 224,
+              "snippet": "return \"forward:/uss/ion/sit/selectSiteList.do\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/selectSiteDetail.do:src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+      "name": "사이트 상세 조회 사이트 업무 처리",
+      "summary": {
+        "text": "사이트 업무의 처리 계약을 정의하며 사이트 상세 조회에 필요한 사이트 조회·등록·수정·삭제 작업을 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 7,
+            "snippet": "public interface EgovSiteService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 9,
+            "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 업무의 처리 계약을 정의하며 사이트 상세 조회에 필요한 사이트 조회·등록·수정·삭제 작업을 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 7,
+              "snippet": "public interface EgovSiteService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 9,
+              "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "사이트 목록 조회와 목록 건수 조회, 사이트 상세 조회, 사이트 등록·수정·삭제를 각각 별도의 업무 작업으로 제공한다. 사이트 등록은 사이트 식별자 채번 실패 시 예외로 처리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 9,
+              "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 11,
+              "snippet": "int selectSiteListCnt(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 13,
+              "snippet": "SiteVO selectSiteDetail(SiteVO siteVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 15,
+              "snippet": "void insertSite(SiteVO siteVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 17,
+              "snippet": "void updateSite(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 19,
+              "snippet": "void deleteSite(SiteVO siteVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/selectSiteDetail.do:src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+      "name": "사이트 상세 조회 요청 접수",
+      "summary": {
+        "text": "사이트 관리 화면의 요청 창구로서 사이트 상세 조회 요청을 받아 사이트 정보에 담고 사이트 업무에 처리를 위임한 뒤, 처리 결과를 화면 또는 목록 조회로 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 220,
+            "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 214,
+            "snippet": "* 사이트정보를 삭제처리한다."
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 관리 화면의 요청 창구로서 사이트 상세 조회 요청을 받아 사이트 정보에 담고 사이트 업무에 처리를 위임한 뒤, 처리 결과를 화면 또는 목록 조회로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 220,
+              "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 214,
+              "snippet": "* 사이트정보를 삭제처리한다."
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터는 사이트 정보로 바인딩되어 넘어오며, 사이트 상세 조회 처리는 사이트 업무 호출로 위임된다. 처리 후에는 사이트 목록 조회로 되돌려 갱신된 목록을 보여준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 220,
+              "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 221,
+              "snippet": "public String deleteSite(@ModelAttribute(\"siteVO\") SiteVO siteVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 224,
+              "snippet": "return \"forward:/uss/ion/sit/selectSiteList.do\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/selectSiteList.do:src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+      "name": "사이트 목록 조회 사이트 업무 처리",
+      "summary": {
+        "text": "사이트 업무의 처리 계약을 정의하며 사이트 목록 조회에 필요한 사이트 조회·등록·수정·삭제 작업을 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 7,
+            "snippet": "public interface EgovSiteService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 9,
+            "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 업무의 처리 계약을 정의하며 사이트 목록 조회에 필요한 사이트 조회·등록·수정·삭제 작업을 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 7,
+              "snippet": "public interface EgovSiteService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 9,
+              "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "사이트 목록 조회와 목록 건수 조회, 사이트 상세 조회, 사이트 등록·수정·삭제를 각각 별도의 업무 작업으로 제공한다. 사이트 등록은 사이트 식별자 채번 실패 시 예외로 처리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 9,
+              "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 11,
+              "snippet": "int selectSiteListCnt(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 13,
+              "snippet": "SiteVO selectSiteDetail(SiteVO siteVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 15,
+              "snippet": "void insertSite(SiteVO siteVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 17,
+              "snippet": "void updateSite(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 19,
+              "snippet": "void deleteSite(SiteVO siteVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/selectSiteList.do:src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+      "name": "사이트 목록 조회 사이트 정보",
+      "summary": {
+        "text": "사이트 목록 조회에서 주고받는 사이트 정보를 담는 데이터 구조로서, 조회 조건과 사이트 등록·수정 입력값을 함께 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 33,
+            "snippet": "public class SiteVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 38,
+            "snippet": "private String siteId;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 목록 조회에서 주고받는 사이트 정보를 담는 데이터 구조로서, 조회 조건과 사이트 등록·수정 입력값을 함께 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 33,
+              "snippet": "public class SiteVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 38,
+              "snippet": "private String siteId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "사이트 식별자, 사이트 URL, 사이트명, 사이트설명, 사이트주제분류코드와 활성여부·사용여부, 등록·수정 이력 항목을 가진다. 사이트 URL·사이트명은 각각 100자, 사이트설명은 1000자를 넘을 수 없고 주제분류코드는 필수값이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 38,
+              "snippet": "private String siteId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 41,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 42,
+              "snippet": "@Size(max=100)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 43,
+              "snippet": "private String siteUrl;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 48,
+              "snippet": "private String siteNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 52,
+              "snippet": "@Size(max=1000)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 53,
+              "snippet": "private String siteDc;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 57,
+              "snippet": "private String siteThemaClCode;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 63,
+              "snippet": "private String actvtyAt;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/selectSiteList.do:src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+      "name": "사이트 목록 조회 요청 접수",
+      "summary": {
+        "text": "사이트 관리 화면의 요청 창구로서 사이트 목록 조회 요청을 받아 사이트 정보에 담고 사이트 업무에 처리를 위임한 뒤, 처리 결과를 화면 또는 목록 조회로 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 220,
+            "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 214,
+            "snippet": "* 사이트정보를 삭제처리한다."
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 관리 화면의 요청 창구로서 사이트 목록 조회 요청을 받아 사이트 정보에 담고 사이트 업무에 처리를 위임한 뒤, 처리 결과를 화면 또는 목록 조회로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 220,
+              "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 214,
+              "snippet": "* 사이트정보를 삭제처리한다."
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터는 사이트 정보로 바인딩되어 넘어오며, 사이트 목록 조회 처리는 사이트 업무 호출로 위임된다. 처리 후에는 사이트 목록 조회로 되돌려 갱신된 목록을 보여준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 220,
+              "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 221,
+              "snippet": "public String deleteSite(@ModelAttribute(\"siteVO\") SiteVO siteVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 224,
+              "snippet": "return \"forward:/uss/ion/sit/selectSiteList.do\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/updateSite.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "사이트 수정 공통코드 조회 조건",
+      "summary": {
+        "text": "사이트 수정에서 사이트 주제분류 등 선택 항목을 채우기 위한 공통코드 조회 조건을 담는 데이터 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 31,
+            "snippet": "private String codeId = \"\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 수정에서 사이트 주제분류 등 선택 항목을 채우기 위한 공통코드 조회 조건을 담는 데이터 구조이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드 ID와 상세코드, 코드명·코드설명을 가지며, 특정 테이블에서 코드를 뽑을 때 쓰는 테이블명과 상세 조건 사용 여부·상세 조건을 함께 가진다. 상세 조건 여부는 기본값이 미사용이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 34,
+              "snippet": "private String code = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/updateSite.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "사이트 수정 로그인 사용자 정보",
+      "summary": {
+        "text": "사이트 수정에서 등록자·수정자를 확정하기 위해 인증된 사용자의 신원 정보를 담아 전달하는 데이터 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 67,
+            "snippet": "private String uniqId;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 수정에서 등록자·수정자를 확정하기 위해 인증된 사용자의 신원 정보를 담아 전달하는 데이터 구조이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "private String uniqId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일 등 사용자 신원 항목과 소속 조직 정보, 고유아이디를 가진다. 아이디·이름·이메일은 필수값이며 이메일은 형식 검증 대상이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "private String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 45,
+              "snippet": "private String name;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 50,
+              "snippet": "@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 51,
+              "snippet": "private String email;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 63,
+              "snippet": "private String orgnztId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "private String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/updateSite.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "사이트 수정 공통코드 제공",
+      "summary": {
+        "text": "사이트 수정에서 화면의 선택 항목으로 쓸 공통코드를 조회해 제공하는 업무이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 수정에서 화면의 선택 항목으로 쓸 공통코드를 조회해 제공하는 업무이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "조회 조건 한 건으로 상세코드 목록을 조회하거나, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 제공한다. 조직정보·그룹정보도 코드 형태로 조회할 수 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "public Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/updateSite.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "사이트 수정 인증 사용자 확인",
+      "summary": {
+        "text": "사이트 수정에서 현재 인증된 사용자와 그 권한을 확인해 주는 협력 객체로서, 등록자·수정자 확정과 권한 확인의 근거를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 41,
+            "snippet": "public static Object getAuthenticatedUser() {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 수정에서 현재 인증된 사용자와 그 권한을 확인해 주는 협력 객체로서, 등록자·수정자 확정과 권한 확인의 근거를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 정보, 사용자 권한 목록, 인증 여부 세 가지를 제공한다. 이 확인은 사용자 상세정보 업무에 위임되어 이루어진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "public static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "public static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "public static Boolean isAuthenticated() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/updateSite.do:src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+      "name": "사이트 수정 사이트 업무 처리",
+      "summary": {
+        "text": "사이트 업무의 처리 계약을 정의하며 사이트 수정에 필요한 사이트 조회·등록·수정·삭제 작업을 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 7,
+            "snippet": "public interface EgovSiteService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 9,
+            "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 업무의 처리 계약을 정의하며 사이트 수정에 필요한 사이트 조회·등록·수정·삭제 작업을 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 7,
+              "snippet": "public interface EgovSiteService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 9,
+              "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "사이트 목록 조회와 목록 건수 조회, 사이트 상세 조회, 사이트 등록·수정·삭제를 각각 별도의 업무 작업으로 제공한다. 사이트 등록은 사이트 식별자 채번 실패 시 예외로 처리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 9,
+              "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 11,
+              "snippet": "int selectSiteListCnt(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 13,
+              "snippet": "SiteVO selectSiteDetail(SiteVO siteVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 15,
+              "snippet": "void insertSite(SiteVO siteVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 17,
+              "snippet": "void updateSite(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 19,
+              "snippet": "void deleteSite(SiteVO siteVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/updateSite.do:src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+      "name": "사이트 수정 사이트 정보",
+      "summary": {
+        "text": "사이트 수정에서 주고받는 사이트 정보를 담는 데이터 구조로서, 조회 조건과 사이트 등록·수정 입력값을 함께 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 33,
+            "snippet": "public class SiteVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+            "line": 38,
+            "snippet": "private String siteId;"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 수정에서 주고받는 사이트 정보를 담는 데이터 구조로서, 조회 조건과 사이트 등록·수정 입력값을 함께 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 33,
+              "snippet": "public class SiteVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 38,
+              "snippet": "private String siteId;"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "사이트 식별자, 사이트 URL, 사이트명, 사이트설명, 사이트주제분류코드와 활성여부·사용여부, 등록·수정 이력 항목을 가진다. 사이트 URL·사이트명은 각각 100자, 사이트설명은 1000자를 넘을 수 없고 주제분류코드는 필수값이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 38,
+              "snippet": "private String siteId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 41,
+              "snippet": "@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 42,
+              "snippet": "@Size(max=100)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 43,
+              "snippet": "private String siteUrl;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 48,
+              "snippet": "private String siteNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 52,
+              "snippet": "@Size(max=1000)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 53,
+              "snippet": "private String siteDc;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 57,
+              "snippet": "private String siteThemaClCode;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/SiteVO.java",
+              "line": 63,
+              "snippet": "private String actvtyAt;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/updateSite.do:src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+      "name": "사이트 수정 요청 접수",
+      "summary": {
+        "text": "사이트 관리 화면의 요청 창구로서 사이트 수정 요청을 받아 사이트 정보에 담고 사이트 업무에 처리를 위임한 뒤, 처리 결과를 화면 또는 목록 조회로 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 220,
+            "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 214,
+            "snippet": "* 사이트정보를 삭제처리한다."
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 관리 화면의 요청 창구로서 사이트 수정 요청을 받아 사이트 정보에 담고 사이트 업무에 처리를 위임한 뒤, 처리 결과를 화면 또는 목록 조회로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 220,
+              "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 214,
+              "snippet": "* 사이트정보를 삭제처리한다."
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터는 사이트 정보로 바인딩되어 넘어오며, 사이트 수정 처리는 사이트 업무 호출로 위임된다. 처리 후에는 사이트 목록 조회로 되돌려 갱신된 목록을 보여준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 220,
+              "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 221,
+              "snippet": "public String deleteSite(@ModelAttribute(\"siteVO\") SiteVO siteVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 224,
+              "snippet": "return \"forward:/uss/ion/sit/selectSiteList.do\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/updateSite.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "사이트 수정 문자열 처리 지원",
+      "summary": {
+        "text": "사이트 수정에서 입력 문자열의 공백·널 여부 확인과 길이 자르기 등 문자열 가공을 담당하는 협력 객체이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 47,
+            "snippet": "public static final String EMPTY = \"\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 수정에서 입력 문자열의 공백·널 여부 확인과 길이 자르기 등 문자열 가공을 담당하는 협력 객체이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 상수를 기준으로 문자열이 비었거나 없는지 검증하고, 지정 길이를 넘는 문자열을 잘라내는 처리를 제공한다. 무작위 값 생성은 보안 난수를 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "public static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 50,
+              "snippet": "private static SecureRandom rnd = new SecureRandom();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/updateSiteView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "사이트 수정 화면 조회 공통코드 조회 조건",
+      "summary": {
+        "text": "사이트 수정 화면 조회에서 사이트 주제분류 등 선택 항목을 채우기 위한 공통코드 조회 조건을 담는 데이터 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 31,
+            "snippet": "private String codeId = \"\";"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 수정 화면 조회에서 사이트 주제분류 등 선택 항목을 채우기 위한 공통코드 조회 조건을 담는 데이터 구조이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "코드 ID와 상세코드, 코드명·코드설명을 가지며, 특정 테이블에서 코드를 뽑을 때 쓰는 테이블명과 상세 조건 사용 여부·상세 조건을 함께 가진다. 상세 조건 여부는 기본값이 미사용이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 34,
+              "snippet": "private String code = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "private String haveDetailCondition = \"N\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/updateSiteView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "사이트 수정 화면 조회 공통코드 제공",
+      "summary": {
+        "text": "사이트 수정 화면 조회에서 화면의 선택 항목으로 쓸 공통코드를 조회해 제공하는 업무이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 수정 화면 조회에서 화면의 선택 항목으로 쓸 공통코드를 조회해 제공하는 업무이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "조회 조건 한 건으로 상세코드 목록을 조회하거나, 여러 조회 조건을 한 번에 받아 코드 목록들을 묶어 제공한다. 조직정보·그룹정보도 코드 형태로 조회할 수 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "public List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "public Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/updateSiteView.do:src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+      "name": "사이트 수정 화면 조회 사이트 업무 처리",
+      "summary": {
+        "text": "사이트 업무의 처리 계약을 정의하며 사이트 수정 화면 조회에 필요한 사이트 조회·등록·수정·삭제 작업을 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 7,
+            "snippet": "public interface EgovSiteService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+            "line": 9,
+            "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 업무의 처리 계약을 정의하며 사이트 수정 화면 조회에 필요한 사이트 조회·등록·수정·삭제 작업을 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 7,
+              "snippet": "public interface EgovSiteService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 9,
+              "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "사이트 목록 조회와 목록 건수 조회, 사이트 상세 조회, 사이트 등록·수정·삭제를 각각 별도의 업무 작업으로 제공한다. 사이트 등록은 사이트 식별자 채번 실패 시 예외로 처리된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 9,
+              "snippet": "List<SiteVO> selectSiteList(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 11,
+              "snippet": "int selectSiteListCnt(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 13,
+              "snippet": "SiteVO selectSiteDetail(SiteVO siteVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 15,
+              "snippet": "void insertSite(SiteVO siteVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 17,
+              "snippet": "void updateSite(SiteVO siteVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/service/EgovSiteService.java",
+              "line": 19,
+              "snippet": "void deleteSite(SiteVO siteVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/sit/updateSiteView.do:src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+      "name": "사이트 수정 화면 조회 요청 접수",
+      "summary": {
+        "text": "사이트 관리 화면의 요청 창구로서 사이트 수정 화면 조회 요청을 받아 사이트 정보에 담고 사이트 업무에 처리를 위임한 뒤, 처리 결과를 화면 또는 목록 조회로 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 220,
+            "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+            "line": 214,
+            "snippet": "* 사이트정보를 삭제처리한다."
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "사이트 관리 화면의 요청 창구로서 사이트 수정 화면 조회 요청을 받아 사이트 정보에 담고 사이트 업무에 처리를 위임한 뒤, 처리 결과를 화면 또는 목록 조회로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 220,
+              "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 214,
+              "snippet": "* 사이트정보를 삭제처리한다."
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터는 사이트 정보로 바인딩되어 넘어오며, 사이트 수정 화면 조회 처리는 사이트 업무 호출로 위임된다. 처리 후에는 사이트 목록 조회로 되돌려 갱신된 목록을 보여준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 220,
+              "snippet": "@RequestMapping(\"/uss/ion/sit/deleteSite.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 221,
+              "snippet": "public String deleteSite(@ModelAttribute(\"siteVO\") SiteVO siteVO) throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/sit/web/EgovSiteController.java",
+              "line": 224,
+              "snippet": "return \"forward:/uss/ion/sit/selectSiteList.do\";"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

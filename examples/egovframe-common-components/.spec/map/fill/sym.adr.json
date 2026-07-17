@@ -1,0 +1,860 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "n1",
+          "to": "n2"
+        },
+        {
+          "from": "n2",
+          "to": "n3"
+        },
+        {
+          "from": "n3",
+          "to": "n4"
+        },
+        {
+          "from": "n4",
+          "label": "아니오",
+          "to": "n5"
+        },
+        {
+          "from": "n4",
+          "label": "예",
+          "to": "n6"
+        },
+        {
+          "from": "n5",
+          "to": "n12"
+        },
+        {
+          "from": "n6",
+          "label": "예",
+          "to": "n8"
+        },
+        {
+          "from": "n6",
+          "label": "아니오",
+          "to": "n7"
+        },
+        {
+          "from": "n7",
+          "to": "n9"
+        },
+        {
+          "from": "n8",
+          "to": "n9"
+        },
+        {
+          "from": "n9",
+          "to": "n10"
+        },
+        {
+          "from": "n10",
+          "to": "n11"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "n1",
+          "kind": "start",
+          "label": "주소 검색 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 127,
+              "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcInitPage.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/adr/getAdressCntcInitPage.do",
+          "id": "n2",
+          "kind": "activity",
+          "label": "주소 검색 초기 화면 제공"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 43,
+              "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcApi.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 46,
+              "snippet": "\t\tString currentPage = req.getParameter(\"currentPage\");"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/adr/getAdressCntcApi.do",
+          "id": "n3",
+          "kind": "activity",
+          "label": "검색 조건 접수"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 51,
+              "snippet": "\t\t// currentPage/countPerPage는 숫자만 허용한다. 비정상값 차단 및 쿼리 파라미터 인젝션 방어."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 52,
+              "snippet": "\t\tif (currentPage == null || !currentPage.matches(\"\\\\d+\") || countPerPage == null || !countPerPage.matches(\"\\\\d+\")) {"
+            }
+          ],
+          "id": "n4",
+          "kind": "decision",
+          "label": "페이지 정보가 숫자인가"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 53,
+              "snippet": "\t\t\tresponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 54,
+              "snippet": "\t\t\treturn;"
+            }
+          ],
+          "id": "n5",
+          "kind": "activity",
+          "label": "잘못된 요청으로 반려"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 57,
+              "snippet": "\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApi.do?currentPage=\" + currentPage + \"&countPerPage=\""
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 99,
+              "snippet": "\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApiTest.do?currentPage=\" + currentPage"
+            }
+          ],
+          "id": "n6",
+          "kind": "decision",
+          "label": "시험용 조회인가"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 57,
+              "snippet": "\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApi.do?currentPage=\" + currentPage + \"&countPerPage=\""
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 60,
+              "snippet": "\t\tURL url = new URL(EgovWebUtil.filePathBlackList(apiUrl));"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/adr/getAdressCntcApi.do",
+          "id": "n7",
+          "kind": "activity",
+          "label": "운영 주소 API 호출"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 85,
+              "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcTestApi.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 99,
+              "snippet": "\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApiTest.do?currentPage=\" + currentPage"
+            }
+          ],
+          "flowRef": "flow:ANY /sym/adr/getAdressCntcTestApi.do",
+          "id": "n8",
+          "kind": "activity",
+          "label": "시험 주소 API 호출"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 65,
+              "snippet": "\t\t\t\ttempStr = br.readLine();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 69,
+              "snippet": "\t\t\t\tsb.append(tempStr);"
+            }
+          ],
+          "id": "n9",
+          "kind": "activity",
+          "label": "주소 검색 결과 수신"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 73,
+              "snippet": "\t\t\tresponse.setContentType(\"text/xml\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 74,
+              "snippet": "\t\t\tresponse.getWriter().write(EgovWebUtil.clearXSSMaximum(sb.toString()));"
+            }
+          ],
+          "id": "n10",
+          "kind": "activity",
+          "label": "결과 정화 후 화면 회신"
+        },
+        {
+          "id": "n11",
+          "kind": "end",
+          "label": "주소 검색 완료"
+        },
+        {
+          "id": "n12",
+          "kind": "end",
+          "label": "요청 종료"
+        }
+      ],
+      "title": "주소 연계 조회"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 51,
+          "snippet": "\t\t// currentPage/countPerPage는 숫자만 허용한다. 비정상값 차단 및 쿼리 파라미터 인젝션 방어."
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 52,
+          "snippet": "\t\tif (currentPage == null || !currentPage.matches(\"\\\\d+\") || countPerPage == null || !countPerPage.matches(\"\\\\d+\")) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 53,
+          "snippet": "\t\t\tresponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);"
+        }
+      ],
+      "text": "현재 페이지와 페이지당 건수는 숫자만 허용하며, 값이 없거나 숫자가 아니면 잘못된 요청으로 처리하고 외부 API를 호출하지 않는다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 58,
+          "snippet": "\t\t\t+ countPerPage + \"&keyword=\" + URLEncoder.encode(keyword, \"UTF-8\") + \"&confmKey=\""
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 59,
+          "snippet": "\t\t\t+ URLEncoder.encode(confmKey, \"UTF-8\");"
+        }
+      ],
+      "text": "검색어와 승인키는 외부 주소 API 주소에 붙이기 전에 반드시 인코딩하여 전달한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 60,
+          "snippet": "\t\tURL url = new URL(EgovWebUtil.filePathBlackList(apiUrl));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 85,
+          "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+        }
+      ],
+      "text": "외부 호출 주소는 상위 경로 이동 문자를 제거하는 경로 점검을 통과한 뒤에만 사용한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 74,
+          "snippet": "\t\t\tresponse.getWriter().write(EgovWebUtil.clearXSSMaximum(sb.toString()));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 44,
+          "snippet": "\tpublic static String clearXSSMaximum(String value) {"
+        }
+      ],
+      "text": "외부 시스템이 회신한 응답은 화면으로 내보내기 전에 스크립트 삽입 위험 문자를 제거한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 72,
+          "snippet": "\t\t\tresponse.setCharacterEncoding(\"UTF-8\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 73,
+          "snippet": "\t\t\tresponse.setContentType(\"text/xml\");"
+        }
+      ],
+      "text": "주소 검색 응답은 문자 인코딩을 통일하고 XML 형식으로 회신한다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 57,
+          "snippet": "\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApi.do?currentPage=\" + currentPage + \"&countPerPage=\""
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 99,
+          "snippet": "\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApiTest.do?currentPage=\" + currentPage"
+        }
+      ],
+      "text": "외부 도로명주소 안내시스템과 연계한다. 운영용 창구는 운영 API 주소를, 시험용 창구는 시험 API 주소를 호출한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 25,
+          "snippet": "public class EgovWebUtil {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 60,
+          "snippet": "\t\tURL url = new URL(EgovWebUtil.filePathBlackList(apiUrl));"
+        }
+      ],
+      "text": "공통 보안 처리 기능에 의존하여 호출 주소 점검과 응답 정화를 위임한다."
+    }
+  ],
+  "domainId": "domain:sym.adr",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 49,
+          "snippet": "\t\tString keyword = req.getParameter(\"keyword\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 58,
+          "snippet": "\t\t\t+ countPerPage + \"&keyword=\" + URLEncoder.encode(keyword, \"UTF-8\") + \"&confmKey=\""
+        }
+      ],
+      "text": "검색어: 이용자가 찾으려는 주소 문자열로, 외부 주소 API 호출 시 인코딩되어 전달된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 46,
+          "snippet": "\t\tString currentPage = req.getParameter(\"currentPage\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 47,
+          "snippet": "\t\tString countPerPage = req.getParameter(\"countPerPage\");"
+        }
+      ],
+      "text": "페이지 정보: 현재 페이지 번호와 페이지당 건수로, 주소 검색 결과의 분할 조회 범위를 정한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 48,
+          "snippet": "\t\tString confmKey = req.getParameter(\"confmKey\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 59,
+          "snippet": "\t\t\t+ URLEncoder.encode(confmKey, \"UTF-8\");"
+        }
+      ],
+      "text": "승인키: 도로명주소 안내시스템이 발급한 이용 승인 키로, 외부 API 호출의 이용 자격을 증명한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 62,
+          "snippet": "\t\t\tStringBuffer sb = new StringBuffer();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 69,
+          "snippet": "\t\t\t\tsb.append(tempStr);"
+        }
+      ],
+      "text": "주소 검색 결과: 외부 시스템이 회신한 주소 목록 응답으로, 한 건씩 읽어 하나의 응답 본문으로 합쳐진다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /sym/adr/getAdressCntcApi.do",
+      "name": "주소 정보 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 43,
+            "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcApi.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 52,
+            "snippet": "\t\tif (currentPage == null || !currentPage.matches(\"\\\\d+\") || countPerPage == null || !countPerPage.matches(\"\\\\d+\")) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 57,
+            "snippet": "\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApi.do?currentPage=\" + currentPage + \"&countPerPage=\""
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 74,
+            "snippet": "\t\t\tresponse.getWriter().write(EgovWebUtil.clearXSSMaximum(sb.toString()));"
+          }
+        ],
+        "text": "도로명주소 안내시스템의 운영 공개 API를 호출해 검색어에 해당하는 주소 목록을 받아온다. 페이지 정보가 숫자인지 확인한 뒤 호출하며, 회신 내용은 정화하여 XML로 전달한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/adr/getAdressCntcInitPage.do",
+      "name": "주소 검색 초기 화면 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 127,
+            "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcInitPage.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 36,
+            "snippet": "\t * 도로명주소 안내시스템에서 제공하는 Open API를 호출하여 주소 정보를 얻어온다."
+          }
+        ],
+        "text": "주소 연계 검색을 시작할 수 있는 초기 화면을 제공하는 창구이다. 이용자는 이 화면에서 검색어와 페이지 조건을 입력해 주소 조회를 시작한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/adr/getAdressCntcTestApi.do",
+      "name": "주소 정보 시험 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 85,
+            "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcTestApi.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 79,
+            "snippet": "\t * 도로명주소 안내시스템에서 제공하는 Test용 Open API를 호출하여 주소 정보를 얻어온다."
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 99,
+            "snippet": "\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApiTest.do?currentPage=\" + currentPage"
+          }
+        ],
+        "text": "도로명주소 안내시스템이 제공하는 시험용 공개 API를 호출해 주소 정보를 받아온다. 운영 조회와 동일한 검증과 정화 절차를 거치되 호출 대상만 시험용 주소를 사용한다."
+      }
+    }
+  ],
+  "name": "주소 연계",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 80,
+              "snippet": "\t\tString returnValue = value;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 81,
+              "snippet": "\t\tif (returnValue == null || returnValue.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 34,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 50,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"%\", \"&#37;\");"
+            }
+          ],
+          "text": "문자열 값 하나를 받아 정화된 문자열을 돌려주는 구조이다. 값이 비어 있으면 빈 문자열을 돌려주는 것이 공통 규칙이며, 경로 점검은 상위 경로 이동 문자를 제거하고, 응답 정화는 꺾쇠·따옴표·백분율 등 위험 문자를 표시 문자로 치환한 결과를 유지한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "\tpublic static String filePathBlackList(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 44,
+              "snippet": "\tpublic static String clearXSSMaximum(String value) {"
+            }
+          ],
+          "text": "주소 조회 흐름에서 협력 객체로 쓰이는 공통 보안 처리 기능이다. 외부 API 호출 주소가 상위 경로 이동을 포함하지 않도록 걸러 주고, 외부에서 받은 응답 본문을 화면으로 내보내기 전에 위험 문자를 제거해 준다."
+        }
+      },
+      "name": "주소 조회 보안 처리",
+      "stepId": "step:ANY /sym/adr/getAdressCntcApi.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 79,
+            "snippet": "\tpublic static String filePathBlackList(String value) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 85,
+            "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+          }
+        ],
+        "text": "주소 조회 흐름에서 외부 호출 주소의 상위 경로 이동 문자를 제거하고, 회신 내용의 스크립트 삽입 위험 문자를 치환하는 공통 보안 처리를 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 46,
+              "snippet": "\t\tString currentPage = req.getParameter(\"currentPage\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 49,
+              "snippet": "\t\tString keyword = req.getParameter(\"keyword\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 52,
+              "snippet": "\t\tif (currentPage == null || !currentPage.matches(\"\\\\d+\") || countPerPage == null || !countPerPage.matches(\"\\\\d+\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 53,
+              "snippet": "\t\t\tresponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 58,
+              "snippet": "\t\t\t+ countPerPage + \"&keyword=\" + URLEncoder.encode(keyword, \"UTF-8\") + \"&confmKey=\""
+            }
+          ],
+          "text": "현재 페이지, 페이지당 건수, 승인키, 검색어를 요청 값으로 받는다. 현재 페이지와 페이지당 건수는 값이 있고 숫자로만 이루어져야 하며, 그렇지 않으면 잘못된 요청으로 응답하고 처리를 중단한다. 검색어와 승인키는 인코딩하여 호출 주소에 붙인다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 43,
+              "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcApi.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 57,
+              "snippet": "\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApi.do?currentPage=\" + currentPage + \"&countPerPage=\""
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 60,
+              "snippet": "\t\tURL url = new URL(EgovWebUtil.filePathBlackList(apiUrl));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 74,
+              "snippet": "\t\t\tresponse.getWriter().write(EgovWebUtil.clearXSSMaximum(sb.toString()));"
+            }
+          ],
+          "text": "주소 연계 업무의 운영용 창구로서 이용자의 주소 검색 요청을 받는다. 요청에서 검색 조건을 꺼내 외부 도로명주소 안내시스템 호출 주소를 구성하고, 호출 주소 점검과 응답 정화는 공통 보안 처리 기능에 위임한 뒤 결과를 화면으로 회신한다."
+        }
+      },
+      "name": "주소 조회 요청 접수",
+      "stepId": "step:ANY /sym/adr/getAdressCntcApi.do:src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 43,
+            "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcApi.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 46,
+            "snippet": "\t\tString currentPage = req.getParameter(\"currentPage\");"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 57,
+            "snippet": "\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApi.do?currentPage=\" + currentPage + \"&countPerPage=\""
+          }
+        ],
+        "text": "주소 조회 요청을 받아 검색어·페이지 정보·승인키를 꺼내고, 페이지 정보 검증을 통과하면 외부 주소 API 호출을 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 43,
+              "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcApi.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 52,
+              "snippet": "\t\tif (currentPage == null || !currentPage.matches(\"\\\\d+\") || countPerPage == null || !countPerPage.matches(\"\\\\d+\")) {"
+            }
+          ],
+          "text": "주소 연계 컨트롤러의 화면 제공 창구로 들어오는 요청을 처리한다. 주소 조회 창구와 달리 검색 조건에 대한 숫자 검증 절차는 이 단계에서 수행하지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 43,
+              "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcApi.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 33,
+              "snippet": "public class EgovAdressCntcController {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 36,
+              "snippet": "\t * 도로명주소 안내시스템에서 제공하는 Open API를 호출하여 주소 정보를 얻어온다."
+            }
+          ],
+          "text": "주소 연계 업무의 진입 창구로서 검색 초기 화면 요청을 받는다. 실제 주소 조회는 수행하지 않고, 이용자가 검색어와 페이지 조건을 입력해 주소 조회 창구로 넘어갈 수 있도록 화면만 제공한다."
+        }
+      },
+      "name": "주소 검색 초기 화면 접수",
+      "stepId": "step:ANY /sym/adr/getAdressCntcInitPage.do:src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 43,
+            "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcApi.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 33,
+            "snippet": "public class EgovAdressCntcController {"
+          }
+        ],
+        "text": "주소 검색 초기 화면 요청을 받아 이용자가 검색 조건을 입력할 화면을 제공하는 창구이다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 81,
+              "snippet": "\t\tif (returnValue == null || returnValue.trim().equals(\"\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 85,
+              "snippet": "\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 46,
+              "snippet": "\t\treturnValue = clearXSSMinimum(returnValue);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 48,
+              "snippet": "\t\treturnValue = returnValue.replace(\"%00\", \"\");"
+            }
+          ],
+          "text": "운영 조회와 같은 문자열 입출력 구조를 사용한다. 빈 값은 빈 문자열로 돌려주고, 상위 경로 이동 문자는 제거하며, 응답 정화 시 최소 정화 규칙을 먼저 적용한 뒤 추가 위험 문자를 제거하는 불변식을 지킨다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "\tpublic static String filePathBlackList(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 85,
+              "snippet": "\t@RequestMapping(value = \"/sym/adr/getAdressCntcTestApi.do\")"
+            }
+          ],
+          "text": "시험용 주소 조회 흐름의 협력 객체로서 운영 조회와 동일한 공통 보안 처리를 제공한다. 시험 API 호출 주소를 점검하고 회신 본문을 정화해 시험 창구도 운영 창구와 같은 보안 수준을 유지하게 한다."
+        }
+      },
+      "name": "시험 조회 보안 처리",
+      "stepId": "step:ANY /sym/adr/getAdressCntcTestApi.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 79,
+            "snippet": "\tpublic static String filePathBlackList(String value) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 44,
+            "snippet": "\tpublic static String clearXSSMaximum(String value) {"
+          }
+        ],
+        "text": "시험용 주소 조회 흐름에서도 동일하게 외부 호출 주소의 경로 점검과 회신 내용의 위험 문자 정화를 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 88,
+              "snippet": "\t\tString currentPage = req.getParameter(\"currentPage\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 91,
+              "snippet": "\t\tString keyword = req.getParameter(\"keyword\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 94,
+              "snippet": "\t\tif (currentPage == null || !currentPage.matches(\"\\\\d+\") || countPerPage == null || !countPerPage.matches(\"\\\\d+\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 95,
+              "snippet": "\t\t\tresponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 99,
+              "snippet": "\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApiTest.do?currentPage=\" + currentPage"
+            }
+          ],
+          "text": "현재 페이지, 페이지당 건수, 승인키, 검색어를 요청 값으로 받는다. 현재 페이지와 페이지당 건수가 없거나 숫자가 아니면 잘못된 요청으로 응답하고 중단하며, 검색어와 승인키는 인코딩하여 시험용 호출 주소에 붙인다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 85,
+              "snippet": "\t@RequestMapping(value = \"/sym/adr/getAdressCntcTestApi.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 79,
+              "snippet": "\t * 도로명주소 안내시스템에서 제공하는 Test용 Open API를 호출하여 주소 정보를 얻어온다."
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+              "line": 99,
+              "snippet": "\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApiTest.do?currentPage=\" + currentPage"
+            }
+          ],
+          "text": "주소 연계 업무의 시험용 창구로서 운영 창구와 같은 절차로 요청을 받아 처리한다. 호출 대상만 도로명주소 안내시스템의 시험용 주소로 달라지며, 경로 점검과 응답 정화는 동일하게 공통 보안 처리 기능에 위임한다."
+        }
+      },
+      "name": "시험 조회 요청 접수",
+      "stepId": "step:ANY /sym/adr/getAdressCntcTestApi.do:src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 43,
+            "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcApi.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 85,
+            "snippet": "\t@RequestMapping(value = \"/sym/adr/getAdressCntcTestApi.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+            "line": 99,
+            "snippet": "\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApiTest.do?currentPage=\" + currentPage"
+          }
+        ],
+        "text": "시험용 주소 조회 요청을 받아 검색 조건을 꺼내고, 페이지 정보 검증을 통과하면 시험용 외부 주소 API를 호출한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+        "line": 36,
+        "snippet": "\t * 도로명주소 안내시스템에서 제공하는 Open API를 호출하여 주소 정보를 얻어온다."
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+        "line": 57,
+        "snippet": "\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApi.do?currentPage=\" + currentPage + \"&countPerPage=\""
+      }
+    ],
+    "text": "행정안전부 도로명주소 안내시스템이 제공하는 공개 API를 호출해 주소 검색 결과를 받아오고, 이를 화면에 그대로 전달하는 외부 주소 연계 업무이다. 운영용 조회, 시험용 조회, 검색 초기 화면 제공의 세 가지 창구로 구성된다."
+  }
+}

@@ -1,0 +1,1177 @@
+{
+  "domainId": "domain:cop.cmy",
+  "files": [
+    {
+      "className": "EgovMessageSource",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovMessageSource.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이문준          최초 생성\n *   2017.07.21  장동한 \t\t\targs, locale 설정\n *\n * </pre>\n */\n\npublic class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {\n\n\tprivate ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;\n\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @param reloadableResourceBundleMessageSource - resource MessageSource\n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic void setReloadableResourceBundleMessageSource(ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource) {\n\t\tthis.reloadableResourceBundleMessageSource = reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic ReloadableResourceBundleMessageSource getReloadableResourceBundleMessageSource() {\n\t\treturn reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, locale);\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @return String\n\t */\t\n\tpublic String getMessageArgs(String code, Object[] args) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, locale);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovWebUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovWebUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "slice": {
+        "endLine": 94,
+        "startLine": 15,
+        "text": " *\t2017-02-07   이정은      시큐어코딩(ES) - 시큐어코딩 경로 조작 및 자원 삽입[CWE-22, CWE-23, CWE-95, CWE-99]\n *  2018.08.17   신용호      filePathBlackList 수정\n *  2018.10.10   신용호      . => \\\\.으로 수정\n *  2022.05.10   정진오      clearXSS() 메소드 추가\n *  2022.06.09   김장하      NSR 보안조치 (removeOSCmdRisk 함수에 윈도우 다중 명령 실행 키워드 추가)\n *  2023.08.10   신용호      removeLDAPInjectionRisk() 오류 수정\n *  2024.12.04   신용호      filePathBlackList() basePath 추가\n * </pre>\n */\n\npublic class EgovWebUtil {\n\tpublic static String clearXSSMinimum(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\"\", \"&#34;\");\n\t\treturnValue = returnValue.replaceAll(\"\\'\", \"&#39;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSSMaximum(String value) {\n\t\tString returnValue = value;\n\t\treturnValue = clearXSSMinimum(returnValue);\n\n\t\treturnValue = returnValue.replace(\"%00\", \"\");\n\n\t\treturnValue = returnValue.replaceAll(\"%\", \"&#37;\");\n\n\t\t// \\\\. => .\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\\\\\\\\\", \"\"); // ..\\\n\t\treturnValue = returnValue.replaceAll(\"\\\\./\", \"\"); // ./\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSS(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3C\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3E\", \"&gt;\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String filePathBlackList(String value) {\n\t\tString returnValue = value;\n\t\tif (returnValue == null || returnValue.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\t/**\n\t * 파일경로 보안취약점 조치\n\t * # 주의사항\n\t * 1. basePath는 반드시 지정해야 한다.\n\t * 2. basePath는 ROOT Path \"/\" 사용 금지 한다.",
+        "truncated": true
+      }
+    },
+    {
+      "className": "LoginVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/LoginVO.java — java 파일",
+        "tags": []
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 21,
+        "text": " *   2009.03.03     박지욱     최초 생성\n *   2021.05.30     정진오     디지털원패스 사용자키/세션값 추가\n *</pre>\n *\n *  @author 공통서비스 개발팀 박지욱\n *  @since 2009.03.03\n *  @version 1.0\n *  @see\n *\n */\n@Getter\n@Setter\npublic class LoginVO implements Serializable{\n\n\t/**\n\t *\n\t */\n\tprivate static final long serialVersionUID = -8274004534207618049L;\n\n\t/** 아이디 */\n\t@EgovNullCheck\n\tprivate String id;\n\t/** 이름 */\n\t@EgovNullCheck\n\tprivate String name;\n\t/** 주민등록번호 */\n\tprivate String ihidNum;\n\t/** 이메일주소 */\n\t@EgovNullCheck\n\t@EgovEmailCheck\n\tprivate String email;\n\t/** 비밀번호 */\n\tprivate String password;\n\t/** 비밀번호 힌트 */\n\t@EgovNullCheck\n\tprivate String passwordHint;\n\t/** 비밀번호 정답 */\n\t@EgovNullCheck\n\tprivate String passwordCnsr;\n\t/** 사용자구분 */\n\tprivate String userSe;\n\t/** 조직(부서)ID */\n\tprivate String orgnztId;\n\t/** 조직(부서)명 */\n\tprivate String orgnztNm;\n\t/** 고유아이디 */\n\tprivate String uniqId;\n\t/** 로그인 후 이동할 페이지 */\n\tprivate String url;\n\t/** 사용자 IP정보 */\n\tprivate String ip;\n\t/** GPKI인증 DN */\n\tprivate String dn;\n\t/** 디지털원패스 사용자키 */\n\tprivate String onepassUserkey;\n\t/** 디지털원패스 사용자세션값 */\n\tprivate String onepassIntfToken;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "slice": {
+        "endLine": 27,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.service;\n\nimport java.util.List;\n\npublic interface EgovUserDetailsService {\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic Object getAuthenticatedUser();\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t * 예) [ROLE_ADMIN, ROLE_USER, ROLE_A, ROLE_B, ROLE_RESTRICTED, IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED_ANONYMOUSLY]\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic List<String> getAuthorities();\n\t\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\t\n\t */\n\tpublic Boolean isAuthenticated(); \n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovUserDetailsHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "slice": {
+        "endLine": 62,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n *   2009.03.10  sjyoon         최초 생성\n *   2011.07.01\t 서준식          interface 생성후 상세 로직의 분리\n * </pre>\n */\n\npublic class EgovUserDetailsHelper {\n\n\tstatic EgovUserDetailsService egovUserDetailsService;\n\n\tpublic EgovUserDetailsService getEgovUserDetailsService() {\n\t\treturn egovUserDetailsService;\n\t}\n\n\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {\n\t\tEgovUserDetailsHelper.egovUserDetailsService = egovUserDetailsService;\n\t}\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic static Object getAuthenticatedUser() {\n\t\treturn egovUserDetailsService.getAuthenticatedUser();\n\t}\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t *\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic static List<String> getAuthorities() {\n\t\treturn egovUserDetailsService.getAuthorities();\n\t}\n\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\n\t */\n\tpublic static Boolean isAuthenticated() {\n\t\treturn egovUserDetailsService.isAuthenticated();\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "BoardMasterVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "slice": {
+        "endLine": 94,
+        "startLine": 15,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.3.12  이삼섭          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class BoardMasterVO extends BoardMaster implements Serializable {\n\n    /** 검색시작일 */\n    private String searchBgnDe = \"\";\n\n    /** 검색조건 */\n    private String searchCnd = \"\";\n\n    /** 검색종료일 */\n    private String searchEndDe = \"\";\n\n    /** 검색단어 */\n    private String searchWrd = \"\";\n\n    /** 정렬순서(DESC,ASC) */\n    private String sortOrdr = \"\";\n\n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n\n    /** 현재페이지 */\n    private int pageIndex = 1;\n\n    /** 페이지개수 */\n    private int pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private int pageSize = 10;\n\n    /** firstIndex */\n    private int firstIndex = 1;\n\n    /** lastIndex */\n    private int lastIndex = 1;\n\n    /** recordCountPerPage */\n    private int recordCountPerPage = 10;\n\n    /** rowNo */\n    private int rowNo = 0;\n\n    /** 최초 등록자명 */\n    private String frstRegisterNm = \"\";\n\n    /** 게시판유형 코드명 */\n    private String bbsTyCodeNm = \"\";\n\n    /** 템플릿 명 */\n    private String tmplatNm = \"\";\n\n    /** 최종 수정자명 */\n    private String lastUpdusrNm = \"\";\n\n    /** 권한지정 여부 */\n    private String authFlag = \"\";\n\n    /** 템플릿경로 */\n    private String tmplatCours = \"\";\n\n    /**\n     * toString 메소드를 대치한다.\n     */\n    public String toString() {\n\treturn ToStringBuilder.reflectionToString(this);\n    }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "BoardVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java — java 파일",
+        "tags": []
+      },
+      "line": 27,
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "slice": {
+        "endLine": 96,
+        "startLine": 17,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------      --------    ---------------------------\n *   2009.3.19  이삼섭          최초 생성\n *   2009.06.29  한성곤\t\t2단계 기능 추가 (댓글관리, 만족도조사)\n *\n * </pre>\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class BoardVO extends Board implements Serializable {\n\n    /** 검색시작일 */\n    private String searchBgnDe = \"\";\n\n    /** 검색조건 */\n    private String searchCnd = \"\";\n\n    /** 검색종료일 */\n    private String searchEndDe = \"\";\n\n    /** 검색단어 */\n    private String searchWrd = \"\";\n\n    /** 정렬순서(DESC,ASC) */\n    private Long sortOrdr = 0L;\n\n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n\n    /** 현재페이지 */\n    private Integer pageIndex = 1;\n\n    /** 페이지개수 */\n    private Integer pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private Integer pageSize = 10;\n\n    /** 첫페이지 인덱스 */\n    private Integer firstIndex = 1;\n\n    /** 마지막페이지 인덱스 */\n    private Integer lastIndex = 1;\n\n    /** 페이지당 레코드 개수 */\n    private Integer recordCountPerPage = 10;\n\n    /** 레코드 번호 */\n    private int rowNo = 0;\n\n    /** 최초 등록자명 */\n    private String frstRegisterNm = \"\";\n\n    /** 최종 수정자명 */\n    private String lastUpdusrNm = \"\";\n\n    /** 유효여부 */\n    private String isExpired = \"N\";\n\n    /** 상위 정렬 순서 */\n    private String parntsSortOrdr = \"\";\n\n    /** 상위 답변 위치 */\n    private String parntsReplyLc = \"\";\n\n    /** 게시판 유형코드 */\n    private String bbsTyCode = \"\";\n\n    /** 게시판 속성코드 */\n    private String bbsAttrbCode = \"\";\n\n    /** 게시판 명 */\n    private String bbsNm = \"\";\n\n    /** 파일첨부가능여부 */\n    private String fileAtchPosblAt = \"\";",
+        "truncated": true
+      }
+    },
+    {
+      "className": "Community",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/cmy/service/Community.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/Community.java",
+      "slice": {
+        "endLine": 95,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.4.2  이삼섭          최초 생성\n *\n * </pre>\n */\n@SuppressWarnings(\"serial\")\npublic class Community implements Serializable {\n\n    /** 커뮤니티 아이디 */\n    private String cmmntyId = \"\";\n    \n    /** 커뮤니티 소개 */\n   @EgovNullCheck\n\t@Size(max=1200)\n    private String cmmntyIntrcn = \"\";\n    \n    /** 커뮤니티 명 */\n\t@EgovNullCheck\n\t@Size(max=120)\n    private String cmmntyNm = \"\";\n    \n    /** 최초등록자 아이디 */\n    private String frstRegisterId = \"\";\n    \n    /** 최초등록시점 */\n    private String frstRegisterPnttm = \"\";\n    \n    /** 최종수정자 아이디 */\n    private String lastUpdusrId = \"\";\n    \n    /** 최종수정시점 */\n    private String lastUpdusrPnttm = \"\";\n    \n    /** 등록구분코드 */\n    private String registSeCode = \"\";\n    \n    /** 템플릿 아이디 */\n    private String tmplatId = \"\";\n    \n    /** 템플릿 아이디 */\n    private String useAt = \"\";\n\n    /** 사용자 아이디 */\n    private String emplyrId = \"\";\n\n    /** 사용자명 */\n    private String userNm = \"\";\n\n    /** 템플릿 명 */\n    private String tmplatNm = \"\";\n\n    /**\n     * cmmntyId attribute를 리턴한다.\n     * \n     * @return the cmmntyId\n     */\n    public String getCmmntyId() {\n\treturn cmmntyId;\n    }\n\n    /**\n     * cmmntyId attribute 값을 설정한다.\n     * \n     * @param cmmntyId\n     *            the cmmntyId to set\n     */\n    public void setCmmntyId(String cmmntyId) {\n\tthis.cmmntyId = cmmntyId;\n    }\n\n    /**\n     * cmmntyIntrcn attribute를 리턴한다.\n     * \n     * @return the cmmntyIntrcn\n     */",
+        "truncated": true
+      }
+    },
+    {
+      "className": "CommunityUser",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/cmy/service/CommunityUser.java — java 파일",
+        "tags": []
+      },
+      "line": 23,
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityUser.java",
+      "slice": {
+        "endLine": 92,
+        "startLine": 13,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.4.2  이삼섭          최초 생성\n *\n * </pre>\n */\n@SuppressWarnings(\"serial\")\npublic class CommunityUser implements Serializable {\n\n    /** 커뮤니티아이디 */\n    private String cmmntyId = \"\";\n    \n    /** 최초등록자 아이디 */\n    private String frstRegisterId = \"\";\n    \n    /** 최초등록시점 */\n    private String frstRegisterPnttm = \"\";\n    \n    /** 최종수정자 아이디 */\n    private String lastUpdusrId = \"\";\n    \n    /** 최종수정시점 */\n    private String lastUpdusrPnttm = \"\";\n    \n    /** 관리자여부 */\n    private String mngrAt = \"\";\n    \n    /** 탈퇴일 */\n    private String secsnDe = \"\";\n    \n    /** 가입일 */\n    private String sbscrbDe = \"\";\n    \n    /** 사용여부 */\n    private String useAt = \"\";\n    \n    /** 사용자 아이디 */\n    private String emplyrId = \"\";\n    \n    /** 사용자명 */\n    private String emplyrNm = \"\";\n    \n    /** 회원 ID */\n    private String userId = \"\";\n   \n    /** 회원 이메일 */\n    private String userEmail = \"\";\n    \n    /** 회원 상태 */\n    private String mberSttus = \"\";\n\n    /** 회원 상태 코드명 */\n    private String mberSttusNm = \"\";\n\n    /**\n     * cmmntyId attribute를 리턴한다.\n     * \n     * @return the cmmntyId\n     */\n    public String getCmmntyId() {\n\treturn cmmntyId;\n    }\n\n    /**\n     * cmmntyId attribute 값을 설정한다.\n     * \n     * @param cmmntyId\n     *            the cmmntyId to set\n     */\n    public void setCmmntyId(String cmmntyId) {\n\tthis.cmmntyId = cmmntyId;\n    }\n\n    /**\n     * frstRegisterId attribute를 리턴한다.\n     * ",
+        "truncated": true
+      }
+    },
+    {
+      "className": "CommunityUserVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java",
+      "slice": {
+        "endLine": 77,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.4.2  이삼섭          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class CommunityUserVO extends CommunityUser implements Serializable {\n\n    /** 검색시작일 */\n    private String searchBgnDe = \"\";\n\n    /** 검색조건 */\n    private String searchCnd = \"\";\n\n    /** 검색종료일 */\n    private String searchEndDe = \"\";\n\n    /** 검색단어 */\n    private String searchWrd = \"\";\n\n    /** 정렬순서(DESC,ASC) */\n    private long sortOrdr = 0L;\n\n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n\n    /** 현재페이지 */\n    private int pageIndex = 1;\n\n    /** 페이지개수 */\n    private int pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private int pageSize = 10;\n\n    /** 첫페이지 인덱스 */\n    private int firstIndex = 1;\n\n    /** 마지막페이지 인덱스 */\n    private int lastIndex = 1;\n\n    /** 페이지당 레코드 개수 */\n    private int recordCountPerPage = 10;\n\n    /** 레코드 번호 */\n    private int rowNo = 0;\n\n    /**\n     * toString 메소드를 대치한다.\n     */\n    public String toString() {\n\treturn ToStringBuilder.reflectionToString(this);\n    }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "CommunityVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java",
+      "slice": {
+        "endLine": 92,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.4.2  이삼섭          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class CommunityVO extends Community implements Serializable {\n\n    /** 검색시작일 */\n    private String searchBgnDe = \"\";\n\n    /** 검색조건 */\n    private String searchCnd = \"\";\n\n    /** 검색종료일 */\n    private String searchEndDe = \"\";\n\n    /** 검색단어 */\n    private String searchWrd = \"\";\n\n    /** 정렬순서(DESC,ASC) */\n    private long sortOrdr = 0L;\n\n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n\n    /** 현재페이지 */\n    private int pageIndex = 1;\n\n    /** 페이지개수 */\n    private int pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private int pageSize = 10;\n\n    /** 첫페이지 인덱스 */\n    private int firstIndex = 1;\n\n    /** 마지막페이지 인덱스 */\n    private int lastIndex = 1;\n\n    /** 페이지당 레코드 개수 */\n    private int recordCountPerPage = 10;\n\n    /** 레코드 번호 */\n    private int rowNo = 0;\n\n    /** 등록구분 코드명 */\n    private String registSeCodeNm = \"\";\n\n    /** 최초 등록자명 */\n    private String frstRegisterNm = \"\";\n\n    /** 게시판 아이드 */\n    private String bbsId = \"\";\n\n    /** 게시판 이름 */\n    private String bbsNm = \"\";\n\n    /** 제공 URL */\n    private String provdUrl = \"\";\n\n    /**\n     * toString 메소드를 대치한다.\n     */\n    public String toString() {\n\treturn ToStringBuilder.reflectionToString(this);\n    }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCommuBBSMasterService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuBBSMasterService.java — java 파일",
+        "tags": []
+      },
+      "line": 7,
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuBBSMasterService.java",
+      "slice": {
+        "endLine": 12,
+        "startLine": 1,
+        "text": "package egovframework.com.cop.cmy.service;\n\nimport java.util.List;\n\nimport egovframework.com.cop.bbs.service.BoardMasterVO;\n\npublic interface EgovCommuBBSMasterService {\n\n\tList<BoardMasterVO> selectCommuBBSMasterListMain(BoardMasterVO bbsVo);\n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovCommuManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+      "slice": {
+        "endLine": 26,
+        "startLine": 1,
+        "text": "package egovframework.com.cop.cmy.service;\n\nimport java.util.Map;\n\npublic interface EgovCommuManageService {\n\n\tMap<String, Object> selectCommuInf(CommunityVO cmmntyVO);\n\n\tString checkCommuUserDetail(CommunityUser cmmntyUser);\n\n\tvoid insertCommuUserRqst(CommunityUser cmmntyUser);\n\n\tMap<String, Object> selectCommuUserList(CommunityUserVO cmmntyUserVO);\n\n\tBoolean selectIsCommuAdmin(CommunityUserVO userVO);\n\n\tvoid insertCommuUser(CommunityUserVO cmmntyUserVO);\n\n\tvoid deleteCommuUser(CommunityUserVO cmmntyUserVO);\n\n\tvoid insertCommuUserAdmin(CommunityUserVO cmmntyUserVO);\n\n\tvoid deleteCommuUserAdmin(CommunityUserVO cmmntyUserVO);\n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovCommuMasterService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java — java 파일",
+        "tags": []
+      },
+      "line": 8,
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java",
+      "slice": {
+        "endLine": 22,
+        "startLine": 1,
+        "text": "package egovframework.com.cop.cmy.service;\n\nimport java.util.List;\nimport java.util.Map;\n\nimport org.egovframe.rte.fdl.cmmn.exception.FdlException;\n\npublic interface EgovCommuMasterService {\n\n\tMap<String, Object> selectCommuMasterList(CommunityVO cmmntyVO);\n\n\tString insertCommuMaster(Community community) throws FdlException;\n\n\tCommunityVO selectCommuMaster(CommunityVO cmmntyVO) throws Exception;\n\n\tvoid updateCommuMaster(Community community);\n\n\tvoid deleteBBSMasterInf(Community community);\n\t\n\tList<CommunityVO> selectCommuMasterListPortlet(CommunityVO cmmntyVO) throws Exception;\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovCommuManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 91,
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "slice": {
+        "endLine": 160,
+        "startLine": 81,
+        "text": "\n\t/**\n     * 커뮤니티 메인페이지를 조회한다.\n     *\n     * @param cmmntyVO\n     * @param sessionVO\n     * @param model\n     * @return\n     * @throws Exception\n     */\n    @RequestMapping(\"/cop/cmy/cmmntyMain.do\")\n    public String selectCmmntyMain(@ModelAttribute(\"searchVO\") CommunityVO cmmntyVO\n    \t\t,ModelMap model\n    \t\t,HttpServletRequest request) throws Exception {\n\n\t\tLoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n   \t \t// KISA 보안취약점 조치 (2018-12-10, 신용호)\n        if(!isAuthenticated) {\n            return \"redirect:/uat/uia/egovLoginUsr.do\";\n        }\n\n        cmmntyVO.setEmplyrId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getUniqId()));\n\n        // 2022.11.11 시큐어코딩 처리\n\t\tMap<String, Object> map = egovCommuManageService.selectCommuInf(cmmntyVO);\n\t\tmodel.addAttribute(\"cmmntyVO\", map.get(\"cmmntyVO\"));\n\t\tmodel.addAttribute(\"cmmntyUser\", map.get(\"cmmntyUser\"));\n\n\t\t//--------------------------------\n\t\t// 게시판 목록 정보 처리\n\t\t//--------------------------------\n\t\tBoardMasterVO bbsVo = new BoardMasterVO();\n\n\t\tbbsVo.setCmmntyId(cmmntyVO.getCmmntyId());\n\n\t\tList<BoardMasterVO> bbsResult = egovCommuBBSMasterService.selectCommuBBSMasterListMain(bbsVo);\n\n\t\tmodel.addAttribute(\"bbsList\", bbsResult);\n\t\t////------------------------------\n\t\t//\t\t221116\t김혜준\t2022 시큐어코딩 조치\n\t\tmodel.addAttribute(\"isAuthenticated\", \"Y\");\n\t\tmodel.addAttribute(\"returnMsg\", request.getParameter(\"returnMsg\"));\n\n\t\treturn \"egovframework/com/cop/cmy/EgovCommuMain\";\n    }\n\n    /**\n     * 커뮤니티 메인페이지의 기본 내용(게시판 4개 표시) 조회한다.\n     *\n     * @param cmmntyVO\n     * @param sessionVO\n     * @param model\n     * @return\n     * @throws Exception\n     */\n    @RequestMapping(\"/cop/cmy/cmmntyMainContents.do\")\n    public String selectCmmntyMainContents(@ModelAttribute(\"searchVO\") CommunityVO cmmntyVO, ModelMap model) throws Exception {\n\n    \tLoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\t\t// KISA 보안취약점 조치 (2018-12-10, 신용호)\n        if(!isAuthenticated) {\n            return \"redirect:/uat/uia/egovLoginUsr.do\";\n        }\n\n\t\tcmmntyVO.setEmplyrId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getUniqId()));\n\n\t\t//--------------------------------\n\t\t// 게시판 목록 정보 처리\n\t\t//--------------------------------\n\t\tBoardMasterVO bbsVo = new BoardMasterVO();\n\n\t\tbbsVo.setCmmntyId(cmmntyVO.getCmmntyId());\n\n\t\tList<BoardMasterVO> bbsResult = egovCommuBBSMasterService.selectCommuBBSMasterListMain(bbsVo);\n\n\t\t// 방명록 제외 처리\n\t\tfor (int i = 0; i < bbsResult.size(); i++) {\n\t\t    if (\"BBST04\".equals(bbsResult.get(i).getBbsTyCode())) {",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCommuMasterController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java — java 파일",
+        "tags": []
+      },
+      "line": 245,
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "slice": {
+        "endLine": 277,
+        "startLine": 235,
+        "text": "\n    /**\n     * 커뮤니티 정보를 삭제한다.\n     *\n     * @param cmmntyVO\n     * @param status\n     * @param model\n     * @return\n     * @throws Exception\n     */\n    @RequestMapping(\"/cop/cmy/deleteCommuMaster.do\")\n    public String deleteCommuMaster(@ModelAttribute(\"searchVO\") CommunityVO cmmntyVO, @ModelAttribute(\"commuMaster\") Community community,\n\t    BindingResult bindingResult, ModelMap model) throws Exception {\n\n    \tLoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();\n    \tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\n    \tif (isAuthenticated) {\n    \t\tcommunity.setLastUpdusrId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getUniqId()));\n    \t    egovCommuMasterService.deleteBBSMasterInf(community);\n    \t}\n    \treturn \"forward:/cop/cmy/selectCommuMasterList.do\";\n        }\n\n    /**\n     * 포트릿을 위한 커뮤니티 정보 목록 정보를 조회한다.\n     *\n     * @param cmmntyVO\n     * @param sessionVO\n     * @param model\n     * @return\n     * @throws Exception\n     */\n    @RequestMapping(\"/cop/cmy/selectCommuMasterListPortlet.do\")\n    public String selectCmmntyListPortlet(@ModelAttribute(\"searchVO\") CommunityVO cmmntyVO, ModelMap model) throws Exception {\n\tList<CommunityVO> result = egovCommuMasterService.selectCommuMasterListPortlet(cmmntyVO);\n\n\tmodel.addAttribute(\"resultList\", result);\n\n\treturn \"egovframework/com/cop/cmy/EgovCommuMasterListPortlet\";\n    }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovStringUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 43,
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "slice": {
+        "endLine": 112,
+        "startLine": 33,
+        "text": " * See the License for the specific language governing permissions and\n * limitations under the License.\n */\nimport java.io.UnsupportedEncodingException;\nimport java.math.BigDecimal;\nimport java.security.SecureRandom;\nimport java.sql.Timestamp;\nimport java.text.SimpleDateFormat;\nimport java.util.Locale;\n\npublic class EgovStringUtil {\n\t/**\n\t * 빈 문자열 <code>\"\"</code>.\n\t */\n\tpublic static final String EMPTY = \"\";\n\n\t// 221116\t김혜준\t2022 시큐어코딩 조치\n\tprivate static SecureRandom rnd = new SecureRandom();\n\n\t/**\n\t * <p>Padding을 할 수 있는 최대 수치</p>\n\t */\n\t// private static final int PAD_LIMIT = 8192;\n\n\t/**\n\t * <p>An array of <code>String</code>s used for padding.</p>\n\t * <p>Used for efficient space padding. The length of each String expands as needed.</p>\n\t */\n\t/*\n\tprivate static final String[] PADDING = new String[Character.MAX_VALUE];\n\n\tstatic {\n\t\t// space padding is most common, start with 64 chars\n\t\tPADDING[32] = \"                                                                \";\n\t}\n\t */\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 지정한길이에다가 해당 문자열을 붙여주는 메서드.\n\t * @param source 원본 문자열 배열\n\t * @param output 더할문자열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, String output, int slength) {\n\t\tString returnVal = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\treturnVal = source.substring(0, slength) + output;\n\t\t\t} else {\n\t\t\t\treturnVal = source;\n\t\t\t}\n\t\t}\n\t\treturn returnVal;\n\t}\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 해당 문자열을 삭제하는 메서드\n\t * @param source 원본 문자열 배열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, int slength) {\n\t\tString result = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\tresult = source.substring(0, slength);\n\t\t\t} else {\n\t\t\t\tresult = source;\n\t\t\t}\n\t\t}\n\t\treturn result;\n\t}\n\n\t/**\n\t * <p>\n\t * String이 비었거나(\"\") 혹은 null 인지 검증한다.\n\t * </p>\n\t *\n\t * <pre>",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovCommuManageController#selectCmmntyMain",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "flowId": "flow:ANY /cop/cmy/cmmntyMain.do",
+      "line": 91,
+      "stepIds": [
+        "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+        "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java",
+        "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+        "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuBBSMasterService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuManageController#selectCmmntyMainContents",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "flowId": "flow:ANY /cop/cmy/cmmntyMainContents.do",
+      "line": 137,
+      "stepIds": [
+        "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+        "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java",
+        "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuBBSMasterService.java",
+        "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuMasterController#deleteCommuMaster",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "flowId": "flow:ANY /cop/cmy/deleteCommuMaster.do",
+      "line": 245,
+      "stepIds": [
+        "step:ANY /cop/cmy/deleteCommuMaster.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+        "step:ANY /cop/cmy/deleteCommuMaster.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/cmy/deleteCommuMaster.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/cmy/deleteCommuMaster.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/cmy/deleteCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/Community.java",
+        "step:ANY /cop/cmy/deleteCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java",
+        "step:ANY /cop/cmy/deleteCommuMaster.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuManageController#deleteCommuUser",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "flowId": "flow:ANY /cop/cmy/deleteCommuUser.do",
+      "line": 361,
+      "stepIds": [
+        "step:ANY /cop/cmy/deleteCommuUser.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+        "step:ANY /cop/cmy/deleteCommuUser.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/cmy/deleteCommuUser.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java",
+        "step:ANY /cop/cmy/deleteCommuUser.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/cmy/deleteCommuUser.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/cmy/deleteCommuUser.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+        "step:ANY /cop/cmy/deleteCommuUser.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuManageController#deleteCommuUserAdmin",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "flowId": "flow:ANY /cop/cmy/deleteCommuUserAdmin.do",
+      "line": 426,
+      "stepIds": [
+        "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+        "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java",
+        "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+        "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java",
+        "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuManageController#deleteCmmntyUserBySelf",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "flowId": "flow:ANY /cop/cmy/deleteCommuUserBySelf.do",
+      "line": 252,
+      "stepIds": [
+        "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+        "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java",
+        "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+        "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuMasterController#insertCommuMaster",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "flowId": "flow:ANY /cop/cmy/insertCommuMaster.do",
+      "line": 124,
+      "stepIds": [
+        "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+        "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/Community.java",
+        "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java",
+        "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java",
+        "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuMasterController#insertCommuMasterView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "flowId": "flow:ANY /cop/cmy/insertCommuMasterView.do",
+      "line": 107,
+      "stepIds": [
+        "step:ANY /cop/cmy/insertCommuMasterView.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuManageController#insertCommuUser",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "flowId": "flow:ANY /cop/cmy/insertCommuUser.do",
+      "line": 328,
+      "stepIds": [
+        "step:ANY /cop/cmy/insertCommuUser.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+        "step:ANY /cop/cmy/insertCommuUser.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/cmy/insertCommuUser.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java",
+        "step:ANY /cop/cmy/insertCommuUser.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/cmy/insertCommuUser.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/cmy/insertCommuUser.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+        "step:ANY /cop/cmy/insertCommuUser.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuManageController#insertCommuUserAdmin",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "flowId": "flow:ANY /cop/cmy/insertCommuUserAdmin.do",
+      "line": 393,
+      "stepIds": [
+        "step:ANY /cop/cmy/insertCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+        "step:ANY /cop/cmy/insertCommuUserAdmin.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/cmy/insertCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java",
+        "step:ANY /cop/cmy/insertCommuUserAdmin.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/cmy/insertCommuUserAdmin.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/cmy/insertCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+        "step:ANY /cop/cmy/insertCommuUserAdmin.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuManageController#insertCmmntyUserBySelf",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "flowId": "flow:ANY /cop/cmy/insertCommuUserBySelf.do",
+      "line": 206,
+      "stepIds": [
+        "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+        "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUser.java",
+        "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+        "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuManageController#previewCmmntyMainContents",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "flowId": "flow:ANY /cop/cmy/previewCmmntyMainContents.do",
+      "line": 561,
+      "stepIds": [
+        "step:ANY /cop/cmy/previewCmmntyMainContents.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+        "step:ANY /cop/cmy/previewCmmntyMainContents.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/cmy/previewCmmntyMainContents.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/cmy/previewCmmntyMainContents.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/cmy/previewCmmntyMainContents.do:src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java",
+        "step:ANY /cop/cmy/previewCmmntyMainContents.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "step:ANY /cop/cmy/previewCmmntyMainContents.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuManageController#previewCmmntyMainPage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "flowId": "flow:ANY /cop/cmy/previewCmmntyMainPage.do",
+      "line": 469,
+      "stepIds": [
+        "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+        "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java",
+        "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUser.java",
+        "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuMasterController#selectCommuMasterDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "flowId": "flow:ANY /cop/cmy/selectCommuMasterDetail.do",
+      "line": 167,
+      "stepIds": [
+        "step:ANY /cop/cmy/selectCommuMasterDetail.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+        "step:ANY /cop/cmy/selectCommuMasterDetail.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java",
+        "step:ANY /cop/cmy/selectCommuMasterDetail.do:src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuMasterController#selectCommuMasterList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "flowId": "flow:ANY /cop/cmy/selectCommuMasterList.do",
+      "line": 72,
+      "stepIds": [
+        "step:ANY /cop/cmy/selectCommuMasterList.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+        "step:ANY /cop/cmy/selectCommuMasterList.do:src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java",
+        "step:ANY /cop/cmy/selectCommuMasterList.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuMasterController#selectCmmntyListPortlet",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "flowId": "flow:ANY /cop/cmy/selectCommuMasterListPortlet.do",
+      "line": 268,
+      "stepIds": [
+        "step:ANY /cop/cmy/selectCommuMasterListPortlet.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+        "step:ANY /cop/cmy/selectCommuMasterListPortlet.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuManageController#selectCommuUserList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "flowId": "flow:ANY /cop/cmy/selectCommuUserList.do",
+      "line": 293,
+      "stepIds": [
+        "step:ANY /cop/cmy/selectCommuUserList.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+        "step:ANY /cop/cmy/selectCommuUserList.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java",
+        "step:ANY /cop/cmy/selectCommuUserList.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuMasterController#updateCommuMaster",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "flowId": "flow:ANY /cop/cmy/updateCommuMaster.do",
+      "line": 210,
+      "stepIds": [
+        "step:ANY /cop/cmy/updateCommuMaster.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+        "step:ANY /cop/cmy/updateCommuMaster.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/cmy/updateCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java",
+        "step:ANY /cop/cmy/updateCommuMaster.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/cmy/updateCommuMaster.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/cmy/updateCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/Community.java",
+        "step:ANY /cop/cmy/updateCommuMaster.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCommuMasterController#updateCommuMasterView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "flowId": "flow:ANY /cop/cmy/updateCommuMasterView.do",
+      "line": 190,
+      "stepIds": [
+        "step:ANY /cop/cmy/updateCommuMasterView.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+        "step:ANY /cop/cmy/updateCommuMasterView.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "cop.cmy",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuBBSMasterService.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuBBSMasterService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMain.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuBBSMasterService.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuBBSMasterService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /cop/cmy/cmmntyMainContents.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuMaster.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuMaster.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuMaster.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/Community.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/Community.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuMaster.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuMaster.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUser.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUser.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUser.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUser.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUser.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUser.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUser.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserAdmin.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /cop/cmy/deleteCommuUserBySelf.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/Community.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/Community.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuMaster.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuMasterView.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUser.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUser.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUser.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUser.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUser.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUser.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUser.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUserAdmin.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUserAdmin.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUserAdmin.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUserAdmin.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUserAdmin.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityUser.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUser.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /cop/cmy/insertCommuUserBySelf.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/cmy/previewCmmntyMainContents.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /cop/cmy/previewCmmntyMainContents.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/cmy/previewCmmntyMainContents.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "stepId": "step:ANY /cop/cmy/previewCmmntyMainContents.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java",
+      "stepId": "step:ANY /cop/cmy/previewCmmntyMainContents.do:src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "stepId": "step:ANY /cop/cmy/previewCmmntyMainContents.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /cop/cmy/previewCmmntyMainContents.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "stepId": "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "stepId": "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityUser.java",
+      "stepId": "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUser.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java",
+      "stepId": "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "stepId": "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /cop/cmy/previewCmmntyMainPage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java",
+      "stepId": "step:ANY /cop/cmy/selectCommuMasterDetail.do:src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java",
+      "stepId": "step:ANY /cop/cmy/selectCommuMasterDetail.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "stepId": "step:ANY /cop/cmy/selectCommuMasterDetail.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java",
+      "stepId": "step:ANY /cop/cmy/selectCommuMasterList.do:src/main/java/egovframework/com/cop/cmy/service/CommunityVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java",
+      "stepId": "step:ANY /cop/cmy/selectCommuMasterList.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "stepId": "step:ANY /cop/cmy/selectCommuMasterList.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java",
+      "stepId": "step:ANY /cop/cmy/selectCommuMasterListPortlet.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "stepId": "step:ANY /cop/cmy/selectCommuMasterListPortlet.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java",
+      "stepId": "step:ANY /cop/cmy/selectCommuUserList.do:src/main/java/egovframework/com/cop/cmy/service/CommunityUserVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java",
+      "stepId": "step:ANY /cop/cmy/selectCommuUserList.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java",
+      "stepId": "step:ANY /cop/cmy/selectCommuUserList.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /cop/cmy/updateCommuMaster.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /cop/cmy/updateCommuMaster.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /cop/cmy/updateCommuMaster.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/Community.java",
+      "stepId": "step:ANY /cop/cmy/updateCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/Community.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java",
+      "stepId": "step:ANY /cop/cmy/updateCommuMaster.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "stepId": "step:ANY /cop/cmy/updateCommuMaster.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /cop/cmy/updateCommuMaster.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java",
+      "stepId": "step:ANY /cop/cmy/updateCommuMasterView.do:src/main/java/egovframework/com/cop/cmy/service/EgovCommuMasterService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java",
+      "stepId": "step:ANY /cop/cmy/updateCommuMasterView.do:src/main/java/egovframework/com/cop/cmy/web/EgovCommuMasterController.java"
+    }
+  ]
+}

@@ -1,0 +1,334 @@
+{
+  "domainId": "domain:uss.ion.nts",
+  "files": [
+    {
+      "className": "EgovMessageSource",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovMessageSource.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이문준          최초 생성\n *   2017.07.21  장동한 \t\t\targs, locale 설정\n *\n * </pre>\n */\n\npublic class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {\n\n\tprivate ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;\n\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @param reloadableResourceBundleMessageSource - resource MessageSource\n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic void setReloadableResourceBundleMessageSource(ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource) {\n\t\tthis.reloadableResourceBundleMessageSource = reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic ReloadableResourceBundleMessageSource getReloadableResourceBundleMessageSource() {\n\t\treturn reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, locale);\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @return String\n\t */\t\n\tpublic String getMessageArgs(String code, Object[] args) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, locale);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "LoginVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/LoginVO.java — java 파일",
+        "tags": []
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 21,
+        "text": " *   2009.03.03     박지욱     최초 생성\n *   2021.05.30     정진오     디지털원패스 사용자키/세션값 추가\n *</pre>\n *\n *  @author 공통서비스 개발팀 박지욱\n *  @since 2009.03.03\n *  @version 1.0\n *  @see\n *\n */\n@Getter\n@Setter\npublic class LoginVO implements Serializable{\n\n\t/**\n\t *\n\t */\n\tprivate static final long serialVersionUID = -8274004534207618049L;\n\n\t/** 아이디 */\n\t@EgovNullCheck\n\tprivate String id;\n\t/** 이름 */\n\t@EgovNullCheck\n\tprivate String name;\n\t/** 주민등록번호 */\n\tprivate String ihidNum;\n\t/** 이메일주소 */\n\t@EgovNullCheck\n\t@EgovEmailCheck\n\tprivate String email;\n\t/** 비밀번호 */\n\tprivate String password;\n\t/** 비밀번호 힌트 */\n\t@EgovNullCheck\n\tprivate String passwordHint;\n\t/** 비밀번호 정답 */\n\t@EgovNullCheck\n\tprivate String passwordCnsr;\n\t/** 사용자구분 */\n\tprivate String userSe;\n\t/** 조직(부서)ID */\n\tprivate String orgnztId;\n\t/** 조직(부서)명 */\n\tprivate String orgnztNm;\n\t/** 고유아이디 */\n\tprivate String uniqId;\n\t/** 로그인 후 이동할 페이지 */\n\tprivate String url;\n\t/** 사용자 IP정보 */\n\tprivate String ip;\n\t/** GPKI인증 DN */\n\tprivate String dn;\n\t/** 디지털원패스 사용자키 */\n\tprivate String onepassUserkey;\n\t/** 디지털원패스 사용자세션값 */\n\tprivate String onepassIntfToken;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovSecurityMap",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java — java 파일",
+        "tags": []
+      },
+      "line": 28,
+      "relPath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+      "slice": {
+        "endLine": 65,
+        "startLine": 18,
+        "text": " *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2024.07.09  신용호          Map 타입에서 noteId 복호화 적용을 위한 EgovSecurityMap 추가\n *   2025.05.24  이백행          PMD로 소프트웨어 보안약점 진단하고 제거하기-SwitchStmtsShouldHaveDefault(스위치 명령문에는 기본값이 있어야 합니다.), AvoidReassigningParameters(매개변수 재할당 방지)\n *   2026.04.20  유지보수        국가사이버안보센터(NCSC)의 보안 점검 결과 반영을 통한 보안패치\n *\n *      </pre>\n */\n@Slf4j\npublic class EgovSecurityMap {\n\n\tMap<String, String> map = new HashMap<>();\n\n\tpublic String get(String key) {\n\t\treturn map.get(key);\n\t}\n\n\tpublic void put(String key, String value) {\n\t\tString value2 = value;\n\n\t\t// 특정 암호화된 파라미터 복호화 처리\n\t\tswitch (key) {\n\t\tcase \"proxyId\":\n\t\tcase \"serverId\":\n\t\tcase \"noteId\":\n\t\tcase \"noteTrnsmitId\":\n\t\tcase \"noteRecptnId\":\n\t\tcase \"reprtId\":\n\t\t\tlog.debug(\"### EgovSecurityMap {} : {}\", key, value);\n\t\t\tvalue2 = EgovComUtlController.decryptId(value);\n\t\t\tbreak;\n\n\t\tdefault:\n\t\t\tbreak;\n\t\t}\n\n\t\tmap.put(key, value2);\n\t}\n\n\t@Override\n\tpublic String toString() {\n\t\treturn map.toString();\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "slice": {
+        "endLine": 62,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n *   2009.03.10  sjyoon         최초 생성\n *   2011.07.01\t 서준식          interface 생성후 상세 로직의 분리\n * </pre>\n */\n\npublic class EgovUserDetailsHelper {\n\n\tstatic EgovUserDetailsService egovUserDetailsService;\n\n\tpublic EgovUserDetailsService getEgovUserDetailsService() {\n\t\treturn egovUserDetailsService;\n\t}\n\n\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {\n\t\tEgovUserDetailsHelper.egovUserDetailsService = egovUserDetailsService;\n\t}\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic static Object getAuthenticatedUser() {\n\t\treturn egovUserDetailsService.getAuthenticatedUser();\n\t}\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t *\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic static List<String> getAuthorities() {\n\t\treturn egovUserDetailsService.getAuthorities();\n\t}\n\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\n\t */\n\tpublic static Boolean isAuthenticated() {\n\t\treturn egovUserDetailsService.isAuthenticated();\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovNoteTrnsmitService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java — java 파일",
+        "tags": []
+      },
+      "line": 23,
+      "relPath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+      "slice": {
+        "endLine": 72,
+        "startLine": 13,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.07.03  장동한          최초 생성\n *\n * </pre>\n */\npublic interface EgovNoteTrnsmitService {\n\n    /**\n\t * 보낸쪽지함관리 목록을 조회한다.\n\t * @param noteTrnsmit -조회할 정보가 담긴 객체\n\t * @return List\n\t * @throws Exception\n\t */\n\tpublic List<EgovMap> selectNoteTrnsmitList(NoteTrnsmit noteTrnsmit) throws Exception;\n\n    /**\n     * 보낸쪽지함관리를(을) 목록 전체 건수를(을) 조회한다.\n     * @param searchVO -조회할 정보가 담긴 객체\n     * @return int\n     * @throws Exception\n     */\n    public int selectNoteTrnsmitListCnt(NoteTrnsmit noteTrnsmit) throws Exception;\n\n     /**\n\t * 보낸쪽지함관리를(을) 상세조회 한다.\n\t * @param noteTrnsmit -조회할 정보가 담긴 객체\n\t * @return Map\n\t * @throws Exception\n\t */\n\tpublic Map<?, ?> selectNoteTrnsmitDetail(NoteTrnsmit noteTrnsmit) throws Exception;\n\n\t/**\n\t * 보낸쪽지함관리를(을) 삭제한다.\n\t * @param noteTrnsmit -보낸쪽지함관리 정보 담김 객체\n\t * @throws Exception\n\t */\n\tvoid  deleteNoteTrnsmit(NoteTrnsmit noteTrnsmit) throws Exception;\n\n\t/**\n\t * 받은쪽지함관리를(을) 삭제한다.\n\t * @param noteTrnsmit -보낸쪽지함관리 정보 담김 객체\n\t * @throws Exception\n\t */\n\tvoid  deleteNoteRecptn(NoteTrnsmit noteTrnsmit) throws Exception;\n\n    /**\n\t * 수신자목록을 조회한다.\n\t * @param noteTrnsmit -조회할 정보가 담긴 객체\n\t * @return List\n\t * @throws Exception\n\t */\n\tpublic List<EgovMap> selectNoteTrnsmitCnfirm(NoteTrnsmit noteTrnsmit) throws Exception;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "NoteTrnsmit",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java — java 파일",
+        "tags": []
+      },
+      "line": 19,
+      "relPath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 9,
+        "text": " * @version 1.0\n * @see <pre>\n * &lt;&lt; 개정이력(Modification Information) &gt;&gt;\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.07.03  장동한          최초 생성\n * \n * </pre>\n */\npublic class NoteTrnsmit extends ComDefaultVO {\n\n\t/**\n\t * \n\t */\n\tprivate static final long serialVersionUID = 1L;\n\n\t/** 쪽지 ID */\n\tprivate String noteId;\n\t\n\t/** 쪽지 송신 ID */\n\tprivate String noteTrnsmitId;\n\t\n\t/** 쪽지 수신 ID */\n\tprivate String noteRecptnId;\n\t\n\t/** 쪽지 송신자 ID */\n\tprivate String trnsmiterId;\n\t\n\t/** 개봉여부 */\n\tprivate String openYn;\n\t\n\t/** 쪽지 제목 */\n\tprivate String noteSj;\n\t\n\t/** 쪽지 내용 */\n\tprivate String noteCn;\n\t\n\t/** 쪽지 첨부파일 */\n\tprivate String atchFileId;\n\t\n\t/** 보낸 시작날짜 */\n\tprivate String searchFromDate;\n\t\n\t/** 보낸 종료날짜 */\n\tprivate String searchToDate;\n\t\n    /** 최초등록시점 */\n    private String frstRegisterPnttm;\n\n    /** 최초등록아이디 */\n    private String frstRegisterId;\n\n    /** 최종수정일 */\n    private String lastUpdusrPnttm;\n\n    /** 최종수정자 아이디 */\n    private String lastUpdusrId;\n\n\t/**\n\t * @return the noteId\n\t */\n\tpublic String getNoteId() {\n\t\treturn noteId;\n\t}\n\n\t/**\n\t * @param noteId the noteId to set\n\t */\n\tpublic void setNoteId(String noteId) {\n\t\tthis.noteId = noteId;\n\t}\n\n\t/**\n\t * @return the noteTrnsmitId\n\t */\n\tpublic String getNoteTrnsmitId() {\n\t\treturn noteTrnsmitId;\n\t}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovNoteTrnsmitController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java — java 파일",
+        "tags": []
+      },
+      "line": 166,
+      "relPath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+      "slice": {
+        "endLine": 233,
+        "startLine": 156,
+        "text": "    }\n\n    /**\n     * 보낸쪽지함관리 목록을 상세조회 조회한다.\n     * @param searchVO -검색정보가 담긴 객체\n     * @param commandMap -Request Variable\n     * @param model -Spring 제공하는 ModelMap\n     * @return String -리턴 URL\n     * @throws Exception\n     */\n    @RequestMapping(value = \"/uss/ion/nts/detailNoteTrnsmit.do\")\n    public String EgovNoteTrnsmitDetail(\n    \t\t@ModelAttribute(\"searchVO\") NoteTrnsmit searchVO,\n    \t\tEgovSecurityMap securityMap,\n            ModelMap model) throws Exception {\n\n    \t\tString sLocationUrl = \"egovframework/com/uss/ion/nts/EgovNoteTrnsmitDetail\";\n\n            String sCmd = securityMap.get(\"cmd\") == null ? \"\" : (String) securityMap.get(\"cmd\");\n\n    \t\t//Spring Security 사용자권한 처리\n    \t    Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n    \t    if (!isAuthenticated) {\n    \t        model.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));\n    \t        return \"redirect:/uat/uia/egovLoginUsr.do\";\n    \t    }\n\n            //로그인 객체 선언\n            LoginVO loginVO = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();\n\n            securityMap.put(\"noteId\",searchVO.getNoteId());\n            securityMap.put(\"noteTrnsmitId\", searchVO.getNoteTrnsmitId());\n\n            if(sCmd.equals(\"del\")){\n            \tsearchVO.setFrstRegisterId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));\n            \tsearchVO.setLastUpdusrId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));\n            \tsearchVO.setTrnsmiterId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));\n            \tegovNoteTrnsmitService.deleteNoteTrnsmit(searchVO);\n\n            \tsLocationUrl = \"redirect:/uss/ion/nts/listNoteTrnsmit.do\";\n            }else{\n            \tsearchVO.setTrnsmiterId(loginVO == null ? \"\" : EgovStringUtil.isNullToString(loginVO.getUniqId()));\n\n            \tMap<?, ?> noteTrnsmitMap = egovNoteTrnsmitService.selectNoteTrnsmitDetail(searchVO);\n            \tmodel.addAttribute(\"noteTrnsmit\", noteTrnsmitMap);\n\n            \tegovframework.com.uss.ion.nts.service.NoteTrnsmit noteTrnsmit = new egovframework.com.uss.ion.nts.service.NoteTrnsmit();\n            \tnoteTrnsmit.setNoteId(searchVO.getNoteId());\n\n                List<EgovMap> resultRecptnEmp = egovNoteTrnsmitService.selectNoteTrnsmitCnfirm(noteTrnsmit);\n            \tmodel.addAttribute(\"resultRecptnEmp\", resultRecptnEmp);\n            }\n\n    \t\treturn sLocationUrl;\n    }\n\n    /**\n     * 수신자목록을 조회한다.\n     * @param noteTrnsmit -보낸쪽지함 정보가 담긴 객체\n     * @param commandMap -Request Variable\n     * @param model -Spring 제공하는 ModelMap\n     * @return String -리턴 URL\n     * @throws Exception\n     */\n    @RequestMapping(value = \"/uss/ion/nts/selectNoteTrnsmitCnfirm.do\")\n    public String EgovNoteTrnsmitCnfirm(\n    \t\tNoteTrnsmit noteTrnsmit,\n    \t\t@RequestParam Map<?, ?> commandMap,\n            ModelMap model) throws Exception {\n\n            List<EgovMap> resultList = egovNoteTrnsmitService.selectNoteTrnsmitCnfirm(noteTrnsmit);\n        \tmodel.addAttribute(\"resultList\", resultList);\n\n    \t\treturn \"egovframework/com/uss/ion/nts/EgovNoteTrnsmitCnfirm\";\n    }\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovStringUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 43,
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "slice": {
+        "endLine": 112,
+        "startLine": 33,
+        "text": " * See the License for the specific language governing permissions and\n * limitations under the License.\n */\nimport java.io.UnsupportedEncodingException;\nimport java.math.BigDecimal;\nimport java.security.SecureRandom;\nimport java.sql.Timestamp;\nimport java.text.SimpleDateFormat;\nimport java.util.Locale;\n\npublic class EgovStringUtil {\n\t/**\n\t * 빈 문자열 <code>\"\"</code>.\n\t */\n\tpublic static final String EMPTY = \"\";\n\n\t// 221116\t김혜준\t2022 시큐어코딩 조치\n\tprivate static SecureRandom rnd = new SecureRandom();\n\n\t/**\n\t * <p>Padding을 할 수 있는 최대 수치</p>\n\t */\n\t// private static final int PAD_LIMIT = 8192;\n\n\t/**\n\t * <p>An array of <code>String</code>s used for padding.</p>\n\t * <p>Used for efficient space padding. The length of each String expands as needed.</p>\n\t */\n\t/*\n\tprivate static final String[] PADDING = new String[Character.MAX_VALUE];\n\n\tstatic {\n\t\t// space padding is most common, start with 64 chars\n\t\tPADDING[32] = \"                                                                \";\n\t}\n\t */\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 지정한길이에다가 해당 문자열을 붙여주는 메서드.\n\t * @param source 원본 문자열 배열\n\t * @param output 더할문자열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, String output, int slength) {\n\t\tString returnVal = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\treturnVal = source.substring(0, slength) + output;\n\t\t\t} else {\n\t\t\t\treturnVal = source;\n\t\t\t}\n\t\t}\n\t\treturn returnVal;\n\t}\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 해당 문자열을 삭제하는 메서드\n\t * @param source 원본 문자열 배열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, int slength) {\n\t\tString result = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\tresult = source.substring(0, slength);\n\t\t\t} else {\n\t\t\t\tresult = source;\n\t\t\t}\n\t\t}\n\t\treturn result;\n\t}\n\n\t/**\n\t * <p>\n\t * String이 비었거나(\"\") 혹은 null 인지 검증한다.\n\t * </p>\n\t *\n\t * <pre>",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovNoteTrnsmitController#EgovNoteTrnsmitDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+      "flowId": "flow:ANY /uss/ion/nts/detailNoteTrnsmit.do",
+      "line": 166,
+      "stepIds": [
+        "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+        "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+        "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+        "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovNoteTrnsmitController#EgovNoteTrnsmitList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+      "flowId": "flow:ANY /uss/ion/nts/listNoteTrnsmit.do",
+      "line": 69,
+      "stepIds": [
+        "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+        "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+        "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+        "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovNoteTrnsmitController#EgovNoteTrnsmitCnfirm",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+      "flowId": "flow:ANY /uss/ion/nts/selectNoteTrnsmitCnfirm.do",
+      "line": 220,
+      "stepIds": [
+        "step:ANY /uss/ion/nts/selectNoteTrnsmitCnfirm.do:src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+        "step:ANY /uss/ion/nts/selectNoteTrnsmitCnfirm.do:src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "uss.ion.nts",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /uss/ion/nts/detailNoteTrnsmit.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java",
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/cmm/resolver/EgovSecurityMap.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java",
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/service/NoteTrnsmit.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /uss/ion/nts/listNoteTrnsmit.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java",
+      "stepId": "step:ANY /uss/ion/nts/selectNoteTrnsmitCnfirm.do:src/main/java/egovframework/com/uss/ion/nts/service/EgovNoteTrnsmitService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java",
+      "stepId": "step:ANY /uss/ion/nts/selectNoteTrnsmitCnfirm.do:src/main/java/egovframework/com/uss/ion/nts/web/EgovNoteTrnsmitController.java"
+    }
+  ]
+}

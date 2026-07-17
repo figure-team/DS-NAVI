@@ -1,0 +1,585 @@
+{
+  "chunkId": "uss.ion.ism-000",
+  "domainId": "domain:uss.ion.ism",
+  "domainName": "",
+  "files": [
+    {
+      "className": "EgovMessageSource",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovMessageSource.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이문준          최초 생성\n *   2017.07.21  장동한 \t\t\targs, locale 설정\n *\n * </pre>\n */\n\npublic class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {\n\n\tprivate ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;\n\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @param reloadableResourceBundleMessageSource - resource MessageSource\n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic void setReloadableResourceBundleMessageSource(ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource) {\n\t\tthis.reloadableResourceBundleMessageSource = reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic ReloadableResourceBundleMessageSource getReloadableResourceBundleMessageSource() {\n\t\treturn reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, locale);\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @return String\n\t */\t\n\tpublic String getMessageArgs(String code, Object[] args) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, locale);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "slice": {
+        "endLine": 27,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.service;\n\nimport java.util.List;\n\npublic interface EgovUserDetailsService {\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic Object getAuthenticatedUser();\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t * 예) [ROLE_ADMIN, ROLE_USER, ROLE_A, ROLE_B, ROLE_RESTRICTED, IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED_ANONYMOUSLY]\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic List<String> getAuthorities();\n\t\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\t\n\t */\n\tpublic Boolean isAuthenticated(); \n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovUserDetailsHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "slice": {
+        "endLine": 62,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n *   2009.03.10  sjyoon         최초 생성\n *   2011.07.01\t 서준식          interface 생성후 상세 로직의 분리\n * </pre>\n */\n\npublic class EgovUserDetailsHelper {\n\n\tstatic EgovUserDetailsService egovUserDetailsService;\n\n\tpublic EgovUserDetailsService getEgovUserDetailsService() {\n\t\treturn egovUserDetailsService;\n\t}\n\n\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {\n\t\tEgovUserDetailsHelper.egovUserDetailsService = egovUserDetailsService;\n\t}\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic static Object getAuthenticatedUser() {\n\t\treturn egovUserDetailsService.getAuthenticatedUser();\n\t}\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t *\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic static List<String> getAuthorities() {\n\t\treturn egovUserDetailsService.getAuthorities();\n\t}\n\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\n\t */\n\tpublic static Boolean isAuthenticated() {\n\t\treturn egovUserDetailsService.isAuthenticated();\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovInfrmlSanctnService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/ism/service/EgovInfrmlSanctnService.java — java 파일",
+        "tags": []
+      },
+      "line": 16,
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/service/EgovInfrmlSanctnService.java",
+      "slice": {
+        "endLine": 81,
+        "startLine": 6,
+        "text": " * 개요\n * - 약식결재관리에 대한 Service Interface를 정의한다.\n * \n * 상세내용\n * - 약식결재관리에 대한 등록, 수정, 삭제기능을 제공한다.\n * - 결재자에 대한 목록 조회기능을 제공한다.\n * @author 장철호\n * @version 1.0\n * @created 28-6-2010 오전 11:29:25\n */\npublic interface EgovInfrmlSanctnService {\n\n\t/**\n\t * 결재자 목록을 조회한다.\n\t * @param SanctnerVO\n\t * @return  Map<String, Object>\n\t * \n\t * @param sanctnerVO\n\t */\n\tpublic Map<String, Object> selectSanctnerList(SanctnerVO sanctnerVO) throws Exception;\n\t\n\t/**\n\t * 약식결재 정보를 조회한다.\n\t * @param InfrmlSanctn\n\t * @return  InfrmlSanctn\n\t * \n\t * @param infrmlSanctn\n\t */\n\tpublic InfrmlSanctn selectInfrmlSanctn(InfrmlSanctn infrmlSanctn) throws Exception;\n\t\n\t/**\n\t * 약식결재관리 정보를 수정한다.\n\t * @param InfrmlSanctn\n\t * @return  InfrmlSanctn\n\t * \n\t * @param InfrmlSanctn\n\t */\n\tpublic InfrmlSanctn updateInfrmlSanctn(InfrmlSanctn infrmlSanctn) throws Exception;\n\t\n\t/**\n\t * 약식결재관리 정보를 승인한다.\n\t * @param InfrmlSanctn\n\t * @return  InfrmlSanctn\n\t * \n\t * @param InfrmlSanctn\n\t */\n\tpublic InfrmlSanctn updateInfrmlSanctnConfm(InfrmlSanctn infrmlSanctn) throws Exception;\n\t\n\t/**\n\t * 약식결재관리 정보를 반려한다.\n\t * @param InfrmlSanctn\n\t * @return  InfrmlSanctn\n\t * \n\t * @param InfrmlSanctn\n\t */\n\tpublic InfrmlSanctn updateInfrmlSanctnReturn(InfrmlSanctn infrmlSanctn) throws Exception;\n\n\t/**\n\t * 약식결재관리 정보를 등록한다.\n\t * @param InfrmlSanctn\n\t * @return  InfrmlSanctn\n\t * \n\t * @param InfrmlSanctn\n\t */\n\tpublic InfrmlSanctn insertInfrmlSanctn(InfrmlSanctn infrmlSanctn) throws Exception;\n\n\t/**\n\t * 약식결재관리 정보를 삭제한다.\n\t * @param InfrmlSanctn\n\t * @return  InfrmlSanctn\n\t * \n\t * @param InfrmlSanctn\n\t */\n\tpublic void deleteInfrmlSanctn(InfrmlSanctn infrmlSanctn) throws Exception;\n\n}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "InfrmlSanctn",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/ism/service/InfrmlSanctn.java — java 파일",
+        "tags": []
+      },
+      "line": 15,
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/service/InfrmlSanctn.java",
+      "slice": {
+        "endLine": 84,
+        "startLine": 5,
+        "text": "/**\n * 개요\n * - 약식결재관리에 대한 model 클래스를 정의한다.\n * \n * 상세내용\n * - 약식결재ID, 업무구분코드, 업무구분명, 연계URL, 신청자ID, 신청자명, 신청일자, 결재자ID, 결재자명, 결재자소속, 승인여부, 결재일시, 반려사유 의 항목을 관리한다.\n * @author 장철호\n * @version 1.0\n * @created 28-6-2010 오전 11:29:26\n */\n@SuppressWarnings(\"serial\")\npublic class InfrmlSanctn implements Serializable {\n\t/**\n\t * 약식결재ID\n\t */\n\tprivate String infrmlSanctnId;\n\t/**\n\t * 업무구분코드\n\t */\n\tprivate String jobSeCode;\n\t/**\n\t * 업무구분명\n\t */\n\tprivate String jobSeNm;\n\t/**\n\t * 신청자ID\n\t */\n\tprivate String applcntId;\n\t/**\n\t * 신청자명\n\t */\n\tprivate String applcntNm;\n\t/**\n\t * 신청일자\n\t */\n\tprivate String reqstDe = \"\";\n\t/**\n\t * 결재자ID\n\t */\n\tprivate String sanctnerId;\n\t/**\n\t * 결재자명\n\t */\n\tprivate String sanctnerNm;\n\t/**\n\t * 결재자소속\n\t */\n\tprivate String sanctnerOrgnztNm;\n\t/**\n\t * 승인여부\n\t */\n\tprivate String confmAt = \"\";\n\t/**\n\t * 결재일시\n\t */\n\tprivate String sanctnDt = \"\";\n\t/**\n\t * 반려사유\n\t */\n\tprivate String returnResn = \"\";\n\t/**\n\t * 최초등록자 ID\n\t */\n\tprivate String frstRegisterId = \"\";\n\t/**\n\t * 최초등록시점\n\t */\n\tprivate String frstRegisterPnttm = \"\";\n\t/**\n\t * 최종수정자ID\n\t */\n\tprivate String lastUpdusrId = \"\";\n\t/**\n\t * 최종수정자명\n\t */\n\tprivate String lastUpdusrNm = \"\";\n\t/**\n\t * 최종수정시점\n\t */\n\tprivate String lastUpdusrPnttm = \"\";",
+        "truncated": true
+      }
+    },
+    {
+      "className": "SanctnerVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/ism/service/SanctnerVO.java — java 파일",
+        "tags": []
+      },
+      "line": 16,
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/service/SanctnerVO.java",
+      "slice": {
+        "endLine": 46,
+        "startLine": 6,
+        "text": "/**\n * 개요\n * - 결재자에 대한 Vo 클래스를 정의한다.\n *\n * 상세내용\n * - 결재자의 목록 항목, 조회조건 등을 관리한다.\n * @author 장철호\n * @version 1.0\n * @created 28-6-2010 오전 11:29:26\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class SanctnerVO extends Sanctner {\n\n\t/** 검색조건 */\n    private String searchCnd = \"\";\n\n    /** 검색단어 */\n    private String searchWrd = \"\";\n\n    /** 현재페이지 */\n    private int pageIndex = 1;\n\n    /** 페이지개수 */\n    private int pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private int pageSize = 10;\n\n    /** 첫페이지 인덱스 */\n    private int firstIndex = 1;\n\n    /** 마지막페이지 인덱스 */\n    private int lastIndex = 1;\n\n    /** 페이지당 레코드 개수 */\n    private int recordCountPerPage = 10;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovInfrmlSanctnController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java — java 파일",
+        "tags": []
+      },
+      "line": 173,
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "slice": {
+        "endLine": 202,
+        "startLine": 163,
+        "text": "\t\treturn \"egovframework/com/uss/ion/ism/EgovReturnPopup\";\n\t}\n\n\t/**\n\t * 약식결재 승인처리 화면을 호출한다.\n\t * @param\n\t * @return  String\n\t *\n\t * @param\n\t */\n\t@RequestMapping(\"/uss/ion/ism/EgovConfmPopup.do\")\n\tpublic String selectConfmPopup() throws Exception{\n\t\treturn \"egovframework/com/uss/ion/ism/EgovConfmPopup\";\n\t}\n\n\t/**\n\t * 약식결재 반려처리 화면을 호출한다. Old 삭제 후 반영\n\t * @param\n\t * @return  String\n\t *\n\t * @param\n\t */\n\t@RequestMapping(\"/uss/ion/ism/EgovReturnPopupNew.do\")\n\tpublic String selectReturnPopupNew() throws Exception{\n\t\treturn \"egovframework/com/uss/ion/ism/EgovReturnPopupNew\";\n\t}\n\n\t/**\n\t * 약식결재 승인처리 화면을 호출한다. Old 삭제 후 반영\n\t * @param\n\t * @return  String\n\t *\n\t * @param\n\t */\n\t@RequestMapping(\"/uss/ion/ism/EgovConfmPopupNew.do\")\n\tpublic String selectConfmPopupNew() throws Exception{\n\t\treturn \"egovframework/com/uss/ion/ism/EgovConfmPopupNew\";\n\t}\n\n}",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovInfrmlSanctnController#selectConfmPopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "flowId": "flow:ANY /uss/ion/ism/EgovConfmPopup.do",
+      "line": 173,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 173,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/EgovConfmPopup.do\")"
+      },
+      "stepIds": [
+        "step:ANY /uss/ion/ism/EgovConfmPopup.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovInfrmlSanctnController#selectConfmPopupNew",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "flowId": "flow:ANY /uss/ion/ism/EgovConfmPopupNew.do",
+      "line": 197,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 197,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/EgovConfmPopupNew.do\")"
+      },
+      "stepIds": [
+        "step:ANY /uss/ion/ism/EgovConfmPopupNew.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovInfrmlSanctnController#selectReturnPopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "flowId": "flow:ANY /uss/ion/ism/EgovReturnPopup.do",
+      "line": 161,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 161,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/EgovReturnPopup.do\")"
+      },
+      "stepIds": [
+        "step:ANY /uss/ion/ism/EgovReturnPopup.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovInfrmlSanctnController#selectReturnPopupNew",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "flowId": "flow:ANY /uss/ion/ism/EgovReturnPopupNew.do",
+      "line": 185,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 185,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/EgovReturnPopupNew.do\")"
+      },
+      "stepIds": [
+        "step:ANY /uss/ion/ism/EgovReturnPopupNew.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovInfrmlSanctnController#selectInfrmlSanctn",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "flowId": "flow:ANY /uss/ion/ism/selectInfrmlSanctn.do",
+      "line": 133,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 133,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/selectInfrmlSanctn.do\")"
+      },
+      "stepIds": [
+        "step:ANY /uss/ion/ism/selectInfrmlSanctn.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "step:ANY /uss/ion/ism/selectInfrmlSanctn.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/ism/selectInfrmlSanctn.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uss/ion/ism/selectInfrmlSanctn.do:src/main/java/egovframework/com/uss/ion/ism/service/InfrmlSanctn.java",
+        "step:ANY /uss/ion/ism/selectInfrmlSanctn.do:src/main/java/egovframework/com/uss/ion/ism/service/EgovInfrmlSanctnService.java",
+        "step:ANY /uss/ion/ism/selectInfrmlSanctn.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovInfrmlSanctnController#selectSanctnerList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "flowId": "flow:ANY /uss/ion/ism/selectSanctnerList.do",
+      "line": 61,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 61,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/selectSanctnerList.do\")"
+      },
+      "stepIds": [
+        "step:ANY /uss/ion/ism/selectSanctnerList.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "step:ANY /uss/ion/ism/selectSanctnerList.do:src/main/java/egovframework/com/uss/ion/ism/service/SanctnerVO.java",
+        "step:ANY /uss/ion/ism/selectSanctnerList.do:src/main/java/egovframework/com/uss/ion/ism/service/EgovInfrmlSanctnService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovInfrmlSanctnController#selectSanctnerListNew",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "flowId": "flow:ANY /uss/ion/ism/selectSanctnerListNew.do",
+      "line": 97,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 97,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/selectSanctnerListNew.do\")"
+      },
+      "stepIds": [
+        "step:ANY /uss/ion/ism/selectSanctnerListNew.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "step:ANY /uss/ion/ism/selectSanctnerListNew.do:src/main/java/egovframework/com/uss/ion/ism/service/SanctnerVO.java",
+        "step:ANY /uss/ion/ism/selectSanctnerListNew.do:src/main/java/egovframework/com/uss/ion/ism/service/EgovInfrmlSanctnService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovInfrmlSanctnController#selectSanctnerListPopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "flowId": "flow:ANY /uss/ion/ism/selectSanctnerListPopup.do",
+      "line": 49,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 49,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/selectSanctnerListPopup.do\")"
+      },
+      "stepIds": [
+        "step:ANY /uss/ion/ism/selectSanctnerListPopup.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "header": {
+    "flowIndex": [
+      {
+        "entryPoint": "EgovInfrmlSanctnController#selectConfmPopup",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "flowId": "flow:ANY /uss/ion/ism/EgovConfmPopup.do",
+        "line": 173,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+          "line": 173,
+          "snippet": "@RequestMapping(\"/uss/ion/ism/EgovConfmPopup.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovInfrmlSanctnController#selectConfmPopupNew",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "flowId": "flow:ANY /uss/ion/ism/EgovConfmPopupNew.do",
+        "line": 197,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+          "line": 197,
+          "snippet": "@RequestMapping(\"/uss/ion/ism/EgovConfmPopupNew.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovInfrmlSanctnController#selectReturnPopup",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "flowId": "flow:ANY /uss/ion/ism/EgovReturnPopup.do",
+        "line": 161,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+          "line": 161,
+          "snippet": "@RequestMapping(\"/uss/ion/ism/EgovReturnPopup.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovInfrmlSanctnController#selectReturnPopupNew",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "flowId": "flow:ANY /uss/ion/ism/EgovReturnPopupNew.do",
+        "line": 185,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+          "line": 185,
+          "snippet": "@RequestMapping(\"/uss/ion/ism/EgovReturnPopupNew.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovInfrmlSanctnController#selectInfrmlSanctn",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "flowId": "flow:ANY /uss/ion/ism/selectInfrmlSanctn.do",
+        "line": 133,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+          "line": 133,
+          "snippet": "@RequestMapping(\"/uss/ion/ism/selectInfrmlSanctn.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovInfrmlSanctnController#selectSanctnerList",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "flowId": "flow:ANY /uss/ion/ism/selectSanctnerList.do",
+        "line": 61,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+          "line": 61,
+          "snippet": "@RequestMapping(\"/uss/ion/ism/selectSanctnerList.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovInfrmlSanctnController#selectSanctnerListNew",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "flowId": "flow:ANY /uss/ion/ism/selectSanctnerListNew.do",
+        "line": 97,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+          "line": 97,
+          "snippet": "@RequestMapping(\"/uss/ion/ism/selectSanctnerListNew.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovInfrmlSanctnController#selectSanctnerListPopup",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "flowId": "flow:ANY /uss/ion/ism/selectSanctnerListPopup.do",
+        "line": 49,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+          "line": 49,
+          "snippet": "@RequestMapping(\"/uss/ion/ism/selectSanctnerListPopup.do\")"
+        }
+      }
+    ]
+  },
+  "isHeaderChunk": true,
+  "key": "uss.ion.ism",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 173,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/EgovConfmPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "stepId": "step:ANY /uss/ion/ism/EgovConfmPopup.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 173,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/EgovConfmPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "stepId": "step:ANY /uss/ion/ism/EgovConfmPopupNew.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 173,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/EgovConfmPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "stepId": "step:ANY /uss/ion/ism/EgovReturnPopup.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 173,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/EgovConfmPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "stepId": "step:ANY /uss/ion/ism/EgovReturnPopupNew.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/ism/selectInfrmlSanctn.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /uss/ion/ism/selectInfrmlSanctn.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/ism/selectInfrmlSanctn.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/service/EgovInfrmlSanctnService.java",
+        "line": 16,
+        "snippet": "public interface EgovInfrmlSanctnService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/service/EgovInfrmlSanctnService.java",
+      "stepId": "step:ANY /uss/ion/ism/selectInfrmlSanctn.do:src/main/java/egovframework/com/uss/ion/ism/service/EgovInfrmlSanctnService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/service/InfrmlSanctn.java",
+        "line": 15,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/service/InfrmlSanctn.java",
+      "stepId": "step:ANY /uss/ion/ism/selectInfrmlSanctn.do:src/main/java/egovframework/com/uss/ion/ism/service/InfrmlSanctn.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 173,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/EgovConfmPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "stepId": "step:ANY /uss/ion/ism/selectInfrmlSanctn.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/service/EgovInfrmlSanctnService.java",
+        "line": 16,
+        "snippet": "public interface EgovInfrmlSanctnService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/service/EgovInfrmlSanctnService.java",
+      "stepId": "step:ANY /uss/ion/ism/selectSanctnerList.do:src/main/java/egovframework/com/uss/ion/ism/service/EgovInfrmlSanctnService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/service/SanctnerVO.java",
+        "line": 18,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/service/SanctnerVO.java",
+      "stepId": "step:ANY /uss/ion/ism/selectSanctnerList.do:src/main/java/egovframework/com/uss/ion/ism/service/SanctnerVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 173,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/EgovConfmPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "stepId": "step:ANY /uss/ion/ism/selectSanctnerList.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/service/EgovInfrmlSanctnService.java",
+        "line": 16,
+        "snippet": "public interface EgovInfrmlSanctnService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/service/EgovInfrmlSanctnService.java",
+      "stepId": "step:ANY /uss/ion/ism/selectSanctnerListNew.do:src/main/java/egovframework/com/uss/ion/ism/service/EgovInfrmlSanctnService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/service/SanctnerVO.java",
+        "line": 18,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/service/SanctnerVO.java",
+      "stepId": "step:ANY /uss/ion/ism/selectSanctnerListNew.do:src/main/java/egovframework/com/uss/ion/ism/service/SanctnerVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 173,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/EgovConfmPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "stepId": "step:ANY /uss/ion/ism/selectSanctnerListNew.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+        "line": 173,
+        "snippet": "@RequestMapping(\"/uss/ion/ism/EgovConfmPopup.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java",
+      "stepId": "step:ANY /uss/ion/ism/selectSanctnerListPopup.do:src/main/java/egovframework/com/uss/ion/ism/web/EgovInfrmlSanctnController.java"
+    }
+  ]
+}

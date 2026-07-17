@@ -1,0 +1,763 @@
+{
+  "domainId": "domain:uss.ion.rwd",
+  "files": [
+    {
+      "className": "ComDefaultCodeVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "slice": {
+        "endLine": 58,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------       --------    ---------------------------\n *   2009.3.11   이삼섭          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class ComDefaultCodeVO implements Serializable {\n    /** 코드 ID */\n    private String codeId = \"\";\n\n    /** 상세코드 */\n    private String code = \"\";\n\n    /** 코드명 */\n    private String codeNm = \"\";\n\n    /** 코드설명 */\n    private String codeDc = \"\";\n\n    /** 특정테이블명 */\n    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용\n\n    /** 상세 조건 여부 */\n    private String haveDetailCondition = \"N\";\n\n    /** 상세 조건 */\n    private String detailCondition = \"\";\n\n    /**\n     * toString 메소드를 대치한다.\n     */\n    public String toString() {\n    \treturn ToStringBuilder.reflectionToString(this);\n    }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovMessageSource",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovMessageSource.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이문준          최초 생성\n *   2017.07.21  장동한 \t\t\targs, locale 설정\n *\n * </pre>\n */\n\npublic class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {\n\n\tprivate ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;\n\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @param reloadableResourceBundleMessageSource - resource MessageSource\n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic void setReloadableResourceBundleMessageSource(ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource) {\n\t\tthis.reloadableResourceBundleMessageSource = reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic ReloadableResourceBundleMessageSource getReloadableResourceBundleMessageSource() {\n\t\treturn reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, locale);\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @return String\n\t */\t\n\tpublic String getMessageArgs(String code, Object[] args) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, locale);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "LoginVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/LoginVO.java — java 파일",
+        "tags": []
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 21,
+        "text": " *   2009.03.03     박지욱     최초 생성\n *   2021.05.30     정진오     디지털원패스 사용자키/세션값 추가\n *</pre>\n *\n *  @author 공통서비스 개발팀 박지욱\n *  @since 2009.03.03\n *  @version 1.0\n *  @see\n *\n */\n@Getter\n@Setter\npublic class LoginVO implements Serializable{\n\n\t/**\n\t *\n\t */\n\tprivate static final long serialVersionUID = -8274004534207618049L;\n\n\t/** 아이디 */\n\t@EgovNullCheck\n\tprivate String id;\n\t/** 이름 */\n\t@EgovNullCheck\n\tprivate String name;\n\t/** 주민등록번호 */\n\tprivate String ihidNum;\n\t/** 이메일주소 */\n\t@EgovNullCheck\n\t@EgovEmailCheck\n\tprivate String email;\n\t/** 비밀번호 */\n\tprivate String password;\n\t/** 비밀번호 힌트 */\n\t@EgovNullCheck\n\tprivate String passwordHint;\n\t/** 비밀번호 정답 */\n\t@EgovNullCheck\n\tprivate String passwordCnsr;\n\t/** 사용자구분 */\n\tprivate String userSe;\n\t/** 조직(부서)ID */\n\tprivate String orgnztId;\n\t/** 조직(부서)명 */\n\tprivate String orgnztNm;\n\t/** 고유아이디 */\n\tprivate String uniqId;\n\t/** 로그인 후 이동할 페이지 */\n\tprivate String url;\n\t/** 사용자 IP정보 */\n\tprivate String ip;\n\t/** GPKI인증 DN */\n\tprivate String dn;\n\t/** 디지털원패스 사용자키 */\n\tprivate String onepassUserkey;\n\t/** 디지털원패스 사용자세션값 */\n\tprivate String onepassIntfToken;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCmmUseService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "slice": {
+        "endLine": 60,
+        "startLine": 16,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이삼섭          최초 생성\n *   2025.07.16  이백행          2025년 컨트리뷰션 `throws Exception` 제거\n *\n *      </pre>\n */\npublic interface EgovCmmUseService {\n\n\t/**\n\t * 공통코드를 조회한다.\n\t *\n\t * @param comDefaultCodeVO\n\t * @return List(코드)\n\t */\n\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * ComDefaultCodeVO의 리스트를 받아서 여러개의 코드 리스트를 맵에 담아서 리턴한다.\n\t *\n\t * @param comDefaultCodeVOs\n\t * @return Map(코드)\n\t */\n\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);\n\n\t/**\n\t * 조직정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 조직정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * 그룹정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 그룹정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovFileMngService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java — java 파일",
+        "tags": []
+      },
+      "line": 21,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "slice": {
+        "endLine": 90,
+        "startLine": 11,
+        "text": " *    수정일       수정자         수정내용\n *    -------        -------     -------------------\n *    2009. 3. 25.     이삼섭    최초생성\n *\n * @author 공통 서비스 개발팀 이삼섭\n * @since 2009. 3. 25.\n * @version\n * @see\n *\n */\npublic interface EgovFileMngService {\n\n    /**\n     * 파일에 대한 목록을 조회한다.\n     *\n     * @param fvo\n     * @return\n     * @throws Exception\n     */\n    public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;\n\n    /**\n     * 하나의 파일에 대한 정보(속성 및 상세)를 등록한다.\n     *\n     * @param fvo\n     * @throws Exception\n     */\n    public String insertFileInf(FileVO fvo) throws Exception;\n\n    /**\n     * 여러 개의 파일에 대한 정보(속성 및 상세)를 등록한다.\n     *\n     * @param fvoList\n     * @throws Exception\n     */\n    public String insertFileInfs(List<FileVO> fvoList) throws Exception;\n\n    /**\n     * 여러 개의 파일에 대한 정보(속성 및 상세)를 수정한다.\n     *\n     * @param fvoList\n     * @throws Exception\n     */\n    public void updateFileInfs(List<FileVO> fvoList) throws Exception;\n\n    /**\n     * 여러 개의 파일을 삭제한다.\n     *\n     * @param fvoList\n     * @throws Exception\n     */\n    public void deleteFileInfs(List<FileVO> fvoList) throws Exception;\n\n    /**\n     * 하나의 파일을 삭제한다.\n     *\n     * @param fvo\n     * @throws Exception\n     */\n    public void deleteFileInf(FileVO fvo) throws Exception;\n\n    /**\n     * 파일에 대한 상세정보를 조회한다.\n     *\n     * @param fvo\n     * @return\n     * @throws Exception\n     */\n    public FileVO selectFileInf(FileVO fvo) throws Exception;\n\n    /**\n     * 파일 구분자에 대한 최대값을 구한다.\n     *\n     * @param fvo\n     * @return\n     * @throws Exception\n     */\n    public int getMaxFileSN(FileVO fvo) throws Exception;\n\n    /**",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovFileMngUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 60,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "slice": {
+        "endLine": 129,
+        "startLine": 50,
+        "text": " *   2009.02.13  이삼섭          최초 생성\n *   2011.08.09  서준식          utl.fcc패키지와 Dependency제거를 위해 getTimeStamp()메서드 추가\n *   2017.03.03  조성원          시큐어코딩(ES)-부적절한 예외 처리[CWE-253, CWE-440, CWE-754]\n *   2020.10.26  신용호          parseFileInf(List<MultipartFile> files ...) 추가\n *   2022.11.11  김혜준          시큐어코딩 처리\n *   2024.12.04  신용호          downFile() KISA 시큐어코딩 처리\n *   2025.05.26  이백행          PMD로 소프트웨어 보안약점 진단하고 제거하기-FormalParameterNamingConventions(공식 매개변수 명명 규칙), CloseResource(리소스 닫기), LocalVariableNamingConventions(지역 변수 명명 규칙), AssignmentInOperand(피연산자의 할당)\n * \n *      </pre>\n */\n@Component(\"EgovFileMngUtil\")\npublic class EgovFileMngUtil {\n\n\tprivate static final Logger LOGGER = LoggerFactory.getLogger(EgovFileMngUtil.class);\n\tprivate static final String FILE_STORE_PATH = EgovProperties.getProperty(\"Globals.fileStorePath\");\n\n\t@Resource(name = \"egovFileIdGnrService\")\n\tprivate EgovIdGnrService idgenService;\n\n\t/**\n\t * 첨부파일에 대한 목록 정보를 취득한다.\n\t *\n\t * @param files\n\t * @return\n\t * @throws Exception\n\t */\n\tpublic List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam,\n\t\t\tString atchFileId, String storePath) throws Exception {\n\t\tint fileKey = fileKeyParam;\n\n\t\tString storePathString = \"\";\n\t\tString atchFileIdString = \"\";\n\n\t\tif (storePath == null || \"\".equals(storePath)) {\n\t\t\tstorePathString = EgovProperties.getProperty(\"Globals.fileStorePath\");\n\t\t} else {\n\t\t\tstorePathString = EgovProperties.getProperty(storePath);\n\t\t}\n\n\t\tif (atchFileId == null || \"\".equals(atchFileId)) {\n\t\t\tatchFileIdString = idgenService.getNextStringId();\n\t\t} else {\n\t\t\tatchFileIdString = atchFileId;\n\t\t}\n\n\t\tFile saveFolder = new File(EgovWebUtil.filePathBlackList(storePathString));\n\n\t\tif (!saveFolder.exists() || saveFolder.isFile()) {\n\t\t\t// 2017.03.03 조성원 시큐어코딩(ES)-부적절한 예외 처리[CWE-253, CWE-440, CWE-754]\n\t\t\tif (saveFolder.mkdirs()) {\n\t\t\t\tLOGGER.debug(\"[file.mkdirs] saveFolder : Creation Success \");\n\t\t\t} else {\n\t\t\t\tLOGGER.error(\"[file.mkdirs] saveFolder : Creation Fail \");\n\t\t\t}\n\t\t}\n\n\t\tIterator<Entry<String, MultipartFile>> itr = files.entrySet().iterator();\n\t\tMultipartFile file;\n\t\tList<FileVO> result = new ArrayList<FileVO>();\n\t\tFileVO fvo;\n\n\t\twhile (itr.hasNext()) {\n\t\t\tEntry<String, MultipartFile> entry = itr.next();\n\t\t\tfile = entry.getValue();\n\t\t\tString orginFileName = file.getOriginalFilename();\n\t\t\tif (StringUtils.isEmpty(orginFileName)) {\n\t\t\t\tcontinue;\n\t\t\t}\n\n\t\t\t// 2022.11.11 시큐어코딩 처리\n\t\t\tString fileExt = FilenameUtils.getExtension(orginFileName).toUpperCase();\n\t\t\tString newName = keyStr + getTimeStamp() + fileKey;\n\t\t\tlong size = file.getSize();\n\t\t\tString filePath = storePathString + File.separator + newName;\n\t\t\tfile.transferTo(new File(EgovWebUtil.filePathBlackList(filePath)));\n\n\t\t\tfvo = new FileVO();\n\t\t\tfvo.setFileExtsn(fileExt);\n\t\t\tfvo.setFileStreCours(storePathString);\n\t\t\tfvo.setFileMg(Long.toString(size));",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "slice": {
+        "endLine": 27,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.service;\n\nimport java.util.List;\n\npublic interface EgovUserDetailsService {\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic Object getAuthenticatedUser();\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t * 예) [ROLE_ADMIN, ROLE_USER, ROLE_A, ROLE_B, ROLE_RESTRICTED, IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED_ANONYMOUSLY]\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic List<String> getAuthorities();\n\t\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\t\n\t */\n\tpublic Boolean isAuthenticated(); \n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "FileVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/FileVO.java — java 파일",
+        "tags": []
+      },
+      "line": 20,
+      "relPath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "slice": {
+        "endLine": 89,
+        "startLine": 10,
+        "text": " *    수정일       수정자         수정내용\n *    -------        -------     -------------------\n *    2009. 3. 25.     이삼섭\n *\n * @author 공통 서비스 개발팀 이삼섭\n * @since 2009. 3. 25.\n * @version\n * @see\n *\n */\n@SuppressWarnings(\"serial\")\npublic class FileVO extends ComDefaultVO {\n\n    /**\n     * 첨부파일 아이디\n     */\n    public String atchFileId = \"\";\n    /**\n     * 생성일자\n     */\n    public String creatDt = \"\";\n    /**\n     * 파일내용\n     */\n    public String fileCn = \"\";\n    /**\n     * 파일확장자\n     */\n    public String fileExtsn = \"\";\n    /**\n     * 파일크기\n     */\n    public String fileMg = \"\";\n    /**\n     * 파일연번\n     */\n    public String fileSn = \"\";\n    /**\n     * 파일저장경로\n     */\n    public String fileStreCours = \"\";\n    /**\n     * 원파일명\n     */\n    public String orignlFileNm = \"\";\n    /**\n     * 저장파일명\n     */\n    public String streFileNm = \"\";\n\n    /**\n     * atchFileId attribute를 리턴한다.\n     * \n     * @return the atchFileId\n     */\n    public String getAtchFileId() {\n\treturn atchFileId;\n    }\n\n    /**\n     * atchFileId attribute 값을 설정한다.\n     * \n     * @param atchFileId\n     *            the atchFileId to set\n     */\n    public void setAtchFileId(String atchFileId) {\n\tthis.atchFileId = atchFileId;\n    }\n\n    /**\n     * creatDt attribute를 리턴한다.\n     * \n     * @return the creatDt\n     */\n    public String getCreatDt() {\n\treturn creatDt;\n    }\n\n    /**\n     * creatDt attribute 값을 설정한다.",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "slice": {
+        "endLine": 62,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n *   2009.03.10  sjyoon         최초 생성\n *   2011.07.01\t 서준식          interface 생성후 상세 로직의 분리\n * </pre>\n */\n\npublic class EgovUserDetailsHelper {\n\n\tstatic EgovUserDetailsService egovUserDetailsService;\n\n\tpublic EgovUserDetailsService getEgovUserDetailsService() {\n\t\treturn egovUserDetailsService;\n\t}\n\n\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {\n\t\tEgovUserDetailsHelper.egovUserDetailsService = egovUserDetailsService;\n\t}\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic static Object getAuthenticatedUser() {\n\t\treturn egovUserDetailsService.getAuthenticatedUser();\n\t}\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t *\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic static List<String> getAuthorities() {\n\t\treturn egovUserDetailsService.getAuthorities();\n\t}\n\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\n\t */\n\tpublic static Boolean isAuthenticated() {\n\t\treturn egovUserDetailsService.isAuthenticated();\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovRwardManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 16,
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+      "slice": {
+        "endLine": 78,
+        "startLine": 6,
+        "text": " * 개요\n * - 포상관리에 대한 Service Interface를 정의한다.\n * \n * 상세내용\n * - 포상관리에 대한 등록, 수정, 삭제, 조회, 승인처리 기능을 제공한다.\n * - 포상관리의 조회기능은 목록조회, 상세조회로 구분된다.\n * @author 이용\n * @version 1.0\n * @created 06-15-2010 오후 2:08:56\n */\npublic interface EgovRwardManageService {\n\n\t/**\n\t * 포상관리 정보를 관리하기 위해 등록된 로그인화면이미지 목록을 조회한다.\n\t * @param rwardManageVO - 포상관리 VO\n\t * @return List - 포상관리 목록\n\t */\n\tpublic List<RwardManageVO> selectRwardManageList(RwardManageVO rwardManageVO) throws Exception;\n\n\t/**\n\t * 포상관리 목록 총 개수를 조회한다.\n\t * @param rwardManageVO - 포상관리 VO\n\t * @return int - 포상관리 카운트 수\n\t */\n\tpublic int selectRwardManageListTotCnt(RwardManageVO rwardManageVO) throws Exception ;\n\t\n\t/**\n\t * 등록된 포상관리의 상세정보를 조회한다.\n\t * @param rwardManageVO - 포상관리 VO\n\t * @return RwardManageVO - 포상관리 VO\n\t */\n\tpublic RwardManageVO selectRwardManage(RwardManageVO rwardManageVO) throws Exception;\n\n\t/**\n\t * 포상관리 정보를 신규로 등록한다.\n\t * @param rwardManage - 포상관리 model\n\t */\n\tpublic void insertRwardManage(RwardManage rwardManage) throws Exception;\n\n\t/**\n\t * 기 등록된 포상관리 정보를 수정한다.\n\t * @param rwardManage - 포상관리 model\n\t */\n\tpublic void updtRwardManage(RwardManage rwardManage) throws Exception;\n\n\t/**\n\t * 기 등록된 포상관리 정보를 삭제한다.\n\t * @param rwardManage - 포상관리 model\n\t */\n\tpublic void deleteRwardManage(RwardManage rwardManage) throws Exception;\n\n    /*** 승인처리관련 ***/\n\t/**\n\t * 포상관리정보 승인 처리를 위해 신청된 포상관리 목록을 조회한다.\n\t * @param rwardManageVO - 포상관리 VO\n\t * @return List - 포상관리 목록\n\t */\n\tpublic List<RwardManageVO> selectRwardManageConfmList(RwardManageVO rwardManageVO) throws Exception;\n\n\t/**\n\t * 포상관리정보 승인 처리를 위해 신청된 포상관리 목록 총 개수를 조회한다.\n\t * @param rwardManageVO - 포상관리 VO\n\t * @return int - 포상관리 카운트 수\n\t */\n\tpublic int selectRwardManageConfmListTotCnt(RwardManageVO rwardManageVO) throws Exception ;\n\t\n\t/**\n\t * 포상정보를 승인/반려처리 한다.\n\t * @param rwardManage - 포상관리 model\n\t */\n\tpublic void updtRwardManageConfm(RwardManage rwardManage) throws Exception;\n\t\n}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "RwardManage",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java — java 파일",
+        "tags": []
+      },
+      "line": 29,
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java",
+      "slice": {
+        "endLine": 98,
+        "startLine": 19,
+        "text": " * == 개정이력(Modification Information) ==\n *\n *   수정일       수정자          수정내용\n *  ----------   --------   ---------------------------\n *   2010.06.15  이용\t\t\t최초 생성\n *   2024.10.29  권태성\t\t\t포상자 소속을 처리할 변수와 getter, setter 추가\n *  \n * </pre>\n */\n\npublic class RwardManage extends ComDefaultVO {\n\n\t/**\n\t* serialVersionUID\n\t*/\n\tprivate static final long serialVersionUID = 1L;\n\n\t/**\n\t*  포상ID\t      \n\t*/ \n\tprivate String rwardId;\n\t\n\t/**\n\t*  포상자ID\t      \n\t*/ \n\tprivate String rwardManId;\n\t\n\t/**\n\t*  포상자명\t      \n\t*/ \n\t@EgovNullCheck\n\tprivate String rwardManNm;\n\n\t/**\n\t * 포상자 소속\n\t */\n\tprivate String rwardManOrgnztNm;\n\t\n\tpublic String getRwardManNm() {\n\t\treturn rwardManNm;\n\t}\n\n\tpublic void setRwardManNm(String rwardManNm) {\n\t\tthis.rwardManNm = rwardManNm;\n\t}\n\n\t/**\n\t*  포상코드\t      \n\t*/ \n\t@EgovNullCheck\n\tprivate String rwardCd;\n\n\t/**\n\t*  포상일자\t      \n\t*/ \n\t@EgovNullCheck\n\t@Size(max=10)\n\t@Pattern(regexp=\"^\\\\d{4}-\\\\d{2}-\\\\d{2}$\", message=\"{validation.pattern.date}\")\n\tprivate String rwardDe;\n\n\t/**\n\t*  포상명\n\t*/ \n\t@EgovNullCheck\n\t@Size(max=255)\n\tprivate String rwardNm;\n\t\n\t/**\n\t*  공적내용\t      \n\t*/ \n\t@EgovNullCheck\n\t@Size(max=1000)\n\tprivate String pblenCn;\n\n\t/**\n\t*  결재자ID\t      \n\t*/ \n\t@EgovNullCheck\n\tprivate String sanctnerId;\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "RwardManageVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java — java 파일",
+        "tags": []
+      },
+      "line": 19,
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 9,
+        "text": "/**\n * 개요\n * - 포상관리에 대한 Vo 클래스를 정의한다.\n *\n * 상세내용\n * - 포상관리의 목록 항목을 관리한다.\n * @author 이용\n * @version 1.0\n * @created 06-15-2010 오후 2:08:56\n */\n@Getter\n@Setter\npublic class RwardManageVO extends RwardManage implements Serializable {\n\n\t/**\n\t * serialVersionUID\n\t */\n\tprivate static final long serialVersionUID = 1L;\n\n\t/**\n\t * 포상자 목록\n\t */\n\tList<RwardManageVO> rwardManageList;\n\n\t/**\n\t*  포상자명\n\t*/\n\tprivate String rwardManNm;\n\n\t/**\n\t*  승인자명\n\t*/\n\tprivate String sanctnerNm;\n\n\t/**\n\t*  포상코드명\n\t*/\n\tprivate String rwardCdNm;\n\n\t/**\n\t*  사용자 소속명\n\t*/\n\tprivate String orgnztNm;\n\n\t/**\n\t*  승인자 소속명\n\t*/\n\tprivate String sanctnerOrgnztNm;\n\n\t/**\n\t*  검색시작일자\n\t*/\n\tprivate String searchFromDate;\n\n\t/**\n\t*  검색종료일자\n\t*/\n\tprivate String searchToDate;\n\n\t/**\n\t*  검색 성명\n\t*/\n\tprivate String searchNm;\n\n\t/**\n\t*  검색 진행구분\n\t*/\n\tprivate String searchConfmAt;\n\n\t/**\n\t*  searchToDateView\n\t*/\n\tprivate String searchToDateView;\n\n\t/**\n\t*  searchFromDateView\n\t*/\n\tprivate String searchFromDateView;\n\n}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovRwardManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 371,
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "slice": {
+        "endLine": 429,
+        "startLine": 361,
+        "text": "\n\t\treturn \"egovframework/com/uss/ion/rwd/EgovRwardConfmList\";\n\t}\n\n\t/**\n\t * 포상승인관리 상세정보를 조회한다.\n\t * \n\t * @param rwardManageVO - 포상관리 VO\n\t * @return String - 리턴 Url\n\t */\n\t@RequestMapping(value = \"/uss/ion/rwd/EgovRwardConfm.do\")\n\tpublic String selectRwardConfm(@ModelAttribute(\"rwardManageVO\") RwardManageVO rwardManageVO,\n\t\t\t@ModelAttribute(\"rwardManage\") RwardManage rwardManage, ModelMap model) throws Exception {\n\t\trwardManageVO.setRwardDe(EgovStringUtil.removeMinusChar(rwardManageVO.getRwardDe()));\n\n\t\t// 등록 상세정보\n\t\tRwardManageVO rwardManageVOTemp = egovRwardManageService.selectRwardManage(rwardManageVO);\n\n\t\tRwardManage rwardManageTemp = new RwardManage();\n\n\t\trwardManageTemp.setRwardId(rwardManageVOTemp.getRwardId());\n\t\trwardManageTemp.setRwardNm(rwardManageVOTemp.getRwardNm());\n\t\trwardManageTemp.setPblenCn(rwardManageVOTemp.getPblenCn());\n\t\trwardManageTemp.setRwardManId(rwardManageVOTemp.getRwardManId());\n\t\trwardManageTemp.setRwardCd(rwardManageVOTemp.getRwardCd());\n\t\trwardManageTemp.setRwardDe(rwardManageVOTemp.getRwardDe());\n\t\trwardManageTemp.setSanctnerId(rwardManageVOTemp.getSanctnerId());\n\t\trwardManageTemp.setInfrmlSanctnId(rwardManageVOTemp.getInfrmlSanctnId());\n\n\t\tmodel.addAttribute(\"rwardManage\", rwardManageTemp);\n\t\tmodel.addAttribute(\"rwardManageVO\", rwardManageVOTemp);\n\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));\n\n\t\treturn \"egovframework/com/uss/ion/rwd/EgovRwardConfm\";\n\t}\n\n\t/**\n\t * 신청된 포상을 승인처리한다.\n\t * \n\t * @param rwardManage - 포상관리 model\n\t * @return String - 리턴 Url\n\t */\n\t@RequestMapping(value = \"/uss/ion/rwd/updtRwardConfm.do\")\n\tpublic String updtRwardManageConfm(@ModelAttribute(\"rwardManage\") RwardManage rwardManage,\n\t\t\tBindingResult bindingResult, SessionStatus status, ModelMap model) throws Exception {\n\n\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();\n\t\t// KISA 보안취약점 조치 (2018-12-10, 신용호)\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\n\t\tif (!isAuthenticated) {\n\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";\n\t\t}\n\n\t\tif (bindingResult.hasErrors()) {\n\t\t\tmodel.addAttribute(\"rwardManageVO\", rwardManage);\n\t\t\treturn \"egovframework/com/uss/ion/vct/EgovRwardConfm\";\n\t\t} else {\n\n\t\t\trwardManage.setSanctnerId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());\n\t\t\trwardManage.setLastUpdusrId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());\n\t\t\trwardManage.setRwardDe(EgovStringUtil.removeMinusChar(rwardManage.getRwardDe()));\n\n\t\t\tegovRwardManageService.updtRwardManageConfm(rwardManage);\n\t\t\treturn \"forward:/uss/ion/rwd/EgovRwardConfmList.do\";\n\t\t}\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovStringUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 43,
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "slice": {
+        "endLine": 112,
+        "startLine": 33,
+        "text": " * See the License for the specific language governing permissions and\n * limitations under the License.\n */\nimport java.io.UnsupportedEncodingException;\nimport java.math.BigDecimal;\nimport java.security.SecureRandom;\nimport java.sql.Timestamp;\nimport java.text.SimpleDateFormat;\nimport java.util.Locale;\n\npublic class EgovStringUtil {\n\t/**\n\t * 빈 문자열 <code>\"\"</code>.\n\t */\n\tpublic static final String EMPTY = \"\";\n\n\t// 221116\t김혜준\t2022 시큐어코딩 조치\n\tprivate static SecureRandom rnd = new SecureRandom();\n\n\t/**\n\t * <p>Padding을 할 수 있는 최대 수치</p>\n\t */\n\t// private static final int PAD_LIMIT = 8192;\n\n\t/**\n\t * <p>An array of <code>String</code>s used for padding.</p>\n\t * <p>Used for efficient space padding. The length of each String expands as needed.</p>\n\t */\n\t/*\n\tprivate static final String[] PADDING = new String[Character.MAX_VALUE];\n\n\tstatic {\n\t\t// space padding is most common, start with 64 chars\n\t\tPADDING[32] = \"                                                                \";\n\t}\n\t */\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 지정한길이에다가 해당 문자열을 붙여주는 메서드.\n\t * @param source 원본 문자열 배열\n\t * @param output 더할문자열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, String output, int slength) {\n\t\tString returnVal = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\treturnVal = source.substring(0, slength) + output;\n\t\t\t} else {\n\t\t\t\treturnVal = source;\n\t\t\t}\n\t\t}\n\t\treturn returnVal;\n\t}\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 해당 문자열을 삭제하는 메서드\n\t * @param source 원본 문자열 배열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, int slength) {\n\t\tString result = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\tresult = source.substring(0, slength);\n\t\t\t} else {\n\t\t\t\tresult = source;\n\t\t\t}\n\t\t}\n\t\treturn result;\n\t}\n\n\t/**\n\t * <p>\n\t * String이 비었거나(\"\") 혹은 null 인지 검증한다.\n\t * </p>\n\t *\n\t * <pre>",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovRwardManageController#selectRwardConfm",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "flowId": "flow:ANY /uss/ion/rwd/EgovRwardConfm.do",
+      "line": 371,
+      "stepIds": [
+        "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+        "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java",
+        "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+        "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java",
+        "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovRwardManageController#selectRwardManageConfmList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "flowId": "flow:ANY /uss/ion/rwd/EgovRwardConfmList.do",
+      "line": 326,
+      "stepIds": [
+        "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+        "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java",
+        "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+        "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovRwardManageController#selectRwardManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "flowId": "flow:ANY /uss/ion/rwd/EgovRwardManageDetail.do",
+      "line": 144,
+      "stepIds": [
+        "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+        "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java",
+        "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+        "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java",
+        "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovRwardManageController#selectRwardManageListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "flowId": "flow:ANY /uss/ion/rwd/EgovRwardManageListView.do",
+      "line": 85,
+      "stepIds": [
+        "step:ANY /uss/ion/rwd/EgovRwardManageListView.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+        "step:ANY /uss/ion/rwd/EgovRwardManageListView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/ion/rwd/EgovRwardManageListView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovRwardManageController#insertViewRwardManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "flowId": "flow:ANY /uss/ion/rwd/EgovRwardRegist.do",
+      "line": 187,
+      "stepIds": [
+        "step:ANY /uss/ion/rwd/EgovRwardRegist.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+        "step:ANY /uss/ion/rwd/EgovRwardRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/ion/rwd/EgovRwardRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovRwardManageController#deleteRwardManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "flowId": "flow:ANY /uss/ion/rwd/deleteRwardManage.do",
+      "line": 295,
+      "stepIds": [
+        "step:ANY /uss/ion/rwd/deleteRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+        "step:ANY /uss/ion/rwd/deleteRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java",
+        "step:ANY /uss/ion/rwd/deleteRwardManage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /uss/ion/rwd/deleteRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+        "step:ANY /uss/ion/rwd/deleteRwardManage.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+        "step:ANY /uss/ion/rwd/deleteRwardManage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+        "step:ANY /uss/ion/rwd/deleteRwardManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovRwardManageController#insertRwardManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "flowId": "flow:ANY /uss/ion/rwd/insertRwardManage.do",
+      "line": 204,
+      "stepIds": [
+        "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+        "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+        "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+        "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java",
+        "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+        "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovRwardManageController#selectRwardManageList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "flowId": "flow:ANY /uss/ion/rwd/selectRwardManageList.do",
+      "line": 105,
+      "stepIds": [
+        "step:ANY /uss/ion/rwd/selectRwardManageList.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+        "step:ANY /uss/ion/rwd/selectRwardManageList.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java",
+        "step:ANY /uss/ion/rwd/selectRwardManageList.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+        "step:ANY /uss/ion/rwd/selectRwardManageList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/ion/rwd/selectRwardManageList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /uss/ion/rwd/selectRwardManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovRwardManageController#updtRwardManageConfm",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "flowId": "flow:ANY /uss/ion/rwd/updtRwardConfm.do",
+      "line": 403,
+      "stepIds": [
+        "step:ANY /uss/ion/rwd/updtRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+        "step:ANY /uss/ion/rwd/updtRwardConfm.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/rwd/updtRwardConfm.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/rwd/updtRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java",
+        "step:ANY /uss/ion/rwd/updtRwardConfm.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /uss/ion/rwd/updtRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+        "step:ANY /uss/ion/rwd/updtRwardConfm.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovRwardManageController#updtRwardManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "flowId": "flow:ANY /uss/ion/rwd/updtRwardManage.do",
+      "line": 245,
+      "stepIds": [
+        "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+        "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java",
+        "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+        "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+        "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+        "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "uss.ion.rwd",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardManageDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardManageListView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardManageListView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardManageListView.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "stepId": "step:ANY /uss/ion/rwd/EgovRwardRegist.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/rwd/deleteRwardManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "stepId": "step:ANY /uss/ion/rwd/deleteRwardManage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "stepId": "step:ANY /uss/ion/rwd/deleteRwardManage.do:src/main/java/egovframework/com/cmm/service/FileVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+      "stepId": "step:ANY /uss/ion/rwd/deleteRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java",
+      "stepId": "step:ANY /uss/ion/rwd/deleteRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "stepId": "step:ANY /uss/ion/rwd/deleteRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /uss/ion/rwd/deleteRwardManage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "stepId": "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "stepId": "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+      "stepId": "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java",
+      "stepId": "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "stepId": "step:ANY /uss/ion/rwd/insertRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /uss/ion/rwd/selectRwardManageList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/rwd/selectRwardManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /uss/ion/rwd/selectRwardManageList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+      "stepId": "step:ANY /uss/ion/rwd/selectRwardManageList.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java",
+      "stepId": "step:ANY /uss/ion/rwd/selectRwardManageList.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "stepId": "step:ANY /uss/ion/rwd/selectRwardManageList.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /uss/ion/rwd/updtRwardConfm.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /uss/ion/rwd/updtRwardConfm.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/rwd/updtRwardConfm.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+      "stepId": "step:ANY /uss/ion/rwd/updtRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java",
+      "stepId": "step:ANY /uss/ion/rwd/updtRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "stepId": "step:ANY /uss/ion/rwd/updtRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /uss/ion/rwd/updtRwardConfm.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "stepId": "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "stepId": "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "stepId": "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/cmm/service/FileVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java",
+      "stepId": "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java",
+      "stepId": "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java",
+      "stepId": "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /uss/ion/rwd/updtRwardManage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    }
+  ]
+}

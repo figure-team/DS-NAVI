@@ -1,0 +1,931 @@
+{
+  "domainId": "domain:uss.ion.evt",
+  "files": [
+    {
+      "className": "ComDefaultCodeVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "slice": {
+        "endLine": 58,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------       --------    ---------------------------\n *   2009.3.11   이삼섭          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class ComDefaultCodeVO implements Serializable {\n    /** 코드 ID */\n    private String codeId = \"\";\n\n    /** 상세코드 */\n    private String code = \"\";\n\n    /** 코드명 */\n    private String codeNm = \"\";\n\n    /** 코드설명 */\n    private String codeDc = \"\";\n\n    /** 특정테이블명 */\n    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용\n\n    /** 상세 조건 여부 */\n    private String haveDetailCondition = \"N\";\n\n    /** 상세 조건 */\n    private String detailCondition = \"\";\n\n    /**\n     * toString 메소드를 대치한다.\n     */\n    public String toString() {\n    \treturn ToStringBuilder.reflectionToString(this);\n    }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovMessageSource",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovMessageSource.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "slice": {
+        "endLine": 88,
+        "startLine": 16,
+        "text": " * << 개정이력(Modification Information) >>\n *   \n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이문준          최초 생성\n *   2017.07.21  장동한 \t\t\targs, locale 설정\n *\n * </pre>\n */\n\npublic class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {\n\n\tprivate ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;\n\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @param reloadableResourceBundleMessageSource - resource MessageSource\n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic void setReloadableResourceBundleMessageSource(ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource) {\n\t\tthis.reloadableResourceBundleMessageSource = reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * getReloadableResourceBundleMessageSource() \n\t * @return ReloadableResourceBundleMessageSource\n\t */\t\n\tpublic ReloadableResourceBundleMessageSource getReloadableResourceBundleMessageSource() {\n\t\treturn reloadableResourceBundleMessageSource;\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessage(String code, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, locale);\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @return String\n\t */\t\n\tpublic String getMessageArgs(String code, Object[] args) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, Locale.getDefault());\n\t}\n\t\n\t/**\n\t * 정의된 메세지 조회\n\t * @param code - 메세지 코드\n\t * @param args - 매개변수\n\t * @param locale - 로케일\n\t * @return String\n\t */\t\n\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {\n\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, args, locale);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "LoginVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/LoginVO.java — java 파일",
+        "tags": []
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 21,
+        "text": " *   2009.03.03     박지욱     최초 생성\n *   2021.05.30     정진오     디지털원패스 사용자키/세션값 추가\n *</pre>\n *\n *  @author 공통서비스 개발팀 박지욱\n *  @since 2009.03.03\n *  @version 1.0\n *  @see\n *\n */\n@Getter\n@Setter\npublic class LoginVO implements Serializable{\n\n\t/**\n\t *\n\t */\n\tprivate static final long serialVersionUID = -8274004534207618049L;\n\n\t/** 아이디 */\n\t@EgovNullCheck\n\tprivate String id;\n\t/** 이름 */\n\t@EgovNullCheck\n\tprivate String name;\n\t/** 주민등록번호 */\n\tprivate String ihidNum;\n\t/** 이메일주소 */\n\t@EgovNullCheck\n\t@EgovEmailCheck\n\tprivate String email;\n\t/** 비밀번호 */\n\tprivate String password;\n\t/** 비밀번호 힌트 */\n\t@EgovNullCheck\n\tprivate String passwordHint;\n\t/** 비밀번호 정답 */\n\t@EgovNullCheck\n\tprivate String passwordCnsr;\n\t/** 사용자구분 */\n\tprivate String userSe;\n\t/** 조직(부서)ID */\n\tprivate String orgnztId;\n\t/** 조직(부서)명 */\n\tprivate String orgnztNm;\n\t/** 고유아이디 */\n\tprivate String uniqId;\n\t/** 로그인 후 이동할 페이지 */\n\tprivate String url;\n\t/** 사용자 IP정보 */\n\tprivate String ip;\n\t/** GPKI인증 DN */\n\tprivate String dn;\n\t/** 디지털원패스 사용자키 */\n\tprivate String onepassUserkey;\n\t/** 디지털원패스 사용자세션값 */\n\tprivate String onepassIntfToken;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCmmUseService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "slice": {
+        "endLine": 60,
+        "startLine": 16,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이삼섭          최초 생성\n *   2025.07.16  이백행          2025년 컨트리뷰션 `throws Exception` 제거\n *\n *      </pre>\n */\npublic interface EgovCmmUseService {\n\n\t/**\n\t * 공통코드를 조회한다.\n\t *\n\t * @param comDefaultCodeVO\n\t * @return List(코드)\n\t */\n\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * ComDefaultCodeVO의 리스트를 받아서 여러개의 코드 리스트를 맵에 담아서 리턴한다.\n\t *\n\t * @param comDefaultCodeVOs\n\t * @return Map(코드)\n\t */\n\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);\n\n\t/**\n\t * 조직정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 조직정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * 그룹정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 그룹정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "slice": {
+        "endLine": 27,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.service;\n\nimport java.util.List;\n\npublic interface EgovUserDetailsService {\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic Object getAuthenticatedUser();\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t * 예) [ROLE_ADMIN, ROLE_USER, ROLE_A, ROLE_B, ROLE_RESTRICTED, IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED_ANONYMOUSLY]\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic List<String> getAuthorities();\n\t\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\t\n\t */\n\tpublic Boolean isAuthenticated(); \n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovUserDetailsHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "slice": {
+        "endLine": 62,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n *   2009.03.10  sjyoon         최초 생성\n *   2011.07.01\t 서준식          interface 생성후 상세 로직의 분리\n * </pre>\n */\n\npublic class EgovUserDetailsHelper {\n\n\tstatic EgovUserDetailsService egovUserDetailsService;\n\n\tpublic EgovUserDetailsService getEgovUserDetailsService() {\n\t\treturn egovUserDetailsService;\n\t}\n\n\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {\n\t\tEgovUserDetailsHelper.egovUserDetailsService = egovUserDetailsService;\n\t}\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic static Object getAuthenticatedUser() {\n\t\treturn egovUserDetailsService.getAuthenticatedUser();\n\t}\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t *\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic static List<String> getAuthorities() {\n\t\treturn egovUserDetailsService.getAuthorities();\n\t}\n\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\n\t */\n\tpublic static Boolean isAuthenticated() {\n\t\treturn egovUserDetailsService.isAuthenticated();\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovEventManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 17,
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "slice": {
+        "endLine": 86,
+        "startLine": 7,
+        "text": " * - 행사관리에 대한 Service Interface를 정의한다.\n * \n * 상세내용\n * - 행사관리에 대한 등록, 수정, 삭제, 조회, 반영확인 기능을 제공한다.\n * - 행사관리의 조회기능은 목록조회, 상세조회로 구분된다.\n * @author 이용\n * @version 1.0\n * @created 06-15-2010 오후 2:08:56\n */\n\npublic interface EgovEventManageService {\n\n\t/**\n\t * 행사관리 정보를 관리하기 위해 등록된 행사목록을 조회한다.\n\t * @param eventManageVO - 행사관리 VO\n\t * @return List - 행사관리 목록\n\t */\n\tpublic List<EventManageVO> selectEventManageList(EventManageVO eventManageVO) throws Exception;\n\n\t/**\n\t * 행사관리 목록 총 개수를 조회한다.\n\t * @param eventManageVO - 행사관리 VO\n\t * @return int - 행사관리 카운트 수\n\t */\n\tpublic int selectEventManageListTotCnt(EventManageVO eventManageVO) throws Exception ;\n\t\n\t/**\n\t * 등록된 행사관리의 상세정보를 조회한다.\n\t * @param eventManageVO - 행사관리 VO\n\t * @return EventManageVO - 행사관리 VO\n\t */\n\tpublic EventManageVO selectEventManage(EventManageVO eventManageVO) throws Exception;\n\n\t/**\n\t * 행사관리 정보를 신규로 등록한다.\n\t * @param eventManage - 행사관리 model\n\t */\n\tpublic void insertEventManage(EventManage eventManage) throws Exception;\n\n\t/**\n\t * 기 등록된 행사관리 정보를 수정한다.\n\t * @param eventManage - 행사관리 model\n\t */\n\tpublic void updtEventManage(EventManage eventManage) throws Exception;\n\n\t/**\n\t * 기 등록된 행사관리 정보를 삭제한다.\n\t * @param eventManage - 행사관리 model\n\t */\n\tpublic void deleteEventManage(EventManage eventManage) throws Exception;\n\n\t\n\n\t/***  행사접수관리  ****/\t\n\t\n\t/**\n\t * 행사접수정보를 관리하기 위해 등록된 행사관리 목록을 조회한다.\n\t * @param eventManageVO - 행사관리 VO\n\t * @return List - 행사접수관리 목록\n\t */\n\tpublic List<EventManageVO> selectEventAtdrnList(EventManageVO eventManageVO) throws Exception;\n\n\t/**\n\t * 행사관리 목록 총 개수를 조회한다.\n\t * @param eventManageVO - 행사관리 VO\n\t * @return int - 행사접수관리 카운트 수\n\t */\n\tpublic int selectEventAtdrnListTotCnt(EventManageVO eventManageVO) throws Exception ;\n\n\t/**\n\t * 행사접수승인/반려 처리를 위해 등록된 행사접수 목록을 조회한다.\n\t * @param eventManageVO - 행사관리 VO\n\t * @return List - 행사접수승인 목록\n\t */\n\tpublic List<EventManageVO> selectEventRceptConfmList(EventManageVO eventManageVO) throws Exception;\n\n\t/**\n\t * 행사접수승인/반려 처리를 위해 등록된 행사접수 목록 총 개수를 조회한다.\n\t * @param eventManageVO - 행사관리 VO\n\t * @return int - 행사접수승인 카운트 수",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EventAtdrn",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java — java 파일",
+        "tags": []
+      },
+      "line": 18,
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java",
+      "slice": {
+        "endLine": 87,
+        "startLine": 8,
+        "text": " * 개요\n * - 행사참석자에 대한 model 클래스를 정의한다.\n * \n * 상세내용\n * - 행사참석자의 신청자ID,행사ID,신청일자,결재자ID,승인여부,결재일시,반려사유,최초등록자ID,최초등록시점,최종수정자ID,최종수정시점 항목을 관리한다.\n * @author 이용\n * @version 1.0\n * @created 06-15-2010 오후 2:08:56\n */\n\npublic class EventAtdrn extends ComDefaultVO {\n\n\t/**\n\t* serialVersionUID\n\t*/\n\tprivate static final long serialVersionUID = 1L;\n\t\n\t/**\n\t*  신청자ID\t      \n\t*/ \n\tprivate String applcntId;\n\n\t/**\n\t*  행사ID\t      \n\t*/ \n\t@EgovNullCheck\n\tprivate String eventId;\n\n\t/**\n\t*  신청일자\t      \n\t*/ \n\tprivate String reqstDe;\n\n\t/**\n\t*  결재자ID\t      \n\t*/ \n\t@EgovNullCheck\n\tprivate String sanctnerId;\n\n\t/**\n\t*  승인여부\t      \n\t*/ \n\tprivate String confmAt;\n\n\t/**\n\t*  결재일시\t      \n\t*/ \n\tprivate String sanctnDt;\n\n\t/**\n\t*  반려사유\t      \n\t*/ \n\tprivate String returnResn;\n\n\t/**\n\t*  약식결재ID\t      \n\t*/ \n\tprivate String infrmlSanctnId;\n\n\t/**\n\t*  최초등록자ID\t\n\t*/ \n\tprivate String frstRegisterId;\n\n\t/**\n\t*  최초등록시점\t\n\t*/ \n\tprivate String frstRegisterPnttm;\n\n\t/**\n\t*  최종수정자ID\t\n\t*/ \n\tprivate String lastUpdusrId;\n\n\t/**\n\t*  최종수정시점\t\n\t*/ \n\tprivate String lastUpdusrPnttm;\n\n\t/**",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EventManage",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/evt/service/EventManage.java — java 파일",
+        "tags": []
+      },
+      "line": 23,
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManage.java",
+      "slice": {
+        "endLine": 92,
+        "startLine": 13,
+        "text": " * 개요\n * - 행사관리에 대한 model 클래스를 정의한다.\n * \n * 상세내용\n * - 행사관리의 행사ID,행사구분,행사명,행사목적,행사시작일자,행사종료일자,행사주최기관명,행사주관기관명,행사장소,행사내용,비용발생여부,참가비용,정원,참조URL,접수시작일자,접수종료일자,최초등록자ID,최초등록시점,최종수정자ID,최종수정시점 항목을 관리한다.\n * @author 이용\n * @version 1.0\n * @created 06-15-2010 오후 2:08:56\n */\n\npublic class EventManage extends ComDefaultVO {\n\n\t/**\n\t* serialVersionUID\n\t*/\n\tprivate static final long serialVersionUID = 1L;\n\t\n\t/**\n\t*  행사ID\t      \n\t*/ \n\tprivate String eventId;\n\n\t/**\n\t*  행사구분\t      \n\t*/ \n\t@EgovNullCheck\n\tprivate String eventSe;\n\n\t/**\n\t*  행사명\t      \n\t*/ \n\t@EgovNullCheck\n\t@Size(max=60)\n\tprivate String eventNm;\n\n\t/**\n\t*  행사목적\t      \n\t*/ \n\t@EgovNullCheck\n\t@Size(max=200)\n\tprivate String eventPurps;\n\n\t/**\n\t*  행사시작일자\t\n\t*/ \n\t@EgovNullCheck\n\t@Size(max=10)\n\t@Pattern(regexp=\"^$|^\\\\d{4}-\\\\d{2}-\\\\d{2}$\", message=\"{validation.pattern.date}\")\n\tprivate String eventBeginDe;\n\n\t/**\n\t*  행사종료일자\t\n\t*/ \n\t@EgovNullCheck\n\t@Size(max=10)\n\t@Pattern(regexp=\"^$|^\\\\d{4}-\\\\d{2}-\\\\d{2}$\", message=\"{validation.pattern.date}\")\n\tprivate String eventEndDe;\n\n\t/**\n\t*  행사주최기관명\t\n\t*/ \n\t@EgovNullCheck\n\t@Size(max=60)\n\tprivate String eventAuspcInsttNm;\n\n\t/**\n\t*  행사주관기관명\t\n\t*/ \n\t@EgovNullCheck\n\t@Size(max=60)\n\tprivate String eventMngtInsttNm;\n\n\t/**\n\t*  행사장소\t      \n\t*/ \n\t@EgovNullCheck\n\t@Size(max=200)\n\tprivate String eventPlace;\n\n\t/**",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EventManageVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java — java 파일",
+        "tags": []
+      },
+      "line": 20,
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+      "slice": {
+        "endLine": 89,
+        "startLine": 10,
+        "text": " * 개요\n * - 행사관리에 대한 Vo 클래스를 정의한다.\n *\n * 상세내용\n * - 행사관리의 목록 항목을 관리한다.\n * @author 이용\n * @version 1.0\n * @created 06-15-2010 오후 2:08:56\n */\n\n@Getter\n@Setter\npublic class EventManageVO extends EventManage implements Serializable {\n\n\t/**\n\t * serialVersionUID\n\t */\n\tprivate static final long serialVersionUID = 1L;\n\t/**\n\t * 배너 목록\n\t */\n\tList<EventManageVO> eventManageList;\n\n\t/**\n\t*  신청자ID\n\t*/\n\tprivate String applcntId;\n\n\t/**\n\t*  신청일자\n\t*/\n\tprivate String reqstDe;\n\n\t/**\n\t*  결재자ID\n\t*/\n\tprivate String sanctnerId;\n\n\t/**\n\t*  승인여부\n\t*/\n\tprivate String confmAt;\n\n\t/**\n\t*  결재일시\n\t*/\n\tprivate String sanctnDt;\n\n\t/**\n\t*  반려사유\n\t*/\n\tprivate String returnResn;\n\n\t/**\n\t*  약식결재ID\n\t*/\n\tprivate String infrmlSanctnId;\n\n\t/**\n\t*  eventTemp1\n\t*/\n\tprivate String eventTemp1;\n\n\t/**\n\t*  eventTemp1\n\t*/\n\tprivate String eventTemp2;\n\t/**\n\t*  eventTemp1\n\t*/\n\n\tprivate String eventTemp3;\n\n\t/**\n\t*  eventTemp4\n\t*/\n\tprivate String eventTemp4;\n\n\t/**\n\t*  eventTemp5",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovEventManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 346,
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "slice": {
+        "endLine": 415,
+        "startLine": 336,
+        "text": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));\n\n\t\treturn \"egovframework/com/uss/ion/evt/EgovEventRceptDetail\";\n\t}\n\n\t/**\n\t * 행사접수관리 등록 화면으로 이동한다.\n\t * \n\t * @return String - 리턴 Url\n\t */\n\t@RequestMapping(value = \"/uss/ion/evt/EgovEventRceptRegist.do\")\n\tpublic String insertViewEventAtdrn(@ModelAttribute(\"eventAtdrn\") EventAtdrn eventAtdrn,\n\t\t\t@ModelAttribute(\"eventManageVO\") EventManageVO eventManageVO, SessionStatus status, ModelMap model)\n\t\t\tthrows Exception {\n\t\tEventManageVO eventManageVO1 = egovEventManageService.selectEventManage(eventManageVO);\n\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();\n\t\tstatus.setComplete();\n\t\teventAtdrn.setApplcntId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());\n\t\teventAtdrn.setEventId(eventManageVO1.getEventId());\n\t\teventManageVO1.setEventBeginDe(EgovDateUtil.formatDate(eventManageVO1.getEventBeginDe(), \"-\"));\n\t\teventManageVO1.setEventEndDe(EgovDateUtil.formatDate(eventManageVO1.getEventEndDe(), \"-\"));\n\t\teventManageVO1.setRceptBeginDe(EgovDateUtil.formatDate(eventManageVO1.getRceptBeginDe(), \"-\"));\n\t\teventManageVO1.setRceptEndDe(EgovDateUtil.formatDate(eventManageVO1.getRceptEndDe(), \"-\"));\n\t\teventManageVO1.setEventTemp6((user == null || user.getName() == null) ? \"\" : user.getName());\n\t\teventManageVO1.setEventTemp7((user == null || user.getOrgnztNm() == null) ? \"\" : user.getOrgnztNm());\n\n\t\tmodel.addAttribute(\"eventAtdrn\", eventAtdrn);\n\t\tmodel.addAttribute(\"eventManageVO\", eventManageVO1);\n\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));\n\n\t\treturn \"egovframework/com/uss/ion/evt/EgovEventRceptRegist\";\n\t}\n\n\t/**\n\t * 행사접수관리정보를 신규로 등록한다.\n\t * \n\t * @param eventAtdrn - 행사참석자 model\n\t * @return String - 리턴 Url\n\t */\n\t@RequestMapping(value = \"/uss/ion/evt/insertEventAtdrn.do\")\n\tpublic String insertEventAtdrn(@Valid @ModelAttribute(\"eventAtdrn\") EventAtdrn eventAtdrn, BindingResult bindingResult,\n\t\t\t@ModelAttribute(\"eventManageVO\") EventManageVO eventManageVO, SessionStatus status, ModelMap model) throws Exception {\n\n\t\tif (bindingResult.hasErrors()) {\n\t\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();\n\t\t\teventManageVO = egovEventManageService.selectEventManage(eventManageVO);\n\t\t\teventManageVO.setEventTemp6((user == null || user.getName() == null) ? \"\" : user.getName());\n\t\t\teventManageVO.setEventTemp7((user == null || user.getOrgnztNm() == null) ? \"\" : user.getOrgnztNm());\n\t\t\t\n\t\t\tmodel.addAttribute(\"eventManageVO\", eventManageVO);\n\t\t\tmodel.addAttribute(\"eventManage\", eventAtdrn);\n\t\t\treturn \"egovframework/com/uss/ion/evt/EgovEventRceptRegist\";\n\t\t} else {\n\t\t\tEventManageVO resultVO = egovEventManageService.selectEventManage(eventManageVO);\n\t\t\tif (resultVO.getPsncpa() > egovEventManageService.selectEventReqstAtdrnListTotCnt(eventManageVO)) {\n\t\t\t\tjava.util.Calendar cal = java.util.Calendar.getInstance();\n\n\t\t\t\tint iYear = cal.get(java.util.Calendar.YEAR);\n\t\t\t\tint iMonth = cal.get(java.util.Calendar.MONTH);\n\t\t\t\tint iDate = cal.get(java.util.Calendar.DATE);\n\n\t\t\t\t// 검색 설정\n\t\t\t\tString sSearchDate = \"\";\n\t\t\t\tsSearchDate += Integer.toString(iYear);\n\t\t\t\tsSearchDate += Integer.toString(iMonth + 1).length() == 1 ? \"0\" + Integer.toString(iMonth + 1)\n\t\t\t\t\t\t: Integer.toString(iMonth + 1);\n\t\t\t\tsSearchDate += Integer.toString(iDate);\n\t\t\t\teventAtdrn.setReqstDe(sSearchDate);// 신청일자\n\n\t\t\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();\n\t\t\t\teventAtdrn.setFrstRegisterId((user == null || user.getUniqId() == null) ? \"\" : user.getUniqId());\n\t\t\t\tstatus.setComplete();\n\t\t\t\tegovEventManageService.insertEventAtdrn(eventAtdrn);\n\t\t\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));\n\n\t\t\t\treturn \"forward:/uss/ion/evt/EgovEventRcrptManageList.do\";\n\t\t\t} else {\n\t\t\t\tEventManageVO eventManageVO1 = egovEventManageService.selectEventManage(eventManageVO);\n\t\t\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();\n\t\t\t\tstatus.setComplete();",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovDateUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 36,
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "slice": {
+        "endLine": 105,
+        "startLine": 26,
+        "text": " *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.02.01  이중호          최초 생성\n *   2025.08.30  이백행          2025년 컨트리뷰션 PMD로 소프트웨어 보안약점 진단하고 제거하기-UselessParentheses(불필요한 괄호사용)\n *   2025.08.30  이백행          2025년 컨트리뷰션 PMD로 소프트웨어 보안약점 진단하고 제거하기-LocalVariableNamingConventions(final이 아닌 변수는 밑줄을 포함할 수 없음)\n *   2025.08.30  이백행          2025년 컨트리뷰션 PMD로 소프트웨어 보안약점 진단하고 제거하기-AvoidReassigningParameters(넘겨받는 메소드 parameter 값을 직접 변경하는 코드 탐지)\n *\n *      </pre>\n */\npublic class EgovDateUtil {\n    private static final  String SIMPLE_DATE_PATTERN = \"yyyyMMdd\";\n\t/**\n\t * <p>\n\t * yyyyMMdd 혹은 yyyy-MM-dd 형식의 날짜 문자열을 입력 받아 년, 월, 일을 증감한다. 년, 월, 일은 가감할 수를 의미하며,\n\t * 음수를 입력할 경우 감한다.\n\t * </p>\n\t *\n\t * <pre>\n\t * DateUtil.addYearMonthDay(\"19810828\", 0, 0, 19)  = \"19810916\"\n\t * DateUtil.addYearMonthDay(\"20060228\", 0, 0, -10) = \"20060218\"\n\t * DateUtil.addYearMonthDay(\"20060228\", 0, 0, 10)  = \"20060310\"\n\t * DateUtil.addYearMonthDay(\"20060228\", 0, 0, 32)  = \"20060401\"\n\t * DateUtil.addYearMonthDay(\"20050331\", 0, -1, 0)  = \"20050228\"\n\t * DateUtil.addYearMonthDay(\"20050301\", 0, 2, 30)  = \"20050531\"\n\t * DateUtil.addYearMonthDay(\"20050301\", 1, 2, 30)  = \"20060531\"\n\t * DateUtil.addYearMonthDay(\"20040301\", 2, 0, 0)   = \"20060301\"\n\t * DateUtil.addYearMonthDay(\"20040229\", 2, 0, 0)   = \"20060228\"\n\t * DateUtil.addYearMonthDay(\"20040229\", 2, 0, 1)   = \"20060301\"\n\t * </pre>\n\t *\n\t * @param sDate   날짜 문자열(yyyyMMdd, yyyy-MM-dd의 형식)\n\t * @param year    가감할 년. 0이 입력될 경우 가감이 없다\n\t * @param month   가감할 월. 0이 입력될 경우 가감이 없다\n\t * @param day     가감할 일. 0이 입력될 경우 가감이 없다\n\t * @return yyyyMMdd 형식의 날짜 문자열\n\t * @throws IllegalArgumentException 날짜 포맷이 정해진 바와 다를 경우. 입력 값이\n\t *                                  <code>null</code>인 경우.\n\t */\n\tpublic static String addYearMonthDay(String sDate, int year, int month, int day) {\n\n\t\tString dateStr = validChkDate(sDate);\n\n\t\tCalendar cal = Calendar.getInstance();\n\t\tSimpleDateFormat sdf = new SimpleDateFormat(SIMPLE_DATE_PATTERN, Locale.getDefault());\n\t\ttry {\n\t\t\tcal.setTime(sdf.parse(dateStr));\n\t\t} catch (ParseException e) {\n\t\t\tthrow new IllegalArgumentException(\"Invalid date format: \" + dateStr);\n\t\t}\n\n\t\tif (year != 0) {\n\t\t\tcal.add(Calendar.YEAR, year);\n\t\t}\n\t\tif (month != 0) {\n\t\t\tcal.add(Calendar.MONTH, month);\n\t\t}\n\t\tif (day != 0) {\n\t\t\tcal.add(Calendar.DATE, day);\n\t\t}\n\n\t\treturn sdf.format(cal.getTime());\n\t}\n\n\t/**\n\t * <p>\n\t * yyyyMMdd 혹은 yyyy-MM-dd 형식의 날짜 문자열을 입력 받아 년을 증감한다. <code>year</code>는 가감할 수를\n\t * 의미하며, 음수를 입력할 경우 감한다.\n\t * </p>\n\t *\n\t * <pre>\n\t * DateUtil.addYear(\"20000201\", 62)  = \"20620201\"\n\t * DateUtil.addYear(\"20620201\", -62) = \"20000201\"\n\t * DateUtil.addYear(\"20040229\", 2)   = \"20060228\"\n\t * DateUtil.addYear(\"20060228\", -2)  = \"20040228\"\n\t * DateUtil.addYear(\"19000101\", 200) = \"21000101\"\n\t * </pre>\n\t *\n\t * @param dateStr 날짜 문자열(yyyyMMdd, yyyy-MM-dd의 형식)\n\t * @param year    가감할 년. 0이 입력될 경우 가감이 없다",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovStringUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 43,
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "slice": {
+        "endLine": 112,
+        "startLine": 33,
+        "text": " * See the License for the specific language governing permissions and\n * limitations under the License.\n */\nimport java.io.UnsupportedEncodingException;\nimport java.math.BigDecimal;\nimport java.security.SecureRandom;\nimport java.sql.Timestamp;\nimport java.text.SimpleDateFormat;\nimport java.util.Locale;\n\npublic class EgovStringUtil {\n\t/**\n\t * 빈 문자열 <code>\"\"</code>.\n\t */\n\tpublic static final String EMPTY = \"\";\n\n\t// 221116\t김혜준\t2022 시큐어코딩 조치\n\tprivate static SecureRandom rnd = new SecureRandom();\n\n\t/**\n\t * <p>Padding을 할 수 있는 최대 수치</p>\n\t */\n\t// private static final int PAD_LIMIT = 8192;\n\n\t/**\n\t * <p>An array of <code>String</code>s used for padding.</p>\n\t * <p>Used for efficient space padding. The length of each String expands as needed.</p>\n\t */\n\t/*\n\tprivate static final String[] PADDING = new String[Character.MAX_VALUE];\n\n\tstatic {\n\t\t// space padding is most common, start with 64 chars\n\t\tPADDING[32] = \"                                                                \";\n\t}\n\t */\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 지정한길이에다가 해당 문자열을 붙여주는 메서드.\n\t * @param source 원본 문자열 배열\n\t * @param output 더할문자열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, String output, int slength) {\n\t\tString returnVal = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\treturnVal = source.substring(0, slength) + output;\n\t\t\t} else {\n\t\t\t\treturnVal = source;\n\t\t\t}\n\t\t}\n\t\treturn returnVal;\n\t}\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 해당 문자열을 삭제하는 메서드\n\t * @param source 원본 문자열 배열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, int slength) {\n\t\tString result = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\tresult = source.substring(0, slength);\n\t\t\t} else {\n\t\t\t\tresult = source;\n\t\t\t}\n\t\t}\n\t\treturn result;\n\t}\n\n\t/**\n\t * <p>\n\t * String이 비었거나(\"\") 혹은 null 인지 검증한다.\n\t * </p>\n\t *\n\t * <pre>",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovEventManageController#insertViewEventAtdrn",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventRceptRegist.do",
+      "line": 346,
+      "stepIds": [
+        "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+        "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+        "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java",
+        "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+        "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+        "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEventManageController#selectEventAtdrn",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventRcrptDetail.do",
+      "line": 322,
+      "stepIds": [
+        "step:ANY /uss/ion/evt/EgovEventRcrptDetail.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+        "step:ANY /uss/ion/evt/EgovEventRcrptDetail.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+        "step:ANY /uss/ion/evt/EgovEventRcrptDetail.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+        "step:ANY /uss/ion/evt/EgovEventRcrptDetail.do:src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java",
+        "step:ANY /uss/ion/evt/EgovEventRcrptDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+        "step:ANY /uss/ion/evt/EgovEventRcrptDetail.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uss/ion/evt/EgovEventRcrptDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEventManageController#selectEventAtdrnList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventRcrptManageList.do",
+      "line": 271,
+      "stepIds": [
+        "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+        "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+        "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+        "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEventManageController#selectEventReqstAtdrnList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventReqstAtdrnList.do",
+      "line": 537,
+      "stepIds": [
+        "step:ANY /uss/ion/evt/EgovEventReqstAtdrnList.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstAtdrnList.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstAtdrnList.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstAtdrnList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEventManageController#deleteEventManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventReqstDelete.do",
+      "line": 253,
+      "stepIds": [
+        "step:ANY /uss/ion/evt/EgovEventReqstDelete.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstDelete.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEventManageController#selectEventManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventReqstDetail.do",
+      "line": 132,
+      "stepIds": [
+        "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEventManageController#selectEventManageList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventReqstManageList.do",
+      "line": 87,
+      "stepIds": [
+        "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEventManageController#selectEventManageListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventReqstManageListView.do",
+      "line": 74,
+      "stepIds": [
+        "step:ANY /uss/ion/evt/EgovEventReqstManageListView.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEventManageController#insertViewEventManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventReqstRegist.do",
+      "line": 179,
+      "stepIds": [
+        "step:ANY /uss/ion/evt/EgovEventReqstRegist.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEventManageController#updtEventManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventReqstSave.do",
+      "line": 225,
+      "stepIds": [
+        "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManage.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+        "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEventManageController#deleteEventAtdrn",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "flowId": "flow:ANY /uss/ion/evt/deleteEventAtdrn.do",
+      "line": 440,
+      "stepIds": [
+        "step:ANY /uss/ion/evt/deleteEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+        "step:ANY /uss/ion/evt/deleteEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+        "step:ANY /uss/ion/evt/deleteEventAtdrn.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEventManageController#insertEventAtdrn",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "flowId": "flow:ANY /uss/ion/evt/insertEventAtdrn.do",
+      "line": 375,
+      "stepIds": [
+        "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+        "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+        "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+        "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java",
+        "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEventManageController#insertEventManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "flowId": "flow:ANY /uss/ion/evt/insertEventManage.do",
+      "line": 197,
+      "stepIds": [
+        "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+        "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManage.java",
+        "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+        "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEventManageController#selectEventRceptConfmList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "flowId": "flow:ANY /uss/ion/evt/selectEventRceptConfmList.do",
+      "line": 457,
+      "stepIds": [
+        "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+        "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+        "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+        "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEventManageController#updtEventAtdrn",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "flowId": "flow:ANY /uss/ion/evt/updtEventAtdrn.do",
+      "line": 510,
+      "stepIds": [
+        "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+        "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java",
+        "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+        "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "uss.ion.evt",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRceptRegist.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptDetail.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptDetail.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptDetail.do:src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptDetail.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptDetail.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstAtdrnList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstAtdrnList.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstAtdrnList.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstAtdrnList.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDelete.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDelete.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstManageListView.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstRegist.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManage.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManage.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/evt/deleteEventAtdrn.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "stepId": "step:ANY /uss/ion/evt/deleteEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "stepId": "step:ANY /uss/ion/evt/deleteEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManage.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManage.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "stepId": "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java",
+      "stepId": "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "stepId": "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java"
+    }
+  ]
+}

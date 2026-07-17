@@ -1,0 +1,741 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "n1",
+          "to": "n2"
+        },
+        {
+          "from": "n2",
+          "to": "n3"
+        },
+        {
+          "from": "n3",
+          "to": "n4"
+        },
+        {
+          "from": "n4",
+          "to": "n5"
+        },
+        {
+          "from": "n5",
+          "to": "n6"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "n1",
+          "kind": "start",
+          "label": "단건조회 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 59,
+              "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.GET)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 61,
+              "snippet": "return \"egovframework/com/utl/jso/EgovUtlJsonInquire\";"
+            }
+          ],
+          "flowRef": "flow:GET /utl/jso/EgovUtlJsonInquire.do",
+          "id": "n2",
+          "kind": "activity",
+          "label": "단건조회 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 64,
+              "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.POST)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 65,
+              "snippet": "public ModelAndView selectUtlJsonInquirePost(@RequestParam Map<?, ?> commandMap)  throws Exception {"
+            }
+          ],
+          "flowRef": "flow:POST /utl/jso/EgovUtlJsonInquire.do",
+          "id": "n3",
+          "kind": "activity",
+          "label": "단건 데이터 조회 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 72,
+              "snippet": "modelAndView.addObject(\"fruits1\", \"apple\");"
+            }
+          ],
+          "id": "n4",
+          "kind": "activity",
+          "label": "과일 항목 구성"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 67,
+              "snippet": "modelAndView.setViewName(\"jsonView\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 80,
+              "snippet": "return modelAndView;"
+            }
+          ],
+          "id": "n5",
+          "kind": "activity",
+          "label": "JSON 응답 반환"
+        },
+        {
+          "id": "n6",
+          "kind": "end",
+          "label": "조회 완료"
+        }
+      ],
+      "title": "JSON 단건조회"
+    },
+    {
+      "edges": [
+        {
+          "from": "m1",
+          "to": "m2"
+        },
+        {
+          "from": "m2",
+          "to": "m3"
+        },
+        {
+          "from": "m3",
+          "to": "m4"
+        },
+        {
+          "from": "m4",
+          "to": "m5"
+        },
+        {
+          "from": "m5",
+          "to": "m6"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "m1",
+          "kind": "start",
+          "label": "다건조회 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 87,
+              "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.GET)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 89,
+              "snippet": "return \"egovframework/com/utl/jso/EgovUtlJsonMultiInquire\";"
+            }
+          ],
+          "flowRef": "flow:GET /utl/jso/EgovUtlJsonMultiInquire.do",
+          "id": "m2",
+          "kind": "activity",
+          "label": "다건조회 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 91,
+              "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.POST)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 92,
+              "snippet": "public ModelAndView selectUtlJsonMultiInquirePost(@RequestParam Map<?, ?> commandMap)  throws Exception {"
+            }
+          ],
+          "flowRef": "flow:POST /utl/jso/EgovUtlJsonMultiInquire.do",
+          "id": "m3",
+          "kind": "activity",
+          "label": "다건 데이터 조회 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 72,
+              "snippet": "modelAndView.addObject(\"fruits1\", \"apple\");"
+            }
+          ],
+          "id": "m4",
+          "kind": "activity",
+          "label": "과일 목록 구성"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 67,
+              "snippet": "modelAndView.setViewName(\"jsonView\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 80,
+              "snippet": "return modelAndView;"
+            }
+          ],
+          "id": "m5",
+          "kind": "activity",
+          "label": "JSON 목록 응답 반환"
+        },
+        {
+          "id": "m6",
+          "kind": "end",
+          "label": "조회 완료"
+        }
+      ],
+      "title": "JSON 다건조회"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+          "line": 67,
+          "snippet": "modelAndView.setViewName(\"jsonView\");"
+        }
+      ],
+      "text": "데이터 응답은 화면 템플릿이 아니라 JSON 표현 방식으로 되돌려 준다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+          "line": 61,
+          "snippet": "return \"egovframework/com/utl/jso/EgovUtlJsonInquire\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+          "line": 89,
+          "snippet": "return \"egovframework/com/utl/jso/EgovUtlJsonMultiInquire\";"
+        }
+      ],
+      "text": "화면을 여는 조회 요청은 데이터를 만들지 않고 해당 화면만 지정해 되돌려 준다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+          "line": 87,
+          "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.GET)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+          "line": 91,
+          "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.POST)"
+        }
+      ],
+      "text": "다건 조회 화면 요청과 데이터 요청은 같은 주소를 쓰되 요청 방식으로 구분된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+          "line": 59,
+          "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.GET)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+          "line": 64,
+          "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.POST)"
+        }
+      ],
+      "text": "단건 조회 화면 요청과 데이터 요청도 같은 주소를 쓰되 요청 방식으로 구분된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+          "line": 52,
+          "snippet": "private static final Logger LOGGER = LoggerFactory.getLogger(EgovUtlJsonController.class);"
+        }
+      ],
+      "text": "처리 시작과 종료 시점 및 전달받은 요청 조건은 운영 점검을 위해 기록으로 남긴다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+          "line": 49,
+          "snippet": "@Resource(name = \"propertiesService\")"
+        }
+      ],
+      "text": "공통 환경설정 조회 기능을 주입받아 사용할 수 있도록 연결되어 있다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+          "line": 67,
+          "snippet": "modelAndView.setViewName(\"jsonView\");"
+        }
+      ],
+      "text": "응답 표현은 공통 JSON 표현 설정에 위임하며, 이 영역은 표현 이름만 지정한다."
+    }
+  ],
+  "domainId": "domain:utl.jso",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+          "line": 72,
+          "snippet": "modelAndView.addObject(\"fruits1\", \"apple\");"
+        }
+      ],
+      "text": "과일 항목 — 단건 조회 응답에 담기는 예시 데이터로, 항목 이름과 값의 쌍 다섯 건으로 구성된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+          "line": 92,
+          "snippet": "public ModelAndView selectUtlJsonMultiInquirePost(@RequestParam Map<?, ?> commandMap)  throws Exception {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+          "line": 72,
+          "snippet": "modelAndView.addObject(\"fruits1\", \"apple\");"
+        }
+      ],
+      "text": "과일 목록 — 다건 조회 응답에 담기는 예시 데이터로, 과일 항목 묶음을 여러 건 반복해 목록 형태로 전달한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+          "line": 65,
+          "snippet": "public ModelAndView selectUtlJsonInquirePost(@RequestParam Map<?, ?> commandMap)  throws Exception {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+          "line": 92,
+          "snippet": "public ModelAndView selectUtlJsonMultiInquirePost(@RequestParam Map<?, ?> commandMap)  throws Exception {"
+        }
+      ],
+      "text": "요청 파라미터 묶음 — 화면에서 전달되는 조회 조건을 이름과 값의 형태로 받아 처리 흐름에 넘긴다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:GET /utl/jso/EgovUtlJsonInquire.do",
+      "name": "JSON 단건조회 화면 열기",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 59,
+            "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.GET)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 60,
+            "snippet": "public String selectUtlJsonInquire()  throws Exception {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 61,
+            "snippet": "return \"egovframework/com/utl/jso/EgovUtlJsonInquire\";"
+          }
+        ],
+        "text": "사용자가 단건조회 화면을 요청하면 별도 데이터 조회 없이 단건조회 화면만 지정해 되돌려 준다. 실제 데이터는 화면에서 이어지는 데이터 요청으로 받아 온다."
+      }
+    },
+    {
+      "flowId": "flow:GET /utl/jso/EgovUtlJsonMultiInquire.do",
+      "name": "JSON 다건조회 화면 열기",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 87,
+            "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.GET)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 88,
+            "snippet": "public String selectUtlJsonMultiInquire(@RequestParam Map<?, ?> commandMap)  throws Exception {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 89,
+            "snippet": "return \"egovframework/com/utl/jso/EgovUtlJsonMultiInquire\";"
+          }
+        ],
+        "text": "사용자가 다건조회 화면을 요청하면 전달된 조회 조건을 받아들이되 데이터를 만들지 않고 다건조회 화면만 지정해 되돌려 준다."
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/jso/EgovUtlJsonInquire.do",
+      "name": "JSON 단건 데이터 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 64,
+            "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.POST)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 65,
+            "snippet": "public ModelAndView selectUtlJsonInquirePost(@RequestParam Map<?, ?> commandMap)  throws Exception {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 67,
+            "snippet": "modelAndView.setViewName(\"jsonView\");"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 72,
+            "snippet": "modelAndView.addObject(\"fruits1\", \"apple\");"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 80,
+            "snippet": "return modelAndView;"
+          }
+        ],
+        "text": "단건조회 화면의 데이터 요청을 받아 과일 항목 다섯 건을 예시 데이터로 구성하고, JSON 표현 방식으로 되돌려 준다. 전달받은 조회 조건은 기록으로 남긴다."
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/jso/EgovUtlJsonMultiInquire.do",
+      "name": "JSON 다건 데이터 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 91,
+            "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.POST)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 92,
+            "snippet": "public ModelAndView selectUtlJsonMultiInquirePost(@RequestParam Map<?, ?> commandMap)  throws Exception {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 67,
+            "snippet": "modelAndView.setViewName(\"jsonView\");"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 72,
+            "snippet": "modelAndView.addObject(\"fruits1\", \"apple\");"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 80,
+            "snippet": "return modelAndView;"
+          }
+        ],
+        "text": "다건조회 화면의 데이터 요청을 받아 과일 항목 묶음을 여러 건 반복한 목록을 예시 데이터로 구성하고, 단건 항목과 함께 JSON 표현 방식으로 되돌려 준다."
+      }
+    }
+  ],
+  "name": "JSON 조회 예제",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 59,
+              "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.GET)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 60,
+              "snippet": "public String selectUtlJsonInquire()  throws Exception {"
+            }
+          ],
+          "text": "조회 요청 방식으로만 받아들이며 별도의 요청 조건이나 검증, 권한 확인 절차 없이 화면 이름을 되돌려 준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 59,
+              "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.GET)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 60,
+              "snippet": "public String selectUtlJsonInquire()  throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 61,
+              "snippet": "return \"egovframework/com/utl/jso/EgovUtlJsonInquire\";"
+            }
+          ],
+          "text": "이 흐름에서 화면 진입점 역할을 맡는다. 단건조회 화면 주소로 들어온 조회 요청을 받아 업무 서비스나 데이터 계층으로 위임하지 않고, 단건조회 화면 이름만 되돌려 주어 화면 표시를 화면 계층에 넘긴다."
+        }
+      },
+      "name": "JSON 단건조회 화면 요청 접수",
+      "stepId": "step:GET /utl/jso/EgovUtlJsonInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 59,
+            "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.GET)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 61,
+            "snippet": "return \"egovframework/com/utl/jso/EgovUtlJsonInquire\";"
+          }
+        ],
+        "text": "단건조회 화면 주소로 들어온 조회 요청을 접수해 단건조회 화면을 지정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 87,
+              "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.GET)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 88,
+              "snippet": "public String selectUtlJsonMultiInquire(@RequestParam Map<?, ?> commandMap)  throws Exception {"
+            }
+          ],
+          "text": "조회 요청 방식으로 들어온 요청 조건을 이름과 값의 묶음으로 전달받지만 검증이나 권한 확인 없이 화면 이름을 되돌려 준다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 87,
+              "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.GET)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 88,
+              "snippet": "public String selectUtlJsonMultiInquire(@RequestParam Map<?, ?> commandMap)  throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 89,
+              "snippet": "return \"egovframework/com/utl/jso/EgovUtlJsonMultiInquire\";"
+            }
+          ],
+          "text": "이 흐름에서 화면 진입점 역할을 맡는다. 다건조회 화면 주소로 들어온 조회 요청을 받아 목록 데이터를 만들지 않고 다건조회 화면 이름만 되돌려 준다."
+        }
+      },
+      "name": "JSON 다건조회 화면 요청 접수",
+      "stepId": "step:GET /utl/jso/EgovUtlJsonMultiInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 87,
+            "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.GET)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 89,
+            "snippet": "return \"egovframework/com/utl/jso/EgovUtlJsonMultiInquire\";"
+          }
+        ],
+        "text": "다건조회 화면 주소로 들어온 조회 요청을 접수해 다건조회 화면을 지정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 64,
+              "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.POST)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 65,
+              "snippet": "public ModelAndView selectUtlJsonInquirePost(@RequestParam Map<?, ?> commandMap)  throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 52,
+              "snippet": "private static final Logger LOGGER = LoggerFactory.getLogger(EgovUtlJsonController.class);"
+            }
+          ],
+          "text": "등록 요청 방식으로 들어온 요청 조건을 이름과 값의 묶음으로 전달받아 기록으로 남기며, 별도 검증이나 권한 확인 절차는 두지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 64,
+              "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.POST)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 67,
+              "snippet": "modelAndView.setViewName(\"jsonView\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 72,
+              "snippet": "modelAndView.addObject(\"fruits1\", \"apple\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 80,
+              "snippet": "return modelAndView;"
+            }
+          ],
+          "text": "이 흐름에서 데이터 응답 진입점 역할을 맡는다. 단건조회 화면의 데이터 요청을 받아 응답 표현을 JSON으로 지정하고, 과일 항목 다섯 건을 응답에 담아 되돌려 준다. 하위 업무 서비스로 위임하지 않고 화면 계층에서 예시 데이터를 직접 구성한다."
+        }
+      },
+      "name": "JSON 단건 데이터 요청 처리",
+      "stepId": "step:POST /utl/jso/EgovUtlJsonInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 64,
+            "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.POST)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 67,
+            "snippet": "modelAndView.setViewName(\"jsonView\");"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 72,
+            "snippet": "modelAndView.addObject(\"fruits1\", \"apple\");"
+          }
+        ],
+        "text": "단건조회 데이터 요청을 접수해 과일 항목을 구성하고 JSON 표현으로 응답한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 91,
+              "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.POST)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 92,
+              "snippet": "public ModelAndView selectUtlJsonMultiInquirePost(@RequestParam Map<?, ?> commandMap)  throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 52,
+              "snippet": "private static final Logger LOGGER = LoggerFactory.getLogger(EgovUtlJsonController.class);"
+            }
+          ],
+          "text": "등록 요청 방식으로 들어온 요청 조건을 이름과 값의 묶음으로 전달받아 기록으로 남기며, 별도 검증이나 권한 확인 절차는 두지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 91,
+              "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.POST)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 92,
+              "snippet": "public ModelAndView selectUtlJsonMultiInquirePost(@RequestParam Map<?, ?> commandMap)  throws Exception {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 67,
+              "snippet": "modelAndView.setViewName(\"jsonView\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 80,
+              "snippet": "return modelAndView;"
+            }
+          ],
+          "text": "이 흐름에서 목록 데이터 응답 진입점 역할을 맡는다. 다건조회 화면의 데이터 요청을 받아 응답 표현을 JSON으로 지정하고, 단건 항목과 함께 과일 항목 묶음을 반복한 목록을 응답에 담아 되돌려 준다."
+        }
+      },
+      "name": "JSON 다건 데이터 요청 처리",
+      "stepId": "step:POST /utl/jso/EgovUtlJsonMultiInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 91,
+            "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.POST)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 67,
+            "snippet": "modelAndView.setViewName(\"jsonView\");"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "line": 72,
+            "snippet": "modelAndView.addObject(\"fruits1\", \"apple\");"
+          }
+        ],
+        "text": "다건조회 데이터 요청을 접수해 과일 목록을 구성하고 JSON 표현으로 응답한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+        "line": 59,
+        "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.GET)"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+        "line": 64,
+        "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.POST)"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+        "line": 87,
+        "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.GET)"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+        "line": 91,
+        "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.POST)"
+      }
+    ],
+    "text": "JSON 형식 데이터 조회 방식을 시연하는 예제 영역이다. 단건 조회와 다건 조회 두 가지 업무 화면을 제공하며, 각각 화면을 여는 조회 요청과 실제 데이터를 JSON 형태로 되돌려 주는 데이터 요청으로 나뉜다. 별도의 업무 서비스나 데이터베이스를 거치지 않고 화면 계층에서 예시 데이터를 구성해 응답한다."
+  }
+}

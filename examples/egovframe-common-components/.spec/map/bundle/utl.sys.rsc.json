@@ -1,0 +1,247 @@
+{
+  "domainId": "domain:utl.sys.rsc",
+  "files": [
+    {
+      "className": "LoginVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/LoginVO.java — java 파일",
+        "tags": []
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 21,
+        "text": " *   2009.03.03     박지욱     최초 생성\n *   2021.05.30     정진오     디지털원패스 사용자키/세션값 추가\n *</pre>\n *\n *  @author 공통서비스 개발팀 박지욱\n *  @since 2009.03.03\n *  @version 1.0\n *  @see\n *\n */\n@Getter\n@Setter\npublic class LoginVO implements Serializable{\n\n\t/**\n\t *\n\t */\n\tprivate static final long serialVersionUID = -8274004534207618049L;\n\n\t/** 아이디 */\n\t@EgovNullCheck\n\tprivate String id;\n\t/** 이름 */\n\t@EgovNullCheck\n\tprivate String name;\n\t/** 주민등록번호 */\n\tprivate String ihidNum;\n\t/** 이메일주소 */\n\t@EgovNullCheck\n\t@EgovEmailCheck\n\tprivate String email;\n\t/** 비밀번호 */\n\tprivate String password;\n\t/** 비밀번호 힌트 */\n\t@EgovNullCheck\n\tprivate String passwordHint;\n\t/** 비밀번호 정답 */\n\t@EgovNullCheck\n\tprivate String passwordCnsr;\n\t/** 사용자구분 */\n\tprivate String userSe;\n\t/** 조직(부서)ID */\n\tprivate String orgnztId;\n\t/** 조직(부서)명 */\n\tprivate String orgnztNm;\n\t/** 고유아이디 */\n\tprivate String uniqId;\n\t/** 로그인 후 이동할 페이지 */\n\tprivate String url;\n\t/** 사용자 IP정보 */\n\tprivate String ip;\n\t/** GPKI인증 DN */\n\tprivate String dn;\n\t/** 디지털원패스 사용자키 */\n\tprivate String onepassUserkey;\n\t/** 디지털원패스 사용자세션값 */\n\tprivate String onepassIntfToken;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "slice": {
+        "endLine": 27,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.service;\n\nimport java.util.List;\n\npublic interface EgovUserDetailsService {\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic Object getAuthenticatedUser();\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t * 예) [ROLE_ADMIN, ROLE_USER, ROLE_A, ROLE_B, ROLE_RESTRICTED, IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED_ANONYMOUSLY]\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic List<String> getAuthorities();\n\t\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\t\n\t */\n\tpublic Boolean isAuthenticated(); \n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovUserDetailsHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "slice": {
+        "endLine": 62,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n *   2009.03.10  sjyoon         최초 생성\n *   2011.07.01\t 서준식          interface 생성후 상세 로직의 분리\n * </pre>\n */\n\npublic class EgovUserDetailsHelper {\n\n\tstatic EgovUserDetailsService egovUserDetailsService;\n\n\tpublic EgovUserDetailsService getEgovUserDetailsService() {\n\t\treturn egovUserDetailsService;\n\t}\n\n\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {\n\t\tEgovUserDetailsHelper.egovUserDetailsService = egovUserDetailsService;\n\t}\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic static Object getAuthenticatedUser() {\n\t\treturn egovUserDetailsService.getAuthenticatedUser();\n\t}\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t *\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic static List<String> getAuthorities() {\n\t\treturn egovUserDetailsService.getAuthorities();\n\t}\n\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\n\t */\n\tpublic static Boolean isAuthenticated() {\n\t\treturn egovUserDetailsService.isAuthenticated();\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovLoginSesionCeckUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 20,
+      "relPath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+      "slice": {
+        "endLine": 53,
+        "startLine": 10,
+        "text": " * 개요\n * - 로그인 세션정보체크 컴포넌트에 대한 util 클래스를 정의한다.\n *\n * 상세내용\n * - 로그인 세션정보체크에 대한 기능을 제공한다.\n * @author lee.m.j\n * @version 1.0\n * @created 28-6-2010 오전 10:44:26\n */\n\n@Service(\"egovLoginSesionCeckUtil\")\npublic class EgovLoginSesionCeckUtil extends EgovAbstractServiceImpl {\n\n\t/**\n\t * 로그인 후 이동할 처리화면을 세션에 등록한다.\n\t * @param url - String\n\t * @return String\n\t */\n\tpublic void setLoginSession(String url) throws Exception {\n\t\tLoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();\n\t\t// KISA 보안취약점 조치 (2018-12-10, 이정은)\n\t\tif ( user != null ) {\n\t\t\tuser.setUrl(\"\");\n\t\t\tuser.setUrl(url);\n\t\t}\n\t\t//new EgovUserDetails(user.getId(), user.getPassword(), true, user);\n\t}\n\n\t/**\n\t * 로그인 세션정보체크 화면 이동\n\t * @return String - 세션URL\n\t */\n\tpublic String checkLoginSessionView() throws Exception {\n\t\tLoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();\n\t\t// KISA 보안취약점 조치 (2018-12-10, 이정은)\n\t\tif ( user == null ) {\n\t\t\treturn \"\";\n\t\t} else {\n\t\t\treturn user.getUrl();\n\t\t}\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovLoginSesionController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java — java 파일",
+        "tags": []
+      },
+      "line": 66,
+      "relPath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "slice": {
+        "endLine": 73,
+        "startLine": 56,
+        "text": "\t@RequestMapping(value = \"/utl/sys/rsc/setLoginSession.do\")\n\tpublic String setLoginSession(@RequestParam(\"url\") String url) throws Exception {\n\t\tegovLoginSesionCeckUtil.setLoginSession(url);\n\t\treturn \"forward:/utl/sys/rsc/loginSessionView.do\";\n\t}\n\n\t/**\n\t * 로그인 세션정보체크\n\t * @return String\n\t */\n\t@RequestMapping(value = \"/utl/sys/rsc/checkLloginSession.do\")\n\tpublic String checkLoginSession() throws Exception {\n\t\tegovLoginSesionCeckUtil.checkLoginSessionView();\n\t\treturn \"egovframework/com/utl/sys/rsc/EgovLoginSesionCheck\";\n\t}\n\n\n}",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovLoginSesionController#checkLoginSession",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "flowId": "flow:ANY /utl/sys/rsc/checkLloginSession.do",
+      "line": 66,
+      "stepIds": [
+        "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+        "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+        "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovLoginSesionController#checkLoginSessionView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "flowId": "flow:ANY /utl/sys/rsc/loginSessionView.do",
+      "line": 46,
+      "stepIds": [
+        "step:ANY /utl/sys/rsc/loginSessionView.do:src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovLoginSesionController#setLoginSession",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "flowId": "flow:ANY /utl/sys/rsc/setLoginSession.do",
+      "line": 56,
+      "stepIds": [
+        "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+        "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+        "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "utl.sys.rsc",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+      "stepId": "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "stepId": "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "stepId": "step:ANY /utl/sys/rsc/loginSessionView.do:src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+      "stepId": "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "stepId": "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java"
+    }
+  ]
+}

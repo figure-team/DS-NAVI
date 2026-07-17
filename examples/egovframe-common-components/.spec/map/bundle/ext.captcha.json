@@ -1,0 +1,139 @@
+{
+  "domainId": "domain:ext.captcha",
+  "files": [
+    {
+      "className": "EgovCaptchaController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java — java 파일",
+        "tags": []
+      },
+      "line": 69,
+      "relPath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "slice": {
+        "endLine": 138,
+        "startLine": 59,
+        "text": "\tprotected final Log logger = LogFactory.getLog(getClass());\n\n\t/**\n\t * Captcha 사용자 입력 페이지\n\t * \n\t * @param session\n\t * @param model\n\t * @return\n\t */\n\t@IncludedInfo(name = \"Captcha\", order = 3300, gid = 100)\n\t@RequestMapping(\"/ext/captcha/input.do\")\n\tpublic String input(HttpSession session, ModelMap model) {\n\t\treturn \"egovframework/com/ext/captcha/EgovCaptcha\";\n\t}\n\n\t/**\n\t * Captcha 입력값 검증 결과 페이지\n\t * \n\t * @param session\n\t * @param model\n\t * @param captcha\n\t * @param pgNm\n\t * @return\n\t */\n\t@PostMapping(\"/ext/captcha/result.do\")\n\tpublic String result(HttpSession session, ModelMap model, @RequestParam(\"captcha\") String captcha,\n\t\t\t@RequestParam(\"pgNm\") String pgNm) {\n\t\tString expectedCaptcha = (String) session.getAttribute(\"captcha\" + pgNm);\n\t\tboolean result = expectedCaptcha != null && expectedCaptcha.equalsIgnoreCase(captcha);\n\t\tif (result) {\n\t\t\tmodel.addAttribute(\"message\", \"Captcha 값이 올바르게 입력되었습니다.\");\n\t\t} else {\n\t\t\tmodel.addAttribute(\"message\", \"Captcha 값이 올바르지 않습니다.\");\n\t\t}\n\t\tmodel.addAttribute(\"result\", result);\n\t\treturn \"egovframework/com/ext/captcha/EgovCaptchaResult\";\n\t}\n\n\t/**\n\t * Captcha 이미지 생성\n\t * \n\t * @param request\n\t * @param response\n\t * @param width    이미지 가로 크기\n\t * @param height   이미지 세로 크기\n\t * @param length   Captcha 문자 길이\n\t * @param pgNm     Captcha를 사용하는 프로그램 구분값\n\t */\n\t@GetMapping(\"/ext/captcha/generate.do\")\n\tpublic void generate(HttpServletRequest request, HttpServletResponse response,\n\t\t\t@RequestParam(value = \"width\", defaultValue = \"150\") int width,\n\t\t\t@RequestParam(value = \"height\", defaultValue = \"50\") int height,\n\t\t\t@RequestParam(value = \"length\", required = false) Integer length,\n\t\t\t@RequestParam(value = \"lenght\", required = false) Integer legacyLength,\n\t\t\t@RequestParam(value = \"pgNm\", defaultValue = \"capt\") String pgNm) {\n\t\tint captchaLength = resolveCaptchaLength(length, legacyLength);\n\t\tif (!isValidRequest(width, height, captchaLength, pgNm)) {\n\t\t\tresponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);\n\t\t\treturn;\n\t\t}\n\n\t\ttry {\n\t\t\tString captchaTxt = generateRandomText(captchaLength);\n\t\t\trequest.getSession().setAttribute(\"captcha\" + pgNm, captchaTxt);\n\n\t\t\tBufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);\n\t\t\tGraphics2D g2d = bufferedImage.createGraphics();\n\t\t\t\n\t\t\t//배경채우기\n\t\t\tg2d.setColor(Color.white);\n\t\t\tg2d.fillRect(0, 0, width, height);\n\t\t\t//글씨쓰기\n\t\t\tg2d.setFont(new Font(\"Arial\", Font.BOLD, 40));\n\t\t\tg2d.setColor(Color.BLACK);\n\t\t\tg2d.drawString(captchaTxt, 10, 35);//텍스트,위치\n\t\t\t//랜덤줄긋기\n\t\t\tg2d.setColor(Color.white);\n\t\t\tfor(int i =0; i <8; i++) {//i= 선 갯수 x1,y1 시작점, x2,y2 끝점\n\t\t\t\tfloat thickness = 1.0f + SECURE_RANDOM.nextFloat() * 3.0f; // 두께 조절\n\t\t\t    g2d.setStroke(new BasicStroke(thickness));",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovCaptchaController#input",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "flowId": "flow:ANY /ext/captcha/input.do",
+      "line": 69,
+      "stepIds": [
+        "step:ANY /ext/captcha/input.do:src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCaptchaController#generate",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "flowId": "flow:GET /ext/captcha/generate.do",
+      "line": 107,
+      "stepIds": [
+        "step:GET /ext/captcha/generate.do:src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovCaptchaController#result",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "flowId": "flow:POST /ext/captcha/result.do",
+      "line": 83,
+      "stepIds": [
+        "step:POST /ext/captcha/result.do:src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "ext.captcha",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "stepId": "step:ANY /ext/captcha/input.do:src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "stepId": "step:GET /ext/captcha/generate.do:src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "stepId": "step:POST /ext/captcha/result.do:src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java"
+    }
+  ]
+}

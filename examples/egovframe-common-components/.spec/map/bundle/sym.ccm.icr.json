@@ -1,0 +1,268 @@
+{
+  "domainId": "domain:sym.ccm.icr",
+  "files": [
+    {
+      "className": "ComDefaultCodeVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "slice": {
+        "endLine": 58,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------       --------    ---------------------------\n *   2009.3.11   이삼섭          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class ComDefaultCodeVO implements Serializable {\n    /** 코드 ID */\n    private String codeId = \"\";\n\n    /** 상세코드 */\n    private String code = \"\";\n\n    /** 코드명 */\n    private String codeNm = \"\";\n\n    /** 코드설명 */\n    private String codeDc = \"\";\n\n    /** 특정테이블명 */\n    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용\n\n    /** 상세 조건 여부 */\n    private String haveDetailCondition = \"N\";\n\n    /** 상세 조건 */\n    private String detailCondition = \"\";\n\n    /**\n     * toString 메소드를 대치한다.\n     */\n    public String toString() {\n    \treturn ToStringBuilder.reflectionToString(this);\n    }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCmmUseService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "slice": {
+        "endLine": 60,
+        "startLine": 16,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이삼섭          최초 생성\n *   2025.07.16  이백행          2025년 컨트리뷰션 `throws Exception` 제거\n *\n *      </pre>\n */\npublic interface EgovCmmUseService {\n\n\t/**\n\t * 공통코드를 조회한다.\n\t *\n\t * @param comDefaultCodeVO\n\t * @return List(코드)\n\t */\n\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * ComDefaultCodeVO의 리스트를 받아서 여러개의 코드 리스트를 맵에 담아서 리턴한다.\n\t *\n\t * @param comDefaultCodeVOs\n\t * @return Map(코드)\n\t */\n\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);\n\n\t/**\n\t * 조직정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 조직정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * 그룹정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 그룹정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovInsttCodeRecptnService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+      "slice": {
+        "endLine": 72,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호          최초 생성\n *\n * Copyright (C) 2009 by MOPAS  All rights reserved.\n * </pre>\n */\npublic interface EgovInsttCodeRecptnService {\n\n\t/**\n\t * 기관코드수신을 처리한다.\n\t * @param insttCode\n\t * @throws Exception\n\t */\n\tvoid insertInsttCodeRecptn() throws Exception;\n\n\t/**\n\t * 기관코드 상세내역을 조회한다.\n\t * @param insttCode\n\t * @return InsttCode(기관코드)\n\t * @throws Exception\n\t */\n\tInsttCodeRecptn selectInsttCodeDetail(InsttCodeRecptn insttCodeRecptn) throws Exception;\n\n\t/**\n\t * 기관코드수신 목록을 조회한다.\n\t * @param searchVO\n\t * @return List(기관코드 목록)\n\t * @throws Exception\n\t */\n\tList<EgovMap> selectInsttCodeRecptnList(InsttCodeRecptnVO searchVO) throws Exception;\n\n    /**\n\t * 기관코드수신 총 개수를 조회한다.\n     * @param searchVO\n     * @return int(기관코드 총 개수)\n     */\n    int selectInsttCodeRecptnListTotCnt(InsttCodeRecptnVO searchVO) throws Exception;\n\n\t/**\n\t * 기관코드 목록을 조회한다.\n\t * @param searchVO\n\t * @return List(기관코드 목록)\n\t * @throws Exception\n\t */\n\tList<EgovMap> selectInsttCodeList(InsttCodeRecptnVO searchVO) throws Exception;\n\n    /**\n\t * 기관코드 총 개수를 조회한다.\n     * @param searchVO\n     * @return int(기관코드 총 개수)\n     */\n    int selectInsttCodeListTotCnt(InsttCodeRecptnVO searchVO) throws Exception;\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "InsttCodeRecptnVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+      "slice": {
+        "endLine": 60,
+        "startLine": 16,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.01  이중호          최초 생성\n *\n * Copyright (C) 2009 by MOPAS  All rights reserved.\n * </pre>\n */\n@Getter\n@Setter\npublic class InsttCodeRecptnVO extends InsttCodeRecptn implements Serializable {\n\n\tprivate static final long serialVersionUID = -1775265891182170426L;\n\n\t/** 검색조건 */\n    private String searchCondition = \"\";\n\n    /** 검색Keyword */\n    private String searchKeyword = \"\";\n\n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n\n    /** 현재페이지 */\n    private int pageIndex = 1;\n\n    /** 페이지개수 */\n    private int pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private int pageSize = 10;\n\n    /** firstIndex */\n    private int firstIndex = 1;\n\n    /** lastIndex */\n    private int lastIndex = 1;\n\n    /** recordCountPerPage */\n    private int recordCountPerPage = 10;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovInsttCodeRecptnController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java — java 파일",
+        "tags": []
+      },
+      "line": 71,
+      "relPath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+      "slice": {
+        "endLine": 140,
+        "startLine": 61,
+        "text": "\t * 기관코드를 수신처리한다.\n\t *\n\t * @param insttCodeRecptn\n\t * @param bindingResult\n\t * @param commandMap\n\t * @param model\n\t * @return \"egovframework/com/sym/ccm/icr/EgovInsttCodeRegist_TEST\"\n\t * @return \"forward:/sym/ccm/icr/getInsttCodeRecptnList.do\"\n\t * @throws Exception\n\t */\n    @RequestMapping(value = \"/sym/ccm/icr/addInsttCode.do\")\n\tpublic String insertInsttCodeRecptn (InsttCodeRecptn insttCodeRecptn\n\t\t\t, BindingResult bindingResult\n\t\t\t, @RequestParam Map<?, ?> commandMap\n\t\t\t, ModelMap model\n\t\t\t) throws Exception {\n\t\tString sCmd = commandMap.get(\"cmd\") == null ? \"\" : (String)commandMap.get(\"cmd\");\n    \tif   (sCmd.equals(\"\")) {\n\t    \tinsttCodeManageService.insertInsttCodeRecptn();\n\n    \t\treturn \"egovframework/com/sym/ccm/icr/EgovInsttCodeRegist_TEST\";\n    \t} else {\n\t        return \"forward:/sym/ccm/icr/getInsttCodeRecptnList.do\";\n    \t}\n    }\n\n\t/**\n\t * 기관코드 상세내역을 조회한다.\n\t * @param insttCode\n\t * @param insttCodeRecptnVO\n\t * @param model\n\t * @return\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/sym/ccm/icr/getInsttCodeDetail.do\")\n \tpublic String selectInsttCodeDetail (@ModelAttribute(\"insttCode\") InsttCodeRecptn insttCode\n\t\t\t, @ModelAttribute(\"insttCodeRecptnVO\") InsttCodeRecptnVO insttCodeRecptnVO\n\t\t\t, ModelMap model\n \t\t\t) throws Exception {\n\t\t/* 기관코드 조회 */\n\t\tInsttCodeRecptn vo = insttCodeManageService.selectInsttCodeDetail(insttCode);\n\t\tmodel.addAttribute(\"result\", vo);\n\n    \t/* 기관코드수신 리스트 */\n    \tinsttCodeRecptnVO.setRecordCountPerPage(9999999);\n    \tinsttCodeRecptnVO.setFirstIndex(0);\n\n\n    \t/* 공통코드처리 */\n    \tComDefaultCodeVO comCodeVO = new ComDefaultCodeVO();\n\n    \t/* 변경구분코드 */\n    \tcomCodeVO.setCodeId(\"COM043\");\n        List<CmmnDetailCode> changeSeCodeList = cmmUseService.selectCmmCodeDetail(comCodeVO);\n        model.addAttribute(\"changeSeCodeList\", changeSeCodeList);\n\n    \t/* 처리구분코드 */\n        comCodeVO.setCodeId(\"COM044\");\n        List<CmmnDetailCode> processSeList = cmmUseService.selectCmmCodeDetail(comCodeVO);\n        model.addAttribute(\"processSeList\", processSeList);\n\n        insttCodeRecptnVO.setSearchCondition(\"CodeList\");\n        List<EgovMap> insttCodeRecptnList = insttCodeManageService.selectInsttCodeRecptnList(insttCodeRecptnVO);\n        model.addAttribute(\"insttCodeRecptnList\", insttCodeRecptnList);\n\n\t\treturn \"egovframework/com/sym/ccm/icr/EgovInsttCodeDetail\";\n\t}\n\n    /**\n     * 기관코드수신 목록을 조회한다.\n     * @param searchVO\n     * @param model\n     * @return \"egovframework/com/sym/ccm/icr/EgovInsttCodeRecptnList\"\n     * @throws Exception\n     */\n\t@IncludedInfo(name=\"기관코드수신\", listUrl=\"/sym/ccm/icr/getInsttCodeRecptnList.do\", order = 1020 ,gid = 60)\n    @RequestMapping(value = \"/sym/ccm/icr/getInsttCodeRecptnList.do\")\n\tpublic String selectInsttCodeRecptnList (@ModelAttribute(\"searchVO\") InsttCodeRecptnVO searchVO\n\t\t\t, ModelMap model\n\t\t\t) throws Exception {",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovInsttCodeRecptnController#insertInsttCodeRecptn",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+      "flowId": "flow:ANY /sym/ccm/icr/addInsttCode.do",
+      "line": 71,
+      "stepIds": [
+        "step:ANY /sym/ccm/icr/addInsttCode.do:src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+        "step:ANY /sym/ccm/icr/addInsttCode.do:src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovInsttCodeRecptnController#selectInsttCodeDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+      "flowId": "flow:ANY /sym/ccm/icr/getInsttCodeDetail.do",
+      "line": 95,
+      "stepIds": [
+        "step:ANY /sym/ccm/icr/getInsttCodeDetail.do:src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+        "step:ANY /sym/ccm/icr/getInsttCodeDetail.do:src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+        "step:ANY /sym/ccm/icr/getInsttCodeDetail.do:src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+        "step:ANY /sym/ccm/icr/getInsttCodeDetail.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /sym/ccm/icr/getInsttCodeDetail.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovInsttCodeRecptnController#selectInsttCodeRecptnList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+      "flowId": "flow:ANY /sym/ccm/icr/getInsttCodeRecptnList.do",
+      "line": 137,
+      "stepIds": [
+        "step:ANY /sym/ccm/icr/getInsttCodeRecptnList.do:src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+        "step:ANY /sym/ccm/icr/getInsttCodeRecptnList.do:src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+        "step:ANY /sym/ccm/icr/getInsttCodeRecptnList.do:src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovInsttCodeRecptnController#selectInsttCodeRecptnMainList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+      "flowId": "flow:ANY /sym/ccm/icr/getInsttCodeRecptnMainList.do",
+      "line": 173,
+      "stepIds": [
+        "step:ANY /sym/ccm/icr/getInsttCodeRecptnMainList.do:src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+        "step:ANY /sym/ccm/icr/getInsttCodeRecptnMainList.do:src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+        "step:ANY /sym/ccm/icr/getInsttCodeRecptnMainList.do:src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "sym.ccm.icr",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+      "stepId": "step:ANY /sym/ccm/icr/addInsttCode.do:src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+      "stepId": "step:ANY /sym/ccm/icr/addInsttCode.do:src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeDetail.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeDetail.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeDetail.do:src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeDetail.do:src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeDetail.do:src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeRecptnList.do:src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeRecptnList.do:src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeRecptnList.do:src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeRecptnMainList.do:src/main/java/egovframework/com/sym/ccm/icr/service/EgovInsttCodeRecptnService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeRecptnMainList.do:src/main/java/egovframework/com/sym/ccm/icr/service/InsttCodeRecptnVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java",
+      "stepId": "step:ANY /sym/ccm/icr/getInsttCodeRecptnMainList.do:src/main/java/egovframework/com/sym/ccm/icr/web/EgovInsttCodeRecptnController.java"
+    }
+  ]
+}

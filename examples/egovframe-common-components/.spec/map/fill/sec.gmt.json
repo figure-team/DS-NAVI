@@ -1,0 +1,2488 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "a1"
+        },
+        {
+          "from": "a1",
+          "to": "a2"
+        },
+        {
+          "from": "a2",
+          "to": "a3"
+        },
+        {
+          "from": "a3",
+          "to": "a4"
+        },
+        {
+          "from": "a4",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "그룹 관리 화면 진입"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 65,
+              "snippet": "@RequestMapping(\"/sec/gmt/EgovGroupListView.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sec/gmt/EgovGroupListView.do",
+          "id": "a1",
+          "kind": "activity",
+          "label": "목록 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 78,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sec/gmt/EgovGroupList.do",
+          "id": "a2",
+          "kind": "activity",
+          "label": "그룹 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 94,
+              "snippet": "        int totCnt = egovGroupManageService.selectGroupListTotCnt(groupManageVO);"
+            }
+          ],
+          "id": "a3",
+          "kind": "activity",
+          "label": "전체 건수 산출"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 97,
+              "snippet": "        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+            }
+          ],
+          "id": "a4",
+          "kind": "activity",
+          "label": "조회 결과 메시지 표시"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "목록 표시 완료"
+        }
+      ],
+      "title": "그룹 목록 조회"
+    },
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "a1"
+        },
+        {
+          "from": "a1",
+          "to": "a2"
+        },
+        {
+          "from": "a2",
+          "to": "d1"
+        },
+        {
+          "from": "d1",
+          "label": "오류 있음",
+          "to": "a3"
+        },
+        {
+          "from": "d1",
+          "label": "오류 없음",
+          "to": "a4"
+        },
+        {
+          "from": "a3",
+          "to": "e"
+        },
+        {
+          "from": "a4",
+          "to": "a5"
+        },
+        {
+          "from": "a5",
+          "to": "a6"
+        },
+        {
+          "from": "a6",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "그룹 등록 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 122,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupInsertView.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sec/gmt/EgovGroupInsertView.do",
+          "id": "a1",
+          "kind": "activity",
+          "label": "등록 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 135,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupInsert.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sec/gmt/EgovGroupInsert.do",
+          "id": "a2",
+          "kind": "activity",
+          "label": "그룹 정보 입력 접수"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 141,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            }
+          ],
+          "id": "d1",
+          "kind": "decision",
+          "label": "입력 항목 정합성 오류"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 141,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            }
+          ],
+          "id": "a3",
+          "kind": "activity",
+          "label": "등록 화면 재표시"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 144,
+              "snippet": "\t    \tgroupManage.setGroupId(egovGroupIdGnrService.getNextStringId());"
+            }
+          ],
+          "id": "a4",
+          "kind": "activity",
+          "label": "그룹 아이디 채번"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 47,
+              "snippet": "\tpublic GroupManageVO insertGroup(GroupManage groupManage, GroupManageVO groupManageVO) throws Exception;"
+            }
+          ],
+          "id": "a5",
+          "kind": "activity",
+          "label": "그룹 정보 저장"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 147,
+              "snippet": "\t        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            }
+          ],
+          "id": "a6",
+          "kind": "activity",
+          "label": "등록 완료 메시지 표시"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "그룹 목록으로 이동"
+        }
+      ],
+      "title": "그룹 등록"
+    },
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "a1"
+        },
+        {
+          "from": "a1",
+          "to": "a2"
+        },
+        {
+          "from": "a2",
+          "to": "d1"
+        },
+        {
+          "from": "d1",
+          "label": "오류 있음",
+          "to": "a3"
+        },
+        {
+          "from": "d1",
+          "label": "오류 없음",
+          "to": "a4"
+        },
+        {
+          "from": "a3",
+          "to": "e"
+        },
+        {
+          "from": "a4",
+          "to": "a5"
+        },
+        {
+          "from": "a5",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "그룹 수정 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sec/gmt/EgovGroup.do",
+          "id": "a1",
+          "kind": "activity",
+          "label": "그룹 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 159,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupUpdate.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sec/gmt/EgovGroupUpdate.do",
+          "id": "a2",
+          "kind": "activity",
+          "label": "수정 정보 접수"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 164,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            }
+          ],
+          "id": "d1",
+          "kind": "decision",
+          "label": "입력 항목 정합성 오류"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 164,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            }
+          ],
+          "id": "a3",
+          "kind": "activity",
+          "label": "수정 화면 재표시"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 159,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupUpdate.do\")"
+            }
+          ],
+          "id": "a4",
+          "kind": "activity",
+          "label": "수정 내용 반영"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 168,
+              "snippet": "            model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.update\"));"
+            }
+          ],
+          "id": "a5",
+          "kind": "activity",
+          "label": "수정 완료 메시지 표시"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "그룹 목록으로 이동"
+        }
+      ],
+      "title": "그룹 정보 수정"
+    },
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "d1"
+        },
+        {
+          "from": "d1",
+          "label": "단건 삭제",
+          "to": "a1"
+        },
+        {
+          "from": "d1",
+          "label": "일괄 삭제",
+          "to": "a2"
+        },
+        {
+          "from": "a1",
+          "to": "a4"
+        },
+        {
+          "from": "a2",
+          "to": "a3"
+        },
+        {
+          "from": "a3",
+          "to": "a4"
+        },
+        {
+          "from": "a4",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "그룹 삭제 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 180,
+              "snippet": "\tpublic String deleteGroup(@ModelAttribute(\"groupManage\") GroupManage groupManage,"
+            }
+          ],
+          "id": "d1",
+          "kind": "decision",
+          "label": "삭제 방식 구분"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 179,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupDelete.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sec/gmt/EgovGroupDelete.do",
+          "id": "a1",
+          "kind": "activity",
+          "label": "단건 그룹 삭제"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 194,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupListDelete.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sec/gmt/EgovGroupListDelete.do",
+          "id": "a2",
+          "kind": "activity",
+          "label": "선택 그룹 일괄 삭제"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 207,
+              "snippet": "    \t\tegovGroupManageService.deleteGroup(groupManage);"
+            }
+          ],
+          "id": "a3",
+          "kind": "activity",
+          "label": "선택 목록 반복 삭제"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 183,
+              "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.delete\"));"
+            }
+          ],
+          "id": "a4",
+          "kind": "activity",
+          "label": "삭제 완료 메시지 표시"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "그룹 목록으로 이동"
+        }
+      ],
+      "title": "그룹 삭제"
+    },
+    {
+      "edges": [
+        {
+          "from": "s",
+          "to": "a1"
+        },
+        {
+          "from": "a1",
+          "to": "a2"
+        },
+        {
+          "from": "a2",
+          "to": "a3"
+        },
+        {
+          "from": "a3",
+          "to": "e"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "kind": "start",
+          "label": "그룹 검색 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 219,
+              "snippet": "@RequestMapping(\"/sec/gmt/EgovGroupSearchView.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sec/gmt/EgovGroupSearchView.do",
+          "id": "a1",
+          "kind": "activity",
+          "label": "검색 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 231,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupSearchList.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /sec/gmt/EgovGroupSearchList.do",
+          "id": "a2",
+          "kind": "activity",
+          "label": "검색 조건별 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 247,
+              "snippet": "        int totCnt = egovGroupManageService.selectGroupListTotCnt(groupManageVO);"
+            }
+          ],
+          "id": "a3",
+          "kind": "activity",
+          "label": "검색 결과 건수 산출"
+        },
+        {
+          "id": "e",
+          "kind": "end",
+          "label": "검색 결과 표시"
+        }
+      ],
+      "title": "그룹 검색"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+          "line": 41,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+          "line": 42,
+          "snippet": "\t@Size(max=60)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+          "line": 43,
+          "snippet": "\tprivate String groupNm;"
+        }
+      ],
+      "text": "그룹명은 반드시 입력해야 하며 60자를 초과할 수 없다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+          "line": 141,
+          "snippet": "    \tif (bindingResult.hasErrors()) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+          "line": 164,
+          "snippet": "    \tif (bindingResult.hasErrors()) {"
+        }
+      ],
+      "text": "그룹 등록·수정 시 입력 항목 정합성 오류가 있으면 저장하지 않고 입력 화면으로 되돌린다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+          "line": 144,
+          "snippet": "\t    \tgroupManage.setGroupId(egovGroupIdGnrService.getNextStringId());"
+        }
+      ],
+      "text": "신규 그룹의 그룹 아이디는 사용자가 입력하지 않고 아이디 채번 규칙에 따라 자동 부여한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+          "line": 147,
+          "snippet": "\t        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+          "line": 149,
+          "snippet": "\t        return \"forward:/sec/gmt/EgovGroupList.do\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+          "line": 183,
+          "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.delete\"));"
+        }
+      ],
+      "text": "등록·수정·삭제 처리가 끝나면 결과 메시지를 담아 그룹 목록 화면으로 이동한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+          "line": 195,
+          "snippet": "\tpublic String deleteGroupList(@RequestParam(\"groupIds\") String groupIds,"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+          "line": 207,
+          "snippet": "    \t\tegovGroupManageService.deleteGroup(groupManage);"
+        }
+      ],
+      "text": "그룹 일괄 삭제는 선택된 그룹 아이디들을 받아 한 건씩 삭제 처리한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+          "line": 94,
+          "snippet": "        int totCnt = egovGroupManageService.selectGroupListTotCnt(groupManageVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+          "line": 68,
+          "snippet": "\tpublic int selectGroupListTotCnt(GroupManageVO groupManageVO) throws Exception;\t"
+        }
+      ],
+      "text": "그룹 목록 조회는 조회 결과와 함께 전체 건수를 별도로 산출한다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+          "line": 147,
+          "snippet": "\t        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+          "line": 183,
+          "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.delete\"));"
+        }
+      ],
+      "text": "공통 메시지 관리와 연계해 등록·수정·삭제·조회 결과 안내 메시지를 메시지 자원에서 조회한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+          "line": 144,
+          "snippet": "\t    \tgroupManage.setGroupId(egovGroupIdGnrService.getNextStringId());"
+        }
+      ],
+      "text": "공통 아이디 채번과 연계해 신규 그룹 아이디를 발급받는다."
+    }
+  ],
+  "domainId": "domain:sec.gmt",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+          "line": 25,
+          "snippet": "public class GroupManage extends ComDefaultVO {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+          "line": 37,
+          "snippet": "\tprivate String groupId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+          "line": 43,
+          "snippet": "\tprivate String groupNm;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+          "line": 47,
+          "snippet": "\tprivate String groupCreatDe;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+          "line": 52,
+          "snippet": "\tprivate String groupDc;"
+        }
+      ],
+      "text": "그룹 기본정보 - 그룹 아이디, 그룹명, 그룹등록일시, 그룹설명으로 구성되는 그룹 관리의 핵심 정보이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+          "line": 28,
+          "snippet": "public class GroupManageVO extends GroupManage {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+          "line": 37,
+          "snippet": "\tList<GroupManageVO> groupManageList;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+          "line": 41,
+          "snippet": "\tString[] delYn;"
+        }
+      ],
+      "text": "그룹 조회 정보 - 그룹 기본정보를 확장해 조회된 그룹 목록과 일괄 삭제 대상 표시를 함께 보유한다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /sec/gmt/EgovGroup.do",
+      "name": "그룹 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovGroupManageService {"
+          }
+        ],
+        "text": "검색 조건에 해당하는 단일 그룹의 기본정보를 조회해 그룹 수정 화면에 표시하는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/gmt/EgovGroupDelete.do",
+      "name": "그룹 단건 삭제",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 179,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupDelete.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 182,
+            "snippet": "\t\tegovGroupManageService.deleteGroup(groupManage);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 183,
+            "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.delete\"));"
+          }
+        ],
+        "text": "화면에서 선택한 그룹 한 건을 삭제하고 삭제 완료 메시지와 함께 그룹 목록으로 되돌리는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/gmt/EgovGroupInsert.do",
+      "name": "그룹 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 135,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupInsert.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 141,
+            "snippet": "    \tif (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 144,
+            "snippet": "\t    \tgroupManage.setGroupId(egovGroupIdGnrService.getNextStringId());"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 147,
+            "snippet": "\t        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+          }
+        ],
+        "text": "입력한 그룹 기본정보의 정합성을 검증한 뒤 그룹 아이디를 채번해 신규 그룹을 저장하고 목록으로 이동하는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/gmt/EgovGroupInsertView.do",
+      "name": "그룹 등록 화면 이동",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 122,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupInsertView.do\")"
+          }
+        ],
+        "text": "그룹 기본정보를 입력할 등록 화면을 열어주는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/gmt/EgovGroupList.do",
+      "name": "그룹 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 78,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 94,
+            "snippet": "        int totCnt = egovGroupManageService.selectGroupListTotCnt(groupManageVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 97,
+            "snippet": "        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+          }
+        ],
+        "text": "시스템 사용 목적별 그룹 목록을 전체 건수와 함께 페이지 단위로 조회해 관리 화면에 표시하는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/gmt/EgovGroupListDelete.do",
+      "name": "그룹 일괄 삭제",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 194,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupListDelete.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 195,
+            "snippet": "\tpublic String deleteGroupList(@RequestParam(\"groupIds\") String groupIds,"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 207,
+            "snippet": "    \t\tegovGroupManageService.deleteGroup(groupManage);"
+          }
+        ],
+        "text": "목록에서 선택한 여러 그룹 아이디를 받아 한 건씩 삭제한 뒤 완료 메시지와 함께 목록으로 되돌리는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/gmt/EgovGroupListView.do",
+      "name": "그룹 목록 화면 이동",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 65,
+            "snippet": "@RequestMapping(\"/sec/gmt/EgovGroupListView.do\")"
+          }
+        ],
+        "text": "그룹 관리 목록 화면을 열어주는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/gmt/EgovGroupSearchList.do",
+      "name": "그룹 검색 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 231,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupSearchList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 247,
+            "snippet": "        int totCnt = egovGroupManageService.selectGroupListTotCnt(groupManageVO);"
+          }
+        ],
+        "text": "검색 조건에 맞는 그룹 목록을 전체 건수와 함께 조회해 검색 결과 화면에 표시하는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/gmt/EgovGroupSearchView.do",
+      "name": "그룹 검색 화면 이동",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 219,
+            "snippet": "@RequestMapping(\"/sec/gmt/EgovGroupSearchView.do\")"
+          }
+        ],
+        "text": "그룹 검색 조건을 입력할 화면을 열어주는 업무 흐름이다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/gmt/EgovGroupUpdate.do",
+      "name": "그룹 정보 수정",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 159,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupUpdate.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 164,
+            "snippet": "    \tif (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 168,
+            "snippet": "            model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.update\"));"
+          }
+        ],
+        "text": "조회된 그룹의 기본정보를 수정할 때 항목 정합성을 검증하고 통과 시 반영한 뒤 목록으로 이동하는 업무 흐름이다."
+      }
+    }
+  ],
+  "name": "그룹 관리",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 47,
+              "snippet": "\tpublic GroupManageVO insertGroup(GroupManage groupManage, GroupManageVO groupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 60,
+              "snippet": "\tpublic void deleteGroup(GroupManage groupManage) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 68,
+              "snippet": "\tpublic int selectGroupListTotCnt(GroupManageVO groupManageVO) throws Exception;\t"
+            }
+          ],
+          "text": "그룹 등록은 그룹 정보와 그룹 조회 조건을 함께 받아 저장 결과를 반환하고, 삭제는 그룹 정보를 받아 제거하며, 목록 조회는 전체 건수를 별도로 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovGroupManageService {"
+            }
+          ],
+          "text": "그룹 상세 조회 업무에서 그룹 정보의 조회·등록·수정·삭제 작업을 조율하는 그룹 관리 서비스 계약이다."
+        }
+      },
+      "name": "그룹 상세 조회 - 그룹 관리 서비스 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroup.do:src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovGroupManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+          }
+        ],
+        "text": "그룹 상세 조회 업무에서 그룹 정보의 조회·등록·수정·삭제 업무 작업을 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 141,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 164,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 149,
+              "snippet": "\t        return \"forward:/sec/gmt/EgovGroupList.do\";"
+            }
+          ],
+          "text": "요청 파라미터는 그룹 정보 객체로 바인딩되며, 등록·수정 요청은 검증 오류 여부를 확인해 오류가 있으면 입력 화면으로 되돌리고 정상일 때만 저장 처리를 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+            }
+          ],
+          "text": "그룹 상세 조회 업무의 진입 지점으로, 화면에서 들어온 그룹 관리 요청을 받아 그룹 관리 서비스에 처리를 위임하고 결과 화면을 지정한다."
+        }
+      },
+      "name": "그룹 상세 조회 - 요청 접수 및 화면 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroup.do:src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+          }
+        ],
+        "text": "그룹 상세 조회 업무에서 화면 요청을 받아 그룹 관리 서비스에 처리를 위임하고 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 147,
+              "snippet": "\t        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 168,
+              "snippet": "            model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.update\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 183,
+              "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.delete\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 97,
+              "snippet": "        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+            }
+          ],
+          "text": "등록·수정·삭제·조회 성공 시 각각의 공통 성공 메시지 코드를 조회해 화면 모델에 담는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "그룹 단건 삭제 업무의 처리 결과를 사용자에게 알릴 메시지를 메시지 자원에서 조회해 제공하는 공통 메시지 처리 구성요소이다."
+        }
+      },
+      "name": "그룹 단건 삭제 - 처리 결과 메시지 제공",
+      "stepId": "step:ANY /sec/gmt/EgovGroupDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 179,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupDelete.do\")"
+          }
+        ],
+        "text": "그룹 단건 삭제 업무에서 처리 결과에 해당하는 공통 안내 메시지를 조회해 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 47,
+              "snippet": "\tpublic GroupManageVO insertGroup(GroupManage groupManage, GroupManageVO groupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 60,
+              "snippet": "\tpublic void deleteGroup(GroupManage groupManage) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 68,
+              "snippet": "\tpublic int selectGroupListTotCnt(GroupManageVO groupManageVO) throws Exception;\t"
+            }
+          ],
+          "text": "그룹 등록은 그룹 정보와 그룹 조회 조건을 함께 받아 저장 결과를 반환하고, 삭제는 그룹 정보를 받아 제거하며, 목록 조회는 전체 건수를 별도로 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovGroupManageService {"
+            }
+          ],
+          "text": "그룹 단건 삭제 업무에서 그룹 정보의 조회·등록·수정·삭제 작업을 조율하는 그룹 관리 서비스 계약이다."
+        }
+      },
+      "name": "그룹 단건 삭제 - 그룹 관리 서비스 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroupDelete.do:src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovGroupManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 179,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupDelete.do\")"
+          }
+        ],
+        "text": "그룹 단건 삭제 업무에서 그룹 정보의 조회·등록·수정·삭제 업무 작업을 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 141,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 164,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 149,
+              "snippet": "\t        return \"forward:/sec/gmt/EgovGroupList.do\";"
+            }
+          ],
+          "text": "요청 파라미터는 그룹 정보 객체로 바인딩되며, 등록·수정 요청은 검증 오류 여부를 확인해 오류가 있으면 입력 화면으로 되돌리고 정상일 때만 저장 처리를 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 179,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupDelete.do\")"
+            }
+          ],
+          "text": "그룹 단건 삭제 업무의 진입 지점으로, 화면에서 들어온 그룹 관리 요청을 받아 그룹 관리 서비스에 처리를 위임하고 결과 화면을 지정한다."
+        }
+      },
+      "name": "그룹 단건 삭제 - 요청 접수 및 화면 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroupDelete.do:src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 179,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupDelete.do\")"
+          }
+        ],
+        "text": "그룹 단건 삭제 업무에서 화면 요청을 받아 그룹 관리 서비스에 처리를 위임하고 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 147,
+              "snippet": "\t        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 168,
+              "snippet": "            model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.update\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 183,
+              "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.delete\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 97,
+              "snippet": "        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+            }
+          ],
+          "text": "등록·수정·삭제·조회 성공 시 각각의 공통 성공 메시지 코드를 조회해 화면 모델에 담는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "그룹 등록 업무의 처리 결과를 사용자에게 알릴 메시지를 메시지 자원에서 조회해 제공하는 공통 메시지 처리 구성요소이다."
+        }
+      },
+      "name": "그룹 등록 - 처리 결과 메시지 제공",
+      "stepId": "step:ANY /sec/gmt/EgovGroupInsert.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 135,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupInsert.do\")"
+          }
+        ],
+        "text": "그룹 등록 업무에서 처리 결과에 해당하는 공통 안내 메시지를 조회해 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 47,
+              "snippet": "\tpublic GroupManageVO insertGroup(GroupManage groupManage, GroupManageVO groupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 60,
+              "snippet": "\tpublic void deleteGroup(GroupManage groupManage) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 68,
+              "snippet": "\tpublic int selectGroupListTotCnt(GroupManageVO groupManageVO) throws Exception;\t"
+            }
+          ],
+          "text": "그룹 등록은 그룹 정보와 그룹 조회 조건을 함께 받아 저장 결과를 반환하고, 삭제는 그룹 정보를 받아 제거하며, 목록 조회는 전체 건수를 별도로 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovGroupManageService {"
+            }
+          ],
+          "text": "그룹 등록 업무에서 그룹 정보의 조회·등록·수정·삭제 작업을 조율하는 그룹 관리 서비스 계약이다."
+        }
+      },
+      "name": "그룹 등록 - 그룹 관리 서비스 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroupInsert.do:src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovGroupManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 135,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupInsert.do\")"
+          }
+        ],
+        "text": "그룹 등록 업무에서 그룹 정보의 조회·등록·수정·삭제 업무 작업을 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+              "line": 37,
+              "snippet": "\tprivate String groupId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+              "line": 42,
+              "snippet": "\t@Size(max=60)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+              "line": 43,
+              "snippet": "\tprivate String groupNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+              "line": 47,
+              "snippet": "\tprivate String groupCreatDe;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+              "line": 52,
+              "snippet": "\tprivate String groupDc;"
+            }
+          ],
+          "text": "그룹 아이디, 필수이며 60자 이내인 그룹명, 그룹등록일시, 그룹설명 항목으로 구성되며 그룹명은 값이 반드시 있어야 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+              "line": 25,
+              "snippet": "public class GroupManage extends ComDefaultVO {"
+            }
+          ],
+          "text": "그룹 등록 업무에서 그룹 아이디·그룹명·그룹설명 등 그룹 기본정보를 담아 화면과 서비스 사이를 오가는 데이터 구조이다."
+        }
+      },
+      "name": "그룹 등록 - 그룹 기본정보 데이터",
+      "stepId": "step:ANY /sec/gmt/EgovGroupInsert.do:src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+            "line": 25,
+            "snippet": "public class GroupManage extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 135,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupInsert.do\")"
+          }
+        ],
+        "text": "그룹 등록 업무에서 그룹 아이디·그룹명 등 그룹 기본정보를 담아 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+              "line": 28,
+              "snippet": "public class GroupManageVO extends GroupManage {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+              "line": 37,
+              "snippet": "\tList<GroupManageVO> groupManageList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+              "line": 41,
+              "snippet": "\tString[] delYn;"
+            }
+          ],
+          "text": "그룹 기본정보를 확장해 조회 결과인 그룹 목록과 일괄 삭제 대상 표시 항목을 함께 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+              "line": 28,
+              "snippet": "public class GroupManageVO extends GroupManage {"
+            }
+          ],
+          "text": "그룹 등록 업무에서 그룹 기본정보에 목록과 삭제대상 정보를 더해 화면 조회·일괄 처리에 사용하는 데이터 구조이다."
+        }
+      },
+      "name": "그룹 등록 - 그룹 조회 정보 데이터",
+      "stepId": "step:ANY /sec/gmt/EgovGroupInsert.do:src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+            "line": 28,
+            "snippet": "public class GroupManageVO extends GroupManage {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 135,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupInsert.do\")"
+          }
+        ],
+        "text": "그룹 등록 업무에서 그룹 목록과 삭제대상 정보를 담아 조회 및 일괄 처리에 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 141,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 164,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 149,
+              "snippet": "\t        return \"forward:/sec/gmt/EgovGroupList.do\";"
+            }
+          ],
+          "text": "요청 파라미터는 그룹 정보 객체로 바인딩되며, 등록·수정 요청은 검증 오류 여부를 확인해 오류가 있으면 입력 화면으로 되돌리고 정상일 때만 저장 처리를 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 135,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupInsert.do\")"
+            }
+          ],
+          "text": "그룹 등록 업무의 진입 지점으로, 화면에서 들어온 그룹 관리 요청을 받아 그룹 관리 서비스에 처리를 위임하고 결과 화면을 지정한다."
+        }
+      },
+      "name": "그룹 등록 - 요청 접수 및 화면 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroupInsert.do:src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 135,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupInsert.do\")"
+          }
+        ],
+        "text": "그룹 등록 업무에서 화면 요청을 받아 그룹 관리 서비스에 처리를 위임하고 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 141,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 164,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 149,
+              "snippet": "\t        return \"forward:/sec/gmt/EgovGroupList.do\";"
+            }
+          ],
+          "text": "요청 파라미터는 그룹 정보 객체로 바인딩되며, 등록·수정 요청은 검증 오류 여부를 확인해 오류가 있으면 입력 화면으로 되돌리고 정상일 때만 저장 처리를 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 122,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupInsertView.do\")"
+            }
+          ],
+          "text": "그룹 등록 화면 이동 업무의 진입 지점으로, 화면에서 들어온 그룹 관리 요청을 받아 그룹 관리 서비스에 처리를 위임하고 결과 화면을 지정한다."
+        }
+      },
+      "name": "그룹 등록 화면 이동 - 요청 접수 및 화면 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroupInsertView.do:src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 122,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupInsertView.do\")"
+          }
+        ],
+        "text": "그룹 등록 화면 이동 업무에서 화면 요청을 받아 그룹 관리 서비스에 처리를 위임하고 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 147,
+              "snippet": "\t        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 168,
+              "snippet": "            model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.update\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 183,
+              "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.delete\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 97,
+              "snippet": "        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+            }
+          ],
+          "text": "등록·수정·삭제·조회 성공 시 각각의 공통 성공 메시지 코드를 조회해 화면 모델에 담는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "그룹 목록 조회 업무의 처리 결과를 사용자에게 알릴 메시지를 메시지 자원에서 조회해 제공하는 공통 메시지 처리 구성요소이다."
+        }
+      },
+      "name": "그룹 목록 조회 - 처리 결과 메시지 제공",
+      "stepId": "step:ANY /sec/gmt/EgovGroupList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 78,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupList.do\")"
+          }
+        ],
+        "text": "그룹 목록 조회 업무에서 처리 결과에 해당하는 공통 안내 메시지를 조회해 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 47,
+              "snippet": "\tpublic GroupManageVO insertGroup(GroupManage groupManage, GroupManageVO groupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 60,
+              "snippet": "\tpublic void deleteGroup(GroupManage groupManage) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 68,
+              "snippet": "\tpublic int selectGroupListTotCnt(GroupManageVO groupManageVO) throws Exception;\t"
+            }
+          ],
+          "text": "그룹 등록은 그룹 정보와 그룹 조회 조건을 함께 받아 저장 결과를 반환하고, 삭제는 그룹 정보를 받아 제거하며, 목록 조회는 전체 건수를 별도로 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovGroupManageService {"
+            }
+          ],
+          "text": "그룹 목록 조회 업무에서 그룹 정보의 조회·등록·수정·삭제 작업을 조율하는 그룹 관리 서비스 계약이다."
+        }
+      },
+      "name": "그룹 목록 조회 - 그룹 관리 서비스 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroupList.do:src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovGroupManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 78,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupList.do\")"
+          }
+        ],
+        "text": "그룹 목록 조회 업무에서 그룹 정보의 조회·등록·수정·삭제 업무 작업을 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+              "line": 28,
+              "snippet": "public class GroupManageVO extends GroupManage {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+              "line": 37,
+              "snippet": "\tList<GroupManageVO> groupManageList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+              "line": 41,
+              "snippet": "\tString[] delYn;"
+            }
+          ],
+          "text": "그룹 기본정보를 확장해 조회 결과인 그룹 목록과 일괄 삭제 대상 표시 항목을 함께 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+              "line": 28,
+              "snippet": "public class GroupManageVO extends GroupManage {"
+            }
+          ],
+          "text": "그룹 목록 조회 업무에서 그룹 기본정보에 목록과 삭제대상 정보를 더해 화면 조회·일괄 처리에 사용하는 데이터 구조이다."
+        }
+      },
+      "name": "그룹 목록 조회 - 그룹 조회 정보 데이터",
+      "stepId": "step:ANY /sec/gmt/EgovGroupList.do:src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+            "line": 28,
+            "snippet": "public class GroupManageVO extends GroupManage {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 78,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupList.do\")"
+          }
+        ],
+        "text": "그룹 목록 조회 업무에서 그룹 목록과 삭제대상 정보를 담아 조회 및 일괄 처리에 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 141,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 164,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 149,
+              "snippet": "\t        return \"forward:/sec/gmt/EgovGroupList.do\";"
+            }
+          ],
+          "text": "요청 파라미터는 그룹 정보 객체로 바인딩되며, 등록·수정 요청은 검증 오류 여부를 확인해 오류가 있으면 입력 화면으로 되돌리고 정상일 때만 저장 처리를 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 78,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupList.do\")"
+            }
+          ],
+          "text": "그룹 목록 조회 업무의 진입 지점으로, 화면에서 들어온 그룹 관리 요청을 받아 그룹 관리 서비스에 처리를 위임하고 결과 화면을 지정한다."
+        }
+      },
+      "name": "그룹 목록 조회 - 요청 접수 및 화면 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroupList.do:src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 78,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupList.do\")"
+          }
+        ],
+        "text": "그룹 목록 조회 업무에서 화면 요청을 받아 그룹 관리 서비스에 처리를 위임하고 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 147,
+              "snippet": "\t        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 168,
+              "snippet": "            model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.update\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 183,
+              "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.delete\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 97,
+              "snippet": "        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+            }
+          ],
+          "text": "등록·수정·삭제·조회 성공 시 각각의 공통 성공 메시지 코드를 조회해 화면 모델에 담는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "그룹 일괄 삭제 업무의 처리 결과를 사용자에게 알릴 메시지를 메시지 자원에서 조회해 제공하는 공통 메시지 처리 구성요소이다."
+        }
+      },
+      "name": "그룹 일괄 삭제 - 처리 결과 메시지 제공",
+      "stepId": "step:ANY /sec/gmt/EgovGroupListDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 194,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupListDelete.do\")"
+          }
+        ],
+        "text": "그룹 일괄 삭제 업무에서 처리 결과에 해당하는 공통 안내 메시지를 조회해 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 47,
+              "snippet": "\tpublic GroupManageVO insertGroup(GroupManage groupManage, GroupManageVO groupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 60,
+              "snippet": "\tpublic void deleteGroup(GroupManage groupManage) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 68,
+              "snippet": "\tpublic int selectGroupListTotCnt(GroupManageVO groupManageVO) throws Exception;\t"
+            }
+          ],
+          "text": "그룹 등록은 그룹 정보와 그룹 조회 조건을 함께 받아 저장 결과를 반환하고, 삭제는 그룹 정보를 받아 제거하며, 목록 조회는 전체 건수를 별도로 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovGroupManageService {"
+            }
+          ],
+          "text": "그룹 일괄 삭제 업무에서 그룹 정보의 조회·등록·수정·삭제 작업을 조율하는 그룹 관리 서비스 계약이다."
+        }
+      },
+      "name": "그룹 일괄 삭제 - 그룹 관리 서비스 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroupListDelete.do:src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovGroupManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 194,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupListDelete.do\")"
+          }
+        ],
+        "text": "그룹 일괄 삭제 업무에서 그룹 정보의 조회·등록·수정·삭제 업무 작업을 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+              "line": 37,
+              "snippet": "\tprivate String groupId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+              "line": 42,
+              "snippet": "\t@Size(max=60)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+              "line": 43,
+              "snippet": "\tprivate String groupNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+              "line": 47,
+              "snippet": "\tprivate String groupCreatDe;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+              "line": 52,
+              "snippet": "\tprivate String groupDc;"
+            }
+          ],
+          "text": "그룹 아이디, 필수이며 60자 이내인 그룹명, 그룹등록일시, 그룹설명 항목으로 구성되며 그룹명은 값이 반드시 있어야 한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+              "line": 25,
+              "snippet": "public class GroupManage extends ComDefaultVO {"
+            }
+          ],
+          "text": "그룹 일괄 삭제 업무에서 그룹 아이디·그룹명·그룹설명 등 그룹 기본정보를 담아 화면과 서비스 사이를 오가는 데이터 구조이다."
+        }
+      },
+      "name": "그룹 일괄 삭제 - 그룹 기본정보 데이터",
+      "stepId": "step:ANY /sec/gmt/EgovGroupListDelete.do:src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManage.java",
+            "line": 25,
+            "snippet": "public class GroupManage extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 194,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupListDelete.do\")"
+          }
+        ],
+        "text": "그룹 일괄 삭제 업무에서 그룹 아이디·그룹명 등 그룹 기본정보를 담아 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 141,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 164,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 149,
+              "snippet": "\t        return \"forward:/sec/gmt/EgovGroupList.do\";"
+            }
+          ],
+          "text": "요청 파라미터는 그룹 정보 객체로 바인딩되며, 등록·수정 요청은 검증 오류 여부를 확인해 오류가 있으면 입력 화면으로 되돌리고 정상일 때만 저장 처리를 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 194,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupListDelete.do\")"
+            }
+          ],
+          "text": "그룹 일괄 삭제 업무의 진입 지점으로, 화면에서 들어온 그룹 관리 요청을 받아 그룹 관리 서비스에 처리를 위임하고 결과 화면을 지정한다."
+        }
+      },
+      "name": "그룹 일괄 삭제 - 요청 접수 및 화면 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroupListDelete.do:src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 194,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupListDelete.do\")"
+          }
+        ],
+        "text": "그룹 일괄 삭제 업무에서 화면 요청을 받아 그룹 관리 서비스에 처리를 위임하고 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 141,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 164,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 149,
+              "snippet": "\t        return \"forward:/sec/gmt/EgovGroupList.do\";"
+            }
+          ],
+          "text": "요청 파라미터는 그룹 정보 객체로 바인딩되며, 등록·수정 요청은 검증 오류 여부를 확인해 오류가 있으면 입력 화면으로 되돌리고 정상일 때만 저장 처리를 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 65,
+              "snippet": "@RequestMapping(\"/sec/gmt/EgovGroupListView.do\")"
+            }
+          ],
+          "text": "그룹 목록 화면 이동 업무의 진입 지점으로, 화면에서 들어온 그룹 관리 요청을 받아 그룹 관리 서비스에 처리를 위임하고 결과 화면을 지정한다."
+        }
+      },
+      "name": "그룹 목록 화면 이동 - 요청 접수 및 화면 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroupListView.do:src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 65,
+            "snippet": "@RequestMapping(\"/sec/gmt/EgovGroupListView.do\")"
+          }
+        ],
+        "text": "그룹 목록 화면 이동 업무에서 화면 요청을 받아 그룹 관리 서비스에 처리를 위임하고 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 147,
+              "snippet": "\t        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 168,
+              "snippet": "            model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.update\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 183,
+              "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.delete\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 97,
+              "snippet": "        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+            }
+          ],
+          "text": "등록·수정·삭제·조회 성공 시 각각의 공통 성공 메시지 코드를 조회해 화면 모델에 담는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "그룹 검색 목록 조회 업무의 처리 결과를 사용자에게 알릴 메시지를 메시지 자원에서 조회해 제공하는 공통 메시지 처리 구성요소이다."
+        }
+      },
+      "name": "그룹 검색 목록 조회 - 처리 결과 메시지 제공",
+      "stepId": "step:ANY /sec/gmt/EgovGroupSearchList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 231,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupSearchList.do\")"
+          }
+        ],
+        "text": "그룹 검색 목록 조회 업무에서 처리 결과에 해당하는 공통 안내 메시지를 조회해 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 47,
+              "snippet": "\tpublic GroupManageVO insertGroup(GroupManage groupManage, GroupManageVO groupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 60,
+              "snippet": "\tpublic void deleteGroup(GroupManage groupManage) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 68,
+              "snippet": "\tpublic int selectGroupListTotCnt(GroupManageVO groupManageVO) throws Exception;\t"
+            }
+          ],
+          "text": "그룹 등록은 그룹 정보와 그룹 조회 조건을 함께 받아 저장 결과를 반환하고, 삭제는 그룹 정보를 받아 제거하며, 목록 조회는 전체 건수를 별도로 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovGroupManageService {"
+            }
+          ],
+          "text": "그룹 검색 목록 조회 업무에서 그룹 정보의 조회·등록·수정·삭제 작업을 조율하는 그룹 관리 서비스 계약이다."
+        }
+      },
+      "name": "그룹 검색 목록 조회 - 그룹 관리 서비스 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroupSearchList.do:src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovGroupManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 231,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupSearchList.do\")"
+          }
+        ],
+        "text": "그룹 검색 목록 조회 업무에서 그룹 정보의 조회·등록·수정·삭제 업무 작업을 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+              "line": 28,
+              "snippet": "public class GroupManageVO extends GroupManage {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+              "line": 37,
+              "snippet": "\tList<GroupManageVO> groupManageList;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+              "line": 41,
+              "snippet": "\tString[] delYn;"
+            }
+          ],
+          "text": "그룹 기본정보를 확장해 조회 결과인 그룹 목록과 일괄 삭제 대상 표시 항목을 함께 보유한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+              "line": 28,
+              "snippet": "public class GroupManageVO extends GroupManage {"
+            }
+          ],
+          "text": "그룹 검색 목록 조회 업무에서 그룹 기본정보에 목록과 삭제대상 정보를 더해 화면 조회·일괄 처리에 사용하는 데이터 구조이다."
+        }
+      },
+      "name": "그룹 검색 목록 조회 - 그룹 조회 정보 데이터",
+      "stepId": "step:ANY /sec/gmt/EgovGroupSearchList.do:src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/service/GroupManageVO.java",
+            "line": 28,
+            "snippet": "public class GroupManageVO extends GroupManage {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 231,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupSearchList.do\")"
+          }
+        ],
+        "text": "그룹 검색 목록 조회 업무에서 그룹 목록과 삭제대상 정보를 담아 조회 및 일괄 처리에 사용한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 141,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 164,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 149,
+              "snippet": "\t        return \"forward:/sec/gmt/EgovGroupList.do\";"
+            }
+          ],
+          "text": "요청 파라미터는 그룹 정보 객체로 바인딩되며, 등록·수정 요청은 검증 오류 여부를 확인해 오류가 있으면 입력 화면으로 되돌리고 정상일 때만 저장 처리를 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 231,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupSearchList.do\")"
+            }
+          ],
+          "text": "그룹 검색 목록 조회 업무의 진입 지점으로, 화면에서 들어온 그룹 관리 요청을 받아 그룹 관리 서비스에 처리를 위임하고 결과 화면을 지정한다."
+        }
+      },
+      "name": "그룹 검색 목록 조회 - 요청 접수 및 화면 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroupSearchList.do:src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 231,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupSearchList.do\")"
+          }
+        ],
+        "text": "그룹 검색 목록 조회 업무에서 화면 요청을 받아 그룹 관리 서비스에 처리를 위임하고 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 141,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 164,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 149,
+              "snippet": "\t        return \"forward:/sec/gmt/EgovGroupList.do\";"
+            }
+          ],
+          "text": "요청 파라미터는 그룹 정보 객체로 바인딩되며, 등록·수정 요청은 검증 오류 여부를 확인해 오류가 있으면 입력 화면으로 되돌리고 정상일 때만 저장 처리를 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 219,
+              "snippet": "@RequestMapping(\"/sec/gmt/EgovGroupSearchView.do\")"
+            }
+          ],
+          "text": "그룹 검색 화면 이동 업무의 진입 지점으로, 화면에서 들어온 그룹 관리 요청을 받아 그룹 관리 서비스에 처리를 위임하고 결과 화면을 지정한다."
+        }
+      },
+      "name": "그룹 검색 화면 이동 - 요청 접수 및 화면 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroupSearchView.do:src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 219,
+            "snippet": "@RequestMapping(\"/sec/gmt/EgovGroupSearchView.do\")"
+          }
+        ],
+        "text": "그룹 검색 화면 이동 업무에서 화면 요청을 받아 그룹 관리 서비스에 처리를 위임하고 이동할 화면을 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 147,
+              "snippet": "\t        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 168,
+              "snippet": "            model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.update\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 183,
+              "snippet": "\t\tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.delete\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 97,
+              "snippet": "        model.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.select\"));"
+            }
+          ],
+          "text": "등록·수정·삭제·조회 성공 시 각각의 공통 성공 메시지 코드를 조회해 화면 모델에 담는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ],
+          "text": "그룹 정보 수정 업무의 처리 결과를 사용자에게 알릴 메시지를 메시지 자원에서 조회해 제공하는 공통 메시지 처리 구성요소이다."
+        }
+      },
+      "name": "그룹 정보 수정 - 처리 결과 메시지 제공",
+      "stepId": "step:ANY /sec/gmt/EgovGroupUpdate.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 159,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupUpdate.do\")"
+          }
+        ],
+        "text": "그룹 정보 수정 업무에서 처리 결과에 해당하는 공통 안내 메시지를 조회해 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 47,
+              "snippet": "\tpublic GroupManageVO insertGroup(GroupManage groupManage, GroupManageVO groupManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 60,
+              "snippet": "\tpublic void deleteGroup(GroupManage groupManage) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 68,
+              "snippet": "\tpublic int selectGroupListTotCnt(GroupManageVO groupManageVO) throws Exception;\t"
+            }
+          ],
+          "text": "그룹 등록은 그룹 정보와 그룹 조회 조건을 함께 받아 저장 결과를 반환하고, 삭제는 그룹 정보를 받아 제거하며, 목록 조회는 전체 건수를 별도로 반환한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+              "line": 22,
+              "snippet": "public interface EgovGroupManageService {"
+            }
+          ],
+          "text": "그룹 정보 수정 업무에서 그룹 정보의 조회·등록·수정·삭제 작업을 조율하는 그룹 관리 서비스 계약이다."
+        }
+      },
+      "name": "그룹 정보 수정 - 그룹 관리 서비스 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroupUpdate.do:src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+            "line": 22,
+            "snippet": "public interface EgovGroupManageService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 159,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupUpdate.do\")"
+          }
+        ],
+        "text": "그룹 정보 수정 업무에서 그룹 정보의 조회·등록·수정·삭제 업무 작업을 수행한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 141,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 164,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 149,
+              "snippet": "\t        return \"forward:/sec/gmt/EgovGroupList.do\";"
+            }
+          ],
+          "text": "요청 파라미터는 그룹 정보 객체로 바인딩되며, 등록·수정 요청은 검증 오류 여부를 확인해 오류가 있으면 입력 화면으로 되돌리고 정상일 때만 저장 처리를 진행한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+              "line": 159,
+              "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupUpdate.do\")"
+            }
+          ],
+          "text": "그룹 정보 수정 업무의 진입 지점으로, 화면에서 들어온 그룹 관리 요청을 받아 그룹 관리 서비스에 처리를 위임하고 결과 화면을 지정한다."
+        }
+      },
+      "name": "그룹 정보 수정 - 요청 접수 및 화면 처리",
+      "stepId": "step:ANY /sec/gmt/EgovGroupUpdate.do:src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroup.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+            "line": 159,
+            "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupUpdate.do\")"
+          }
+        ],
+        "text": "그룹 정보 수정 업무에서 화면 요청을 받아 그룹 관리 서비스에 처리를 위임하고 이동할 화면을 결정한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+        "line": 78,
+        "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupList.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/sec/gmt/service/EgovGroupManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovGroupManageService {"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/sec/gmt/web/EgovGroupManageController.java",
+        "line": 135,
+        "snippet": "@RequestMapping(value = \"/sec/gmt/EgovGroupInsert.do\")"
+      }
+    ],
+    "text": "시스템 사용 목적별 사용자 그룹의 기본정보를 등록·조회·수정·삭제하고 검색하는 보안 그룹 관리 업무 영역이다."
+  }
+}

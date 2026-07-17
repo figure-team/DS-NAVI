@@ -1,0 +1,691 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "start",
+          "to": "list"
+        },
+        {
+          "from": "list",
+          "to": "detailReq"
+        },
+        {
+          "from": "detailReq",
+          "to": "hasId"
+        },
+        {
+          "from": "hasId",
+          "label": "아이디 있음",
+          "to": "detail"
+        },
+        {
+          "from": "hasId",
+          "label": "아이디 없음",
+          "to": "end"
+        },
+        {
+          "from": "detail",
+          "to": "secure"
+        },
+        {
+          "from": "secure",
+          "to": "table"
+        },
+        {
+          "from": "table",
+          "to": "end"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "start",
+          "kind": "start",
+          "label": "담당자 조회 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 59,
+              "snippet": "@RequestMapping(value = \"/uss/ion/rsn/listRssTagService.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+              "line": 37,
+              "snippet": "\tpublic List<?> selectRssTagServiceList(RssInfo rssInfo) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/rsn/listRssTagService.do",
+          "id": "list",
+          "kind": "activity",
+          "label": "RSS 태그 서비스 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(value = \"/uss/ion/rsn/detailRssTagService.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 114,
+              "snippet": "    \t\tString sRssId = commandMap.get(\"rssId\") == null ? \"\" : (String) commandMap.get(\"rssId\");"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/ion/rsn/detailRssTagService.do",
+          "id": "detailReq",
+          "kind": "activity",
+          "label": "상세 조회 요청 접수"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 116,
+              "snippet": "    \t\tif(!sRssId.equals(\"\")){"
+            }
+          ],
+          "id": "hasId",
+          "kind": "decision",
+          "label": "서비스 아이디 존재 여부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 118,
+              "snippet": "    \t\t\tMap<String, String> mapRssInfo = (Map<String, String>) egovRssService.selectRssTagServiceDetail(rssInfo);"
+            }
+          ],
+          "id": "detail",
+          "kind": "activity",
+          "label": "RSS 태그 상세정보 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 121,
+              "snippet": "    \t\t\tmapRssInfo.put(\"TRGET_SVC_TABLE\", EgovWebUtil.removeSQLInjectionRisk(mapRssInfo.get(\"TRGET_SVC_TABLE\")));\t// 2012.11 KISA 보안조치"
+            }
+          ],
+          "id": "secure",
+          "kind": "activity",
+          "label": "대상 테이블명 보안 처리"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 123,
+              "snippet": "    \t\t\tmodel.addAttribute(\"mapRssInfoList\", egovRssService.selectRssTagServiceTable(mapRssInfo));"
+            }
+          ],
+          "id": "table",
+          "kind": "activity",
+          "label": "대상 서비스 데이터 조회"
+        },
+        {
+          "id": "end",
+          "kind": "end",
+          "label": "조회 결과 화면 표시"
+        }
+      ],
+      "title": "RSS 태그 서비스 조회"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+          "line": 116,
+          "snippet": "    \t\tif(!sRssId.equals(\"\")){"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+          "line": 114,
+          "snippet": "    \t\tString sRssId = commandMap.get(\"rssId\") == null ? \"\" : (String) commandMap.get(\"rssId\");"
+        }
+      ],
+      "text": "상세 조회는 RSS 태그 서비스 아이디가 요청에 실제로 담겨 있을 때만 수행한다. 아이디가 비어 있으면 조회를 하지 않고 화면만 반환한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+          "line": 121,
+          "snippet": "    \t\t\tmapRssInfo.put(\"TRGET_SVC_TABLE\", EgovWebUtil.removeSQLInjectionRisk(mapRssInfo.get(\"TRGET_SVC_TABLE\")));\t// 2012.11 KISA 보안조치"
+        }
+      ],
+      "text": "상세 조회로 읽어온 대상 서비스 테이블명은 그대로 사용하지 않고 보안 위험 제거 처리를 거친 뒤에야 후속 데이터 조회의 기준으로 쓴다. 공공기관 보안 조치 요건에 따른 규칙이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+          "line": 37,
+          "snippet": "\tpublic List<?> selectRssTagServiceList(RssInfo rssInfo) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+          "line": 45,
+          "snippet": "    public int selectRssTagServiceListCnt(RssInfo rssInfo) throws Exception;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+          "line": 53,
+          "snippet": "\tpublic Map<?, ?> selectRssTagServiceDetail(RssInfo rssInfo) throws Exception;"
+        }
+      ],
+      "text": "RSS 태그 서비스 조회 기능은 목록·건수·상세·대상 테이블 데이터 네 가지 조회로만 정의되어 있으며, 등록·수정·삭제 기능은 이 업무 영역에 포함되지 않는다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 25,
+          "snippet": "public class EgovWebUtil {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+          "line": 121,
+          "snippet": "    \t\t\tmapRssInfo.put(\"TRGET_SVC_TABLE\", EgovWebUtil.removeSQLInjectionRisk(mapRssInfo.get(\"TRGET_SVC_TABLE\")));\t// 2012.11 KISA 보안조치"
+        }
+      ],
+      "text": "공통 보안 유틸리티 업무에 의존한다. RSS 상세 조회가 반환한 대상 서비스 테이블명의 보안 위험 제거를 이 공통 기능에 위임한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+          "line": 19,
+          "snippet": "public class RssInfo extends ComDefaultVO {"
+        }
+      ],
+      "text": "공통 조회 조건 업무 항목을 상속받아 검색어·검색조건·페이지 단위 등 전사 공통 조회 규격을 그대로 따른다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+          "line": 29,
+          "snippet": "\tpublic List<?> selectRssTagServiceTable(Map<?, ?> param) throws Exception;"
+        }
+      ],
+      "text": "대상 서비스 테이블에 담긴 실제 업무 데이터를 읽어오므로, RSS로 발행되는 원천 업무 영역의 데이터에 간접적으로 연결된다."
+    }
+  ],
+  "domainId": "domain:uss.ion.rsn",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+          "line": 19,
+          "snippet": "public class RssInfo extends ComDefaultVO {"
+        }
+      ],
+      "text": "RSS 태그 서비스 정보 — RSS 태그 서비스 한 건의 등록 정보를 담는 업무 항목으로, 공통 조회 항목을 확장해 검색·페이징 조건을 함께 다룬다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+          "line": 24,
+          "snippet": "\tprivate String rssId;"
+        }
+      ],
+      "text": "RSS 태그 서비스 아이디 — 개별 RSS 태그 서비스를 식별하는 업무 키로, 상세 조회의 조회 기준이 된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+          "line": 27,
+          "snippet": "\tprivate String trgetSvcNm;"
+        }
+      ],
+      "text": "대상 서비스명 — 해당 RSS 태그가 어떤 업무 서비스를 대상으로 발행되는지를 나타내는 이름 항목이다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+          "line": 30,
+          "snippet": "\tprivate String trgetSvcTable;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+          "line": 123,
+          "snippet": "    \t\t\tmodel.addAttribute(\"mapRssInfoList\", egovRssService.selectRssTagServiceTable(mapRssInfo));"
+        }
+      ],
+      "text": "대상 서비스 테이블 — RSS 본문에 실릴 실제 데이터를 어느 업무 테이블에서 가져올지 지정하는 항목으로, 상세 조회 시 해당 테이블의 데이터를 함께 읽어온다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+          "line": 33,
+          "snippet": "\tprivate String hderTitle;"
+        }
+      ],
+      "text": "헤더 제목 — 발행되는 RSS 문서의 머리말 영역에 표기될 제목 항목이며, 본문 항목들과 짝을 이뤄 RSS 태그 구성을 이룬다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/ion/rsn/detailRssTagService.do",
+      "name": "RSS 태그 서비스 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/uss/ion/rsn/detailRssTagService.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+            "line": 118,
+            "snippet": "    \t\t\tMap<String, String> mapRssInfo = (Map<String, String>) egovRssService.selectRssTagServiceDetail(rssInfo);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+            "line": 123,
+            "snippet": "    \t\t\tmodel.addAttribute(\"mapRssInfoList\", egovRssService.selectRssTagServiceTable(mapRssInfo));"
+          }
+        ],
+        "text": "담당자가 선택한 RSS 태그 서비스 한 건의 상세 내용을 보여준다. 요청에 서비스 아이디가 담겨 있을 때만 상세정보를 읽어오고, 그 안의 대상 서비스 테이블명을 보안 처리한 뒤 해당 테이블의 실제 데이터 목록까지 함께 조회해 상세 화면에 표시한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rsn/listRssTagService.do",
+      "name": "RSS 태그 서비스 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+            "line": 59,
+            "snippet": "@RequestMapping(value = \"/uss/ion/rsn/listRssTagService.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+            "line": 37,
+            "snippet": "\tpublic List<?> selectRssTagServiceList(RssInfo rssInfo) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+            "line": 45,
+            "snippet": "    public int selectRssTagServiceListCnt(RssInfo rssInfo) throws Exception;"
+          }
+        ],
+        "text": "등록된 RSS 태그 서비스를 목록 형태로 보여준다. 담당자가 입력한 검색 조건과 검색어를 조회 조건으로 삼아 목록과 전체 건수를 함께 읽어오고, 페이징 규격에 맞춰 화면에 표시한다."
+      }
+    }
+  ],
+  "name": "RSS 태그 서비스 관리",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 62,
+              "snippet": "\tpublic static String clearXSS(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "\tpublic static String filePathBlackList(String value) {"
+            }
+          ],
+          "text": "상태를 보관하지 않고 문자열 값을 받아 정제된 문자열을 돌려주는 형태로만 구성된다. 지켜야 할 불변식은 값이 비어 있으면 빈 문자열을 돌려주어 후속 처리에서 빈 값 판단이 일관되게 이뤄지도록 하는 것이며, 화면 표시용 위험 문자 치환과 파일 경로 위험 요소 제거가 각각 별도 기능으로 분리되어 있다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 121,
+              "snippet": "    \t\t\tmapRssInfo.put(\"TRGET_SVC_TABLE\", EgovWebUtil.removeSQLInjectionRisk(mapRssInfo.get(\"TRGET_SVC_TABLE\")));\t// 2012.11 KISA 보안조치"
+            }
+          ],
+          "text": "RSS 태그 서비스 상세 조회 흐름에서 협력 객체로 쓰이는 전사 공통 보안 처리 도구다. RSS 업무 자체의 규칙은 갖지 않고, 화면 표시나 후속 조회에 쓰일 값에서 위험 문자열을 제거해 돌려주는 역할만 맡는다. 상세 조회는 조회 결과로 받은 대상 서비스 테이블명을 이 도구에 넘겨 정제한 뒤 다음 조회의 기준으로 사용한다."
+        }
+      },
+      "name": "공통 보안 처리 유틸",
+      "stepId": "step:ANY /uss/ion/rsn/detailRssTagService.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+            "line": 121,
+            "snippet": "    \t\t\tmapRssInfo.put(\"TRGET_SVC_TABLE\", EgovWebUtil.removeSQLInjectionRisk(mapRssInfo.get(\"TRGET_SVC_TABLE\")));\t// 2012.11 KISA 보안조치"
+          }
+        ],
+        "text": "상세 조회 흐름에서 외부 입력이나 조회 결과에 섞여 들어올 수 있는 보안 위험 문자열을 걸러내는 공통 기능이다. 이 흐름에서는 대상 서비스 테이블명의 위험 요소 제거를 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+              "line": 53,
+              "snippet": "\tpublic Map<?, ?> selectRssTagServiceDetail(RssInfo rssInfo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+              "line": 29,
+              "snippet": "\tpublic List<?> selectRssTagServiceTable(Map<?, ?> param) throws Exception;"
+            }
+          ],
+          "text": "상세 조회는 조회 조건 객체를 받아 RSS 태그 서비스 한 건의 정보를 항목 묶음 형태로 돌려준다. 이어지는 대상 서비스 테이블 조회는 앞선 상세 조회 결과를 그대로 조건으로 받아 목록을 돌려주는 구조여서, 두 조회는 상세 → 대상 데이터 순서로 이어져야 한다는 순서 규칙을 갖는다. 계약 자체는 조회만 정의하며 변경 작업이나 트랜잭션 경계는 두지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+              "line": 21,
+              "snippet": "public interface EgovRssService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+              "line": 53,
+              "snippet": "\tpublic Map<?, ?> selectRssTagServiceDetail(RssInfo rssInfo) throws Exception;"
+            }
+          ],
+          "text": "상세 조회 흐름에서 데이터 조회 업무를 조율하는 계약이다. 화면 요청 처리부는 이 계약에만 의존하며, RSS 태그 서비스 한 건의 상세 조회와 대상 서비스 테이블 데이터 조회 두 가지 작업을 이 계약을 통해 요청한다."
+        }
+      },
+      "name": "RSS 태그 서비스 조회 업무",
+      "stepId": "step:ANY /uss/ion/rsn/detailRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+            "line": 21,
+            "snippet": "public interface EgovRssService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+            "line": 53,
+            "snippet": "\tpublic Map<?, ?> selectRssTagServiceDetail(RssInfo rssInfo) throws Exception;"
+          }
+        ],
+        "text": "상세 조회 흐름에서 RSS 태그 서비스 한 건의 상세 내용과 그 서비스가 가리키는 대상 테이블의 데이터를 읽어오는 업무 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 111,
+              "snippet": "            @RequestParam Map<?, ?> commandMap,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 114,
+              "snippet": "    \t\tString sRssId = commandMap.get(\"rssId\") == null ? \"\" : (String) commandMap.get(\"rssId\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 116,
+              "snippet": "    \t\tif(!sRssId.equals(\"\")){"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 121,
+              "snippet": "    \t\t\tmapRssInfo.put(\"TRGET_SVC_TABLE\", EgovWebUtil.removeSQLInjectionRisk(mapRssInfo.get(\"TRGET_SVC_TABLE\")));\t// 2012.11 KISA 보안조치"
+            }
+          ],
+          "text": "요청 파라미터 묶음과 RSS 태그 서비스 조회 조건 객체를 함께 받는다. 검증은 서비스 아이디가 비어 있는지 확인하는 것 하나이며, 값이 없으면 빈 문자열로 간주해 조회를 건너뛰고 화면만 반환한다. 조회를 수행한 경우에도 결과에 담긴 대상 서비스 테이블명은 그대로 쓰지 않고 공통 보안 처리를 거친 뒤 다음 조회 조건으로 사용한다. 별도의 인증·권한 검사는 이 지점에 두지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 108,
+              "snippet": "@RequestMapping(value = \"/uss/ion/rsn/detailRssTagService.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 119,
+              "snippet": "    \t\t\tmodel.addAttribute(\"mapRssInfo\",mapRssInfo);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 127,
+              "snippet": "        \treturn \"egovframework/com/uss/ion/rsn/EgovRssTagService\";"
+            }
+          ],
+          "text": "상세 조회 요청의 접수 창구 역할을 한다. 담당자가 목록에서 선택한 서비스 아이디를 받아 조회를 수행할지 판단하고, 실제 데이터 조회는 RSS 태그 서비스 조회 업무에 위임한다. 조회 결과인 상세정보와 대상 서비스 데이터를 화면 모델에 담아 상세 화면으로 넘기는 것으로 역할을 마친다."
+        }
+      },
+      "name": "RSS 태그 서비스 상세 화면 요청 처리",
+      "stepId": "step:ANY /uss/ion/rsn/detailRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/uss/ion/rsn/detailRssTagService.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+            "line": 127,
+            "snippet": "        \treturn \"egovframework/com/uss/ion/rsn/EgovRssTagService\";"
+          }
+        ],
+        "text": "RSS 태그 서비스 상세 조회 화면 요청을 받아 조회 여부를 판단하고, 상세정보와 대상 서비스 데이터를 화면에 전달하는 진입 지점이다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+              "line": 37,
+              "snippet": "\tpublic List<?> selectRssTagServiceList(RssInfo rssInfo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+              "line": 45,
+              "snippet": "    public int selectRssTagServiceListCnt(RssInfo rssInfo) throws Exception;"
+            }
+          ],
+          "text": "목록과 건수를 각각 별도 작업으로 나눠 제공하는 것이 핵심 규칙이다. 목록 조회는 조회 조건 객체에 담긴 검색어·검색조건과 페이징 시작·종료 범위를 그대로 반영해 해당 구간만 돌려주고, 건수 조회는 페이징 범위를 무시한 전체 건수를 돌려주어 화면이 총 페이지 수를 계산할 수 있게 한다. 두 작업은 같은 조회 조건 객체를 공유해야 목록과 건수가 어긋나지 않는다. 조회 전용이라 트랜잭션 경계는 두지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+              "line": 21,
+              "snippet": "public interface EgovRssService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+              "line": 37,
+              "snippet": "\tpublic List<?> selectRssTagServiceList(RssInfo rssInfo) throws Exception;"
+            }
+          ],
+          "text": "목록 조회 흐름에서 조회 업무를 조율하는 계약이다. 화면 요청 처리부가 담아 넘긴 검색 조건과 페이징 범위를 받아 해당 구간의 목록을 돌려주고, 페이징 화면 구성에 필요한 전체 건수도 별도로 제공한다."
+        }
+      },
+      "name": "RSS 태그 서비스 목록 조회 업무",
+      "stepId": "step:ANY /uss/ion/rsn/listRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+            "line": 21,
+            "snippet": "public interface EgovRssService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+            "line": 37,
+            "snippet": "\tpublic List<?> selectRssTagServiceList(RssInfo rssInfo) throws Exception;"
+          }
+        ],
+        "text": "목록 조회 흐름에서 검색 조건에 맞는 RSS 태그 서비스 목록과 전체 건수를 읽어오는 업무 기능을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+              "line": 24,
+              "snippet": "\tprivate String rssId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+              "line": 27,
+              "snippet": "\tprivate String trgetSvcNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+              "line": 30,
+              "snippet": "\tprivate String trgetSvcTable;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+              "line": 33,
+              "snippet": "\tprivate String hderTitle;"
+            }
+          ],
+          "text": "식별 항목인 RSS 태그 서비스 아이디를 중심으로, 대상 서비스명과 대상 서비스 테이블이 RSS가 어떤 업무 데이터를 발행하는지를 지정한다. 발행 문서 구성은 헤더 영역 항목과 본문 영역 항목이 제목·링크·설명·태그·기타로 대칭을 이루며, 여기에 최초등록시점·최초등록아이디·최종수정일·최종수정자 아이디의 이력 항목이 따라붙는다. 지켜야 할 불변식은 대상 서비스 테이블 항목이 실제 조회 가능한 업무 테이블을 가리켜야 한다는 점으로, 이 값이 이후 대상 데이터 조회의 기준이 되기 때문에 보안 처리를 거친 뒤에만 사용된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+              "line": 19,
+              "snippet": "public class RssInfo extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+              "line": 37,
+              "snippet": "\tpublic List<?> selectRssTagServiceList(RssInfo rssInfo) throws Exception;"
+            }
+          ],
+          "text": "목록 조회 흐름에서 조건 전달과 결과 표현을 동시에 맡는 데이터 구조다. 화면에서 들어온 검색어·검색조건과 계산된 페이징 범위를 담아 조회 업무로 넘기는 통로이자, 조회된 RSS 태그 서비스의 등록 항목을 화면으로 되돌리는 그릇 역할을 한다. 공통 조회 조건 구조를 상속받아 검색·페이징 항목은 전사 공통 규격을 그대로 쓴다."
+        }
+      },
+      "name": "RSS 태그 서비스 조회 조건 및 정보",
+      "stepId": "step:ANY /uss/ion/rsn/listRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+            "line": 19,
+            "snippet": "public class RssInfo extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+            "line": 24,
+            "snippet": "\tprivate String rssId;"
+          }
+        ],
+        "text": "목록 조회 흐름에서 검색 조건과 페이징 범위를 담아 전달하고, 조회된 RSS 태그 서비스 한 건의 등록 항목을 표현하는 업무 데이터 구조다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 59,
+              "snippet": "@RequestMapping(value = \"/uss/ion/rsn/listRssTagService.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java",
+              "line": 19,
+              "snippet": "public class RssInfo extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+              "line": 45,
+              "snippet": "    public int selectRssTagServiceListCnt(RssInfo rssInfo) throws Exception;"
+            }
+          ],
+          "text": "요청 파라미터 묶음과 화면 조회 조건 객체를 함께 받는다. 검색어와 검색조건은 값이 없으면 빈 문자열로 대체해 조회 조건 객체에 설정하므로, 조건 미입력 시 전체 목록 조회로 동작한다. 페이지 단위와 페이지 크기는 사용자 입력이 아니라 시스템 설정값에서 읽어와 적용하고, 이를 바탕으로 조회 시작·종료 위치를 계산해 조회 조건에 담는다. 별도의 인증·권한 검사는 이 지점에 두지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+              "line": 59,
+              "snippet": "@RequestMapping(value = \"/uss/ion/rsn/listRssTagService.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+              "line": 37,
+              "snippet": "\tpublic List<?> selectRssTagServiceList(RssInfo rssInfo) throws Exception;"
+            }
+          ],
+          "text": "목록 조회 요청의 접수 창구 역할을 한다. 담당자가 입력한 검색 조건을 조회 조건 객체에 담고 페이징 범위를 계산한 뒤, 실제 목록과 건수 조회는 RSS 태그 서비스 조회 업무에 위임한다. 돌려받은 목록·건수·검색 조건을 화면 모델에 담아 목록 화면으로 넘기며, 이 화면에서 선택한 항목이 상세 조회 흐름의 출발점이 된다."
+        }
+      },
+      "name": "RSS 태그 서비스 목록 화면 요청 처리",
+      "stepId": "step:ANY /uss/ion/rsn/listRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(value = \"/uss/ion/rsn/detailRssTagService.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+            "line": 59,
+            "snippet": "@RequestMapping(value = \"/uss/ion/rsn/listRssTagService.do\")"
+          }
+        ],
+        "text": "RSS 태그 서비스 목록 화면 요청을 받아 검색 조건과 페이징을 구성하고, 조회된 목록과 전체 건수를 화면에 전달하는 진입 지점이다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+        "line": 59,
+        "snippet": "@RequestMapping(value = \"/uss/ion/rsn/listRssTagService.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java",
+        "line": 108,
+        "snippet": "@RequestMapping(value = \"/uss/ion/rsn/detailRssTagService.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java",
+        "line": 21,
+        "snippet": "public interface EgovRssService {"
+      }
+    ],
+    "text": "기관 사이트가 외부에 제공할 RSS 태그 서비스를 등록 기준으로 조회하는 업무 영역이다. 담당자는 RSS 태그 서비스 목록을 검색·페이징으로 확인하고, 개별 서비스의 헤더·본문 태그 구성과 대상 서비스 테이블의 실제 데이터를 상세 화면에서 확인한다. 조회 전용 성격으로, 목록 조회와 상세 조회 두 개의 화면 요청으로 구성된다."
+  }
+}

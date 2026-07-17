@@ -1,0 +1,3289 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "start",
+          "to": "list"
+        },
+        {
+          "from": "list",
+          "to": "detail"
+        },
+        {
+          "from": "detail",
+          "to": "delChk"
+        },
+        {
+          "from": "delChk",
+          "label": "삭제 명령",
+          "to": "del"
+        },
+        {
+          "from": "delChk",
+          "label": "조회 요청",
+          "to": "code"
+        },
+        {
+          "from": "del",
+          "to": "list"
+        },
+        {
+          "from": "code",
+          "to": "end"
+        },
+        {
+          "from": "list",
+          "to": "regView"
+        },
+        {
+          "from": "list",
+          "to": "modView"
+        },
+        {
+          "from": "regView",
+          "to": "authChk"
+        },
+        {
+          "from": "modView",
+          "to": "authChk"
+        },
+        {
+          "from": "authChk",
+          "label": "미인증",
+          "to": "login"
+        },
+        {
+          "from": "authChk",
+          "label": "인증됨",
+          "to": "reg"
+        },
+        {
+          "from": "authChk",
+          "label": "인증됨",
+          "to": "mod"
+        },
+        {
+          "from": "login",
+          "to": "end"
+        },
+        {
+          "from": "reg",
+          "to": "end"
+        },
+        {
+          "from": "mod",
+          "to": "end"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "start",
+          "kind": "start",
+          "label": "설문 응답자 관리 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 84,
+              "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 32,
+              "snippet": "\tpublic List<EgovMap> selectQustnrRespondManageList(ComDefaultVO searchVO) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olp/qrm/EgovQustnrRespondManageList.do",
+          "id": "list",
+          "kind": "activity",
+          "label": "응답자 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 137,
+              "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageDetail.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 160,
+              "snippet": "\t\t\tList<EgovMap> resultList = egovQustnrRespondManageService"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olp/qrm/EgovQustnrRespondManageDetail.do",
+          "id": "detail",
+          "kind": "activity",
+          "label": "응답자 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 143,
+              "snippet": "\t\tString sCmd = commandMap.get(\"cmd\") == null ? \"\" : (String) commandMap.get(\"cmd\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 145,
+              "snippet": "\t\tif (sCmd.equals(\"del\")) {"
+            }
+          ],
+          "id": "delChk",
+          "kind": "decision",
+          "label": "삭제 명령 여부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 146,
+              "snippet": "\t\t\tegovQustnrRespondManageService.deleteQustnrRespondManage(qustnrRespondManageVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 69,
+              "snippet": "\tvoid  deleteQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            }
+          ],
+          "id": "del",
+          "kind": "activity",
+          "label": "응답자 정보 삭제"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 152,
+              "snippet": "\t\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 157,
+              "snippet": "\t\t\tlistComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            }
+          ],
+          "id": "code",
+          "kind": "activity",
+          "label": "성별·직업 코드 조회 후 표시"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 282,
+              "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageRegistView.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olp/qrm/EgovQustnrRespondManageRegistView.do",
+          "id": "regView",
+          "kind": "activity",
+          "label": "응답자 등록 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 188,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 189,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            }
+          ],
+          "id": "authChk",
+          "kind": "decision",
+          "label": "로그인 인증 여부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 190,
+              "snippet": "\t\t\tredirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 191,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ],
+          "id": "login",
+          "kind": "activity",
+          "label": "로그인 화면으로 이동"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 322,
+              "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageRegist.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 55,
+              "snippet": "\tvoid  insertQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olp/qrm/EgovQustnrRespondManageRegist.do",
+          "id": "reg",
+          "kind": "activity",
+          "label": "응답자 정보 등록"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 177,
+              "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageModifyView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 205,
+              "snippet": "\t\tList<EgovMap> resultList = egovQustnrRespondManageService"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olp/qrm/EgovQustnrRespondManageModifyView.do",
+          "id": "modView",
+          "kind": "activity",
+          "label": "응답자 수정 화면 열기"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 223,
+              "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageModify.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 62,
+              "snippet": "\tvoid  updateQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            }
+          ],
+          "flowRef": "flow:ANY /uss/olp/qrm/EgovQustnrRespondManageModify.do",
+          "id": "mod",
+          "kind": "activity",
+          "label": "응답자 정보 수정"
+        },
+        {
+          "id": "end",
+          "kind": "end",
+          "label": "처리 종료"
+        }
+      ],
+      "title": "설문 응답자 정보 관리"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 188,
+          "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 189,
+          "snippet": "\t\tif (!isAuthenticated) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 190,
+          "snippet": "\t\t\tredirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 191,
+          "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+        }
+      ],
+      "text": "응답자 등록·수정 화면은 로그인한 사용자만 이용할 수 있다. 인증되지 않은 사용자는 안내 문구와 함께 로그인 화면으로 되돌려 보낸다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 143,
+          "snippet": "\t\tString sCmd = commandMap.get(\"cmd\") == null ? \"\" : (String) commandMap.get(\"cmd\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 145,
+          "snippet": "\t\tif (sCmd.equals(\"del\")) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 146,
+          "snippet": "\t\t\tegovQustnrRespondManageService.deleteQustnrRespondManage(qustnrRespondManageVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 147,
+          "snippet": "\t\t\tsLocationUrl = \"redirect:/uss/olp/qrm/EgovQustnrRespondManageList.do\";"
+        }
+      ],
+      "text": "상세 조회 요청에 삭제 명령이 함께 들어오면 상세 화면을 보여주지 않고 해당 응답자 정보를 삭제한 뒤 목록 화면으로 이동시킨다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 151,
+          "snippet": "\t\t\tvoComCode.setCodeId(\"COM014\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 152,
+          "snippet": "\t\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 156,
+          "snippet": "\t\t\tvoComCode.setCodeId(\"COM034\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 157,
+          "snippet": "\t\t\tlistComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+        }
+      ],
+      "text": "응답자의 성별과 직업유형은 각각 지정된 공통코드 목록에서 선택하도록 하며, 상세·수정 화면을 열 때마다 두 코드 목록을 조회해 화면에 내려준다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+          "line": 40,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+          "line": 44,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+          "line": 48,
+          "snippet": "\t@EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+          "line": 49,
+          "snippet": "\t@Size(max=50)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+          "line": 50,
+          "snippet": "\tprivate String respondNm = \"\";"
+        }
+      ],
+      "text": "응답자 정보는 성별코드, 직업유형코드, 응답자명에 반드시 값이 있어야 하며 응답자명은 50자를 넘을 수 없다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 35,
+          "snippet": "    private Integer pageIndex = 1;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 50,
+          "snippet": "    private Integer recordCountPerPage = 10;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 59,
+          "snippet": "\t\treturn firstIndex == null ? 1 : firstIndex;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 75,
+          "snippet": "\t\treturn recordCountPerPage == null ? 10 : recordCountPerPage;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+          "line": 48,
+          "snippet": "\tpublic int selectQustnrRespondManageListCnt(ComDefaultVO searchVO) throws Exception;"
+        }
+      ],
+      "text": "응답자 목록은 한 번에 전부 보여주지 않고 페이지 단위로 조회하며, 페이지 위치와 건수가 비어 있으면 첫 페이지와 기본 건수로 보정한다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 26,
+          "snippet": "public interface EgovCmmUseService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 34,
+          "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 152,
+          "snippet": "\t\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 157,
+          "snippet": "\t\t\tlistComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+        }
+      ],
+      "text": "공통코드 영역: 성별코드와 직업유형코드 목록을 공통코드 조회 서비스에서 받아 응답자 화면의 선택 항목으로 사용한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 25,
+          "snippet": "public class EgovUserDetailsHelper {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 58,
+          "snippet": "\tpublic static Boolean isAuthenticated() {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 188,
+          "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 191,
+          "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+        }
+      ],
+      "text": "사용자 인증 영역: 등록·수정 화면 진입 시 인증 확인 창구로 로그인 여부를 확인하고, 미인증이면 로그인 화면으로 이동시킨다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 52,
+          "snippet": "\tpublic String getMessage(String code) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 190,
+          "snippet": "\t\t\tredirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+        }
+      ],
+      "text": "공통 메시지 영역: 로그인 실패 안내처럼 사용자에게 보여줄 문구를 메시지 코드로 조회해 화면에 전달한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 43,
+          "snippet": "public class EgovStringUtil {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 77,
+          "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+        }
+      ],
+      "text": "공통 문자열 처리 영역: 응답자 정보 등록 처리에서 입력 문자열의 길이 제한 등 공통 가공 도구를 사용한다."
+    }
+  ],
+  "domainId": "domain:uss.olp.qrm",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+          "line": 29,
+          "snippet": "public class QustnrRespondManageVO implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+          "line": 34,
+          "snippet": "\tprivate String qestnrId = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+          "line": 37,
+          "snippet": "\tprivate String qestnrRespondId = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+          "line": 50,
+          "snippet": "\tprivate String respondNm = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+          "line": 77,
+          "snippet": "\tprivate String qestnrTmplatId = \"\";"
+        }
+      ],
+      "text": "설문 응답자 정보: 설문지 ID와 설문응답자 아이디로 식별되며 성별코드, 직업유형코드, 응답자명, 생년월일, 전화번호, 등록·수정 이력, 설문템플릿 ID를 갖는 이 영역의 중심 자료다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 29,
+          "snippet": "public class ComDefaultCodeVO implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 31,
+          "snippet": "    private String codeId = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 151,
+          "snippet": "\t\t\tvoComCode.setCodeId(\"COM014\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+          "line": 156,
+          "snippet": "\t\t\tvoComCode.setCodeId(\"COM034\");"
+        }
+      ],
+      "text": "공통코드 조회 조건: 성별코드와 직업유형코드처럼 화면 선택 항목으로 쓰이는 공통코드를 지정해 조회하기 위한 조건 자료다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 23,
+          "snippet": "public class ComDefaultVO implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 26,
+          "snippet": "    private String searchCondition = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 35,
+          "snippet": "    private Integer pageIndex = 1;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+          "line": 32,
+          "snippet": "\tpublic List<EgovMap> selectQustnrRespondManageList(ComDefaultVO searchVO) throws Exception;"
+        }
+      ],
+      "text": "목록 검색·페이징 조건: 응답자 목록 조회 시 검색조건·검색어와 페이지 위치, 페이지당 건수를 담아 조회 범위를 정하는 자료다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 42,
+          "snippet": "\tprivate String id;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 45,
+          "snippet": "\tprivate String name;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 63,
+          "snippet": "\tprivate String orgnztId;"
+        }
+      ],
+      "text": "로그인 사용자 정보: 등록·수정 화면 이용 자격을 확인하는 인증된 사용자의 신원 자료로, 아이디·이름·이메일주소·조직 정보를 담는다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/olp/qrm/EgovQustnrRespondManageDetail.do",
+      "name": "설문 응답자 상세 조회 및 삭제",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageDetail.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 145,
+            "snippet": "\t\tif (sCmd.equals(\"del\")) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 146,
+            "snippet": "\t\t\tegovQustnrRespondManageService.deleteQustnrRespondManage(qustnrRespondManageVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 152,
+            "snippet": "\t\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+          }
+        ],
+        "text": "선택한 설문 응답자의 상세 정보를 조회해 보여주며, 삭제 명령으로 들어온 경우에는 해당 응답자 정보를 삭제한 뒤 목록 화면으로 되돌린다. 상세 표시에는 성별·직업 공통코드 목록을 함께 조회해 사용한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olp/qrm/EgovQustnrRespondManageList.do",
+      "name": "설문 응답자 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 84,
+            "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+            "line": 32,
+            "snippet": "\tpublic List<EgovMap> selectQustnrRespondManageList(ComDefaultVO searchVO) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+            "line": 48,
+            "snippet": "\tpublic int selectQustnrRespondManageListCnt(ComDefaultVO searchVO) throws Exception;"
+          }
+        ],
+        "text": "설문 응답자 목록 화면 요청을 받아 검색조건과 페이지 정보로 응답자 목록과 전체 건수를 조회해 목록 화면에 표시한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olp/qrm/EgovQustnrRespondManageModify.do",
+      "name": "설문 응답자 정보 수정",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 223,
+            "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageModify.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+            "line": 62,
+            "snippet": "\tvoid  updateQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+          }
+        ],
+        "text": "수정 화면에서 전달된 설문 응답자 정보를 검증한 뒤 기존 응답자 정보를 갱신한다. 미로그인 상태이면 로그인 화면으로 되돌린다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olp/qrm/EgovQustnrRespondManageModifyView.do",
+      "name": "설문 응답자 수정 화면",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 177,
+            "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageModifyView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 188,
+            "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 205,
+            "snippet": "\t\tList<EgovMap> resultList = egovQustnrRespondManageService"
+          }
+        ],
+        "text": "수정 대상 설문 응답자의 기존 정보와 성별·직업 공통코드 목록을 조회해 수정 화면에 표시한다. 로그인하지 않은 사용자는 로그인 화면으로 보낸다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olp/qrm/EgovQustnrRespondManageRegist.do",
+      "name": "설문 응답자 정보 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 322,
+            "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageRegist.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+            "line": 55,
+            "snippet": "\tvoid  insertQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+          }
+        ],
+        "text": "입력받은 설문 응답자 정보를 검증한 뒤 신규 응답자로 등록한다. 미로그인 상태이면 로그인 화면으로 되돌린다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/olp/qrm/EgovQustnrRespondManageRegistView.do",
+      "name": "설문 응답자 등록 화면",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 282,
+            "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageRegistView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 58,
+            "snippet": "\tpublic static Boolean isAuthenticated() {"
+          }
+        ],
+        "text": "설문 응답자 신규 등록 화면을 준비하는 업무로, 로그인 여부를 먼저 확인하고 성별·직업 공통코드 목록을 화면에 내려준다."
+      }
+    }
+  ],
+  "name": "설문 응답자 정보 관리",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 34,
+              "snippet": "    private String code = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID, 상세코드, 코드명, 코드설명과 함께 특정 테이블명, 상세 조건 사용 여부 및 상세 조건을 담는다. 문자 항목은 빈 값으로, 상세 조건 사용 여부는 미사용으로 시작한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 151,
+              "snippet": "\t\t\tvoComCode.setCodeId(\"COM014\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 156,
+              "snippet": "\t\t\tvoComCode.setCodeId(\"COM034\");"
+            }
+          ],
+          "text": "공통코드를 조회할 때 어떤 코드를 가져올지 지정하는 조건 묶음이다. 설문 응답자 관리에서는 성별코드와 직업유형코드를 각각 지정해 선택 항목 목록을 받아온다."
+        }
+      },
+      "name": "공통코드 조회 조건",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageDetail.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "응답자 상세 조회·삭제에서 조회할 공통코드를 지정하는 조건 묶음으로, 성별코드와 직업유형코드 조회에 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 58,
+              "snippet": "\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회 조건을 하나 받아 단일 코드 목록을 돌려주는 방식과 조건 목록을 받아 여러 코드 목록을 한 번에 돌려주는 방식을 제공하며, 조직정보·그룹정보도 코드 형태로 조회할 수 있다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 152,
+              "snippet": "\t\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            }
+          ],
+          "text": "공통코드를 조회하는 공용 창구다. 설문 응답자 관리 화면은 이 서비스로 성별코드와 직업유형코드 목록을 받아 화면의 선택 항목으로 사용한다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageDetail.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "응답자 상세 조회·삭제에서 성별코드·직업유형코드 같은 공통코드 목록을 조회해 화면 선택 항목으로 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 48,
+              "snippet": "\tpublic int selectQustnrRespondManageListCnt(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 55,
+              "snippet": "\tvoid  insertQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 62,
+              "snippet": "\tvoid  updateQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 69,
+              "snippet": "\tvoid  deleteQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            }
+          ],
+          "text": "목록 조회는 검색·페이징 조건을 담은 조회 조건을 받아 응답자 목록과 전체 건수를 나누어 제공하고, 상세 조회·등록·수정·삭제는 응답자 정보 항목을 받아 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovQustnrRespondManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 32,
+              "snippet": "\tpublic List<EgovMap> selectQustnrRespondManageList(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 40,
+              "snippet": "\tpublic List<EgovMap> selectQustnrRespondManageDetail(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            }
+          ],
+          "text": "설문 응답자 정보에 대한 업무 규약을 정의한다. 응답자 목록 조회, 전체 건수 조회, 상세 조회와 함께 등록·수정·삭제 업무를 한 곳에서 제공해 화면 처리 쪽이 이 창구만 바라보게 한다."
+        }
+      },
+      "name": "설문 응답자 정보 업무 서비스",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageDetail.do:src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovQustnrRespondManageService {"
+          }
+        ],
+        "text": "응답자 상세 조회·삭제에서 응답자 정보의 조회·등록·수정·삭제 업무를 정의하고 수행하는 서비스 창구다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 138,
+              "snippet": "\tpublic String egovQustnrRespondManageDetail(@ModelAttribute QustnrRespondManageVO qustnrRespondManageVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 143,
+              "snippet": "\t\tString sCmd = commandMap.get(\"cmd\") == null ? \"\" : (String) commandMap.get(\"cmd\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 145,
+              "snippet": "\t\tif (sCmd.equals(\"del\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 189,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 191,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ],
+          "text": "요청 파라미터로 응답자 정보와 명령값 목록을 함께 받는다. 명령값이 삭제이면 삭제 처리로, 아니면 조회 처리로 갈라지며, 화면 진입 업무에서는 먼저 로그인 여부를 확인해 미인증 사용자는 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 137,
+              "snippet": "\t@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageDetail.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 141,
+              "snippet": "\t\tString sLocationUrl = \"egovframework/com/uss/olp/qrm/EgovQustnrRespondManageDetail\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 160,
+              "snippet": "\t\t\tList<EgovMap> resultList = egovQustnrRespondManageService"
+            }
+          ],
+          "text": "설문 응답자 관리 화면의 요청 접수 지점이다. 화면이 보낸 응답자 정보와 명령값을 받아 응답자 정보 업무 서비스와 공통코드 조회 서비스에 처리를 맡기고, 돌려받은 결과를 화면 모델에 담아 이동할 화면 이름을 정한다."
+        }
+      },
+      "name": "설문 응답자 관리 화면 처리",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageDetail.do:src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageDetail.do\")"
+          }
+        ],
+        "text": "응답자 상세 조회·삭제 요청을 받는 창구로, 화면에서 넘어온 조건을 담아 응답자 정보 업무와 공통코드 조회를 호출한 뒤 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 26,
+              "snippet": "    private String searchCondition = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 35,
+              "snippet": "    private Integer pageIndex = 1;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 38,
+              "snippet": "    private Integer pageUnit = 10;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 59,
+              "snippet": "\t\treturn firstIndex == null ? 1 : firstIndex;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 75,
+              "snippet": "\t\treturn recordCountPerPage == null ? 10 : recordCountPerPage;"
+            }
+          ],
+          "text": "검색조건·검색어·검색사용여부와 현재페이지, 페이지개수, 페이지사이즈, 조회 시작·끝 위치, 페이지당 건수를 담는다. 현재페이지는 1, 페이지 관련 기본 건수는 10으로 시작하며, 값이 비어 있으면 시작·끝 위치는 1, 페이지당 건수는 10으로 보정된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+              "line": 23,
+              "snippet": "public class ComDefaultVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 32,
+              "snippet": "\tpublic List<EgovMap> selectQustnrRespondManageList(ComDefaultVO searchVO) throws Exception;"
+            }
+          ],
+          "text": "목록 조회에 공통으로 쓰이는 검색조건과 페이지 정보를 담는 조건 묶음이다. 설문 응답자 목록 조회는 이 조건을 그대로 받아 조회 범위와 페이지 구간을 정한다."
+        }
+      },
+      "name": "목록 검색·페이징 조건",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageList.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+            "line": 22,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "응답자 목록 조회에서 검색조건과 페이지 위치를 담아 응답자 목록 조회 범위를 결정한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 48,
+              "snippet": "\tpublic int selectQustnrRespondManageListCnt(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 55,
+              "snippet": "\tvoid  insertQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 62,
+              "snippet": "\tvoid  updateQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 69,
+              "snippet": "\tvoid  deleteQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            }
+          ],
+          "text": "목록 조회는 검색·페이징 조건을 담은 조회 조건을 받아 응답자 목록과 전체 건수를 나누어 제공하고, 상세 조회·등록·수정·삭제는 응답자 정보 항목을 받아 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovQustnrRespondManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 32,
+              "snippet": "\tpublic List<EgovMap> selectQustnrRespondManageList(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 40,
+              "snippet": "\tpublic List<EgovMap> selectQustnrRespondManageDetail(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            }
+          ],
+          "text": "설문 응답자 정보에 대한 업무 규약을 정의한다. 응답자 목록 조회, 전체 건수 조회, 상세 조회와 함께 등록·수정·삭제 업무를 한 곳에서 제공해 화면 처리 쪽이 이 창구만 바라보게 한다."
+        }
+      },
+      "name": "설문 응답자 정보 업무 서비스",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageList.do:src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovQustnrRespondManageService {"
+          }
+        ],
+        "text": "응답자 목록 조회에서 응답자 정보의 조회·등록·수정·삭제 업무를 정의하고 수행하는 서비스 창구다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 40,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 44,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 48,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 49,
+              "snippet": "\t@Size(max=50)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 53,
+              "snippet": "\tprivate String brth = \"\";"
+            }
+          ],
+          "text": "설문지 ID와 설문응답자 아이디로 대상을 식별하고 성별코드, 직업유형코드, 응답자명, 생년월일, 전화번호 세 부분, 최초등록·최종수정 시점과 처리자, 설문템플릿 ID를 담는다. 성별코드·직업유형코드·응답자명은 반드시 값이 있어야 하며 응답자명은 50자를 넘길 수 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 29,
+              "snippet": "public class QustnrRespondManageVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 34,
+              "snippet": "\tprivate String qestnrId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 37,
+              "snippet": "\tprivate String qestnrRespondId = \"\";"
+            }
+          ],
+          "text": "설문 응답자 한 사람의 정보를 담아 화면과 업무 서비스 사이에서 오가는 항목 묶음이다. 조회·등록·수정·삭제 업무가 모두 이 묶음을 기준으로 대상 응답자를 지정한다."
+        }
+      },
+      "name": "설문 응답자 정보 항목",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageList.do:src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+            "line": 29,
+            "snippet": "public class QustnrRespondManageVO implements Serializable {"
+          }
+        ],
+        "text": "응답자 목록 조회에서 주고받는 설문 응답자 정보 항목 묶음으로, 응답자 식별값과 인적 사항을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 138,
+              "snippet": "\tpublic String egovQustnrRespondManageDetail(@ModelAttribute QustnrRespondManageVO qustnrRespondManageVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 143,
+              "snippet": "\t\tString sCmd = commandMap.get(\"cmd\") == null ? \"\" : (String) commandMap.get(\"cmd\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 145,
+              "snippet": "\t\tif (sCmd.equals(\"del\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 189,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 191,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ],
+          "text": "요청 파라미터로 응답자 정보와 명령값 목록을 함께 받는다. 명령값이 삭제이면 삭제 처리로, 아니면 조회 처리로 갈라지며, 화면 진입 업무에서는 먼저 로그인 여부를 확인해 미인증 사용자는 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 137,
+              "snippet": "\t@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageDetail.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 141,
+              "snippet": "\t\tString sLocationUrl = \"egovframework/com/uss/olp/qrm/EgovQustnrRespondManageDetail\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 160,
+              "snippet": "\t\t\tList<EgovMap> resultList = egovQustnrRespondManageService"
+            }
+          ],
+          "text": "설문 응답자 관리 화면의 요청 접수 지점이다. 화면이 보낸 응답자 정보와 명령값을 받아 응답자 정보 업무 서비스와 공통코드 조회 서비스에 처리를 맡기고, 돌려받은 결과를 화면 모델에 담아 이동할 화면 이름을 정한다."
+        }
+      },
+      "name": "설문 응답자 관리 화면 처리",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageList.do:src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageDetail.do\")"
+          }
+        ],
+        "text": "응답자 목록 조회 요청을 받는 창구로, 화면에서 넘어온 조건을 담아 응답자 정보 업무와 공통코드 조회를 호출한 뒤 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 34,
+              "snippet": "    private String code = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID, 상세코드, 코드명, 코드설명과 함께 특정 테이블명, 상세 조건 사용 여부 및 상세 조건을 담는다. 문자 항목은 빈 값으로, 상세 조건 사용 여부는 미사용으로 시작한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 151,
+              "snippet": "\t\t\tvoComCode.setCodeId(\"COM014\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 156,
+              "snippet": "\t\t\tvoComCode.setCodeId(\"COM034\");"
+            }
+          ],
+          "text": "공통코드를 조회할 때 어떤 코드를 가져올지 지정하는 조건 묶음이다. 설문 응답자 관리에서는 성별코드와 직업유형코드를 각각 지정해 선택 항목 목록을 받아온다."
+        }
+      },
+      "name": "공통코드 조회 조건",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModify.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "응답자 정보 수정에서 조회할 공통코드를 지정하는 조건 묶음으로, 성별코드와 직업유형코드 조회에 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드만으로 조회하거나 로케일·매개변수를 함께 넘겨 조회할 수 있으며, 로케일을 지정하지 않으면 기본 로케일이 적용된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 190,
+              "snippet": "\t\t\tredirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+            }
+          ],
+          "text": "화면에 보여줄 안내 문구를 메시지 코드로 조회해 주는 공용 창구다. 미로그인 사용자를 로그인 화면으로 되돌릴 때 표시할 안내 문구를 여기서 가져온다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModify.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "응답자 정보 수정에서 로그인 실패 등 사용자에게 보여줄 안내 문구를 메시지 코드로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 49,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 50,
+              "snippet": "\t@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디, 이름, 이메일주소, 비밀번호와 비밀번호 힌트·정답, 사용자구분, 조직(부서) ID와 명, 고유아이디, 로그인 후 이동할 페이지, 사용자 IP, 인증 DN, 디지털원패스 사용자키와 세션값을 담는다. 아이디·이름·이메일주소·비밀번호 힌트·정답은 값이 반드시 있어야 하고 이메일주소는 형식 검사를 받는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 188,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "로그인한 사용자의 신원 정보를 담는 묶음이다. 설문 응답자 등록·수정 화면에서 인증 확인을 통과한 사용자의 정보를 받아 업무 처리 주체를 식별하는 데 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModify.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "응답자 정보 수정에서 인증된 사용자의 신원 정보를 담아 처리 권한 확인과 처리자 기록에 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 58,
+              "snippet": "\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회 조건을 하나 받아 단일 코드 목록을 돌려주는 방식과 조건 목록을 받아 여러 코드 목록을 한 번에 돌려주는 방식을 제공하며, 조직정보·그룹정보도 코드 형태로 조회할 수 있다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 152,
+              "snippet": "\t\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            }
+          ],
+          "text": "공통코드를 조회하는 공용 창구다. 설문 응답자 관리 화면은 이 서비스로 성별코드와 직업유형코드 목록을 받아 화면의 선택 항목으로 사용한다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModify.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "응답자 정보 수정에서 성별코드·직업유형코드 같은 공통코드 목록을 조회해 화면 선택 항목으로 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "\t\treturn egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "인증된 사용자 정보를 돌려주는 기능, 사용자 권한 목록을 돌려주는 기능, 인증 여부를 참·거짓으로 돌려주는 기능을 제공하며 실제 판단은 사용자 인증 서비스에 위임한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 188,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "현재 사용자가 인증된 상태인지 확인해 주는 공용 창구다. 설문 응답자 등록·수정 화면은 처리에 앞서 이 확인을 거쳐 미인증 사용자를 걸러낸다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModify.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "응답자 정보 수정에서 현재 사용자가 로그인했는지 확인하고 인증된 사용자 정보와 권한을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 48,
+              "snippet": "\tpublic int selectQustnrRespondManageListCnt(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 55,
+              "snippet": "\tvoid  insertQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 62,
+              "snippet": "\tvoid  updateQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 69,
+              "snippet": "\tvoid  deleteQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            }
+          ],
+          "text": "목록 조회는 검색·페이징 조건을 담은 조회 조건을 받아 응답자 목록과 전체 건수를 나누어 제공하고, 상세 조회·등록·수정·삭제는 응답자 정보 항목을 받아 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovQustnrRespondManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 32,
+              "snippet": "\tpublic List<EgovMap> selectQustnrRespondManageList(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 40,
+              "snippet": "\tpublic List<EgovMap> selectQustnrRespondManageDetail(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            }
+          ],
+          "text": "설문 응답자 정보에 대한 업무 규약을 정의한다. 응답자 목록 조회, 전체 건수 조회, 상세 조회와 함께 등록·수정·삭제 업무를 한 곳에서 제공해 화면 처리 쪽이 이 창구만 바라보게 한다."
+        }
+      },
+      "name": "설문 응답자 정보 업무 서비스",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModify.do:src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovQustnrRespondManageService {"
+          }
+        ],
+        "text": "응답자 정보 수정에서 응답자 정보의 조회·등록·수정·삭제 업무를 정의하고 수행하는 서비스 창구다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 40,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 44,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 48,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 49,
+              "snippet": "\t@Size(max=50)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 53,
+              "snippet": "\tprivate String brth = \"\";"
+            }
+          ],
+          "text": "설문지 ID와 설문응답자 아이디로 대상을 식별하고 성별코드, 직업유형코드, 응답자명, 생년월일, 전화번호 세 부분, 최초등록·최종수정 시점과 처리자, 설문템플릿 ID를 담는다. 성별코드·직업유형코드·응답자명은 반드시 값이 있어야 하며 응답자명은 50자를 넘길 수 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 29,
+              "snippet": "public class QustnrRespondManageVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 34,
+              "snippet": "\tprivate String qestnrId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 37,
+              "snippet": "\tprivate String qestnrRespondId = \"\";"
+            }
+          ],
+          "text": "설문 응답자 한 사람의 정보를 담아 화면과 업무 서비스 사이에서 오가는 항목 묶음이다. 조회·등록·수정·삭제 업무가 모두 이 묶음을 기준으로 대상 응답자를 지정한다."
+        }
+      },
+      "name": "설문 응답자 정보 항목",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModify.do:src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+            "line": 29,
+            "snippet": "public class QustnrRespondManageVO implements Serializable {"
+          }
+        ],
+        "text": "응답자 정보 수정에서 주고받는 설문 응답자 정보 항목 묶음으로, 응답자 식별값과 인적 사항을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 138,
+              "snippet": "\tpublic String egovQustnrRespondManageDetail(@ModelAttribute QustnrRespondManageVO qustnrRespondManageVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 143,
+              "snippet": "\t\tString sCmd = commandMap.get(\"cmd\") == null ? \"\" : (String) commandMap.get(\"cmd\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 145,
+              "snippet": "\t\tif (sCmd.equals(\"del\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 189,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 191,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ],
+          "text": "요청 파라미터로 응답자 정보와 명령값 목록을 함께 받는다. 명령값이 삭제이면 삭제 처리로, 아니면 조회 처리로 갈라지며, 화면 진입 업무에서는 먼저 로그인 여부를 확인해 미인증 사용자는 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 137,
+              "snippet": "\t@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageDetail.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 141,
+              "snippet": "\t\tString sLocationUrl = \"egovframework/com/uss/olp/qrm/EgovQustnrRespondManageDetail\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 160,
+              "snippet": "\t\t\tList<EgovMap> resultList = egovQustnrRespondManageService"
+            }
+          ],
+          "text": "설문 응답자 관리 화면의 요청 접수 지점이다. 화면이 보낸 응답자 정보와 명령값을 받아 응답자 정보 업무 서비스와 공통코드 조회 서비스에 처리를 맡기고, 돌려받은 결과를 화면 모델에 담아 이동할 화면 이름을 정한다."
+        }
+      },
+      "name": "설문 응답자 관리 화면 처리",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModify.do:src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageDetail.do\")"
+          }
+        ],
+        "text": "응답자 정보 수정 요청을 받는 창구로, 화면에서 넘어온 조건을 담아 응답자 정보 업무와 공통코드 조회를 호출한 뒤 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 34,
+              "snippet": "    private String code = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID, 상세코드, 코드명, 코드설명과 함께 특정 테이블명, 상세 조건 사용 여부 및 상세 조건을 담는다. 문자 항목은 빈 값으로, 상세 조건 사용 여부는 미사용으로 시작한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 151,
+              "snippet": "\t\t\tvoComCode.setCodeId(\"COM014\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 156,
+              "snippet": "\t\t\tvoComCode.setCodeId(\"COM034\");"
+            }
+          ],
+          "text": "공통코드를 조회할 때 어떤 코드를 가져올지 지정하는 조건 묶음이다. 설문 응답자 관리에서는 성별코드와 직업유형코드를 각각 지정해 선택 항목 목록을 받아온다."
+        }
+      },
+      "name": "공통코드 조회 조건",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModifyView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "응답자 수정 화면에서 조회할 공통코드를 지정하는 조건 묶음으로, 성별코드와 직업유형코드 조회에 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드만으로 조회하거나 로케일·매개변수를 함께 넘겨 조회할 수 있으며, 로케일을 지정하지 않으면 기본 로케일이 적용된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 190,
+              "snippet": "\t\t\tredirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+            }
+          ],
+          "text": "화면에 보여줄 안내 문구를 메시지 코드로 조회해 주는 공용 창구다. 미로그인 사용자를 로그인 화면으로 되돌릴 때 표시할 안내 문구를 여기서 가져온다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModifyView.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "응답자 수정 화면에서 로그인 실패 등 사용자에게 보여줄 안내 문구를 메시지 코드로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 49,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 50,
+              "snippet": "\t@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디, 이름, 이메일주소, 비밀번호와 비밀번호 힌트·정답, 사용자구분, 조직(부서) ID와 명, 고유아이디, 로그인 후 이동할 페이지, 사용자 IP, 인증 DN, 디지털원패스 사용자키와 세션값을 담는다. 아이디·이름·이메일주소·비밀번호 힌트·정답은 값이 반드시 있어야 하고 이메일주소는 형식 검사를 받는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 188,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "로그인한 사용자의 신원 정보를 담는 묶음이다. 설문 응답자 등록·수정 화면에서 인증 확인을 통과한 사용자의 정보를 받아 업무 처리 주체를 식별하는 데 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModifyView.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "응답자 수정 화면에서 인증된 사용자의 신원 정보를 담아 처리 권한 확인과 처리자 기록에 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 58,
+              "snippet": "\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회 조건을 하나 받아 단일 코드 목록을 돌려주는 방식과 조건 목록을 받아 여러 코드 목록을 한 번에 돌려주는 방식을 제공하며, 조직정보·그룹정보도 코드 형태로 조회할 수 있다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 152,
+              "snippet": "\t\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            }
+          ],
+          "text": "공통코드를 조회하는 공용 창구다. 설문 응답자 관리 화면은 이 서비스로 성별코드와 직업유형코드 목록을 받아 화면의 선택 항목으로 사용한다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModifyView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "응답자 수정 화면에서 성별코드·직업유형코드 같은 공통코드 목록을 조회해 화면 선택 항목으로 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "\t\treturn egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "인증된 사용자 정보를 돌려주는 기능, 사용자 권한 목록을 돌려주는 기능, 인증 여부를 참·거짓으로 돌려주는 기능을 제공하며 실제 판단은 사용자 인증 서비스에 위임한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 188,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "현재 사용자가 인증된 상태인지 확인해 주는 공용 창구다. 설문 응답자 등록·수정 화면은 처리에 앞서 이 확인을 거쳐 미인증 사용자를 걸러낸다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModifyView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "응답자 수정 화면에서 현재 사용자가 로그인했는지 확인하고 인증된 사용자 정보와 권한을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 48,
+              "snippet": "\tpublic int selectQustnrRespondManageListCnt(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 55,
+              "snippet": "\tvoid  insertQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 62,
+              "snippet": "\tvoid  updateQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 69,
+              "snippet": "\tvoid  deleteQustnrRespondManage(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            }
+          ],
+          "text": "목록 조회는 검색·페이징 조건을 담은 조회 조건을 받아 응답자 목록과 전체 건수를 나누어 제공하고, 상세 조회·등록·수정·삭제는 응답자 정보 항목을 받아 처리한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovQustnrRespondManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 32,
+              "snippet": "\tpublic List<EgovMap> selectQustnrRespondManageList(ComDefaultVO searchVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+              "line": 40,
+              "snippet": "\tpublic List<EgovMap> selectQustnrRespondManageDetail(QustnrRespondManageVO qustnrRespondManageVO) throws Exception;"
+            }
+          ],
+          "text": "설문 응답자 정보에 대한 업무 규약을 정의한다. 응답자 목록 조회, 전체 건수 조회, 상세 조회와 함께 등록·수정·삭제 업무를 한 곳에서 제공해 화면 처리 쪽이 이 창구만 바라보게 한다."
+        }
+      },
+      "name": "설문 응답자 정보 업무 서비스",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModifyView.do:src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovQustnrRespondManageService {"
+          }
+        ],
+        "text": "응답자 수정 화면에서 응답자 정보의 조회·등록·수정·삭제 업무를 정의하고 수행하는 서비스 창구다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 40,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 44,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 48,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 49,
+              "snippet": "\t@Size(max=50)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 53,
+              "snippet": "\tprivate String brth = \"\";"
+            }
+          ],
+          "text": "설문지 ID와 설문응답자 아이디로 대상을 식별하고 성별코드, 직업유형코드, 응답자명, 생년월일, 전화번호 세 부분, 최초등록·최종수정 시점과 처리자, 설문템플릿 ID를 담는다. 성별코드·직업유형코드·응답자명은 반드시 값이 있어야 하며 응답자명은 50자를 넘길 수 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 29,
+              "snippet": "public class QustnrRespondManageVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 34,
+              "snippet": "\tprivate String qestnrId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 37,
+              "snippet": "\tprivate String qestnrRespondId = \"\";"
+            }
+          ],
+          "text": "설문 응답자 한 사람의 정보를 담아 화면과 업무 서비스 사이에서 오가는 항목 묶음이다. 조회·등록·수정·삭제 업무가 모두 이 묶음을 기준으로 대상 응답자를 지정한다."
+        }
+      },
+      "name": "설문 응답자 정보 항목",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModifyView.do:src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+            "line": 29,
+            "snippet": "public class QustnrRespondManageVO implements Serializable {"
+          }
+        ],
+        "text": "응답자 수정 화면에서 주고받는 설문 응답자 정보 항목 묶음으로, 응답자 식별값과 인적 사항을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 138,
+              "snippet": "\tpublic String egovQustnrRespondManageDetail(@ModelAttribute QustnrRespondManageVO qustnrRespondManageVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 143,
+              "snippet": "\t\tString sCmd = commandMap.get(\"cmd\") == null ? \"\" : (String) commandMap.get(\"cmd\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 145,
+              "snippet": "\t\tif (sCmd.equals(\"del\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 189,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 191,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ],
+          "text": "요청 파라미터로 응답자 정보와 명령값 목록을 함께 받는다. 명령값이 삭제이면 삭제 처리로, 아니면 조회 처리로 갈라지며, 화면 진입 업무에서는 먼저 로그인 여부를 확인해 미인증 사용자는 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 137,
+              "snippet": "\t@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageDetail.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 141,
+              "snippet": "\t\tString sLocationUrl = \"egovframework/com/uss/olp/qrm/EgovQustnrRespondManageDetail\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 160,
+              "snippet": "\t\t\tList<EgovMap> resultList = egovQustnrRespondManageService"
+            }
+          ],
+          "text": "설문 응답자 관리 화면의 요청 접수 지점이다. 화면이 보낸 응답자 정보와 명령값을 받아 응답자 정보 업무 서비스와 공통코드 조회 서비스에 처리를 맡기고, 돌려받은 결과를 화면 모델에 담아 이동할 화면 이름을 정한다."
+        }
+      },
+      "name": "설문 응답자 관리 화면 처리",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageModifyView.do:src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageDetail.do\")"
+          }
+        ],
+        "text": "응답자 수정 화면 요청을 받는 창구로, 화면에서 넘어온 조건을 담아 응답자 정보 업무와 공통코드 조회를 호출한 뒤 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 34,
+              "snippet": "    private String code = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID, 상세코드, 코드명, 코드설명과 함께 특정 테이블명, 상세 조건 사용 여부 및 상세 조건을 담는다. 문자 항목은 빈 값으로, 상세 조건 사용 여부는 미사용으로 시작한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 151,
+              "snippet": "\t\t\tvoComCode.setCodeId(\"COM014\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 156,
+              "snippet": "\t\t\tvoComCode.setCodeId(\"COM034\");"
+            }
+          ],
+          "text": "공통코드를 조회할 때 어떤 코드를 가져올지 지정하는 조건 묶음이다. 설문 응답자 관리에서는 성별코드와 직업유형코드를 각각 지정해 선택 항목 목록을 받아온다."
+        }
+      },
+      "name": "공통코드 조회 조건",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "응답자 정보 등록에서 조회할 공통코드를 지정하는 조건 묶음으로, 성별코드와 직업유형코드 조회에 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드만으로 조회하거나 로케일·매개변수를 함께 넘겨 조회할 수 있으며, 로케일을 지정하지 않으면 기본 로케일이 적용된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 190,
+              "snippet": "\t\t\tredirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+            }
+          ],
+          "text": "화면에 보여줄 안내 문구를 메시지 코드로 조회해 주는 공용 창구다. 미로그인 사용자를 로그인 화면으로 되돌릴 때 표시할 안내 문구를 여기서 가져온다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "응답자 정보 등록에서 로그인 실패 등 사용자에게 보여줄 안내 문구를 메시지 코드로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 49,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 50,
+              "snippet": "\t@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디, 이름, 이메일주소, 비밀번호와 비밀번호 힌트·정답, 사용자구분, 조직(부서) ID와 명, 고유아이디, 로그인 후 이동할 페이지, 사용자 IP, 인증 DN, 디지털원패스 사용자키와 세션값을 담는다. 아이디·이름·이메일주소·비밀번호 힌트·정답은 값이 반드시 있어야 하고 이메일주소는 형식 검사를 받는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 188,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "로그인한 사용자의 신원 정보를 담는 묶음이다. 설문 응답자 등록·수정 화면에서 인증 확인을 통과한 사용자의 정보를 받아 업무 처리 주체를 식별하는 데 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "응답자 정보 등록에서 인증된 사용자의 신원 정보를 담아 처리 권한 확인과 처리자 기록에 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 58,
+              "snippet": "\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회 조건을 하나 받아 단일 코드 목록을 돌려주는 방식과 조건 목록을 받아 여러 코드 목록을 한 번에 돌려주는 방식을 제공하며, 조직정보·그룹정보도 코드 형태로 조회할 수 있다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 152,
+              "snippet": "\t\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            }
+          ],
+          "text": "공통코드를 조회하는 공용 창구다. 설문 응답자 관리 화면은 이 서비스로 성별코드와 직업유형코드 목록을 받아 화면의 선택 항목으로 사용한다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "응답자 정보 등록에서 성별코드·직업유형코드 같은 공통코드 목록을 조회해 화면 선택 항목으로 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "\t\treturn egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "인증된 사용자 정보를 돌려주는 기능, 사용자 권한 목록을 돌려주는 기능, 인증 여부를 참·거짓으로 돌려주는 기능을 제공하며 실제 판단은 사용자 인증 서비스에 위임한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 188,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "현재 사용자가 인증된 상태인지 확인해 주는 공용 창구다. 설문 응답자 등록·수정 화면은 처리에 앞서 이 확인을 거쳐 미인증 사용자를 걸러낸다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "응답자 정보 등록에서 현재 사용자가 로그인했는지 확인하고 인증된 사용자 정보와 권한을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 40,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 44,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 48,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 49,
+              "snippet": "\t@Size(max=50)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 53,
+              "snippet": "\tprivate String brth = \"\";"
+            }
+          ],
+          "text": "설문지 ID와 설문응답자 아이디로 대상을 식별하고 성별코드, 직업유형코드, 응답자명, 생년월일, 전화번호 세 부분, 최초등록·최종수정 시점과 처리자, 설문템플릿 ID를 담는다. 성별코드·직업유형코드·응답자명은 반드시 값이 있어야 하며 응답자명은 50자를 넘길 수 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 29,
+              "snippet": "public class QustnrRespondManageVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 34,
+              "snippet": "\tprivate String qestnrId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 37,
+              "snippet": "\tprivate String qestnrRespondId = \"\";"
+            }
+          ],
+          "text": "설문 응답자 한 사람의 정보를 담아 화면과 업무 서비스 사이에서 오가는 항목 묶음이다. 조회·등록·수정·삭제 업무가 모두 이 묶음을 기준으로 대상 응답자를 지정한다."
+        }
+      },
+      "name": "설문 응답자 정보 항목",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegist.do:src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+            "line": 29,
+            "snippet": "public class QustnrRespondManageVO implements Serializable {"
+          }
+        ],
+        "text": "응답자 정보 등록에서 주고받는 설문 응답자 정보 항목 묶음으로, 응답자 식별값과 인적 사항을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 138,
+              "snippet": "\tpublic String egovQustnrRespondManageDetail(@ModelAttribute QustnrRespondManageVO qustnrRespondManageVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 143,
+              "snippet": "\t\tString sCmd = commandMap.get(\"cmd\") == null ? \"\" : (String) commandMap.get(\"cmd\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 145,
+              "snippet": "\t\tif (sCmd.equals(\"del\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 189,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 191,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ],
+          "text": "요청 파라미터로 응답자 정보와 명령값 목록을 함께 받는다. 명령값이 삭제이면 삭제 처리로, 아니면 조회 처리로 갈라지며, 화면 진입 업무에서는 먼저 로그인 여부를 확인해 미인증 사용자는 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 137,
+              "snippet": "\t@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageDetail.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 141,
+              "snippet": "\t\tString sLocationUrl = \"egovframework/com/uss/olp/qrm/EgovQustnrRespondManageDetail\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 160,
+              "snippet": "\t\t\tList<EgovMap> resultList = egovQustnrRespondManageService"
+            }
+          ],
+          "text": "설문 응답자 관리 화면의 요청 접수 지점이다. 화면이 보낸 응답자 정보와 명령값을 받아 응답자 정보 업무 서비스와 공통코드 조회 서비스에 처리를 맡기고, 돌려받은 결과를 화면 모델에 담아 이동할 화면 이름을 정한다."
+        }
+      },
+      "name": "설문 응답자 관리 화면 처리",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegist.do:src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageDetail.do\")"
+          }
+        ],
+        "text": "응답자 정보 등록 요청을 받는 창구로, 화면에서 넘어온 조건을 담아 응답자 정보 업무와 공통코드 조회를 호출한 뒤 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 79,
+              "snippet": "\t\tif (source != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            }
+          ],
+          "text": "빈 문자열 기준값과 난수 생성기를 갖추고, 지정 길이를 넘는 문자열을 잘라 지정 문구를 덧붙이거나 그대로 잘라내는 기능을 제공한다. 원본이 비어 있으면 가공하지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            }
+          ],
+          "text": "문자열을 다루는 공용 도구다. 설문 응답자 등록 처리에서 입력값을 정해진 길이로 자르는 등 공통 가공이 필요할 때 사용한다."
+        }
+      },
+      "name": "문자열 처리 도구",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegist.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "응답자 정보 등록에서 입력 문자열의 길이 제한 처리 등 공통 문자열 가공을 담당한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 34,
+              "snippet": "    private String code = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 ID, 상세코드, 코드명, 코드설명과 함께 특정 테이블명, 상세 조건 사용 여부 및 상세 조건을 담는다. 문자 항목은 빈 값으로, 상세 조건 사용 여부는 미사용으로 시작한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 151,
+              "snippet": "\t\t\tvoComCode.setCodeId(\"COM014\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 156,
+              "snippet": "\t\t\tvoComCode.setCodeId(\"COM034\");"
+            }
+          ],
+          "text": "공통코드를 조회할 때 어떤 코드를 가져올지 지정하는 조건 묶음이다. 설문 응답자 관리에서는 성별코드와 직업유형코드를 각각 지정해 선택 항목 목록을 받아온다."
+        }
+      },
+      "name": "공통코드 조회 조건",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegistView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "응답자 등록 화면에서 조회할 공통코드를 지정하는 조건 묶음으로, 성별코드와 직업유형코드 조회에 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 53,
+              "snippet": "\t\treturn getReloadableResourceBundleMessageSource().getMessage(code, null, Locale.getDefault());"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 83,
+              "snippet": "\tpublic String getMessageArgsLocale(String code, Object[] args, Locale locale) {"
+            }
+          ],
+          "text": "메시지 코드만으로 조회하거나 로케일·매개변수를 함께 넘겨 조회할 수 있으며, 로케일을 지정하지 않으면 기본 로케일이 적용된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 190,
+              "snippet": "\t\t\tredirectAttributes.addAttribute(\"message\", egovMessageSource.getMessage(\"fail.common.login\"));"
+            }
+          ],
+          "text": "화면에 보여줄 안내 문구를 메시지 코드로 조회해 주는 공용 창구다. 미로그인 사용자를 로그인 화면으로 되돌릴 때 표시할 안내 문구를 여기서 가져온다."
+        }
+      },
+      "name": "안내 메시지 조회",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegistView.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ],
+        "text": "응답자 등록 화면에서 로그인 실패 등 사용자에게 보여줄 안내 문구를 메시지 코드로 조회한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 49,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 50,
+              "snippet": "\t@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디, 이름, 이메일주소, 비밀번호와 비밀번호 힌트·정답, 사용자구분, 조직(부서) ID와 명, 고유아이디, 로그인 후 이동할 페이지, 사용자 IP, 인증 DN, 디지털원패스 사용자키와 세션값을 담는다. 아이디·이름·이메일주소·비밀번호 힌트·정답은 값이 반드시 있어야 하고 이메일주소는 형식 검사를 받는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 188,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "로그인한 사용자의 신원 정보를 담는 묶음이다. 설문 응답자 등록·수정 화면에서 인증 확인을 통과한 사용자의 정보를 받아 업무 처리 주체를 식별하는 데 쓰인다."
+        }
+      },
+      "name": "로그인 사용자 정보",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegistView.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "응답자 등록 화면에서 인증된 사용자의 신원 정보를 담아 처리 권한 확인과 처리자 기록에 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 50,
+              "snippet": "\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 58,
+              "snippet": "\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "조회 조건을 하나 받아 단일 코드 목록을 돌려주는 방식과 조건 목록을 받아 여러 코드 목록을 한 번에 돌려주는 방식을 제공하며, 조직정보·그룹정보도 코드 형태로 조회할 수 있다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 152,
+              "snippet": "\t\t\tList<CmmnDetailCode> listComCode = cmmUseService.selectCmmCodeDetail(voComCode);"
+            }
+          ],
+          "text": "공통코드를 조회하는 공용 창구다. 설문 응답자 관리 화면은 이 서비스로 성별코드와 직업유형코드 목록을 받아 화면의 선택 항목으로 사용한다."
+        }
+      },
+      "name": "공통코드 조회 서비스",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegistView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "응답자 등록 화면에서 성별코드·직업유형코드 같은 공통코드 목록을 조회해 화면 선택 항목으로 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 59,
+              "snippet": "\t\treturn egovUserDetailsService.isAuthenticated();"
+            }
+          ],
+          "text": "인증된 사용자 정보를 돌려주는 기능, 사용자 권한 목록을 돌려주는 기능, 인증 여부를 참·거짓으로 돌려주는 기능을 제공하며 실제 판단은 사용자 인증 서비스에 위임한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 188,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            }
+          ],
+          "text": "현재 사용자가 인증된 상태인지 확인해 주는 공용 창구다. 설문 응답자 등록·수정 화면은 처리에 앞서 이 확인을 거쳐 미인증 사용자를 걸러낸다."
+        }
+      },
+      "name": "인증 사용자 확인",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegistView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "응답자 등록 화면에서 현재 사용자가 로그인했는지 확인하고 인증된 사용자 정보와 권한을 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 40,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 44,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 48,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 49,
+              "snippet": "\t@Size(max=50)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 53,
+              "snippet": "\tprivate String brth = \"\";"
+            }
+          ],
+          "text": "설문지 ID와 설문응답자 아이디로 대상을 식별하고 성별코드, 직업유형코드, 응답자명, 생년월일, 전화번호 세 부분, 최초등록·최종수정 시점과 처리자, 설문템플릿 ID를 담는다. 성별코드·직업유형코드·응답자명은 반드시 값이 있어야 하며 응답자명은 50자를 넘길 수 없다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 29,
+              "snippet": "public class QustnrRespondManageVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 34,
+              "snippet": "\tprivate String qestnrId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+              "line": 37,
+              "snippet": "\tprivate String qestnrRespondId = \"\";"
+            }
+          ],
+          "text": "설문 응답자 한 사람의 정보를 담아 화면과 업무 서비스 사이에서 오가는 항목 묶음이다. 조회·등록·수정·삭제 업무가 모두 이 묶음을 기준으로 대상 응답자를 지정한다."
+        }
+      },
+      "name": "설문 응답자 정보 항목",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegistView.do:src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/QustnrRespondManageVO.java",
+            "line": 29,
+            "snippet": "public class QustnrRespondManageVO implements Serializable {"
+          }
+        ],
+        "text": "응답자 등록 화면에서 주고받는 설문 응답자 정보 항목 묶음으로, 응답자 식별값과 인적 사항을 담는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 138,
+              "snippet": "\tpublic String egovQustnrRespondManageDetail(@ModelAttribute QustnrRespondManageVO qustnrRespondManageVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 143,
+              "snippet": "\t\tString sCmd = commandMap.get(\"cmd\") == null ? \"\" : (String) commandMap.get(\"cmd\");"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 145,
+              "snippet": "\t\tif (sCmd.equals(\"del\")) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 189,
+              "snippet": "\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 191,
+              "snippet": "\t\t\treturn \"redirect:/uat/uia/egovLoginUsr.do\";"
+            }
+          ],
+          "text": "요청 파라미터로 응답자 정보와 명령값 목록을 함께 받는다. 명령값이 삭제이면 삭제 처리로, 아니면 조회 처리로 갈라지며, 화면 진입 업무에서는 먼저 로그인 여부를 확인해 미인증 사용자는 로그인 화면으로 되돌린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 137,
+              "snippet": "\t@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageDetail.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 141,
+              "snippet": "\t\tString sLocationUrl = \"egovframework/com/uss/olp/qrm/EgovQustnrRespondManageDetail\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+              "line": 160,
+              "snippet": "\t\t\tList<EgovMap> resultList = egovQustnrRespondManageService"
+            }
+          ],
+          "text": "설문 응답자 관리 화면의 요청 접수 지점이다. 화면이 보낸 응답자 정보와 명령값을 받아 응답자 정보 업무 서비스와 공통코드 조회 서비스에 처리를 맡기고, 돌려받은 결과를 화면 모델에 담아 이동할 화면 이름을 정한다."
+        }
+      },
+      "name": "설문 응답자 관리 화면 처리",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegistView.do:src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageDetail.do\")"
+          }
+        ],
+        "text": "응답자 등록 화면 요청을 받는 창구로, 화면에서 넘어온 조건을 담아 응답자 정보 업무와 공통코드 조회를 호출한 뒤 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 79,
+              "snippet": "\t\tif (source != null) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 80,
+              "snippet": "\t\t\tif (source.length() > slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            }
+          ],
+          "text": "빈 문자열 기준값과 난수 생성기를 갖추고, 지정 길이를 넘는 문자열을 잘라 지정 문구를 덧붙이거나 그대로 잘라내는 기능을 제공한다. 원본이 비어 있으면 가공하지 않는다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            }
+          ],
+          "text": "문자열을 다루는 공용 도구다. 설문 응답자 등록 처리에서 입력값을 정해진 길이로 자르는 등 공통 가공이 필요할 때 사용한다."
+        }
+      },
+      "name": "문자열 처리 도구",
+      "stepId": "step:ANY /uss/olp/qrm/EgovQustnrRespondManageRegistView.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ],
+        "text": "응답자 등록 화면에서 입력 문자열의 길이 제한 처리 등 공통 문자열 가공을 담당한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+        "line": 84,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageList.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+        "line": 137,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageDetail.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+        "line": 322,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageRegist.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qrm/web/EgovQustnrRespondManageController.java",
+        "line": 223,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qrm/EgovQustnrRespondManageModify.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qrm/service/EgovQustnrRespondManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovQustnrRespondManageService {"
+      }
+    ],
+    "text": "설문조사에 응답한 사람의 정보를 관리하는 업무 영역이다. 응답자 목록 조회와 상세 조회를 제공하고, 신규 응답자를 등록하거나 기존 응답자 정보를 수정·삭제한다. 성별과 직업유형은 공통코드에서 가져온 선택 항목으로 관리하며, 등록·수정 화면은 로그인한 사용자만 이용할 수 있다."
+  }
+}

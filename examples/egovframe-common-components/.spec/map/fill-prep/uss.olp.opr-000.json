@@ -1,0 +1,211 @@
+{
+  "chunkId": "uss.olp.opr-000",
+  "domainId": "domain:uss.olp.opr",
+  "domainName": "",
+  "files": [
+    {
+      "className": "EgovOnlinePollResultService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/olp/opr/service/EgovOnlinePollResultService.java — java 파일",
+        "tags": []
+      },
+      "line": 20,
+      "relPath": "src/main/java/egovframework/com/uss/olp/opr/service/EgovOnlinePollResultService.java",
+      "slice": {
+        "endLine": 39,
+        "startLine": 10,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.07.03  장동한          최초 생성\n *\n * </pre>\n */\npublic interface EgovOnlinePollResultService {\n\n\n    /**\n     * 온라인POLL결과를(을) 목록을 한다.\n     * @param onlinePollResult  온라인POLL결과 정보 담김 VO\n     * @return List\n     * @throws Exception\n     */\n    public List<?> selectOnlinePollResultList(OnlinePollResult onlinePollResult) throws Exception ;\n\n    /**\n     * 온라인POLL결과를(을) 삭제 한다.\n     * @param onlinePollResult  온라인POLL결과 정보가 담김 VO\n     * @return void\n     * @throws Exception\n     */\n    public void deleteOnlinePollResult(OnlinePollResult onlinePollResult) throws Exception ;\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovOnlinePollResultController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java — java 파일",
+        "tags": []
+      },
+      "line": 69,
+      "relPath": "src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java",
+      "slice": {
+        "endLine": 82,
+        "startLine": 59,
+        "text": "    /**\n     * 온라인POLL결과 목록을 상세조회 조회한다.\n     * @param searchVO\n     * @param onlinePollVO\n     * @param commandMap\n     * @param model\n     * @return\n     *         \"/uss/olp/opr/EgovOnlinePollDetail\"\n     * @throws Exception\n     */\n    @RequestMapping(value = \"/uss/olp/opr/delOnlinePollResult.do\")\n    public String egovOnlinePollResultDetail(\n            OnlinePollResult onlinePollResult,\n            ModelMap model) throws Exception {\n\n        egovOnlinePollResultService.deleteOnlinePollResult(onlinePollResult);\n        return \"forward:/uss/olp/opr/listOnlinePollResult.do\";\n    }\n\n\n\n\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovOnlinePollResultController#egovOnlinePollResultDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java",
+      "flowId": "flow:ANY /uss/olp/opr/delOnlinePollResult.do",
+      "line": 69,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java",
+        "line": 69,
+        "snippet": "@RequestMapping(value = \"/uss/olp/opr/delOnlinePollResult.do\")"
+      },
+      "stepIds": [
+        "step:ANY /uss/olp/opr/delOnlinePollResult.do:src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java",
+        "step:ANY /uss/olp/opr/delOnlinePollResult.do:src/main/java/egovframework/com/uss/olp/opr/service/EgovOnlinePollResultService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovOnlinePollResultController#egovOnlinePollResultList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java",
+      "flowId": "flow:ANY /uss/olp/opr/listOnlinePollResult.do",
+      "line": 47,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java",
+        "line": 47,
+        "snippet": "@RequestMapping(value = \"/uss/olp/opr/listOnlinePollResult.do\")"
+      },
+      "stepIds": [
+        "step:ANY /uss/olp/opr/listOnlinePollResult.do:src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java",
+        "step:ANY /uss/olp/opr/listOnlinePollResult.do:src/main/java/egovframework/com/uss/olp/opr/service/EgovOnlinePollResultService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "header": {
+    "flowIndex": [
+      {
+        "entryPoint": "EgovOnlinePollResultController#egovOnlinePollResultDetail",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java",
+        "flowId": "flow:ANY /uss/olp/opr/delOnlinePollResult.do",
+        "line": 69,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java",
+          "line": 69,
+          "snippet": "@RequestMapping(value = \"/uss/olp/opr/delOnlinePollResult.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovOnlinePollResultController#egovOnlinePollResultList",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java",
+        "flowId": "flow:ANY /uss/olp/opr/listOnlinePollResult.do",
+        "line": 47,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java",
+          "line": 47,
+          "snippet": "@RequestMapping(value = \"/uss/olp/opr/listOnlinePollResult.do\")"
+        }
+      }
+    ]
+  },
+  "isHeaderChunk": true,
+  "key": "uss.olp.opr",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/opr/service/EgovOnlinePollResultService.java",
+        "line": 20,
+        "snippet": "public interface EgovOnlinePollResultService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/opr/service/EgovOnlinePollResultService.java",
+      "stepId": "step:ANY /uss/olp/opr/delOnlinePollResult.do:src/main/java/egovframework/com/uss/olp/opr/service/EgovOnlinePollResultService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java",
+        "line": 69,
+        "snippet": "@RequestMapping(value = \"/uss/olp/opr/delOnlinePollResult.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java",
+      "stepId": "step:ANY /uss/olp/opr/delOnlinePollResult.do:src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/opr/service/EgovOnlinePollResultService.java",
+        "line": 20,
+        "snippet": "public interface EgovOnlinePollResultService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/opr/service/EgovOnlinePollResultService.java",
+      "stepId": "step:ANY /uss/olp/opr/listOnlinePollResult.do:src/main/java/egovframework/com/uss/olp/opr/service/EgovOnlinePollResultService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java",
+        "line": 69,
+        "snippet": "@RequestMapping(value = \"/uss/olp/opr/delOnlinePollResult.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java",
+      "stepId": "step:ANY /uss/olp/opr/listOnlinePollResult.do:src/main/java/egovframework/com/uss/olp/opr/web/EgovOnlinePollResultController.java"
+    }
+  ]
+}

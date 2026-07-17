@@ -1,0 +1,2774 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "uss.ion.bnr-000",
+  "domainId": "domain:uss.ion.bnr",
+  "header": {
+    "name": "배너 관리",
+    "summary": {
+      "text": "공지·홍보용 배너를 등록·수정·삭제하고 목록과 상세를 조회하며, 메인 화면 노출과 반영 결과 확인까지 담당하는 배너 관리 업무 영역이다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+          "line": 154,
+          "snippet": "\t@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+          "line": 17,
+          "snippet": "public interface EgovBannerService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+          "line": 26,
+          "snippet": "\tpublic List<BannerVO> selectBannerList(BannerVO bannerVO) throws Exception;"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "배너: 배너 번호와 배너명, 링크 주소, 배너 이미지, 배너 설명, 정렬 순서, 반영 여부를 갖는 핵심 업무 정보이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 40,
+            "snippet": "public class BannerVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 50,
+            "snippet": "\tprivate String bannerId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 61,
+            "snippet": "\tprivate String linkUrl;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 85,
+            "snippet": "\tprivate String reflctAt;"
+          }
+        ]
+      },
+      {
+        "text": "배너 첨부파일: 배너 이미지의 원본 파일명과 저장 파일명, 저장 경로, 파일 크기를 보관하는 첨부파일 정보이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 21,
+            "snippet": "public class FileVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 54,
+            "snippet": "    public String orignlFileNm = \"\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 58,
+            "snippet": "    public String streFileNm = \"\";"
+          }
+        ]
+      },
+      {
+        "text": "로그인 사용자: 배너 등록·수정 시 등록자로 기록되는 인증 사용자 정보이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 42,
+            "snippet": "\tprivate String id;"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "배너 이미지는 반드시 있어야 하며 값이 비면 등록을 허용하지 않는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 65,
+            "snippet": "\t@NotBlank(message = \"{ussIonBnr.bannerRegist.ImageReq}\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 66,
+            "snippet": "\tprivate String bannerImage;"
+          }
+        ]
+      },
+      {
+        "text": "배너명은 필수 입력이며 30자를 넘을 수 없다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 54,
+            "snippet": "\t@EgovNullCheck"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 55,
+            "snippet": "\t@Size(max = 30)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 56,
+            "snippet": "\tprivate String bannerNm;"
+          }
+        ]
+      },
+      {
+        "text": "정렬 순서는 필수이며 숫자만 입력할 수 있고 100자를 넘을 수 없다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 78,
+            "snippet": "\t@EgovNullCheck"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 79,
+            "snippet": "\t@Size(max = 100)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 80,
+            "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+          }
+        ]
+      },
+      {
+        "text": "입력 검증에 오류가 있으면 등록을 진행하지 않고 입력 화면을 다시 보여준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 161,
+            "snippet": "    \tif (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 163,
+            "snippet": "\t\t\treturn \"egovframework/com/uss/ion/bnr/EgovBannerRegist\";"
+          }
+        ]
+      },
+      {
+        "text": "배너 등록 시 배너 번호는 자동 채번되며 등록자는 로그인 사용자 아이디로 지정된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 190,
+            "snippet": "\t    \tbannerVO.setBannerId(egovBannerIdGnrService.getNextStringId());"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 193,
+            "snippet": "\t    \tbannerVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+          }
+        ]
+      },
+      {
+        "text": "첨부 이미지가 있는 경우에만 파일을 저장하고 첨부파일 번호를 배너에 연결한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 174,
+            "snippet": "\t    \tif(!files.isEmpty()){"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 175,
+            "snippet": "\t    \t    result = fileUtil.parseFileInf(files, \"BNR_\", 0, \"\", uploadFolder);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 192,
+            "snippet": "\t    \tbannerVO.setBannerImageFile(atchFileId);"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "첨부파일 관리 업무와 연동해 배너 이미지를 저장하고 첨부파일 정보를 등록한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 176,
+            "snippet": "\t    \t    atchFileId = fileMngService.insertFileInfs(result);"
+          }
+        ]
+      },
+      {
+        "text": "인증·권한 업무에서 현재 로그인 사용자를 받아 배너 등록자로 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 188,
+            "snippet": "\t    \tLoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();"
+          }
+        ]
+      },
+      {
+        "text": "공통 메시지 업무에서 처리 결과 메시지를 조회해 사용자에게 안내한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 195,
+            "snippet": "\t    \tmodel.addAttribute(\"message\", egovMessageSource.getMessage(\"success.common.insert\"));"
+          }
+        ]
+      },
+      {
+        "text": "공통 문자열 유틸을 사용해 사용자 아이디의 널 값을 안전하게 처리한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 193,
+            "snippet": "\t    \tbannerVO.setUserId(user == null ? \"\" : EgovStringUtil.isNullToString(user.getId()));"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "배너 관리",
+        "nodes": [
+          {
+            "id": "n1",
+            "kind": "start",
+            "label": "배너 관리 시작"
+          },
+          {
+            "id": "n2",
+            "kind": "activity",
+            "label": "배너 목록 화면 진입",
+            "flowRef": "flow:ANY /uss/ion/bnr/selectBannerListView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+                "line": 78,
+                "snippet": "@RequestMapping(\"/uss/ion/bnr/selectBannerListView.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n3",
+            "kind": "activity",
+            "label": "배너 목록 조회",
+            "flowRef": "flow:ANY /uss/ion/bnr/selectBannerList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+                "line": 91,
+                "snippet": "@RequestMapping(value = \"/uss/ion/bnr/selectBannerList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n4",
+            "kind": "activity",
+            "label": "배너 상세 조회",
+            "flowRef": "flow:ANY /uss/ion/bnr/getBanner.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+                "line": 123,
+                "snippet": "@RequestMapping(value = \"/uss/ion/bnr/getBanner.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n5",
+            "kind": "activity",
+            "label": "배너 등록 화면 열기",
+            "flowRef": "flow:ANY /uss/ion/bnr/addViewBanner.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+                "line": 140,
+                "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addViewBanner.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n6",
+            "kind": "activity",
+            "label": "배너 등록 요청",
+            "flowRef": "flow:ANY /uss/ion/bnr/addBanner.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+                "line": 154,
+                "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n7",
+            "kind": "decision",
+            "label": "입력 검증 통과 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+                "line": 161,
+                "snippet": "    \tif (bindingResult.hasErrors()) {"
+              }
+            ]
+          },
+          {
+            "id": "n8",
+            "kind": "activity",
+            "label": "등록 화면 재표시",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+                "line": 163,
+                "snippet": "\t\t\treturn \"egovframework/com/uss/ion/bnr/EgovBannerRegist\";"
+              }
+            ]
+          },
+          {
+            "id": "n9",
+            "kind": "activity",
+            "label": "배너 정보 저장",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+                "line": 196,
+                "snippet": "\t    \tmodel.addAttribute(\"bannerVO\", egovBannerService.insertBanner(bannerVO));"
+              }
+            ]
+          },
+          {
+            "id": "n10",
+            "kind": "activity",
+            "label": "배너 수정",
+            "flowRef": "flow:ANY /uss/ion/bnr/updtBanner.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+                "line": 209,
+                "snippet": "@RequestMapping(value = \"/uss/ion/bnr/updtBanner.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n11",
+            "kind": "activity",
+            "label": "배너 삭제",
+            "flowRef": "flow:ANY /uss/ion/bnr/removeBanner.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+                "line": 270,
+                "snippet": "@RequestMapping(value = \"/uss/ion/bnr/removeBanner.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n12",
+            "kind": "activity",
+            "label": "배너 일괄 삭제",
+            "flowRef": "flow:ANY /uss/ion/bnr/removeBannerList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+                "line": 290,
+                "snippet": "@RequestMapping(value = \"/uss/ion/bnr/removeBannerList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "n13",
+            "kind": "activity",
+            "label": "배너 목록으로 이동",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+                "line": 198,
+                "snippet": "\t\t\treturn \"forward:/uss/ion/bnr/selectBannerList.do\";"
+              }
+            ]
+          },
+          {
+            "id": "n14",
+            "kind": "end",
+            "label": "배너 관리 종료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "n1",
+            "to": "n2"
+          },
+          {
+            "from": "n2",
+            "to": "n3"
+          },
+          {
+            "from": "n3",
+            "to": "n4"
+          },
+          {
+            "from": "n3",
+            "to": "n5"
+          },
+          {
+            "from": "n3",
+            "to": "n12"
+          },
+          {
+            "from": "n5",
+            "to": "n6"
+          },
+          {
+            "from": "n6",
+            "to": "n7"
+          },
+          {
+            "from": "n7",
+            "to": "n9",
+            "label": "검증 통과"
+          },
+          {
+            "from": "n7",
+            "to": "n8",
+            "label": "검증 실패"
+          },
+          {
+            "from": "n8",
+            "to": "n14"
+          },
+          {
+            "from": "n9",
+            "to": "n13"
+          },
+          {
+            "from": "n4",
+            "to": "n10"
+          },
+          {
+            "from": "n4",
+            "to": "n11"
+          },
+          {
+            "from": "n10",
+            "to": "n13"
+          },
+          {
+            "from": "n11",
+            "to": "n13"
+          },
+          {
+            "from": "n12",
+            "to": "n13"
+          },
+          {
+            "from": "n13",
+            "to": "n14"
+          }
+        ]
+      },
+      {
+        "title": "배너 노출",
+        "nodes": [
+          {
+            "id": "m1",
+            "kind": "start",
+            "label": "배너 노출 요청"
+          },
+          {
+            "id": "m2",
+            "kind": "activity",
+            "label": "메인 배너 목록 조회",
+            "flowRef": "flow:ANY /uss/ion/bnr/selectBannerMainList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+                "line": 335,
+                "snippet": "@RequestMapping(value = \"/uss/ion/bnr/selectBannerMainList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "m3",
+            "kind": "activity",
+            "label": "배너 반영 결과 조회",
+            "flowRef": "flow:ANY /uss/ion/bnr/getBannerImage.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+                "line": 317,
+                "snippet": "@RequestMapping(value = \"/uss/ion/bnr/getBannerImage.do\")"
+              }
+            ]
+          },
+          {
+            "id": "m4",
+            "kind": "activity",
+            "label": "반영 결과 목록 확보",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+                "line": 77,
+                "snippet": "\tpublic List<BannerVO> selectBannerResult(BannerVO bannerVO) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "m5",
+            "kind": "end",
+            "label": "배너 노출 완료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "m1",
+            "to": "m2"
+          },
+          {
+            "from": "m2",
+            "to": "m3"
+          },
+          {
+            "from": "m3",
+            "to": "m4"
+          },
+          {
+            "from": "m4",
+            "to": "m5"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/addBanner.do",
+      "name": "배너 등록",
+      "summary": {
+        "text": "관리자가 입력한 배너 정보와 첨부 이미지를 받아 검증하고, 배너 번호 채번·등록자 지정 후 배너를 신규 등록한 다음 배너 목록으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 154,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/addViewBanner.do",
+      "name": "배너 등록 화면",
+      "summary": {
+        "text": "배너를 새로 등록하기 위한 입력 화면을 열어 빈 배너 정보를 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 140,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addViewBanner.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/getBanner.do",
+      "name": "배너 상세 조회",
+      "summary": {
+        "text": "선택한 배너 한 건의 상세 정보를 조회해 상세·수정 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 123,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/getBanner.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/getBannerImage.do",
+      "name": "배너 반영 결과 조회",
+      "summary": {
+        "text": "배너가 특정 화면에 반영된 결과를 조회해 배너 이미지 노출 결과를 확인한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 317,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/getBannerImage.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/removeBanner.do",
+      "name": "배너 삭제",
+      "summary": {
+        "text": "선택한 배너 한 건을 삭제하고 처리 결과 메시지와 함께 목록으로 돌아간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 270,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/removeBanner.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/removeBannerList.do",
+      "name": "배너 일괄 삭제",
+      "summary": {
+        "text": "목록에서 선택한 여러 배너를 한 번에 삭제 처리한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 290,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/removeBannerList.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/selectBannerList.do",
+      "name": "배너 목록 조회",
+      "summary": {
+        "text": "검색 조건과 페이지 정보에 따라 등록된 배너 목록을 조회해 관리 목록 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 91,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/selectBannerList.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/selectBannerListView.do",
+      "name": "배너 목록 화면",
+      "summary": {
+        "text": "배너 관리 목록 화면으로 진입하는 시작 지점 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 78,
+            "snippet": "@RequestMapping(\"/uss/ion/bnr/selectBannerListView.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/selectBannerMainList.do",
+      "name": "메인 배너 목록 조회",
+      "summary": {
+        "text": "메인 화면에 노출할 배너 목록을 로그인 사용자 정보와 함께 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 335,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/selectBannerMainList.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/updtBanner.do",
+      "name": "배너 수정",
+      "summary": {
+        "text": "기 등록된 배너 정보와 이미지를 검증 후 수정 반영한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 209,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/updtBanner.do\")"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "배너 등록 - 로그인 사용자 정보",
+      "summary": {
+        "text": "「배너 등록」 흐름에서 현재 로그인한 사용자의 아이디·이름·부서 등 인증 정보를 담아 배너 등록자·수정자 지정에 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 등록」 처리 과정에서 현재 로그인한 사용자의 아이디·이름·부서 등 인증 정보를 담아 배너 등록자·수정자 지정에 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디와 이름, 이메일은 필수 항목으로 관리되며 사용자 구분과 부서 정보, 고유 아이디를 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 61,
+              "snippet": "\tprivate String userSe;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "배너 등록 - 첨부파일 관리 서비스",
+      "summary": {
+        "text": "「배너 등록」 흐름에서 배너 이미지 파일의 정보 등록·수정·삭제·조회를 담당하는 공통 첨부파일 서비스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 등록」 처리 과정에서 배너 이미지 파일의 정보 등록·수정·삭제·조회를 담당하는 공통 첨부파일 서비스이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "여러 첨부파일 정보를 한 번에 등록해 첨부파일 번호를 돌려주고, 파일 목록 조회와 수정·삭제 기능을 함께 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 46,
+              "snippet": "    public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 30,
+              "snippet": "    public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 62,
+              "snippet": "    public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "name": "배너 등록 - 첨부파일 업로드 처리",
+      "summary": {
+        "text": "「배너 등록」 흐름에서 전송된 배너 이미지 파일을 저장 경로에 보관하고 파일 속성 목록으로 변환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 등록」 처리 과정에서 전송된 배너 이미지 파일을 저장 경로에 보관하고 파일 속성 목록으로 변환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 60,
+              "snippet": "@Component(\"EgovFileMngUtil\")"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "전송된 파일이 비어 있으면 건너뛰고, 저장 폴더가 없으면 생성한 뒤 확장자와 시각 기반 새 이름으로 파일을 저장 경로에 옮겨 파일 속성 목록을 만든다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 97,
+              "snippet": "\t\tif (!saveFolder.exists() || saveFolder.isFile()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 115,
+              "snippet": "\t\t\tif (StringUtils.isEmpty(orginFileName)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 121,
+              "snippet": "\t\t\tString newName = keyStr + getTimeStamp() + fileKey;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 124,
+              "snippet": "\t\t\tfile.transferTo(new File(EgovWebUtil.filePathBlackList(filePath)));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "name": "배너 등록 - 첨부파일 정보 구조",
+      "summary": {
+        "text": "「배너 등록」 흐름에서 업로드된 배너 이미지의 첨부파일 번호·원본 파일명·저장 파일명·크기 등 파일 속성을 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 등록」 처리 과정에서 업로드된 배너 이미지의 첨부파일 번호·원본 파일명·저장 파일명·크기 등 파일 속성을 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "첨부파일 번호와 생성일자, 파일 확장자, 파일 크기, 파일 연번, 저장 경로, 원본 파일명, 저장 파일명을 항목으로 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 26,
+              "snippet": "    public String atchFileId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 50,
+              "snippet": "    public String fileStreCours = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 54,
+              "snippet": "    public String orignlFileNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 58,
+              "snippet": "    public String streFileNm = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "배너 등록 - 인증 사용자 조회 도우미",
+      "summary": {
+        "text": "「배너 등록」 흐름에서 현재 인증된 사용자 정보와 권한, 인증 여부를 배너 업무에 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 등록」 처리 과정에서 현재 인증된 사용자 정보와 권한, 인증 여부를 배너 업무에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 사용자 조회와 권한 목록 조회, 인증 여부 확인을 정적 기능으로 제공하며 실제 처리는 인증 사용자 정보 서비스에 위임한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "name": "배너 등록 - 배너 정보 구조",
+      "summary": {
+        "text": "「배너 등록」 흐름에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 40,
+            "snippet": "public class BannerVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 등록」 처리 과정에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 40,
+              "snippet": "public class BannerVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "배너 번호와 배너명, 링크 주소, 배너 이미지, 정렬 순서, 반영 여부를 주요 항목으로 가지며 배너명은 30자 이내, 배너 이미지는 필수, 정렬 순서는 숫자만 허용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 50,
+              "snippet": "\tprivate String bannerId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 55,
+              "snippet": "\t@Size(max = 30)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 65,
+              "snippet": "\t@NotBlank(message = \"{ussIonBnr.bannerRegist.ImageReq}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 80,
+              "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "name": "배너 등록 - 배너 화면 요청 처리",
+      "summary": {
+        "text": "「배너 등록」 흐름에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 154,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 등록」 처리 과정에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 154,
+              "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "배너 화면 요청은 전송된 배너 정보와 첨부 이미지 파일을 함께 받아 입력 검증 결과를 먼저 확인하고, 오류가 있으면 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 155,
+              "snippet": "\tpublic String insertBanner(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 161,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "배너 등록 - 문자열 처리 유틸",
+      "summary": {
+        "text": "「배너 등록」 흐름에서 사용자 아이디 등 문자열의 널 처리와 자르기 등 공통 문자열 가공을 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 등록」 처리 과정에서 사용자 아이디 등 문자열의 널 처리와 자르기 등 공통 문자열 가공을 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "공백 문자열 상수를 두고 지정 길이 초과 시 문자열을 자르는 등 문자열 가공 기능을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addViewBanner.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "name": "배너 등록 화면 - 배너 화면 요청 처리",
+      "summary": {
+        "text": "「배너 등록 화면」 흐름에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 154,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 등록 화면」 처리 과정에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 154,
+              "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "배너 화면 요청은 전송된 배너 정보와 첨부 이미지 파일을 함께 받아 입력 검증 결과를 먼저 확인하고, 오류가 있으면 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 155,
+              "snippet": "\tpublic String insertBanner(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 161,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/getBanner.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "배너 상세 조회 - 처리 결과 메시지 제공",
+      "summary": {
+        "text": "「배너 상세 조회」 흐름에서 배너 등록·수정·삭제 결과를 사용자에게 보여줄 메시지를 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 상세 조회」 처리 과정에서 배너 등록·수정·삭제 결과를 사용자에게 보여줄 메시지를 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 로케일, 매개변수를 받아 정의된 메시지를 조회해 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/getBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "name": "배너 상세 조회 - 배너 정보 구조",
+      "summary": {
+        "text": "「배너 상세 조회」 흐름에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 40,
+            "snippet": "public class BannerVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 상세 조회」 처리 과정에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 40,
+              "snippet": "public class BannerVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "배너 번호와 배너명, 링크 주소, 배너 이미지, 정렬 순서, 반영 여부를 주요 항목으로 가지며 배너명은 30자 이내, 배너 이미지는 필수, 정렬 순서는 숫자만 허용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 50,
+              "snippet": "\tprivate String bannerId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 55,
+              "snippet": "\t@Size(max = 30)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 65,
+              "snippet": "\t@NotBlank(message = \"{ussIonBnr.bannerRegist.ImageReq}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 80,
+              "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/getBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "name": "배너 상세 조회 - 배너 업무 서비스",
+      "summary": {
+        "text": "「배너 상세 조회」 흐름에서 배너의 목록·상세 조회와 등록·수정·삭제, 반영 결과 조회 등 배너 업무 처리를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+            "line": 17,
+            "snippet": "public interface EgovBannerService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 상세 조회」 처리 과정에서 배너의 목록·상세 조회와 등록·수정·삭제, 반영 결과 조회 등 배너 업무 처리를 정의하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 17,
+              "snippet": "public interface EgovBannerService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "배너 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제, 이미지 파일 삭제, 반영 결과 조회를 각각의 업무 단위로 나누어 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 26,
+              "snippet": "\tpublic List<BannerVO> selectBannerList(BannerVO bannerVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 50,
+              "snippet": "\tpublic BannerVO insertBanner(BannerVO bannerVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 62,
+              "snippet": "\tpublic void deleteBanner(BannerVO bannerVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/getBanner.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "name": "배너 상세 조회 - 배너 화면 요청 처리",
+      "summary": {
+        "text": "「배너 상세 조회」 흐름에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 154,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 상세 조회」 처리 과정에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 154,
+              "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "배너 화면 요청은 전송된 배너 정보와 첨부 이미지 파일을 함께 받아 입력 검증 결과를 먼저 확인하고, 오류가 있으면 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 155,
+              "snippet": "\tpublic String insertBanner(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 161,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/getBannerImage.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "name": "배너 반영 결과 조회 - 배너 정보 구조",
+      "summary": {
+        "text": "「배너 반영 결과 조회」 흐름에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 40,
+            "snippet": "public class BannerVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 반영 결과 조회」 처리 과정에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 40,
+              "snippet": "public class BannerVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "배너 번호와 배너명, 링크 주소, 배너 이미지, 정렬 순서, 반영 여부를 주요 항목으로 가지며 배너명은 30자 이내, 배너 이미지는 필수, 정렬 순서는 숫자만 허용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 50,
+              "snippet": "\tprivate String bannerId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 55,
+              "snippet": "\t@Size(max = 30)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 65,
+              "snippet": "\t@NotBlank(message = \"{ussIonBnr.bannerRegist.ImageReq}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 80,
+              "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/getBannerImage.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "name": "배너 반영 결과 조회 - 배너 업무 서비스",
+      "summary": {
+        "text": "「배너 반영 결과 조회」 흐름에서 배너의 목록·상세 조회와 등록·수정·삭제, 반영 결과 조회 등 배너 업무 처리를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+            "line": 17,
+            "snippet": "public interface EgovBannerService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 반영 결과 조회」 처리 과정에서 배너의 목록·상세 조회와 등록·수정·삭제, 반영 결과 조회 등 배너 업무 처리를 정의하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 17,
+              "snippet": "public interface EgovBannerService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "배너 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제, 이미지 파일 삭제, 반영 결과 조회를 각각의 업무 단위로 나누어 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 26,
+              "snippet": "\tpublic List<BannerVO> selectBannerList(BannerVO bannerVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 50,
+              "snippet": "\tpublic BannerVO insertBanner(BannerVO bannerVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 62,
+              "snippet": "\tpublic void deleteBanner(BannerVO bannerVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/getBannerImage.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "name": "배너 반영 결과 조회 - 배너 화면 요청 처리",
+      "summary": {
+        "text": "「배너 반영 결과 조회」 흐름에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 154,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 반영 결과 조회」 처리 과정에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 154,
+              "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "배너 화면 요청은 전송된 배너 정보와 첨부 이미지 파일을 함께 받아 입력 검증 결과를 먼저 확인하고, 오류가 있으면 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 155,
+              "snippet": "\tpublic String insertBanner(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 161,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBanner.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "배너 삭제 - 처리 결과 메시지 제공",
+      "summary": {
+        "text": "「배너 삭제」 흐름에서 배너 등록·수정·삭제 결과를 사용자에게 보여줄 메시지를 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 삭제」 처리 과정에서 배너 등록·수정·삭제 결과를 사용자에게 보여줄 메시지를 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 로케일, 매개변수를 받아 정의된 메시지를 조회해 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "name": "배너 삭제 - 배너 정보 구조",
+      "summary": {
+        "text": "「배너 삭제」 흐름에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 40,
+            "snippet": "public class BannerVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 삭제」 처리 과정에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 40,
+              "snippet": "public class BannerVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "배너 번호와 배너명, 링크 주소, 배너 이미지, 정렬 순서, 반영 여부를 주요 항목으로 가지며 배너명은 30자 이내, 배너 이미지는 필수, 정렬 순서는 숫자만 허용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 50,
+              "snippet": "\tprivate String bannerId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 55,
+              "snippet": "\t@Size(max = 30)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 65,
+              "snippet": "\t@NotBlank(message = \"{ussIonBnr.bannerRegist.ImageReq}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 80,
+              "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "name": "배너 삭제 - 배너 업무 서비스",
+      "summary": {
+        "text": "「배너 삭제」 흐름에서 배너의 목록·상세 조회와 등록·수정·삭제, 반영 결과 조회 등 배너 업무 처리를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+            "line": 17,
+            "snippet": "public interface EgovBannerService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 삭제」 처리 과정에서 배너의 목록·상세 조회와 등록·수정·삭제, 반영 결과 조회 등 배너 업무 처리를 정의하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 17,
+              "snippet": "public interface EgovBannerService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "배너 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제, 이미지 파일 삭제, 반영 결과 조회를 각각의 업무 단위로 나누어 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 26,
+              "snippet": "\tpublic List<BannerVO> selectBannerList(BannerVO bannerVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 50,
+              "snippet": "\tpublic BannerVO insertBanner(BannerVO bannerVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 62,
+              "snippet": "\tpublic void deleteBanner(BannerVO bannerVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBanner.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "name": "배너 삭제 - 배너 화면 요청 처리",
+      "summary": {
+        "text": "「배너 삭제」 흐름에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 154,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 삭제」 처리 과정에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 154,
+              "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "배너 화면 요청은 전송된 배너 정보와 첨부 이미지 파일을 함께 받아 입력 검증 결과를 먼저 확인하고, 오류가 있으면 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 155,
+              "snippet": "\tpublic String insertBanner(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 161,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBannerList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "배너 일괄 삭제 - 처리 결과 메시지 제공",
+      "summary": {
+        "text": "「배너 일괄 삭제」 흐름에서 배너 등록·수정·삭제 결과를 사용자에게 보여줄 메시지를 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 일괄 삭제」 처리 과정에서 배너 등록·수정·삭제 결과를 사용자에게 보여줄 메시지를 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 로케일, 매개변수를 받아 정의된 메시지를 조회해 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "name": "배너 일괄 삭제 - 배너 정보 구조",
+      "summary": {
+        "text": "「배너 일괄 삭제」 흐름에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 40,
+            "snippet": "public class BannerVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 일괄 삭제」 처리 과정에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 40,
+              "snippet": "public class BannerVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "배너 번호와 배너명, 링크 주소, 배너 이미지, 정렬 순서, 반영 여부를 주요 항목으로 가지며 배너명은 30자 이내, 배너 이미지는 필수, 정렬 순서는 숫자만 허용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 50,
+              "snippet": "\tprivate String bannerId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 55,
+              "snippet": "\t@Size(max = 30)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 65,
+              "snippet": "\t@NotBlank(message = \"{ussIonBnr.bannerRegist.ImageReq}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 80,
+              "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "name": "배너 일괄 삭제 - 배너 업무 서비스",
+      "summary": {
+        "text": "「배너 일괄 삭제」 흐름에서 배너의 목록·상세 조회와 등록·수정·삭제, 반영 결과 조회 등 배너 업무 처리를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+            "line": 17,
+            "snippet": "public interface EgovBannerService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 일괄 삭제」 처리 과정에서 배너의 목록·상세 조회와 등록·수정·삭제, 반영 결과 조회 등 배너 업무 처리를 정의하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 17,
+              "snippet": "public interface EgovBannerService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "배너 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제, 이미지 파일 삭제, 반영 결과 조회를 각각의 업무 단위로 나누어 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 26,
+              "snippet": "\tpublic List<BannerVO> selectBannerList(BannerVO bannerVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 50,
+              "snippet": "\tpublic BannerVO insertBanner(BannerVO bannerVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 62,
+              "snippet": "\tpublic void deleteBanner(BannerVO bannerVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "name": "배너 일괄 삭제 - 배너 화면 요청 처리",
+      "summary": {
+        "text": "「배너 일괄 삭제」 흐름에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 154,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 일괄 삭제」 처리 과정에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 154,
+              "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "배너 화면 요청은 전송된 배너 정보와 첨부 이미지 파일을 함께 받아 입력 검증 결과를 먼저 확인하고, 오류가 있으면 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 155,
+              "snippet": "\tpublic String insertBanner(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 161,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "배너 목록 조회 - 처리 결과 메시지 제공",
+      "summary": {
+        "text": "「배너 목록 조회」 흐름에서 배너 등록·수정·삭제 결과를 사용자에게 보여줄 메시지를 코드로 조회해 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 목록 조회」 처리 과정에서 배너 등록·수정·삭제 결과를 사용자에게 보여줄 메시지를 코드로 조회해 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드와 로케일, 매개변수를 받아 정의된 메시지를 조회해 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 72,
+              "snippet": "\tpublic String getMessageArgs(String code, Object[] args) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "name": "배너 목록 조회 - 배너 정보 구조",
+      "summary": {
+        "text": "「배너 목록 조회」 흐름에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 40,
+            "snippet": "public class BannerVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 목록 조회」 처리 과정에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 40,
+              "snippet": "public class BannerVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "배너 번호와 배너명, 링크 주소, 배너 이미지, 정렬 순서, 반영 여부를 주요 항목으로 가지며 배너명은 30자 이내, 배너 이미지는 필수, 정렬 순서는 숫자만 허용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 50,
+              "snippet": "\tprivate String bannerId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 55,
+              "snippet": "\t@Size(max = 30)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 65,
+              "snippet": "\t@NotBlank(message = \"{ussIonBnr.bannerRegist.ImageReq}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 80,
+              "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "name": "배너 목록 조회 - 배너 업무 서비스",
+      "summary": {
+        "text": "「배너 목록 조회」 흐름에서 배너의 목록·상세 조회와 등록·수정·삭제, 반영 결과 조회 등 배너 업무 처리를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+            "line": 17,
+            "snippet": "public interface EgovBannerService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 목록 조회」 처리 과정에서 배너의 목록·상세 조회와 등록·수정·삭제, 반영 결과 조회 등 배너 업무 처리를 정의하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 17,
+              "snippet": "public interface EgovBannerService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "배너 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제, 이미지 파일 삭제, 반영 결과 조회를 각각의 업무 단위로 나누어 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 26,
+              "snippet": "\tpublic List<BannerVO> selectBannerList(BannerVO bannerVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 50,
+              "snippet": "\tpublic BannerVO insertBanner(BannerVO bannerVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 62,
+              "snippet": "\tpublic void deleteBanner(BannerVO bannerVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "name": "배너 목록 조회 - 배너 화면 요청 처리",
+      "summary": {
+        "text": "「배너 목록 조회」 흐름에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 154,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 목록 조회」 처리 과정에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 154,
+              "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "배너 화면 요청은 전송된 배너 정보와 첨부 이미지 파일을 함께 받아 입력 검증 결과를 먼저 확인하고, 오류가 있으면 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 155,
+              "snippet": "\tpublic String insertBanner(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 161,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerListView.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "name": "배너 목록 화면 - 배너 화면 요청 처리",
+      "summary": {
+        "text": "「배너 목록 화면」 흐름에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 154,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 목록 화면」 처리 과정에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 154,
+              "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "배너 화면 요청은 전송된 배너 정보와 첨부 이미지 파일을 함께 받아 입력 검증 결과를 먼저 확인하고, 오류가 있으면 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 155,
+              "snippet": "\tpublic String insertBanner(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 161,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "메인 배너 목록 조회 - 로그인 사용자 정보",
+      "summary": {
+        "text": "「메인 배너 목록 조회」 흐름에서 현재 로그인한 사용자의 아이디·이름·부서 등 인증 정보를 담아 배너 등록자·수정자 지정에 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「메인 배너 목록 조회」 처리 과정에서 현재 로그인한 사용자의 아이디·이름·부서 등 인증 정보를 담아 배너 등록자·수정자 지정에 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디와 이름, 이메일은 필수 항목으로 관리되며 사용자 구분과 부서 정보, 고유 아이디를 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 61,
+              "snippet": "\tprivate String userSe;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "메인 배너 목록 조회 - 인증 사용자 정보 서비스",
+      "summary": {
+        "text": "「메인 배너 목록 조회」 흐름에서 인증된 사용자 객체와 권한 목록, 인증 여부 확인 기능을 정의하는 공통 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「메인 배너 목록 조회」 처리 과정에서 인증된 사용자 객체와 권한 목록, 인증 여부 확인 기능을 정의하는 공통 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "인증된 사용자 객체 조회, 권한 목록 조회, 인증 여부 확인 세 가지 기능을 정의한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "메인 배너 목록 조회 - 인증 사용자 조회 도우미",
+      "summary": {
+        "text": "「메인 배너 목록 조회」 흐름에서 현재 인증된 사용자 정보와 권한, 인증 여부를 배너 업무에 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「메인 배너 목록 조회」 처리 과정에서 현재 인증된 사용자 정보와 권한, 인증 여부를 배너 업무에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 사용자 조회와 권한 목록 조회, 인증 여부 확인을 정적 기능으로 제공하며 실제 처리는 인증 사용자 정보 서비스에 위임한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "name": "메인 배너 목록 조회 - 배너 정보 구조",
+      "summary": {
+        "text": "「메인 배너 목록 조회」 흐름에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 40,
+            "snippet": "public class BannerVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「메인 배너 목록 조회」 처리 과정에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 40,
+              "snippet": "public class BannerVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "배너 번호와 배너명, 링크 주소, 배너 이미지, 정렬 순서, 반영 여부를 주요 항목으로 가지며 배너명은 30자 이내, 배너 이미지는 필수, 정렬 순서는 숫자만 허용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 50,
+              "snippet": "\tprivate String bannerId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 55,
+              "snippet": "\t@Size(max = 30)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 65,
+              "snippet": "\t@NotBlank(message = \"{ussIonBnr.bannerRegist.ImageReq}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 80,
+              "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "name": "메인 배너 목록 조회 - 배너 업무 서비스",
+      "summary": {
+        "text": "「메인 배너 목록 조회」 흐름에서 배너의 목록·상세 조회와 등록·수정·삭제, 반영 결과 조회 등 배너 업무 처리를 정의하는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+            "line": 17,
+            "snippet": "public interface EgovBannerService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「메인 배너 목록 조회」 처리 과정에서 배너의 목록·상세 조회와 등록·수정·삭제, 반영 결과 조회 등 배너 업무 처리를 정의하는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 17,
+              "snippet": "public interface EgovBannerService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "배너 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제, 이미지 파일 삭제, 반영 결과 조회를 각각의 업무 단위로 나누어 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 26,
+              "snippet": "\tpublic List<BannerVO> selectBannerList(BannerVO bannerVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 50,
+              "snippet": "\tpublic BannerVO insertBanner(BannerVO bannerVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+              "line": 62,
+              "snippet": "\tpublic void deleteBanner(BannerVO bannerVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "name": "메인 배너 목록 조회 - 배너 화면 요청 처리",
+      "summary": {
+        "text": "「메인 배너 목록 조회」 흐름에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 154,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「메인 배너 목록 조회」 처리 과정에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 154,
+              "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "배너 화면 요청은 전송된 배너 정보와 첨부 이미지 파일을 함께 받아 입력 검증 결과를 먼저 확인하고, 오류가 있으면 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 155,
+              "snippet": "\tpublic String insertBanner(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 161,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "메인 배너 목록 조회 - 문자열 처리 유틸",
+      "summary": {
+        "text": "「메인 배너 목록 조회」 흐름에서 사용자 아이디 등 문자열의 널 처리와 자르기 등 공통 문자열 가공을 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「메인 배너 목록 조회」 처리 과정에서 사용자 아이디 등 문자열의 널 처리와 자르기 등 공통 문자열 가공을 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "공백 문자열 상수를 두고 지정 길이 초과 시 문자열을 자르는 등 문자열 가공 기능을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "배너 수정 - 로그인 사용자 정보",
+      "summary": {
+        "text": "「배너 수정」 흐름에서 현재 로그인한 사용자의 아이디·이름·부서 등 인증 정보를 담아 배너 등록자·수정자 지정에 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 수정」 처리 과정에서 현재 로그인한 사용자의 아이디·이름·부서 등 인증 정보를 담아 배너 등록자·수정자 지정에 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디와 이름, 이메일은 필수 항목으로 관리되며 사용자 구분과 부서 정보, 고유 아이디를 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 61,
+              "snippet": "\tprivate String userSe;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "배너 수정 - 첨부파일 관리 서비스",
+      "summary": {
+        "text": "「배너 수정」 흐름에서 배너 이미지 파일의 정보 등록·수정·삭제·조회를 담당하는 공통 첨부파일 서비스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 수정」 처리 과정에서 배너 이미지 파일의 정보 등록·수정·삭제·조회를 담당하는 공통 첨부파일 서비스이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 21,
+              "snippet": "public interface EgovFileMngService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "여러 첨부파일 정보를 한 번에 등록해 첨부파일 번호를 돌려주고, 파일 목록 조회와 수정·삭제 기능을 함께 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 46,
+              "snippet": "    public String insertFileInfs(List<FileVO> fvoList) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 30,
+              "snippet": "    public List<FileVO> selectFileInfs(FileVO fvo) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+              "line": 62,
+              "snippet": "    public void deleteFileInfs(List<FileVO> fvoList) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "name": "배너 수정 - 첨부파일 업로드 처리",
+      "summary": {
+        "text": "「배너 수정」 흐름에서 전송된 배너 이미지 파일을 저장 경로에 보관하고 파일 속성 목록으로 변환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 수정」 처리 과정에서 전송된 배너 이미지 파일을 저장 경로에 보관하고 파일 속성 목록으로 변환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 60,
+              "snippet": "@Component(\"EgovFileMngUtil\")"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "전송된 파일이 비어 있으면 건너뛰고, 저장 폴더가 없으면 생성한 뒤 확장자와 시각 기반 새 이름으로 파일을 저장 경로에 옮겨 파일 속성 목록을 만든다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 97,
+              "snippet": "\t\tif (!saveFolder.exists() || saveFolder.isFile()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 115,
+              "snippet": "\t\t\tif (StringUtils.isEmpty(orginFileName)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 121,
+              "snippet": "\t\t\tString newName = keyStr + getTimeStamp() + fileKey;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+              "line": 124,
+              "snippet": "\t\t\tfile.transferTo(new File(EgovWebUtil.filePathBlackList(filePath)));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "name": "배너 수정 - 첨부파일 정보 구조",
+      "summary": {
+        "text": "「배너 수정」 흐름에서 업로드된 배너 이미지의 첨부파일 번호·원본 파일명·저장 파일명·크기 등 파일 속성을 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 수정」 처리 과정에서 업로드된 배너 이미지의 첨부파일 번호·원본 파일명·저장 파일명·크기 등 파일 속성을 담는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 20,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "첨부파일 번호와 생성일자, 파일 확장자, 파일 크기, 파일 연번, 저장 경로, 원본 파일명, 저장 파일명을 항목으로 가진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 26,
+              "snippet": "    public String atchFileId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 50,
+              "snippet": "    public String fileStreCours = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 54,
+              "snippet": "    public String orignlFileNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+              "line": 58,
+              "snippet": "    public String streFileNm = \"\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "배너 수정 - 인증 사용자 조회 도우미",
+      "summary": {
+        "text": "「배너 수정」 흐름에서 현재 인증된 사용자 정보와 권한, 인증 여부를 배너 업무에 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 수정」 처리 과정에서 현재 인증된 사용자 정보와 권한, 인증 여부를 배너 업무에 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증 사용자 조회와 권한 목록 조회, 인증 여부 확인을 정적 기능으로 제공하며 실제 처리는 인증 사용자 정보 서비스에 위임한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "name": "배너 수정 - 배너 정보 구조",
+      "summary": {
+        "text": "「배너 수정」 흐름에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+            "line": 40,
+            "snippet": "public class BannerVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 수정」 처리 과정에서 배너 번호·배너명·링크 주소·이미지·정렬 순서·반영 여부 등 배너 한 건의 업무 정보를 담아 화면과 서비스 사이를 오간다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 40,
+              "snippet": "public class BannerVO extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "배너 번호와 배너명, 링크 주소, 배너 이미지, 정렬 순서, 반영 여부를 주요 항목으로 가지며 배너명은 30자 이내, 배너 이미지는 필수, 정렬 순서는 숫자만 허용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 50,
+              "snippet": "\tprivate String bannerId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 55,
+              "snippet": "\t@Size(max = 30)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 65,
+              "snippet": "\t@NotBlank(message = \"{ussIonBnr.bannerRegist.ImageReq}\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+              "line": 80,
+              "snippet": "\t@Pattern(regexp = \"^[0-9]*$\", message = \"{validation.pattern.integer}\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "name": "배너 수정 - 배너 화면 요청 처리",
+      "summary": {
+        "text": "「배너 수정」 흐름에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+            "line": 154,
+            "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 수정」 처리 과정에서 배너 업무의 화면 요청을 받아 입력값을 검증하고 배너 서비스와 첨부파일 처리로 위임한 뒤 이동할 화면을 결정한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 154,
+              "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+            }
+          ]
+        },
+        "request": {
+          "text": "배너 화면 요청은 전송된 배너 정보와 첨부 이미지 파일을 함께 받아 입력 검증 결과를 먼저 확인하고, 오류가 있으면 입력 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 155,
+              "snippet": "\tpublic String insertBanner(final MultipartHttpServletRequest multiRequest,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+              "line": 161,
+              "snippet": "    \tif (bindingResult.hasErrors()) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "배너 수정 - 문자열 처리 유틸",
+      "summary": {
+        "text": "「배너 수정」 흐름에서 사용자 아이디 등 문자열의 널 처리와 자르기 등 공통 문자열 가공을 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "「배너 수정」 처리 과정에서 사용자 아이디 등 문자열의 널 처리와 자르기 등 공통 문자열 가공을 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "공백 문자열 상수를 두고 지정 길이 초과 시 문자열을 자르는 등 문자열 가공 기능을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 77,
+              "snippet": "\tpublic static String cutString(String source, String output, int slength) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

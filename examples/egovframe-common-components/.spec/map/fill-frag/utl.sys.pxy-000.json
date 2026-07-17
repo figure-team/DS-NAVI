@@ -1,0 +1,4061 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "utl.sys.pxy-000",
+  "domainId": "domain:utl.sys.pxy",
+  "header": {
+    "name": "프록시서비스 관리",
+    "summary": {
+      "text": "프록시서비스 관리는 내부 서비스를 외부에 중계하는 프록시 정보를 관리자가 등록·수정·삭제·조회하고, 프록시를 통한 접속 이력을 조회해 모니터링하는 업무 영역이다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+          "line": 15,
+          "snippet": "public interface EgovProxySvcService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+          "line": 19,
+          "snippet": "public class ProxySvc extends ComDefaultVO {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+          "line": 14,
+          "snippet": "public class ProxyLog extends ComDefaultVO {"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "프록시서비스: 프록시 ID로 식별되며 프록시 명·프록시 IP·프록시 포트와 중계 대상 서비스 명·서비스 IP·서비스 포트, 서비스 상태를 보관하는 핵심 관리 대상이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 19,
+            "snippet": "public class ProxySvc extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 26,
+            "snippet": "    private String proxyId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 33,
+            "snippet": "    private String proxyNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 40,
+            "snippet": "    private String proxyIp;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 67,
+            "snippet": "    private String svcIp;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 80,
+            "snippet": "    private String svcSttus;"
+          }
+        ]
+      },
+      {
+        "text": "프록시 접속로그: 프록시 ID와 로그 ID로 식별되며 클라이언트 IP·클라이언트 포트·접속시간을 남겨 프록시 이용 현황을 추적한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+            "line": 14,
+            "snippet": "public class ProxyLog extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+            "line": 30,
+            "snippet": "    private String logId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+            "line": 35,
+            "snippet": "    private String clntIp;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+            "line": 40,
+            "snippet": "    private String clntPort;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+            "line": 45,
+            "snippet": "    private String conectTime;"
+          }
+        ]
+      },
+      {
+        "text": "로그인 사용자: 프록시서비스 등록·수정 시 등록자와 최종수정자로 기록되는 인증된 사용자 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 42,
+            "snippet": "\tprivate String id;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 164,
+            "snippet": "\t\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          }
+        ]
+      },
+      {
+        "text": "공통코드: 프록시서비스 등록·수정 화면의 서비스 상태 선택 항목을 채우는 데 사용되는 코드 정보다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 29,
+            "snippet": "public class ComDefaultCodeVO implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 145,
+            "snippet": "\t\tmodel.addAttribute(\"cmmCodeDetailList\", getCmmCodeDetailList(new ComDefaultCodeVO(), \"COM072\"));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "프록시서비스 등록·수정 화면의 입력값 검증에 실패하면 저장하지 않고 입력 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 160,
+            "snippet": "\t\tif (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 162,
+            "snippet": "\t\t\treturn \"egovframework/com/utl/sys/pxy/EgovProxySvcRegist\";"
+          }
+        ]
+      },
+      {
+        "text": "프록시서비스 등록·수정은 로그인 인증을 확인하며, 인증되지 않은 요청은 저장하지 않고 로그인 화면으로 보낸다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 166,
+            "snippet": "\t\t\tif (!isAuthenticated) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 58,
+            "snippet": "\tpublic static Boolean isAuthenticated() {"
+          }
+        ]
+      },
+      {
+        "text": "프록시 명과 프록시 IP, 대상 서비스 명과 서비스 IP는 필수 입력 항목이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 33,
+            "snippet": "    private String proxyNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 40,
+            "snippet": "    private String proxyIp;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 55,
+            "snippet": "    private String trgetSvcNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 67,
+            "snippet": "    private String svcIp;"
+          }
+        ]
+      },
+      {
+        "text": "프록시 포트와 서비스 포트는 숫자만 입력할 수 있다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 48,
+            "snippet": "    private String proxyPort;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 19,
+            "snippet": "public class ProxySvc extends ComDefaultVO {"
+          }
+        ]
+      },
+      {
+        "text": "신규 등록되는 프록시서비스의 프록시 ID는 사용자가 입력하지 않고 채번 기능으로 자동 부여한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 172,
+            "snippet": "\t\t\tproxySvc.setProxyId(egovProxySvcIdGnrService.getNextStringId());"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 26,
+            "snippet": "    private String proxyId;"
+          }
+        ]
+      },
+      {
+        "text": "사용자가 입력한 프록시 IP와 서비스 IP는 저장 전에 보안 필터를 거쳐 위험 문자열을 제거한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 174,
+            "snippet": "\t\t\tproxySvc.setProxyIp(EgovWebUtil.filePathBlackList(proxySvc.getProxyIp()));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 79,
+            "snippet": "\tpublic static String filePathBlackList(String value) {"
+          }
+        ]
+      },
+      {
+        "text": "프록시서비스 등록·수정 시 처리한 사용자의 아이디를 최초등록자 또는 최종수정자로 남긴다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 164,
+            "snippet": "\t\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 42,
+            "snippet": "\tprivate String id;"
+          }
+        ]
+      },
+      {
+        "text": "프록시서비스 접속로그는 조회 시작일자와 종료일자 조건으로 기간을 좁혀 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+            "line": 70,
+            "snippet": "    private String strStartDate;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+            "line": 75,
+            "snippet": "    private String strEndDate;"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "공통코드 업무 영역의 코드 조회 서비스를 이용해 프록시서비스 등록·수정 화면의 서비스 상태 선택 목록을 구성한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 145,
+            "snippet": "\t\tmodel.addAttribute(\"cmmCodeDetailList\", getCmmCodeDetailList(new ComDefaultCodeVO(), \"COM072\"));"
+          }
+        ]
+      },
+      {
+        "text": "사용자 인증 업무 영역의 인증 확인 기능으로 등록·수정 요청자의 로그인 여부와 사용자 정보를 확인한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 164,
+            "snippet": "\t\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          }
+        ]
+      },
+      {
+        "text": "공통 안내 메시지 자원을 이용해 조회·등록·수정·삭제 결과 문구를 사용자에게 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "\tpublic String getMessage(String code) {"
+          }
+        ]
+      },
+      {
+        "text": "공통 문자열·일자 처리 기능을 이용해 저장 값 정리와 접속로그 조회 기간 처리를 수행한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+            "line": 36,
+            "snippet": "public class EgovDateUtil {"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "프록시서비스 관리",
+        "nodes": [
+          {
+            "id": "n_start",
+            "kind": "start",
+            "label": "관리자 프록시 관리 진입"
+          },
+          {
+            "id": "n_listview",
+            "kind": "activity",
+            "label": "목록 화면 열기",
+            "flowRef": "flow:ANY /utl/sys/pxy/selectProxySvcListView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 84,
+                "snippet": "@RequestMapping(value = \"/utl/sys/pxy/selectProxySvcListView.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 116,
+                "snippet": "\t\treturn \"egovframework/com/utl/sys/pxy/EgovProxySvcList\";"
+              }
+            ]
+          },
+          {
+            "id": "n_list",
+            "kind": "activity",
+            "label": "프록시서비스 목록 조회",
+            "flowRef": "flow:ANY /utl/sys/pxy/selectProxySvcList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 96,
+                "snippet": "@RequestMapping(value = \"/utl/sys/pxy/selectProxySvcList.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+                "line": 23,
+                "snippet": "    public List<ProxySvc> selectProxySvcList(ProxySvc proxySvc) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "n_pick",
+            "kind": "decision",
+            "label": "수행할 작업 선택",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 126,
+                "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 141,
+                "snippet": "@RequestMapping(value = \"/utl/sys/pxy/addViewProxySvc.do\", method = RequestMethod.POST)"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 237,
+                "snippet": "@RequestMapping(value = \"/utl/sys/pxy/removeProxySvc.do\", method = RequestMethod.POST)"
+              }
+            ]
+          },
+          {
+            "id": "n_detail",
+            "kind": "activity",
+            "label": "상세 조회",
+            "flowRef": "flow:ANY /utl/sys/pxy/getProxySvc.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 126,
+                "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 129,
+                "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+              }
+            ]
+          },
+          {
+            "id": "n_addview",
+            "kind": "activity",
+            "label": "등록 화면 열기",
+            "flowRef": "flow:POST /utl/sys/pxy/addViewProxySvc.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 141,
+                "snippet": "@RequestMapping(value = \"/utl/sys/pxy/addViewProxySvc.do\", method = RequestMethod.POST)"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 145,
+                "snippet": "\t\tmodel.addAttribute(\"cmmCodeDetailList\", getCmmCodeDetailList(new ComDefaultCodeVO(), \"COM072\"));"
+              }
+            ]
+          },
+          {
+            "id": "n_add",
+            "kind": "activity",
+            "label": "신규 등록",
+            "flowRef": "flow:POST /utl/sys/pxy/addProxySvc.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 157,
+                "snippet": "@RequestMapping(value = \"/utl/sys/pxy/addProxySvc.do\", method = RequestMethod.POST)"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 177,
+                "snippet": "\t\t\tegovProxySvcService.insertProxySvc(proxySvc);"
+              }
+            ]
+          },
+          {
+            "id": "n_updview",
+            "kind": "activity",
+            "label": "수정 화면 열기",
+            "flowRef": "flow:ANY /utl/sys/pxy/updtViewProxySvc.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 191,
+                "snippet": "@RequestMapping(value = \"/utl/sys/pxy/updtViewProxySvc.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 195,
+                "snippet": "\t\tmodel.addAttribute(\"proxySvc\", egovProxySvcService.selectProxySvc(proxySvc));"
+              }
+            ]
+          },
+          {
+            "id": "n_upd",
+            "kind": "activity",
+            "label": "수정 반영",
+            "flowRef": "flow:POST /utl/sys/pxy/updtProxySvc.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 206,
+                "snippet": "@RequestMapping(value = \"/utl/sys/pxy/updtProxySvc.do\", method = RequestMethod.POST)"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+                "line": 55,
+                "snippet": "    public void updateProxySvc(ProxySvc proxySvc) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "n_del",
+            "kind": "activity",
+            "label": "삭제",
+            "flowRef": "flow:POST /utl/sys/pxy/removeProxySvc.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 237,
+                "snippet": "@RequestMapping(value = \"/utl/sys/pxy/removeProxySvc.do\", method = RequestMethod.POST)"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+                "line": 62,
+                "snippet": "    public void deleteProxySvc(ProxySvc proxySvc) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "n_end",
+            "kind": "end",
+            "label": "목록 화면으로 복귀"
+          }
+        ],
+        "edges": [
+          {
+            "from": "n_start",
+            "to": "n_listview"
+          },
+          {
+            "from": "n_listview",
+            "to": "n_list"
+          },
+          {
+            "from": "n_list",
+            "to": "n_pick"
+          },
+          {
+            "from": "n_pick",
+            "to": "n_detail",
+            "label": "상세 조회"
+          },
+          {
+            "from": "n_pick",
+            "to": "n_addview",
+            "label": "신규 등록"
+          },
+          {
+            "from": "n_pick",
+            "to": "n_del",
+            "label": "삭제"
+          },
+          {
+            "from": "n_addview",
+            "to": "n_add"
+          },
+          {
+            "from": "n_detail",
+            "to": "n_updview"
+          },
+          {
+            "from": "n_updview",
+            "to": "n_upd"
+          },
+          {
+            "from": "n_add",
+            "to": "n_end"
+          },
+          {
+            "from": "n_upd",
+            "to": "n_end"
+          },
+          {
+            "from": "n_del",
+            "to": "n_end"
+          }
+        ]
+      },
+      {
+        "title": "프록시서비스 등록 처리",
+        "nodes": [
+          {
+            "id": "a_start",
+            "kind": "start",
+            "label": "등록 요청"
+          },
+          {
+            "id": "a_view",
+            "kind": "activity",
+            "label": "등록 화면과 코드 목록 제공",
+            "flowRef": "flow:POST /utl/sys/pxy/addViewProxySvc.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 141,
+                "snippet": "@RequestMapping(value = \"/utl/sys/pxy/addViewProxySvc.do\", method = RequestMethod.POST)"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 145,
+                "snippet": "\t\tmodel.addAttribute(\"cmmCodeDetailList\", getCmmCodeDetailList(new ComDefaultCodeVO(), \"COM072\"));"
+              }
+            ]
+          },
+          {
+            "id": "a_valid",
+            "kind": "decision",
+            "label": "입력값 검증 통과 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 160,
+                "snippet": "\t\tif (bindingResult.hasErrors()) {"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+                "line": 33,
+                "snippet": "    private String proxyNm;"
+              }
+            ]
+          },
+          {
+            "id": "a_reject",
+            "kind": "activity",
+            "label": "등록 화면으로 되돌림",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 162,
+                "snippet": "\t\t\treturn \"egovframework/com/utl/sys/pxy/EgovProxySvcRegist\";"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 160,
+                "snippet": "\t\tif (bindingResult.hasErrors()) {"
+              }
+            ]
+          },
+          {
+            "id": "a_auth",
+            "kind": "decision",
+            "label": "로그인 인증 여부",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 166,
+                "snippet": "\t\t\tif (!isAuthenticated) {"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+                "line": 58,
+                "snippet": "\tpublic static Boolean isAuthenticated() {"
+              }
+            ]
+          },
+          {
+            "id": "a_login",
+            "kind": "activity",
+            "label": "로그인 화면으로 이동",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 166,
+                "snippet": "\t\t\tif (!isAuthenticated) {"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+                "line": 25,
+                "snippet": "public class EgovUserDetailsHelper {"
+              }
+            ]
+          },
+          {
+            "id": "a_id",
+            "kind": "activity",
+            "label": "프록시 ID 채번",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 172,
+                "snippet": "\t\t\tproxySvc.setProxyId(egovProxySvcIdGnrService.getNextStringId());"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+                "line": 26,
+                "snippet": "    private String proxyId;"
+              }
+            ]
+          },
+          {
+            "id": "a_filter",
+            "kind": "activity",
+            "label": "IP 보안 필터 적용",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 174,
+                "snippet": "\t\t\tproxySvc.setProxyIp(EgovWebUtil.filePathBlackList(proxySvc.getProxyIp()));"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+                "line": 79,
+                "snippet": "\tpublic static String filePathBlackList(String value) {"
+              }
+            ]
+          },
+          {
+            "id": "a_save",
+            "kind": "activity",
+            "label": "프록시서비스 등록",
+            "flowRef": "flow:POST /utl/sys/pxy/addProxySvc.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 157,
+                "snippet": "@RequestMapping(value = \"/utl/sys/pxy/addProxySvc.do\", method = RequestMethod.POST)"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 177,
+                "snippet": "\t\t\tegovProxySvcService.insertProxySvc(proxySvc);"
+              }
+            ]
+          },
+          {
+            "id": "a_detail",
+            "kind": "activity",
+            "label": "등록 결과 상세 표시",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 129,
+                "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+                "line": 52,
+                "snippet": "\tpublic String getMessage(String code) {"
+              }
+            ]
+          },
+          {
+            "id": "a_end",
+            "kind": "end",
+            "label": "등록 완료"
+          },
+          {
+            "id": "a_end2",
+            "kind": "end",
+            "label": "등록 중단"
+          }
+        ],
+        "edges": [
+          {
+            "from": "a_start",
+            "to": "a_view"
+          },
+          {
+            "from": "a_view",
+            "to": "a_valid"
+          },
+          {
+            "from": "a_valid",
+            "to": "a_reject",
+            "label": "검증 실패"
+          },
+          {
+            "from": "a_valid",
+            "to": "a_auth",
+            "label": "검증 통과"
+          },
+          {
+            "from": "a_reject",
+            "to": "a_end2"
+          },
+          {
+            "from": "a_auth",
+            "to": "a_login",
+            "label": "미인증"
+          },
+          {
+            "from": "a_auth",
+            "to": "a_id",
+            "label": "인증됨"
+          },
+          {
+            "from": "a_login",
+            "to": "a_end2"
+          },
+          {
+            "from": "a_id",
+            "to": "a_filter"
+          },
+          {
+            "from": "a_filter",
+            "to": "a_save"
+          },
+          {
+            "from": "a_save",
+            "to": "a_detail"
+          },
+          {
+            "from": "a_detail",
+            "to": "a_end"
+          }
+        ]
+      },
+      {
+        "title": "프록시 접속로그 모니터링",
+        "nodes": [
+          {
+            "id": "l_start",
+            "kind": "start",
+            "label": "접속로그 조회 진입"
+          },
+          {
+            "id": "l_view",
+            "kind": "activity",
+            "label": "조회 조건 화면 열기",
+            "flowRef": "flow:ANY /utl/sys/pxy/selectProxyLogListView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 250,
+                "snippet": "@RequestMapping(value = \"/utl/sys/pxy/selectProxyLogListView.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+                "line": 70,
+                "snippet": "    private String strStartDate;"
+              }
+            ]
+          },
+          {
+            "id": "l_period",
+            "kind": "activity",
+            "label": "조회 기간 조건 설정",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+                "line": 70,
+                "snippet": "    private String strStartDate;"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+                "line": 75,
+                "snippet": "    private String strEndDate;"
+              }
+            ]
+          },
+          {
+            "id": "l_list",
+            "kind": "activity",
+            "label": "접속로그 목록 조회",
+            "flowRef": "flow:ANY /utl/sys/pxy/selectProxyLogList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+                "line": 265,
+                "snippet": "@RequestMapping(value = \"/utl/sys/pxy/selectProxyLogList.do\")"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+                "line": 70,
+                "snippet": "    public List<ProxyLog> selectProxyLogList(ProxyLog proxyLog) throws Exception;"
+              }
+            ]
+          },
+          {
+            "id": "l_cnt",
+            "kind": "activity",
+            "label": "총 건수 산출",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+                "line": 78,
+                "snippet": "    public int selectProxyLogListTotCnt(ProxyLog proxyLog) throws Exception;"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+                "line": 14,
+                "snippet": "public class ProxyLog extends ComDefaultVO {"
+              }
+            ]
+          },
+          {
+            "id": "l_show",
+            "kind": "activity",
+            "label": "접속 이력 표시",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+                "line": 35,
+                "snippet": "    private String clntIp;"
+              },
+              {
+                "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+                "line": 45,
+                "snippet": "    private String conectTime;"
+              }
+            ]
+          },
+          {
+            "id": "l_end",
+            "kind": "end",
+            "label": "모니터링 완료"
+          }
+        ],
+        "edges": [
+          {
+            "from": "l_start",
+            "to": "l_view"
+          },
+          {
+            "from": "l_view",
+            "to": "l_period"
+          },
+          {
+            "from": "l_period",
+            "to": "l_list"
+          },
+          {
+            "from": "l_list",
+            "to": "l_cnt"
+          },
+          {
+            "from": "l_cnt",
+            "to": "l_show"
+          },
+          {
+            "from": "l_show",
+            "to": "l_end"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /utl/sys/pxy/getProxySvc.do",
+      "name": "프록시서비스 상세 조회",
+      "summary": {
+        "text": "목록에서 선택한 프록시서비스의 상세정보를 조회해 상세 화면에 표시하고, 조회 성공 안내 메시지를 함께 내려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 126,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 129,
+            "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 39,
+            "snippet": "    public ProxySvc selectProxySvc(ProxySvc proxySvc) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/pxy/selectProxyLogList.do",
+      "name": "프록시 접속로그 목록 조회",
+      "summary": {
+        "text": "프록시서비스별 접속 이력을 조회 기간과 검색 조건에 따라 목록으로 조회한다. 클라이언트 IP와 접속시간 등 모니터링에 필요한 항목을 총 건수와 함께 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 265,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/selectProxyLogList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 70,
+            "snippet": "    public List<ProxyLog> selectProxyLogList(ProxyLog proxyLog) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 78,
+            "snippet": "    public int selectProxyLogListTotCnt(ProxyLog proxyLog) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+            "line": 45,
+            "snippet": "    private String conectTime;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/pxy/selectProxyLogListView.do",
+      "name": "프록시 접속로그 조회 화면 열기",
+      "summary": {
+        "text": "프록시서비스 접속 이력을 조회하기 위한 초기 화면을 연다. 조회 기간 등 검색 조건을 입력받을 수 있도록 준비한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 250,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/selectProxyLogListView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+            "line": 70,
+            "snippet": "    private String strStartDate;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+            "line": 75,
+            "snippet": "    private String strEndDate;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/pxy/selectProxySvcList.do",
+      "name": "프록시서비스 목록 조회",
+      "summary": {
+        "text": "등록된 프록시서비스 정보를 검색 조건과 페이지 정보에 따라 목록으로 조회하고 총 건수와 함께 목록 화면에 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 96,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/selectProxySvcList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 23,
+            "snippet": "    public List<ProxySvc> selectProxySvcList(ProxySvc proxySvc) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 31,
+            "snippet": "    public int selectProxySvcListTotCnt(ProxySvc proxySvc) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/pxy/selectProxySvcListView.do",
+      "name": "프록시서비스 목록 화면 열기",
+      "summary": {
+        "text": "프록시서비스 관리 메뉴 진입 시 목록 조회 조건을 입력할 수 있는 초기 화면을 띄운다. 실제 목록 조회는 이어지는 목록 조회 요청에서 수행한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 84,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/selectProxySvcListView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 116,
+            "snippet": "\t\treturn \"egovframework/com/utl/sys/pxy/EgovProxySvcList\";"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/pxy/updtViewProxySvc.do",
+      "name": "프록시서비스 수정 화면 열기",
+      "summary": {
+        "text": "기 등록된 프록시서비스의 현재 값을 조회해 수정 입력 화면에 채워 넣고, 서비스 상태 선택용 공통코드 목록을 함께 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 191,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/updtViewProxySvc.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 195,
+            "snippet": "\t\tmodel.addAttribute(\"proxySvc\", egovProxySvcService.selectProxySvc(proxySvc));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/sys/pxy/addProxySvc.do",
+      "name": "프록시서비스 신규 등록",
+      "summary": {
+        "text": "입력값 검증을 통과하고 로그인 인증이 확인된 경우에만 프록시 ID를 새로 채번하고 등록자 정보와 보안 필터를 거친 IP를 담아 프록시서비스를 신규 등록한다. 검증 오류가 있으면 등록 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 157,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/addProxySvc.do\", method = RequestMethod.POST)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 160,
+            "snippet": "\t\tif (bindingResult.hasErrors()) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 166,
+            "snippet": "\t\t\tif (!isAuthenticated) {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 172,
+            "snippet": "\t\t\tproxySvc.setProxyId(egovProxySvcIdGnrService.getNextStringId());"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 177,
+            "snippet": "\t\t\tegovProxySvcService.insertProxySvc(proxySvc);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/sys/pxy/addViewProxySvc.do",
+      "name": "프록시서비스 등록 화면 열기",
+      "summary": {
+        "text": "프록시서비스를 신규로 등록하기 위한 입력 화면을 연다. 서비스 상태 선택에 쓰이는 공통코드 목록을 함께 조회해 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 141,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/addViewProxySvc.do\", method = RequestMethod.POST)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 145,
+            "snippet": "\t\tmodel.addAttribute(\"cmmCodeDetailList\", getCmmCodeDetailList(new ComDefaultCodeVO(), \"COM072\"));"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 34,
+            "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/sys/pxy/removeProxySvc.do",
+      "name": "프록시서비스 삭제",
+      "summary": {
+        "text": "선택된 프록시서비스를 삭제하고 삭제 결과 안내 메시지와 함께 목록 화면으로 돌아간다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 237,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/removeProxySvc.do\", method = RequestMethod.POST)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 62,
+            "snippet": "    public void deleteProxySvc(ProxySvc proxySvc) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 52,
+            "snippet": "\tpublic String getMessage(String code) {"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/sys/pxy/updtProxySvc.do",
+      "name": "프록시서비스 수정",
+      "summary": {
+        "text": "기 등록된 프록시서비스의 프록시 정보와 대상 서비스 정보를 수정한다. 입력값 검증과 로그인 인증을 확인하고 최종수정자 정보를 남긴다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 206,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/updtProxySvc.do\", method = RequestMethod.POST)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 55,
+            "snippet": "    public void updateProxySvc(ProxySvc proxySvc) throws Exception;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 58,
+            "snippet": "\tpublic static Boolean isAuthenticated() {"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /utl/sys/pxy/getProxySvc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "프록시서비스 상세 조회의 처리 결과를 사용자에게 알리기 위해 메시지 코드에 해당하는 안내 문구를 다국어 메시지 자원에서 찾아 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 상세 조회의 처리 결과를 사용자에게 알리기 위해 메시지 코드에 해당하는 안내 문구를 다국어 메시지 자원에서 찾아 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드만으로 조회하면 시스템 기본 로케일 기준 문구를 반환하고, 로케일을 함께 넘기면 해당 언어의 문구를 반환한다. 매개변수를 포함한 메시지 조합도 지원한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/getProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "name": "프록시서비스 업무 서비스",
+      "summary": {
+        "text": "프록시서비스 상세 조회에서 프록시서비스 정보와 프록시 접속로그에 대한 등록·수정·삭제·조회 업무를 담당하는 서비스 계약이다. 화면 요청을 받아 실제 업무 처리를 수행하고 결과를 돌려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 15,
+            "snippet": "public interface EgovProxySvcService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 15,
+            "snippet": "public interface EgovProxySvcService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 상세 조회에서 프록시서비스 정보와 프록시 접속로그에 대한 등록·수정·삭제·조회 업무를 담당하는 서비스 계약이다. 화면 요청을 받아 실제 업무 처리를 수행하고 결과를 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "프록시서비스 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제를 각각 별도 업무 기능으로 제공하며 프록시 접속로그 목록 조회 기능도 함께 제공한다. 프록시서비스 상세 조회은 이 가운데 해당 업무 기능을 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 23,
+              "snippet": "    public List<ProxySvc> selectProxySvcList(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 39,
+              "snippet": "    public ProxySvc selectProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 48,
+              "snippet": "    public ProxySvc insertProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 55,
+              "snippet": "    public void updateProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 62,
+              "snippet": "    public void deleteProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 70,
+              "snippet": "    public List<ProxyLog> selectProxyLogList(ProxyLog proxyLog) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/getProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "name": "프록시서비스 관리 요청 접수",
+      "summary": {
+        "text": "프록시서비스 상세 조회 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 126,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 129,
+            "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 상세 조회 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 129,
+              "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+            }
+          ]
+        },
+        "request": {
+          "text": "프록시서비스 입력 객체를 요청 파라미터로 바인딩해 받는다. 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 입력 화면으로 되돌리고, 로그인 인증 여부를 확인해 미인증이면 로그인 화면으로 보낸다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 160,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 166,
+              "snippet": "\t\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 162,
+              "snippet": "\t\t\treturn \"egovframework/com/utl/sys/pxy/EgovProxySvcRegist\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "프록시 접속로그 목록 조회의 처리 결과를 사용자에게 알리기 위해 메시지 코드에 해당하는 안내 문구를 다국어 메시지 자원에서 찾아 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시 접속로그 목록 조회의 처리 결과를 사용자에게 알리기 위해 메시지 코드에 해당하는 안내 문구를 다국어 메시지 자원에서 찾아 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드만으로 조회하면 시스템 기본 로케일 기준 문구를 반환하고, 로케일을 함께 넘기면 해당 언어의 문구를 반환한다. 매개변수를 포함한 메시지 조합도 지원한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "name": "일자 처리 지원",
+      "summary": {
+        "text": "프록시 접속로그 목록 조회에서 접속로그 조회 기간의 시작일자·종료일자를 다루기 위한 공통 일자 처리 기능을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+            "line": 36,
+            "snippet": "public class EgovDateUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+            "line": 36,
+            "snippet": "public class EgovDateUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시 접속로그 목록 조회에서 접속로그 조회 기간의 시작일자·종료일자를 다루기 위한 공통 일자 처리 기능을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연월일 여덟 자리 또는 하이픈이 포함된 일자 문자열을 받아 년·월·일을 가감하며, 음수를 넘기면 차감한다. 정해진 일자 형식이 아니면 처리하지 않고 오류로 알린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 37,
+              "snippet": "    private static final  String SIMPLE_DATE_PATTERN = \"yyyyMMdd\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 65,
+              "snippet": "\tpublic static String addYearMonthDay(String sDate, int year, int month, int day) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 지원",
+      "summary": {
+        "text": "프록시 접속로그 목록 조회에서 화면에 표시하거나 저장할 문자열 값을 다루기 위한 공통 문자열 처리 기능을 제공한다. 값이 없을 때 빈 문자열로 바꾸는 처리 등에 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시 접속로그 목록 조회에서 화면에 표시하거나 저장할 문자열 값을 다루기 위한 공통 문자열 처리 기능을 제공한다. 값이 없을 때 빈 문자열로 바꾸는 처리 등에 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 상수를 두고, 지정 길이를 넘는 문자열을 잘라내거나 잘라낸 뒤 표시 문자를 덧붙이는 기능, 값이 비었는지 확인하는 기능을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "name": "프록시서비스 업무 서비스",
+      "summary": {
+        "text": "프록시 접속로그 목록 조회에서 프록시서비스 정보와 프록시 접속로그에 대한 등록·수정·삭제·조회 업무를 담당하는 서비스 계약이다. 화면 요청을 받아 실제 업무 처리를 수행하고 결과를 돌려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 15,
+            "snippet": "public interface EgovProxySvcService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 15,
+            "snippet": "public interface EgovProxySvcService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시 접속로그 목록 조회에서 프록시서비스 정보와 프록시 접속로그에 대한 등록·수정·삭제·조회 업무를 담당하는 서비스 계약이다. 화면 요청을 받아 실제 업무 처리를 수행하고 결과를 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "프록시서비스 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제를 각각 별도 업무 기능으로 제공하며 프록시 접속로그 목록 조회 기능도 함께 제공한다. 프록시 접속로그 목록 조회은 이 가운데 해당 업무 기능을 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 23,
+              "snippet": "    public List<ProxySvc> selectProxySvcList(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 39,
+              "snippet": "    public ProxySvc selectProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 48,
+              "snippet": "    public ProxySvc insertProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 55,
+              "snippet": "    public void updateProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 62,
+              "snippet": "    public void deleteProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 70,
+              "snippet": "    public List<ProxyLog> selectProxyLogList(ProxyLog proxyLog) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+      "name": "프록시 접속로그 정보",
+      "summary": {
+        "text": "프록시 접속로그 목록 조회에서 프록시서비스 접속 이력 한 건을 표현하는 데이터 구조다. 어떤 프록시에 누가 언제 접속했는지를 모니터링 목적으로 보관한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+            "line": 14,
+            "snippet": "public class ProxyLog extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+            "line": 14,
+            "snippet": "public class ProxyLog extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시 접속로그 목록 조회에서 프록시서비스 접속 이력 한 건을 표현하는 데이터 구조다. 어떤 프록시에 누가 언제 접속했는지를 모니터링 목적으로 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 14,
+              "snippet": "public class ProxyLog extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 14,
+              "snippet": "public class ProxyLog extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "프록시 ID와 로그 ID로 이력을 식별하고 클라이언트 IP, 클라이언트 포트, 접속시간을 보관한다. 조회 조건으로 접속 시작일자와 종료일자를 함께 지닌다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 14,
+              "snippet": "public class ProxyLog extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 30,
+              "snippet": "    private String logId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 35,
+              "snippet": "    private String clntIp;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 40,
+              "snippet": "    private String clntPort;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 45,
+              "snippet": "    private String conectTime;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 70,
+              "snippet": "    private String strStartDate;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 75,
+              "snippet": "    private String strEndDate;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "name": "프록시서비스 관리 요청 접수",
+      "summary": {
+        "text": "프록시 접속로그 목록 조회 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 126,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 129,
+            "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시 접속로그 목록 조회 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 129,
+              "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+            }
+          ]
+        },
+        "request": {
+          "text": "프록시서비스 입력 객체를 요청 파라미터로 바인딩해 받는다. 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 입력 화면으로 되돌리고, 로그인 인증 여부를 확인해 미인증이면 로그인 화면으로 보낸다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 160,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 166,
+              "snippet": "\t\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 162,
+              "snippet": "\t\t\treturn \"egovframework/com/utl/sys/pxy/EgovProxySvcRegist\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "name": "일자 처리 지원",
+      "summary": {
+        "text": "프록시 접속로그 조회 화면 열기에서 접속로그 조회 기간의 시작일자·종료일자를 다루기 위한 공통 일자 처리 기능을 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+            "line": 36,
+            "snippet": "public class EgovDateUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+            "line": 36,
+            "snippet": "public class EgovDateUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시 접속로그 조회 화면 열기에서 접속로그 조회 기간의 시작일자·종료일자를 다루기 위한 공통 일자 처리 기능을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "연월일 여덟 자리 또는 하이픈이 포함된 일자 문자열을 받아 년·월·일을 가감하며, 음수를 넘기면 차감한다. 정해진 일자 형식이 아니면 처리하지 않고 오류로 알린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 36,
+              "snippet": "public class EgovDateUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 37,
+              "snippet": "    private static final  String SIMPLE_DATE_PATTERN = \"yyyyMMdd\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+              "line": 65,
+              "snippet": "\tpublic static String addYearMonthDay(String sDate, int year, int month, int day) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 지원",
+      "summary": {
+        "text": "프록시 접속로그 조회 화면 열기에서 화면에 표시하거나 저장할 문자열 값을 다루기 위한 공통 문자열 처리 기능을 제공한다. 값이 없을 때 빈 문자열로 바꾸는 처리 등에 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시 접속로그 조회 화면 열기에서 화면에 표시하거나 저장할 문자열 값을 다루기 위한 공통 문자열 처리 기능을 제공한다. 값이 없을 때 빈 문자열로 바꾸는 처리 등에 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 상수를 두고, 지정 길이를 넘는 문자열을 잘라내거나 잘라낸 뒤 표시 문자를 덧붙이는 기능, 값이 비었는지 확인하는 기능을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogListView.do:src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+      "name": "프록시 접속로그 정보",
+      "summary": {
+        "text": "프록시 접속로그 조회 화면 열기에서 프록시서비스 접속 이력 한 건을 표현하는 데이터 구조다. 어떤 프록시에 누가 언제 접속했는지를 모니터링 목적으로 보관한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+            "line": 14,
+            "snippet": "public class ProxyLog extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+            "line": 14,
+            "snippet": "public class ProxyLog extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시 접속로그 조회 화면 열기에서 프록시서비스 접속 이력 한 건을 표현하는 데이터 구조다. 어떤 프록시에 누가 언제 접속했는지를 모니터링 목적으로 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 14,
+              "snippet": "public class ProxyLog extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 14,
+              "snippet": "public class ProxyLog extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "프록시 ID와 로그 ID로 이력을 식별하고 클라이언트 IP, 클라이언트 포트, 접속시간을 보관한다. 조회 조건으로 접속 시작일자와 종료일자를 함께 지닌다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 14,
+              "snippet": "public class ProxyLog extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 30,
+              "snippet": "    private String logId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 35,
+              "snippet": "    private String clntIp;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 40,
+              "snippet": "    private String clntPort;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 45,
+              "snippet": "    private String conectTime;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 70,
+              "snippet": "    private String strStartDate;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+              "line": 75,
+              "snippet": "    private String strEndDate;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogListView.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "name": "프록시서비스 관리 요청 접수",
+      "summary": {
+        "text": "프록시 접속로그 조회 화면 열기 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 126,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 129,
+            "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시 접속로그 조회 화면 열기 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 129,
+              "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+            }
+          ]
+        },
+        "request": {
+          "text": "프록시서비스 입력 객체를 요청 파라미터로 바인딩해 받는다. 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 입력 화면으로 되돌리고, 로그인 인증 여부를 확인해 미인증이면 로그인 화면으로 보낸다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 160,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 166,
+              "snippet": "\t\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 162,
+              "snippet": "\t\t\treturn \"egovframework/com/utl/sys/pxy/EgovProxySvcRegist\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxySvcList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "프록시서비스 목록 조회의 처리 결과를 사용자에게 알리기 위해 메시지 코드에 해당하는 안내 문구를 다국어 메시지 자원에서 찾아 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 목록 조회의 처리 결과를 사용자에게 알리기 위해 메시지 코드에 해당하는 안내 문구를 다국어 메시지 자원에서 찾아 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드만으로 조회하면 시스템 기본 로케일 기준 문구를 반환하고, 로케일을 함께 넘기면 해당 언어의 문구를 반환한다. 매개변수를 포함한 메시지 조합도 지원한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxySvcList.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "name": "프록시서비스 업무 서비스",
+      "summary": {
+        "text": "프록시서비스 목록 조회에서 프록시서비스 정보와 프록시 접속로그에 대한 등록·수정·삭제·조회 업무를 담당하는 서비스 계약이다. 화면 요청을 받아 실제 업무 처리를 수행하고 결과를 돌려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 15,
+            "snippet": "public interface EgovProxySvcService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 15,
+            "snippet": "public interface EgovProxySvcService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 목록 조회에서 프록시서비스 정보와 프록시 접속로그에 대한 등록·수정·삭제·조회 업무를 담당하는 서비스 계약이다. 화면 요청을 받아 실제 업무 처리를 수행하고 결과를 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "프록시서비스 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제를 각각 별도 업무 기능으로 제공하며 프록시 접속로그 목록 조회 기능도 함께 제공한다. 프록시서비스 목록 조회은 이 가운데 해당 업무 기능을 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 23,
+              "snippet": "    public List<ProxySvc> selectProxySvcList(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 39,
+              "snippet": "    public ProxySvc selectProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 48,
+              "snippet": "    public ProxySvc insertProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 55,
+              "snippet": "    public void updateProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 62,
+              "snippet": "    public void deleteProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 70,
+              "snippet": "    public List<ProxyLog> selectProxyLogList(ProxyLog proxyLog) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxySvcList.do:src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+      "name": "프록시서비스 정보",
+      "summary": {
+        "text": "프록시서비스 목록 조회에서 오가는 프록시서비스 정보를 담는 데이터 구조다. 프록시 자체의 접속 정보와 프록시가 중계하는 대상 서비스 정보를 함께 보관한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 19,
+            "snippet": "public class ProxySvc extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 19,
+            "snippet": "public class ProxySvc extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 목록 조회에서 오가는 프록시서비스 정보를 담는 데이터 구조다. 프록시 자체의 접속 정보와 프록시가 중계하는 대상 서비스 정보를 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 19,
+              "snippet": "public class ProxySvc extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 19,
+              "snippet": "public class ProxySvc extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "프록시 ID를 식별자로 두고 프록시 명·프록시 IP·프록시 포트와 대상 서비스 명·서비스 IP·서비스 포트, 서비스 상태를 관리한다. 프록시 명과 IP는 필수 입력이며 길이 제한이 있고, 포트는 숫자만 허용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 19,
+              "snippet": "public class ProxySvc extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 26,
+              "snippet": "    private String proxyId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 33,
+              "snippet": "    private String proxyNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 40,
+              "snippet": "    private String proxyIp;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 48,
+              "snippet": "    private String proxyPort;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 55,
+              "snippet": "    private String trgetSvcNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 67,
+              "snippet": "    private String svcIp;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 80,
+              "snippet": "    private String svcSttus;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxySvcList.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "name": "프록시서비스 관리 요청 접수",
+      "summary": {
+        "text": "프록시서비스 목록 조회 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 126,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 129,
+            "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 목록 조회 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 129,
+              "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+            }
+          ]
+        },
+        "request": {
+          "text": "프록시서비스 입력 객체를 요청 파라미터로 바인딩해 받는다. 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 입력 화면으로 되돌리고, 로그인 인증 여부를 확인해 미인증이면 로그인 화면으로 보낸다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 160,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 166,
+              "snippet": "\t\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 162,
+              "snippet": "\t\t\treturn \"egovframework/com/utl/sys/pxy/EgovProxySvcRegist\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxySvcListView.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "name": "프록시서비스 관리 요청 접수",
+      "summary": {
+        "text": "프록시서비스 목록 화면 열기 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 126,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 129,
+            "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 목록 화면 열기 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 129,
+              "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+            }
+          ]
+        },
+        "request": {
+          "text": "프록시서비스 입력 객체를 요청 파라미터로 바인딩해 받는다. 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 입력 화면으로 되돌리고, 로그인 인증 여부를 확인해 미인증이면 로그인 화면으로 보낸다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 160,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 166,
+              "snippet": "\t\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 162,
+              "snippet": "\t\t\treturn \"egovframework/com/utl/sys/pxy/EgovProxySvcRegist\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/updtViewProxySvc.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통코드 조회 조건",
+      "summary": {
+        "text": "프록시서비스 수정 화면 열기에서 화면의 서비스 상태 선택 항목을 채우기 위해 공통코드를 조회할 때 쓰는 조회 조건 데이터 구조다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 29,
+            "snippet": "public class ComDefaultCodeVO implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 145,
+            "snippet": "\t\tmodel.addAttribute(\"cmmCodeDetailList\", getCmmCodeDetailList(new ComDefaultCodeVO(), \"COM072\"));"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 수정 화면 열기에서 화면의 서비스 상태 선택 항목을 채우기 위해 공통코드를 조회할 때 쓰는 조회 조건 데이터 구조다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 145,
+              "snippet": "\t\tmodel.addAttribute(\"cmmCodeDetailList\", getCmmCodeDetailList(new ComDefaultCodeVO(), \"COM072\"));"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "조회할 코드 ID와 상세코드, 코드명, 코드설명을 담으며 특정 테이블에서 코드를 추출할 때 쓰는 테이블명과 상세 조건 사용 여부·상세 조건을 함께 관리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/updtViewProxySvc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "프록시서비스 수정 화면 열기의 처리 결과를 사용자에게 알리기 위해 메시지 코드에 해당하는 안내 문구를 다국어 메시지 자원에서 찾아 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 수정 화면 열기의 처리 결과를 사용자에게 알리기 위해 메시지 코드에 해당하는 안내 문구를 다국어 메시지 자원에서 찾아 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드만으로 조회하면 시스템 기본 로케일 기준 문구를 반환하고, 로케일을 함께 넘기면 해당 언어의 문구를 반환한다. 매개변수를 포함한 메시지 조합도 지원한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/updtViewProxySvc.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 조회 서비스",
+      "summary": {
+        "text": "프록시서비스 수정 화면 열기에서 화면 선택 항목에 표시할 공통코드 목록을 조회해 주는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 수정 화면 열기에서 화면 선택 항목에 표시할 공통코드 목록을 조회해 주는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "조회 조건에 맞는 공통코드 상세 목록을 반환하며, 여러 조건을 한 번에 넘겨 코드 목록들을 묶어 받는 기능과 조직정보·그룹정보를 코드 형태로 받는 기능도 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/updtViewProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "name": "프록시서비스 업무 서비스",
+      "summary": {
+        "text": "프록시서비스 수정 화면 열기에서 프록시서비스 정보와 프록시 접속로그에 대한 등록·수정·삭제·조회 업무를 담당하는 서비스 계약이다. 화면 요청을 받아 실제 업무 처리를 수행하고 결과를 돌려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 15,
+            "snippet": "public interface EgovProxySvcService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 15,
+            "snippet": "public interface EgovProxySvcService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 수정 화면 열기에서 프록시서비스 정보와 프록시 접속로그에 대한 등록·수정·삭제·조회 업무를 담당하는 서비스 계약이다. 화면 요청을 받아 실제 업무 처리를 수행하고 결과를 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "프록시서비스 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제를 각각 별도 업무 기능으로 제공하며 프록시 접속로그 목록 조회 기능도 함께 제공한다. 프록시서비스 수정 화면 열기은 이 가운데 해당 업무 기능을 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 23,
+              "snippet": "    public List<ProxySvc> selectProxySvcList(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 39,
+              "snippet": "    public ProxySvc selectProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 48,
+              "snippet": "    public ProxySvc insertProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 55,
+              "snippet": "    public void updateProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 62,
+              "snippet": "    public void deleteProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 70,
+              "snippet": "    public List<ProxyLog> selectProxyLogList(ProxyLog proxyLog) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/updtViewProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "name": "프록시서비스 관리 요청 접수",
+      "summary": {
+        "text": "프록시서비스 수정 화면 열기 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 126,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 129,
+            "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 수정 화면 열기 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 129,
+              "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+            }
+          ]
+        },
+        "request": {
+          "text": "프록시서비스 입력 객체를 요청 파라미터로 바인딩해 받는다. 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 입력 화면으로 되돌리고, 로그인 인증 여부를 확인해 미인증이면 로그인 화면으로 보낸다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 160,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 166,
+              "snippet": "\t\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 162,
+              "snippet": "\t\t\treturn \"egovframework/com/utl/sys/pxy/EgovProxySvcRegist\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "프록시서비스 신규 등록의 처리 결과를 사용자에게 알리기 위해 메시지 코드에 해당하는 안내 문구를 다국어 메시지 자원에서 찾아 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 신규 등록의 처리 결과를 사용자에게 알리기 위해 메시지 코드에 해당하는 안내 문구를 다국어 메시지 자원에서 찾아 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드만으로 조회하면 시스템 기본 로케일 기준 문구를 반환하고, 로케일을 함께 넘기면 해당 언어의 문구를 반환한다. 매개변수를 포함한 메시지 조합도 지원한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "입력값 보안 처리",
+      "summary": {
+        "text": "프록시서비스 신규 등록에서 사용자가 입력한 프록시 IP와 서비스 IP에 포함될 수 있는 위험 문자열을 걸러내는 보안 처리 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 174,
+            "snippet": "\t\t\tproxySvc.setProxyIp(EgovWebUtil.filePathBlackList(proxySvc.getProxyIp()));"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 신규 등록에서 사용자가 입력한 프록시 IP와 서비스 IP에 포함될 수 있는 위험 문자열을 걸러내는 보안 처리 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 174,
+              "snippet": "\t\t\tproxySvc.setProxyIp(EgovWebUtil.filePathBlackList(proxySvc.getProxyIp()));"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "경로 조작에 쓰이는 상위 경로 표기를 제거하는 처리와, 화면 출력 시 스크립트 삽입을 막기 위해 특수문자를 치환하는 처리를 제공한다. 입력이 비어 있으면 빈 문자열을 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "\tpublic static String filePathBlackList(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 62,
+              "snippet": "\tpublic static String clearXSS(String value) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "프록시서비스 신규 등록에서 현재 로그인한 사용자의 신원을 담는 데이터 구조다. 등록자·최종수정자 정보를 남기는 데 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 신규 등록에서 현재 로그인한 사용자의 신원을 담는 데이터 구조다. 등록자·최종수정자 정보를 남기는 데 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "사용자 아이디와 이름, 이메일 등 기본 신원 항목과 사용자 구분, 조직 정보, 고유아이디를 보관한다. 프록시서비스 등록·수정 시 이 가운데 아이디가 등록자·수정자로 기록된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "로그인 인증 확인",
+      "summary": {
+        "text": "프록시서비스 신규 등록에서 현재 요청자가 인증된 사용자인지 확인하고 인증된 사용자 정보를 꺼내오는 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 164,
+            "snippet": "\t\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 신규 등록에서 현재 요청자가 인증된 사용자인지 확인하고 인증된 사용자 정보를 꺼내오는 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 164,
+              "snippet": "\t\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인 세 가지를 제공하며 실제 판단은 사용자 상세 서비스에 위임한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 지원",
+      "summary": {
+        "text": "프록시서비스 신규 등록에서 화면에 표시하거나 저장할 문자열 값을 다루기 위한 공통 문자열 처리 기능을 제공한다. 값이 없을 때 빈 문자열로 바꾸는 처리 등에 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 신규 등록에서 화면에 표시하거나 저장할 문자열 값을 다루기 위한 공통 문자열 처리 기능을 제공한다. 값이 없을 때 빈 문자열로 바꾸는 처리 등에 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 상수를 두고, 지정 길이를 넘는 문자열을 잘라내거나 잘라낸 뒤 표시 문자를 덧붙이는 기능, 값이 비었는지 확인하는 기능을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "name": "프록시서비스 업무 서비스",
+      "summary": {
+        "text": "프록시서비스 신규 등록에서 프록시서비스 정보와 프록시 접속로그에 대한 등록·수정·삭제·조회 업무를 담당하는 서비스 계약이다. 화면 요청을 받아 실제 업무 처리를 수행하고 결과를 돌려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 15,
+            "snippet": "public interface EgovProxySvcService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 15,
+            "snippet": "public interface EgovProxySvcService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 신규 등록에서 프록시서비스 정보와 프록시 접속로그에 대한 등록·수정·삭제·조회 업무를 담당하는 서비스 계약이다. 화면 요청을 받아 실제 업무 처리를 수행하고 결과를 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "프록시서비스 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제를 각각 별도 업무 기능으로 제공하며 프록시 접속로그 목록 조회 기능도 함께 제공한다. 프록시서비스 신규 등록은 이 가운데 해당 업무 기능을 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 23,
+              "snippet": "    public List<ProxySvc> selectProxySvcList(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 39,
+              "snippet": "    public ProxySvc selectProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 48,
+              "snippet": "    public ProxySvc insertProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 55,
+              "snippet": "    public void updateProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 62,
+              "snippet": "    public void deleteProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 70,
+              "snippet": "    public List<ProxyLog> selectProxyLogList(ProxyLog proxyLog) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+      "name": "프록시서비스 정보",
+      "summary": {
+        "text": "프록시서비스 신규 등록에서 오가는 프록시서비스 정보를 담는 데이터 구조다. 프록시 자체의 접속 정보와 프록시가 중계하는 대상 서비스 정보를 함께 보관한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 19,
+            "snippet": "public class ProxySvc extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 19,
+            "snippet": "public class ProxySvc extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 신규 등록에서 오가는 프록시서비스 정보를 담는 데이터 구조다. 프록시 자체의 접속 정보와 프록시가 중계하는 대상 서비스 정보를 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 19,
+              "snippet": "public class ProxySvc extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 19,
+              "snippet": "public class ProxySvc extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "프록시 ID를 식별자로 두고 프록시 명·프록시 IP·프록시 포트와 대상 서비스 명·서비스 IP·서비스 포트, 서비스 상태를 관리한다. 프록시 명과 IP는 필수 입력이며 길이 제한이 있고, 포트는 숫자만 허용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 19,
+              "snippet": "public class ProxySvc extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 26,
+              "snippet": "    private String proxyId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 33,
+              "snippet": "    private String proxyNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 40,
+              "snippet": "    private String proxyIp;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 48,
+              "snippet": "    private String proxyPort;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 55,
+              "snippet": "    private String trgetSvcNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 67,
+              "snippet": "    private String svcIp;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 80,
+              "snippet": "    private String svcSttus;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "name": "프록시서비스 관리 요청 접수",
+      "summary": {
+        "text": "프록시서비스 신규 등록 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 126,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 129,
+            "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 신규 등록 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 129,
+              "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+            }
+          ]
+        },
+        "request": {
+          "text": "프록시서비스 입력 객체를 요청 파라미터로 바인딩해 받는다. 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 입력 화면으로 되돌리고, 로그인 인증 여부를 확인해 미인증이면 로그인 화면으로 보낸다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 160,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 166,
+              "snippet": "\t\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 162,
+              "snippet": "\t\t\treturn \"egovframework/com/utl/sys/pxy/EgovProxySvcRegist\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addViewProxySvc.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통코드 조회 조건",
+      "summary": {
+        "text": "프록시서비스 등록 화면 열기에서 화면의 서비스 상태 선택 항목을 채우기 위해 공통코드를 조회할 때 쓰는 조회 조건 데이터 구조다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 29,
+            "snippet": "public class ComDefaultCodeVO implements Serializable {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 145,
+            "snippet": "\t\tmodel.addAttribute(\"cmmCodeDetailList\", getCmmCodeDetailList(new ComDefaultCodeVO(), \"COM072\"));"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 등록 화면 열기에서 화면의 서비스 상태 선택 항목을 채우기 위해 공통코드를 조회할 때 쓰는 조회 조건 데이터 구조다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 29,
+              "snippet": "public class ComDefaultCodeVO implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 145,
+              "snippet": "\t\tmodel.addAttribute(\"cmmCodeDetailList\", getCmmCodeDetailList(new ComDefaultCodeVO(), \"COM072\"));"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "조회할 코드 ID와 상세코드, 코드명, 코드설명을 담으며 특정 테이블에서 코드를 추출할 때 쓰는 테이블명과 상세 조건 사용 여부·상세 조건을 함께 관리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addViewProxySvc.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 조회 서비스",
+      "summary": {
+        "text": "프록시서비스 등록 화면 열기에서 화면 선택 항목에 표시할 공통코드 목록을 조회해 주는 서비스 계약이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 등록 화면 열기에서 화면 선택 항목에 표시할 공통코드 목록을 조회해 주는 서비스 계약이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "조회 조건에 맞는 공통코드 상세 목록을 반환하며, 여러 조건을 한 번에 넘겨 코드 목록들을 묶어 받는 기능과 조직정보·그룹정보를 코드 형태로 받는 기능도 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addViewProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "name": "프록시서비스 관리 요청 접수",
+      "summary": {
+        "text": "프록시서비스 등록 화면 열기 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 126,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 129,
+            "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 등록 화면 열기 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 129,
+              "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+            }
+          ]
+        },
+        "request": {
+          "text": "프록시서비스 입력 객체를 요청 파라미터로 바인딩해 받는다. 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 입력 화면으로 되돌리고, 로그인 인증 여부를 확인해 미인증이면 로그인 화면으로 보낸다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 160,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 166,
+              "snippet": "\t\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 162,
+              "snippet": "\t\t\treturn \"egovframework/com/utl/sys/pxy/EgovProxySvcRegist\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/removeProxySvc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "프록시서비스 삭제의 처리 결과를 사용자에게 알리기 위해 메시지 코드에 해당하는 안내 문구를 다국어 메시지 자원에서 찾아 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 삭제의 처리 결과를 사용자에게 알리기 위해 메시지 코드에 해당하는 안내 문구를 다국어 메시지 자원에서 찾아 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드만으로 조회하면 시스템 기본 로케일 기준 문구를 반환하고, 로케일을 함께 넘기면 해당 언어의 문구를 반환한다. 매개변수를 포함한 메시지 조합도 지원한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/removeProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "name": "프록시서비스 업무 서비스",
+      "summary": {
+        "text": "프록시서비스 삭제에서 프록시서비스 정보와 프록시 접속로그에 대한 등록·수정·삭제·조회 업무를 담당하는 서비스 계약이다. 화면 요청을 받아 실제 업무 처리를 수행하고 결과를 돌려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 15,
+            "snippet": "public interface EgovProxySvcService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 15,
+            "snippet": "public interface EgovProxySvcService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 삭제에서 프록시서비스 정보와 프록시 접속로그에 대한 등록·수정·삭제·조회 업무를 담당하는 서비스 계약이다. 화면 요청을 받아 실제 업무 처리를 수행하고 결과를 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "프록시서비스 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제를 각각 별도 업무 기능으로 제공하며 프록시 접속로그 목록 조회 기능도 함께 제공한다. 프록시서비스 삭제은 이 가운데 해당 업무 기능을 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 23,
+              "snippet": "    public List<ProxySvc> selectProxySvcList(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 39,
+              "snippet": "    public ProxySvc selectProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 48,
+              "snippet": "    public ProxySvc insertProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 55,
+              "snippet": "    public void updateProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 62,
+              "snippet": "    public void deleteProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 70,
+              "snippet": "    public List<ProxyLog> selectProxyLogList(ProxyLog proxyLog) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/removeProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "name": "프록시서비스 관리 요청 접수",
+      "summary": {
+        "text": "프록시서비스 삭제 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 126,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 129,
+            "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 삭제 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 129,
+              "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+            }
+          ]
+        },
+        "request": {
+          "text": "프록시서비스 입력 객체를 요청 파라미터로 바인딩해 받는다. 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 입력 화면으로 되돌리고, 로그인 인증 여부를 확인해 미인증이면 로그인 화면으로 보낸다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 160,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 166,
+              "snippet": "\t\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 162,
+              "snippet": "\t\t\treturn \"egovframework/com/utl/sys/pxy/EgovProxySvcRegist\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "안내 메시지 조회",
+      "summary": {
+        "text": "프록시서비스 수정의 처리 결과를 사용자에게 알리기 위해 메시지 코드에 해당하는 안내 문구를 다국어 메시지 자원에서 찾아 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 수정의 처리 결과를 사용자에게 알리기 위해 메시지 코드에 해당하는 안내 문구를 다국어 메시지 자원에서 찾아 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "메시지 코드만으로 조회하면 시스템 기본 로케일 기준 문구를 반환하고, 로케일을 함께 넘기면 해당 언어의 문구를 반환한다. 매개변수를 포함한 메시지 조합도 지원한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 26,
+              "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 52,
+              "snippet": "\tpublic String getMessage(String code) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+              "line": 62,
+              "snippet": "\tpublic String getMessage(String code, Locale locale) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "입력값 보안 처리",
+      "summary": {
+        "text": "프록시서비스 수정에서 사용자가 입력한 프록시 IP와 서비스 IP에 포함될 수 있는 위험 문자열을 걸러내는 보안 처리 역할을 맡는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 174,
+            "snippet": "\t\t\tproxySvc.setProxyIp(EgovWebUtil.filePathBlackList(proxySvc.getProxyIp()));"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 수정에서 사용자가 입력한 프록시 IP와 서비스 IP에 포함될 수 있는 위험 문자열을 걸러내는 보안 처리 역할을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 174,
+              "snippet": "\t\t\tproxySvc.setProxyIp(EgovWebUtil.filePathBlackList(proxySvc.getProxyIp()));"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "경로 조작에 쓰이는 상위 경로 표기를 제거하는 처리와, 화면 출력 시 스크립트 삽입을 막기 위해 특수문자를 치환하는 처리를 제공한다. 입력이 비어 있으면 빈 문자열을 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 25,
+              "snippet": "public class EgovWebUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 79,
+              "snippet": "\tpublic static String filePathBlackList(String value) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+              "line": 62,
+              "snippet": "\tpublic static String clearXSS(String value) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보",
+      "summary": {
+        "text": "프록시서비스 수정에서 현재 로그인한 사용자의 신원을 담는 데이터 구조다. 등록자·최종수정자 정보를 남기는 데 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 수정에서 현재 로그인한 사용자의 신원을 담는 데이터 구조다. 등록자·최종수정자 정보를 남기는 데 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "사용자 아이디와 이름, 이메일 등 기본 신원 항목과 사용자 구분, 조직 정보, 고유아이디를 보관한다. 프록시서비스 등록·수정 시 이 가운데 아이디가 등록자·수정자로 기록된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "로그인 인증 확인",
+      "summary": {
+        "text": "프록시서비스 수정에서 현재 요청자가 인증된 사용자인지 확인하고 인증된 사용자 정보를 꺼내오는 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 164,
+            "snippet": "\t\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 수정에서 현재 요청자가 인증된 사용자인지 확인하고 인증된 사용자 정보를 꺼내오는 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 164,
+              "snippet": "\t\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 객체 조회, 사용자 권한 목록 조회, 인증 여부 확인 세 가지를 제공하며 실제 판단은 사용자 상세 서비스에 위임한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 50,
+              "snippet": "\tpublic static List<String> getAuthorities() {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 58,
+              "snippet": "\tpublic static Boolean isAuthenticated() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 지원",
+      "summary": {
+        "text": "프록시서비스 수정에서 화면에 표시하거나 저장할 문자열 값을 다루기 위한 공통 문자열 처리 기능을 제공한다. 값이 없을 때 빈 문자열로 바꾸는 처리 등에 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 수정에서 화면에 표시하거나 저장할 문자열 값을 다루기 위한 공통 문자열 처리 기능을 제공한다. 값이 없을 때 빈 문자열로 바꾸는 처리 등에 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열 상수를 두고, 지정 길이를 넘는 문자열을 잘라내거나 잘라낸 뒤 표시 문자를 덧붙이는 기능, 값이 비었는지 확인하는 기능을 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 43,
+              "snippet": "public class EgovStringUtil {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 47,
+              "snippet": "\tpublic static final String EMPTY = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+              "line": 95,
+              "snippet": "\tpublic static String cutString(String source, int slength) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "name": "프록시서비스 업무 서비스",
+      "summary": {
+        "text": "프록시서비스 수정에서 프록시서비스 정보와 프록시 접속로그에 대한 등록·수정·삭제·조회 업무를 담당하는 서비스 계약이다. 화면 요청을 받아 실제 업무 처리를 수행하고 결과를 돌려준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 15,
+            "snippet": "public interface EgovProxySvcService {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+            "line": 15,
+            "snippet": "public interface EgovProxySvcService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 수정에서 프록시서비스 정보와 프록시 접속로그에 대한 등록·수정·삭제·조회 업무를 담당하는 서비스 계약이다. 화면 요청을 받아 실제 업무 처리를 수행하고 결과를 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "프록시서비스 목록 조회와 총 건수 조회, 상세 조회, 신규 등록, 수정, 삭제를 각각 별도 업무 기능으로 제공하며 프록시 접속로그 목록 조회 기능도 함께 제공한다. 프록시서비스 수정은 이 가운데 해당 업무 기능을 호출한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 15,
+              "snippet": "public interface EgovProxySvcService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 23,
+              "snippet": "    public List<ProxySvc> selectProxySvcList(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 39,
+              "snippet": "    public ProxySvc selectProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 48,
+              "snippet": "    public ProxySvc insertProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 55,
+              "snippet": "    public void updateProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 62,
+              "snippet": "    public void deleteProxySvc(ProxySvc proxySvc) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+              "line": 70,
+              "snippet": "    public List<ProxyLog> selectProxyLogList(ProxyLog proxyLog) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+      "name": "프록시서비스 정보",
+      "summary": {
+        "text": "프록시서비스 수정에서 오가는 프록시서비스 정보를 담는 데이터 구조다. 프록시 자체의 접속 정보와 프록시가 중계하는 대상 서비스 정보를 함께 보관한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 19,
+            "snippet": "public class ProxySvc extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+            "line": 19,
+            "snippet": "public class ProxySvc extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 수정에서 오가는 프록시서비스 정보를 담는 데이터 구조다. 프록시 자체의 접속 정보와 프록시가 중계하는 대상 서비스 정보를 함께 보관한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 19,
+              "snippet": "public class ProxySvc extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 19,
+              "snippet": "public class ProxySvc extends ComDefaultVO {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "프록시 ID를 식별자로 두고 프록시 명·프록시 IP·프록시 포트와 대상 서비스 명·서비스 IP·서비스 포트, 서비스 상태를 관리한다. 프록시 명과 IP는 필수 입력이며 길이 제한이 있고, 포트는 숫자만 허용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 19,
+              "snippet": "public class ProxySvc extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 26,
+              "snippet": "    private String proxyId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 33,
+              "snippet": "    private String proxyNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 40,
+              "snippet": "    private String proxyIp;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 48,
+              "snippet": "    private String proxyPort;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 55,
+              "snippet": "    private String trgetSvcNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 67,
+              "snippet": "    private String svcIp;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+              "line": 80,
+              "snippet": "    private String svcSttus;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "name": "프록시서비스 관리 요청 접수",
+      "summary": {
+        "text": "프록시서비스 수정 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 126,
+            "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "line": 129,
+            "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "프록시서비스 수정 요청을 받는 진입점이다. 화면에서 넘어온 프록시서비스 조회·입력 값을 받아 프록시서비스 업무 서비스에 처리를 위임하고, 결과와 안내 메시지를 화면 모델에 담아 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 129,
+              "snippet": "\t\tProxySvc proxySvcResult = egovProxySvcService.selectProxySvc(proxySvc);"
+            }
+          ]
+        },
+        "request": {
+          "text": "프록시서비스 입력 객체를 요청 파라미터로 바인딩해 받는다. 등록·수정 요청은 입력값 검증 결과를 먼저 확인해 오류가 있으면 입력 화면으로 되돌리고, 로그인 인증 여부를 확인해 미인증이면 로그인 화면으로 보낸다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 126,
+              "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 160,
+              "snippet": "\t\tif (bindingResult.hasErrors()) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 166,
+              "snippet": "\t\t\tif (!isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 162,
+              "snippet": "\t\t\treturn \"egovframework/com/utl/sys/pxy/EgovProxySvcRegist\";"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

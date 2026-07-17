@@ -1,0 +1,248 @@
+{
+  "chunkId": "sym.log.clg-000",
+  "domainId": "domain:sym.log.clg",
+  "domainName": "",
+  "files": [
+    {
+      "className": "EgovLoginLogService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/log/clg/service/EgovLoginLogService.java — java 파일",
+        "tags": []
+      },
+      "line": 22,
+      "relPath": "src/main/java/egovframework/com/sym/log/clg/service/EgovLoginLogService.java",
+      "slice": {
+        "endLine": 48,
+        "startLine": 12,
+        "text": " *    -------      -------     -------------------\n *    2009. 3. 11. 이삼섭        최초생성\n *    2011. 7. 01. 이기하        패키지 분리(sym.log -> sym.log.clg)\n *\n * @author 공통 서비스 개발팀 이삼섭\n * @since 2009. 3. 11.\n * @version\n * @see\n *\n */\npublic interface EgovLoginLogService {\n\n\t/**\n\t * 접속로그를 기록한다.\n\t *\n\t * @param LoginLog\n\t */\n\tpublic void logInsertLoginLog(LoginLog loinLog) throws Exception;\n\n\t/**\n\t * 접속로그를 조회한다.\n\t *\n\t * @param loginLog\n\t * @return loginLog\n\t * @throws Exception\n\t */\n\tpublic LoginLog selectLoginLog(LoginLog loginLog) throws Exception;\n\n\t/**\n\t * 접속로그 목록을 조회한다.\n\t *\n\t * @param LoginLog\n\t */\n\tpublic Map<String, Object> selectLoginLogInf(LoginLog loinLog) throws Exception;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "LoginLog",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/log/clg/service/LoginLog.java — java 파일",
+        "tags": []
+      },
+      "line": 22,
+      "relPath": "src/main/java/egovframework/com/sym/log/clg/service/LoginLog.java",
+      "slice": {
+        "endLine": 91,
+        "startLine": 12,
+        "text": " *    2009. 3. 11.  이삼섭      최초생성\n *    2011. 7. 01.  이기하      패키지 분리(sym.log -> sym.log.clg)\n *    2011.09.14       서준식      화면에 검색일자를 표시하기위한 멤버변수 추가.\n *\n * @author 공통 서비스 개발팀 이삼섭\n * @since 2009. 3. 11.\n * @version\n * @see\n *\n */\npublic class LoginLog implements Serializable {\n\n\tprivate static final long serialVersionUID = 3492444929272088373L;\n\n\t/** 로그ID */\n\tprivate String logId;\n\n\t/** 사용자ID */\n\tprivate String loginId;\n\n\t/** 사용자명 */\n\tprivate String loginNm;\n\n\t/** 접속IP */\n\tprivate String loginIp;\n\n\t/** 로그유형 */\n\tprivate String loginMthd;\n\n\t/** 에러발생여부 */\n\tprivate String errOccrrAt;\n\n\t/** 에러코드 */\n\tprivate String errorCode;\n\n\t/** 생성일시 */\n\tprivate String creatDt;\n\n\t/**\n\t * 검색시작일\n\t */\n\tprivate String searchBgnDe = \"\";\n\t/**\n\t * 검색조건\n\t */\n\tprivate String searchCnd = \"\";\n\t/**\n\t * 검색종료일\n\t */\n\tprivate String searchEndDe = \"\";\n\t/**\n\t * 검색단어\n\t */\n\tprivate String searchWrd = \"\";\n\t/**\n\t * 정렬순서(DESC,ASC)\n\t */\n\tprivate String sortOrdr = \"\";\n\n\t/** 검색사용여부 */\n    private String searchUseYn = \"\";\n\n    /** 현재페이지 */\n    private int pageIndex = 1;\n\n    /** 페이지개수 */\n    private int pageUnit = 10;\n\n    /** 페이지사이즈 */\n    private int pageSize = 10;\n\n    /** firstIndex */\n    private int firstIndex = 1;\n\n    /** lastIndex */\n    private int lastIndex = 1;\n\n    /** recordCountPerPage */\n    private int recordCountPerPage = 10;\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovLoginLogController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java — java 파일",
+        "tags": []
+      },
+      "line": 91,
+      "relPath": "src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java",
+      "slice": {
+        "endLine": 103,
+        "startLine": 81,
+        "text": "\t}\n\n\t/**\n\t * 로그인 로그 상세 조회\n\t *\n\t * @param loginLog\n\t * @param model\n\t * @return sym/log/clg/EgovLoginLogInqire\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/sym/log/clg/SelectLoginLogDetail.do\")\n\tpublic String selectLoginLog(@ModelAttribute(\"searchVO\") LoginLog loginLog, @RequestParam(\"logId\") String logId,\n\t\t\tModelMap model) throws Exception {\n\n\t\tloginLog.setLogId(logId.trim());\n\n\t\tLoginLog vo = loginLogService.selectLoginLog(loginLog);\n\t\tmodel.addAttribute(\"result\", vo);\n\t\treturn \"egovframework/com/sym/log/clg/EgovLoginLogDetail\";\n\t}\n\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovLoginLogController#selectLoginLog",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java",
+      "flowId": "flow:ANY /sym/log/clg/SelectLoginLogDetail.do",
+      "line": 91,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java",
+        "line": 91,
+        "snippet": "@RequestMapping(value = \"/sym/log/clg/SelectLoginLogDetail.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/log/clg/SelectLoginLogDetail.do:src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java",
+        "step:ANY /sym/log/clg/SelectLoginLogDetail.do:src/main/java/egovframework/com/sym/log/clg/service/LoginLog.java",
+        "step:ANY /sym/log/clg/SelectLoginLogDetail.do:src/main/java/egovframework/com/sym/log/clg/service/EgovLoginLogService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovLoginLogController#selectLoginLogInf",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java",
+      "flowId": "flow:ANY /sym/log/clg/SelectLoginLogList.do",
+      "line": 56,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java",
+        "line": 56,
+        "snippet": "@RequestMapping(value = \"/sym/log/clg/SelectLoginLogList.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/log/clg/SelectLoginLogList.do:src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java",
+        "step:ANY /sym/log/clg/SelectLoginLogList.do:src/main/java/egovframework/com/sym/log/clg/service/LoginLog.java",
+        "step:ANY /sym/log/clg/SelectLoginLogList.do:src/main/java/egovframework/com/sym/log/clg/service/EgovLoginLogService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "header": {
+    "flowIndex": [
+      {
+        "entryPoint": "EgovLoginLogController#selectLoginLog",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java",
+        "flowId": "flow:ANY /sym/log/clg/SelectLoginLogDetail.do",
+        "line": 91,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java",
+          "line": 91,
+          "snippet": "@RequestMapping(value = \"/sym/log/clg/SelectLoginLogDetail.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovLoginLogController#selectLoginLogInf",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java",
+        "flowId": "flow:ANY /sym/log/clg/SelectLoginLogList.do",
+        "line": 56,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java",
+          "line": 56,
+          "snippet": "@RequestMapping(value = \"/sym/log/clg/SelectLoginLogList.do\")"
+        }
+      }
+    ]
+  },
+  "isHeaderChunk": true,
+  "key": "sym.log.clg",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/log/clg/service/EgovLoginLogService.java",
+        "line": 22,
+        "snippet": "public interface EgovLoginLogService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/log/clg/service/EgovLoginLogService.java",
+      "stepId": "step:ANY /sym/log/clg/SelectLoginLogDetail.do:src/main/java/egovframework/com/sym/log/clg/service/EgovLoginLogService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/log/clg/service/LoginLog.java",
+        "line": 22,
+        "snippet": "public class LoginLog implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/log/clg/service/LoginLog.java",
+      "stepId": "step:ANY /sym/log/clg/SelectLoginLogDetail.do:src/main/java/egovframework/com/sym/log/clg/service/LoginLog.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java",
+        "line": 91,
+        "snippet": "@RequestMapping(value = \"/sym/log/clg/SelectLoginLogDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java",
+      "stepId": "step:ANY /sym/log/clg/SelectLoginLogDetail.do:src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/log/clg/service/EgovLoginLogService.java",
+        "line": 22,
+        "snippet": "public interface EgovLoginLogService {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/log/clg/service/EgovLoginLogService.java",
+      "stepId": "step:ANY /sym/log/clg/SelectLoginLogList.do:src/main/java/egovframework/com/sym/log/clg/service/EgovLoginLogService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/log/clg/service/LoginLog.java",
+        "line": 22,
+        "snippet": "public class LoginLog implements Serializable {"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/log/clg/service/LoginLog.java",
+      "stepId": "step:ANY /sym/log/clg/SelectLoginLogList.do:src/main/java/egovframework/com/sym/log/clg/service/LoginLog.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java",
+        "line": 91,
+        "snippet": "@RequestMapping(value = \"/sym/log/clg/SelectLoginLogDetail.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java",
+      "stepId": "step:ANY /sym/log/clg/SelectLoginLogList.do:src/main/java/egovframework/com/sym/log/clg/web/EgovLoginLogController.java"
+    }
+  ]
+}

@@ -1,0 +1,798 @@
+{
+  "chunkId": "uss.umt-002",
+  "domainId": "domain:uss.umt",
+  "domainName": "",
+  "files": [
+    {
+      "className": "ComDefaultCodeVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "slice": {
+        "endLine": 58,
+        "startLine": 16,
+        "text": " *\n * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------       --------    ---------------------------\n *   2009.3.11   이삼섭          최초 생성\n *\n * </pre>\n */\n@Getter\n@Setter\n@SuppressWarnings(\"serial\")\npublic class ComDefaultCodeVO implements Serializable {\n    /** 코드 ID */\n    private String codeId = \"\";\n\n    /** 상세코드 */\n    private String code = \"\";\n\n    /** 코드명 */\n    private String codeNm = \"\";\n\n    /** 코드설명 */\n    private String codeDc = \"\";\n\n    /** 특정테이블명 */\n    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용\n\n    /** 상세 조건 여부 */\n    private String haveDetailCondition = \"N\";\n\n    /** 상세 조건 */\n    private String detailCondition = \"\";\n\n    /**\n     * toString 메소드를 대치한다.\n     */\n    public String toString() {\n    \treturn ToStringBuilder.reflectionToString(this);\n    }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovWebUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovWebUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "slice": {
+        "endLine": 94,
+        "startLine": 15,
+        "text": " *\t2017-02-07   이정은      시큐어코딩(ES) - 시큐어코딩 경로 조작 및 자원 삽입[CWE-22, CWE-23, CWE-95, CWE-99]\n *  2018.08.17   신용호      filePathBlackList 수정\n *  2018.10.10   신용호      . => \\\\.으로 수정\n *  2022.05.10   정진오      clearXSS() 메소드 추가\n *  2022.06.09   김장하      NSR 보안조치 (removeOSCmdRisk 함수에 윈도우 다중 명령 실행 키워드 추가)\n *  2023.08.10   신용호      removeLDAPInjectionRisk() 오류 수정\n *  2024.12.04   신용호      filePathBlackList() basePath 추가\n * </pre>\n */\n\npublic class EgovWebUtil {\n\tpublic static String clearXSSMinimum(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\"\", \"&#34;\");\n\t\treturnValue = returnValue.replaceAll(\"\\'\", \"&#39;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSSMaximum(String value) {\n\t\tString returnValue = value;\n\t\treturnValue = clearXSSMinimum(returnValue);\n\n\t\treturnValue = returnValue.replace(\"%00\", \"\");\n\n\t\treturnValue = returnValue.replaceAll(\"%\", \"&#37;\");\n\n\t\t// \\\\. => .\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\\\\\\\\\", \"\"); // ..\\\n\t\treturnValue = returnValue.replaceAll(\"\\\\./\", \"\"); // ./\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSS(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3C\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3E\", \"&gt;\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String filePathBlackList(String value) {\n\t\tString returnValue = value;\n\t\tif (returnValue == null || returnValue.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\t/**\n\t * 파일경로 보안취약점 조치\n\t * # 주의사항\n\t * 1. basePath는 반드시 지정해야 한다.\n\t * 2. basePath는 ROOT Path \"/\" 사용 금지 한다.",
+        "truncated": true
+      }
+    },
+    {
+      "className": "LoginVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/LoginVO.java — java 파일",
+        "tags": []
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "slice": {
+        "endLine": 80,
+        "startLine": 21,
+        "text": " *   2009.03.03     박지욱     최초 생성\n *   2021.05.30     정진오     디지털원패스 사용자키/세션값 추가\n *</pre>\n *\n *  @author 공통서비스 개발팀 박지욱\n *  @since 2009.03.03\n *  @version 1.0\n *  @see\n *\n */\n@Getter\n@Setter\npublic class LoginVO implements Serializable{\n\n\t/**\n\t *\n\t */\n\tprivate static final long serialVersionUID = -8274004534207618049L;\n\n\t/** 아이디 */\n\t@EgovNullCheck\n\tprivate String id;\n\t/** 이름 */\n\t@EgovNullCheck\n\tprivate String name;\n\t/** 주민등록번호 */\n\tprivate String ihidNum;\n\t/** 이메일주소 */\n\t@EgovNullCheck\n\t@EgovEmailCheck\n\tprivate String email;\n\t/** 비밀번호 */\n\tprivate String password;\n\t/** 비밀번호 힌트 */\n\t@EgovNullCheck\n\tprivate String passwordHint;\n\t/** 비밀번호 정답 */\n\t@EgovNullCheck\n\tprivate String passwordCnsr;\n\t/** 사용자구분 */\n\tprivate String userSe;\n\t/** 조직(부서)ID */\n\tprivate String orgnztId;\n\t/** 조직(부서)명 */\n\tprivate String orgnztNm;\n\t/** 고유아이디 */\n\tprivate String uniqId;\n\t/** 로그인 후 이동할 페이지 */\n\tprivate String url;\n\t/** 사용자 IP정보 */\n\tprivate String ip;\n\t/** GPKI인증 DN */\n\tprivate String dn;\n\t/** 디지털원패스 사용자키 */\n\tprivate String onepassUserkey;\n\t/** 디지털원패스 사용자세션값 */\n\tprivate String onepassIntfToken;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovCmmUseService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "slice": {
+        "endLine": 60,
+        "startLine": 16,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.03.11  이삼섭          최초 생성\n *   2025.07.16  이백행          2025년 컨트리뷰션 `throws Exception` 제거\n *\n *      </pre>\n */\npublic interface EgovCmmUseService {\n\n\t/**\n\t * 공통코드를 조회한다.\n\t *\n\t * @param comDefaultCodeVO\n\t * @return List(코드)\n\t */\n\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * ComDefaultCodeVO의 리스트를 받아서 여러개의 코드 리스트를 맵에 담아서 리턴한다.\n\t *\n\t * @param comDefaultCodeVOs\n\t * @return Map(코드)\n\t */\n\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);\n\n\t/**\n\t * 조직정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 조직정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectOgrnztIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n\n\t/**\n\t * 그룹정보를 코드형태로 리턴한다.\n\t *\n\t * @param 조회조건정보 vo\n\t * @return 그룹정보 List\n\t */\n\tpublic List<CmmnDetailCode> selectGroupIdDetail(ComDefaultCodeVO comDefaultCodeVO);\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovUserDetailsService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java — java 파일",
+        "tags": []
+      },
+      "line": 5,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "slice": {
+        "endLine": 27,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.service;\n\nimport java.util.List;\n\npublic interface EgovUserDetailsService {\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic Object getAuthenticatedUser();\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t * 예) [ROLE_ADMIN, ROLE_USER, ROLE_A, ROLE_B, ROLE_RESTRICTED, IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED_ANONYMOUSLY]\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic List<String> getAuthorities();\n\t\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\t\n\t */\n\tpublic Boolean isAuthenticated(); \n\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovUmtAuthorizationHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 11,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+      "slice": {
+        "endLine": 38,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.util;\n\nimport java.util.List;\n\nimport egovframework.com.cmm.LoginVO;\nimport egovframework.com.utl.fcc.service.EgovStringUtil;\n\n/**\n * 사용자관리(UMT) 수정 권한 Helper\n */\npublic final class EgovUmtAuthorizationHelper {\n\n\tprivate EgovUmtAuthorizationHelper() {\n\t}\n\n\tpublic static String getLoginUniqId() {\n\t\tLoginVO loginUser = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();\n\t\treturn loginUser == null ? \"\" : EgovStringUtil.isNullToString(loginUser.getUniqId());\n\t}\n\n\tpublic static boolean isAdmin() {\n\t\tList<String> authorities = EgovUserDetailsHelper.getAuthorities();\n\t\treturn authorities != null && authorities.contains(\"ROLE_ADMIN\");\n\t}\n\n\tpublic static boolean isSelfTarget(String targetUniqId) {\n\t\tString loginUniqId = getLoginUniqId();\n\t\treturn !loginUniqId.isEmpty()\n\t\t\t\t&& targetUniqId != null\n\t\t\t\t&& loginUniqId.equals(targetUniqId);\n\t}\n\n\t/** 관리자이거나 수정 대상이 본인인 경우 true */\n\tpublic static boolean canModifyUser(String targetUniqId) {\n\t\treturn isAdmin() || isSelfTarget(targetUniqId);\n\t}\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "EgovUserDetailsHelper",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "slice": {
+        "endLine": 62,
+        "startLine": 15,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n *   2009.03.10  sjyoon         최초 생성\n *   2011.07.01\t 서준식          interface 생성후 상세 로직의 분리\n * </pre>\n */\n\npublic class EgovUserDetailsHelper {\n\n\tstatic EgovUserDetailsService egovUserDetailsService;\n\n\tpublic EgovUserDetailsService getEgovUserDetailsService() {\n\t\treturn egovUserDetailsService;\n\t}\n\n\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {\n\t\tEgovUserDetailsHelper.egovUserDetailsService = egovUserDetailsService;\n\t}\n\n\t/**\n\t * 인증된 사용자객체를 VO형식으로 가져온다.\n\t * @return Object - 사용자 ValueObject\n\t */\n\tpublic static Object getAuthenticatedUser() {\n\t\treturn egovUserDetailsService.getAuthenticatedUser();\n\t}\n\n\t/**\n\t * 인증된 사용자의 권한 정보를 가져온다.\n\t *\n\t * @return List - 사용자 권한정보 목록\n\t */\n\tpublic static List<String> getAuthorities() {\n\t\treturn egovUserDetailsService.getAuthorities();\n\t}\n\n\t/**\n\t * 인증된 사용자 여부를 체크한다.\n\t * @return Boolean - 인증된 사용자 여부(TRUE / FALSE)\n\t */\n\tpublic static Boolean isAuthenticated() {\n\t\treturn egovUserDetailsService.isAuthenticated();\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovComUtlController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java — java 파일",
+        "tags": []
+      },
+      "line": 40,
+      "relPath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+      "slice": {
+        "endLine": 109,
+        "startLine": 30,
+        "text": " *   2022.11.11  김혜준      시큐어코딩 처리\n *   2023.05.23  신용호      moveToPage() 추가 보완 조치\n *   2024.07.08  신용호      decryptId(), encryptId() 추가\n *\n *  @author 공통서비스 개발팀 조재영\n *  @since 2009.03.02\n *  @version 1.0\n *  @see\n *\n */\n@Controller\npublic class EgovComUtlController {\n\n    //@Resource(name = \"egovUserManageService\")\n    //private EgovUserManageService egovUserManageService;\n\tprivate static final Logger LOGGER = LoggerFactory.getLogger(EgovComUtlController.class);\n\tprivate static final String ERROR_VIEW = \"egovframework/com/cmm/error/egovError\";\n\n\t/** 암호화서비스 */\n\tprivate static EgovEnvCryptoService cryptoService;\n\n\n\t@Resource(name = \"egovPageLinkWhitelist\")\n    protected List<String> egovWhitelist;\n\n    /** EgovPropertyService */\n    @Resource(name = \"propertiesService\")\n    protected EgovPropertyService propertiesService;\n\n\t@Resource(name = \"egovEnvCryptoService\")\n\tpublic void setEgovEnvCryptoService(EgovEnvCryptoService cryptoService) {\n\t\tthis.cryptoService = cryptoService;\n\t}\n\n\n    /**\n\t * JSP 호출작업만 처리하는 공통 함수\n\t */\n\t@RequestMapping(value = \"/EgovPageLink.do\")\n\tpublic String moveToPage(@RequestParam(value = \"linkIndex\",required=true,defaultValue=\"0\") Integer linkIndex){\n\n\t\tString link = \"\";\n\t\t// 화이트 리스트가 비었는지 확인\n\t\tif (egovWhitelist == null || egovWhitelist.isEmpty()) {\n\t\t\tlink=ERROR_VIEW;\n\t\t\treturn link;\n\t\t}\n\n\t\tif (linkIndex == null || linkIndex < 0 || egovWhitelist.size() <= linkIndex) {\n\t\t\tlink=ERROR_VIEW;\n\t\t\treturn link;\n\t\t}\n\n\t\tlink = egovWhitelist.get(linkIndex);\n\n\t\tlink = link.replace(\";\", \"\");\n\t\tlink = link.replace(\"%\", \"\");\n\t\tlink = link.replace(\".\", \"\");\n\n\t\t// 안전한 경로 문자열로 조치\n\t\tlink = EgovWebUtil.filePathBlackList(link);\n\n\t\treturn link;\n\t}\n\n    /**\n\t * 모달조회\n\t * @return String\n\t * @exception Exception\n\t */\n    @RequestMapping(value = \"/EgovModal.do\")\n    public String selectUtlJsonInquire()  throws Exception {\n        return \"egovframework/com/cmm/EgovModal\";\n    }\n\n    /**\n\t * validato rule dynamic Javascript\n\t */\n\t@RequestMapping(\"/validator.do\")\n\tpublic String validate(){",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovEntrprsManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 22,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "slice": {
+        "endLine": 91,
+        "startLine": 12,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.10  조재영          최초 생성\n *   2017.07.21  장동한 \t\t\t로그인인증제한 작업\n *\n * </pre>\n */\npublic interface EgovEntrprsManageService {\n\n\t/**\n\t * 기업회원의 기본정보를 화면에서 입력하여 항목의 정합성을 체크하고 데이터베이스에 저장\n\t * @param entrprsManageVO 기업회원등록정보\n\t * @return result 등록결과\n\t * @throws Exception\n\t */\n\tpublic String insertEntrprsmber(EntrprsManageVO entrprsManageVO) throws Exception;\n\n\t/**\n\t * 기 등록된 사용자 중 검색조건에 맞는기업회원의 정보를 데이터베이스에서 읽어와 화면에 출력\n\t * @param entrprsmberId 조회대상 기업회원아이디\n\t * @return entrprsManageVO 기업회원정보\n\t * @throws Exception\n\t */\n\tpublic EntrprsManageVO selectEntrprsmber(String entrprsmberId) throws Exception;\n\n\t/**\n\t * 화면에 조회된 기업회원의 기본정보를 수정하여 항목의 정합성을 체크하고 수정된 데이터를 데이터베이스에 반영\n\t * @param entrprsManageVO 기업회원수정정보\n\t * @throws Exception\n\t */\n\tpublic void updateEntrprsmber(EntrprsManageVO entrprsManageVO) throws Exception;\n\n\t/**\n\t * 화면에 조회된 기업회원의 정보를 데이터베이스에서 삭제\n\t * @param checkedIdForDel 삭제대상기업회원아이디\n\t * @throws Exception\n\t */\n\tpublic void deleteEntrprsmber(String checkedIdForDel) throws Exception;\n\n\t/**\n\t * 기업회원용 약관정보 조회\n\t * @param stplatId 기업회원약관아이디\n\t * @return stplatList 기업회원약관정보\n\t * @throws Exception\n\t */\n\tpublic List<StplatVO> selectStplat(String stplatId) throws Exception;\n\n\t/**\n\t * 기업회원암호수정\n\t * @param entrprsManageVO 기업회원수정정보(비밀번호)\n\t * @throws Exception\n\t */\n\tpublic void updatePassword(EntrprsPasswordManageVO entrprsPasswordManageVO) throws Exception;\n\n\t/**\n\t * 기업회원이 비밀번호를 기억하지 못할 때 비밀번호를 찾을 수 있도록 함\n\t * @param passVO 기업회원암호 조회조건정보\n\t * @return entrprsManageVO 기업회원암호정보\n\t * @throws Exception\n\t */\n\tpublic EntrprsPasswordManageVO selectPassword(EntrprsPasswordManageVO passVO) throws Exception;\n\n\t/**\n\t * 기 등록된기업 회원 중 검색조건에 맞는 회원들의 정보를 데이터베이스에서 읽어와 화면에 출력\n\t * @param userSearchVO 검색조건\n\t * @return List<EntrprsManageVO> 기업회원목록정보\n\t * @throws Exception\n\t */\n\tpublic List<EntrprsManageVO> selectEntrprsMberList(UserDefaultVO userSearchVO) throws Exception;\n\n    /**\n     * 기업회원 총 개수를 조회한다.\n     * @param userSearchVO 검색조건\n     * @return 사용자 총 개수(int)\n     * @throws Exception\n     */\n    public int selectEntrprsMberListTotCnt(UserDefaultVO userSearchVO) throws Exception;",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovMberManageService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java — java 파일",
+        "tags": []
+      },
+      "line": 22,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "slice": {
+        "endLine": 91,
+        "startLine": 12,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.10  조재영          최초 생성\n *   2017.07.21  장동한 \t\t\t로그인인증제한 작업\n *\n * </pre>\n */\npublic interface EgovMberManageService {\n\n\t/**\n\t * 사용자의 기본정보를 화면에서 입력하여 항목의 정합성을 체크하고 데이터베이스에 저장\n\t * @param mberManageVO 일반회원 등록정보\n\t * @return 등록결과\n\t * @throws Exception\n\t */\n\tpublic String insertMber(MberManageVO mberManageVO) throws Exception;\n\n\t/**\n\t * 기 등록된 사용자 중 검색조건에 맞는 일반회원의 정보를 데이터베이스에서 읽어와 화면에 출력\n\t * @param mberId 상세조회대상 일반회원아이디\n\t * @return mberManageVO 일반회원상세정보\n\t * @throws Exception\n\t */\n\tpublic MberManageVO selectMber(String mberId) throws Exception;\n\n\t/**\n\t * 기 등록된 회원 중 검색조건에 맞는 회원들의 정보를 데이터베이스에서 읽어와 화면에 출력\n\t * @param userSearchVO 검색조건\n\t * @return List<MberManageVO> 일반회원목록정보\n\t * @throws Exception\n\t */\n\tpublic List<MberManageVO> selectMberList(UserDefaultVO userSearchVO) throws Exception;\n\n    /**\n     * 일반회원 총 개수를 조회한다.\n     * @param userSearchVO 검색조건\n     * @return 일반회원총개수(int)\n     * @throws Exception\n     */\n    public int selectMberListTotCnt(UserDefaultVO userSearchVO) throws Exception;\n\n\t/**\n\t * 화면에 조회된 일반회원의 기본정보를 수정하여 항목의 정합성을 체크하고 수정된 데이터를 데이터베이스에 반영\n\t * @param mberManageVO 일반회원수정정보\n\t * @throws Exception\n\t */\n\tpublic void updateMber(MberManageVO mberManageVO) throws Exception;\n\n\t/**\n\t * 화면에 조회된 사용자의 정보를 데이터베이스에서 삭제\n\t * @param checkedIdForDel 삭제대상 일반회원아이디\n\t * @throws Exception\n\t */\n\tpublic void deleteMber(String checkedIdForDel) throws Exception;\n\n\t/**\n\t * 일반회원 약관확인\n\t * @param stplatId 일반회원약관아이디\n\t * @return 일반회원약관정보(List)\n\t * @throws Exception\n\t */\n\tpublic List<StplatVO> selectStplat(String stplatId)  throws Exception;\n\n\t/**\n\t * 일반회원암호수정\n\t * @param mberPasswordManageVO 일반회원 비밀번호 수정정보\n\t * @throws Exception\n\t */\n\tpublic void updatePassword(MberPasswordManageVO mberPasswordManageVO) throws Exception;\n\n\t/**\n\t * 일반회원이 비밀번호를 기억하지 못할 때 비밀번호를 찾을 수 있도록 함\n\t * @param mberPasswordManageVO 일반회원 암호 조회조건정보\n\t * @return mberPasswordManageVO 일반회원 암호정보\n\t * @throws Exception\n\t */\n\tpublic MberPasswordManageVO selectPassword(MberPasswordManageVO mberPasswordManageVO) throws Exception;",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EntrprsManageInsertVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java — java 파일",
+        "tags": []
+      },
+      "line": 17,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+      "slice": {
+        "endLine": 31,
+        "startLine": 7,
+        "text": "\n/**\n * 기업회원 등록용 VO 클래스\n * EntrprsManageVO를 상속받아 비밀번호 검증 필드를 추가\n *\n * @author 공통서비스\n * @since 2025.12.16\n * @version 1.0\n * @see EntrprsManageVO\n */\n@Getter\n@Setter\npublic class EntrprsManageInsertVO extends EntrprsManageVO {\n\n\tprivate static final long serialVersionUID = 1L;\n\n\t/**\n\t * 새 비밀번호 확인 (등록 시 확인)\n\t */\n\t@EgovNullCheck\n\t@EgovPwdCheck\n\tprivate String password2;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "MberManageInsertVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java — java 파일",
+        "tags": []
+      },
+      "line": 17,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java",
+      "slice": {
+        "endLine": 31,
+        "startLine": 7,
+        "text": "\n/**\n * 일반회원 등록용 VO 클래스\n * MberManageVO를 상속받아 비밀번호 검증 필드를 추가\n *\n * @author 공통서비스\n * @since 2025.12.16\n * @version 1.0\n * @see MberManageVO\n */\n@Getter\n@Setter\npublic class MberManageInsertVO extends MberManageVO {\n\n\tprivate static final long serialVersionUID = 1L;\n\n\t/**\n\t * 새 비밀번호 확인 (등록 시 확인)\n\t */\n\t@EgovNullCheck\n\t@EgovPwdCheck\n\tprivate String password2;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "MberManageVO",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/service/MberManageVO.java — java 파일",
+        "tags": []
+      },
+      "line": 28,
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/MberManageVO.java",
+      "slice": {
+        "endLine": 97,
+        "startLine": 18,
+        "text": " * <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2009.04.10  조재영          최초 생성\n *   2017.07.21  장동한 \t\t\t로그인인증제한 작업\n *\n * </pre>\n */\n@Getter\n@Setter\npublic class MberManageVO extends UserDefaultVO{\n\n\tprivate static final long serialVersionUID = -4255594107023139972L;\n\n    /**\n\t * 사용자고유아이디\n\t */\n\tprivate String uniqId=\"\";\n\t/**\n\t * 사용자 유형\n\t */\n\tprivate String userTy;\n\t/**\n\t * 주소\n\t */\n\t@EgovNullCheck\n\t@Size(max=100)\n\tprivate String adres;\n\t/**\n\t * 상세주소\n\t */\n\tprivate String detailAdres;\n\t/**\n\t * 끝전화번호\n\t */\n\t@EgovNullCheck\n\t@Size(max=4)\n\t@Pattern(regexp=\"^[0-9]*$\", message=\"{validation.pattern.integer}\")\n\tprivate String endTelno;\n\t/**\n\t * 팩스번호\n\t */\n\t@Size(max=15)\n\tprivate String mberFxnum;\n\t/**\n\t * 그룹 ID\n\t */\n\tprivate String groupId;\n\t/**\n\t * 주민등록번호\n\t */\n\tprivate String ihidnum;\n\t/**\n\t * 성별코드\n\t */\n\tprivate String sexdstnCode;\n\t/**\n\t * 회원 ID\n\t */\n\t@EgovNullCheck\n\t@Size(max=20)\n\tprivate String mberId;\n\t/**\n\t * 회원명\n\t */\n\t@EgovNullCheck\n\t@Size(max=50)\n\tprivate String mberNm;\n\t/**\n\t * 회원상태\n\t */\n\t@EgovNullCheck\n\tprivate String mberSttus;\n\t/**\n\t * 지역번호\n\t */\n\t@EgovNullCheck\n\t@Size(max=4)",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovEmplyrManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 92,
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "slice": {
+        "endLine": 161,
+        "startLine": 82,
+        "text": "\n\t/**\n\t * 사용자목록을 조회한다. (pageing)\n\t * \n\t * @param userSearchVO 검색조건정보\n\t * @param model        화면모델\n\t * @return cmm/uss/umt/EgovUserManage\n\t * @throws Exception\n\t */\n\t@IncludedInfo(name = \"업무사용자관리\", order = 460, gid = 50)\n\t@RequestMapping(value = \"/uss/umt/EgovEmplyrManage.do\")\n\tpublic String selectEmplyrList(@ModelAttribute(\"userSearchVO\") UserDefaultVO userSearchVO, ModelMap model)\n\t\t\tthrows Exception {\n\n\t\t// 미인증 사용자에 대한 보안처리\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\t\tif (!isAuthenticated) {\n\t\t\treturn \"index\";\n\t\t}\n\n\t\t/** EgovPropertyService */\n\t\tuserSearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));\n\t\tuserSearchVO.setPageSize(propertiesService.getInt(\"pageSize\"));\n\n\t\t/** pageing */\n\t\tPaginationInfo paginationInfo = new PaginationInfo();\n\t\tpaginationInfo.setCurrentPageNo(userSearchVO.getPageIndex());\n\t\tpaginationInfo.setRecordCountPerPage(userSearchVO.getPageUnit());\n\t\tpaginationInfo.setPageSize(userSearchVO.getPageSize());\n\n\t\tuserSearchVO.setFirstIndex(paginationInfo.getFirstRecordIndex());\n\t\tuserSearchVO.setLastIndex(paginationInfo.getLastRecordIndex());\n\t\tuserSearchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());\n\n\t\tList<EgovMap> emplyrList = emplyrManageService.selectEmplyrList(userSearchVO);\n\t\tmodel.addAttribute(\"resultList\", emplyrList);\n\n\t\tint totCnt = emplyrManageService.selectEmplyrListTotCnt(userSearchVO);\n\t\tpaginationInfo.setTotalRecordCount(totCnt);\n\t\tmodel.addAttribute(\"paginationInfo\", paginationInfo);\n\n\t\t// 사용자상태코드를 코드정보로부터 조회\n\t\tComDefaultCodeVO comDefaultCodeVO = new ComDefaultCodeVO();\n\t\tcomDefaultCodeVO.setCodeId(\"COM013\");\n\t\tList<CmmnDetailCode> emplyrSttusCodeResult = cmmUseService.selectCmmCodeDetail(comDefaultCodeVO);\n\t\tmodel.addAttribute(\"emplyrSttusCode_result\", emplyrSttusCodeResult);// 사용자상태코드목록\n\n\t\treturn \"egovframework/com/uss/umt/EgovEmplyrManage\";\n\t}\n\n\t/**\n\t * 사용자등록화면으로 이동한다.\n\t * \n\t * @param userSearchVO         검색조건정보\n\t * @param emplyrManageInsertVO 사용자초기화정보\n\t * @param model                화면모델\n\t * @return cmm/uss/umt/EgovUserInsert\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/uss/umt/EgovEmplyrInsertView.do\", method = RequestMethod.POST)\n\t@RequireAdmin\n\tpublic String insertUserView(@ModelAttribute(\"userSearchVO\") UserDefaultVO userSearchVO,\n\t\t\t@ModelAttribute(\"emplyrManageVO\") EmplyrManageInsertVO emplyrManageInsertVO, Model model) throws Exception {\n\n\t\t// 미인증 사용자에 대한 보안처리\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\t\tif (!isAuthenticated) {\n\t\t\treturn \"index\";\n\t\t}\n\n\t\tComDefaultCodeVO comDefaultCodeVO = new ComDefaultCodeVO();\n\n\t\t// 패스워드힌트목록을 코드정보로부터 조회\n\t\tcomDefaultCodeVO.setCodeId(\"COM022\");\n\t\tList<CmmnDetailCode> passwordHintResult = cmmUseService.selectCmmCodeDetail(comDefaultCodeVO);\n\t\t// 성별구분코드를 코드정보로부터 조회\n\t\tcomDefaultCodeVO.setCodeId(\"COM014\");\n\t\tList<CmmnDetailCode> sexdstnCodeResult = cmmUseService.selectCmmCodeDetail(comDefaultCodeVO);\n\t\t// 사용자상태코드를 코드정보로부터 조회\n\t\tcomDefaultCodeVO.setCodeId(\"COM013\");",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovEntrprsManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 90,
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "slice": {
+        "endLine": 159,
+        "startLine": 80,
+        "text": "\n\t/**\n\t * 기업회원목록을 조회한다. (pageing)\n\t *\n\t * @param userSearchVO 검색조건정보\n\t * @param model        화면모델\n\t * @return uss/umt/EgovEntrprsManage\n\t * @throws Exception\n\t */\n\t@IncludedInfo(name = \"기업회원관리\", order = 450, gid = 50)\n\t@RequestMapping(value = \"/uss/umt/EgovEntrprsManage.do\")\n\tpublic String selectEntrprsMberList(@ModelAttribute(\"userSearchVO\") UserDefaultVO userSearchVO, ModelMap model)\n\t\t\tthrows Exception {\n\n\t\t// 미인증 사용자에 대한 보안처리\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\t\tif (!isAuthenticated) {\n\t\t\treturn \"index\";\n\t\t}\n\n\t\t/** EgovPropertyService */\n\t\tuserSearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));\n\t\tuserSearchVO.setPageSize(propertiesService.getInt(\"pageSize\"));\n\n\t\t/** pageing */\n\t\tPaginationInfo paginationInfo = new PaginationInfo();\n\t\tpaginationInfo.setCurrentPageNo(userSearchVO.getPageIndex());\n\t\tpaginationInfo.setRecordCountPerPage(userSearchVO.getPageUnit());\n\t\tpaginationInfo.setPageSize(userSearchVO.getPageSize());\n\n\t\tuserSearchVO.setFirstIndex(paginationInfo.getFirstRecordIndex());\n\t\tuserSearchVO.setLastIndex(paginationInfo.getLastRecordIndex());\n\t\tuserSearchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());\n\n\t\tList<EntrprsManageVO> resultList = entrprsManageService.selectEntrprsMberList(userSearchVO);\n\t\tmodel.addAttribute(\"resultList\", resultList);\n\n\t\tint totCnt = entrprsManageService.selectEntrprsMberListTotCnt(userSearchVO);\n\t\tpaginationInfo.setTotalRecordCount(totCnt);\n\t\tmodel.addAttribute(\"paginationInfo\", paginationInfo);\n\n\t\t// 기업회원 상태코드를 코드정보로부터 조회\n\t\tComDefaultCodeVO comDefaultCodeVO = new ComDefaultCodeVO();\n\t\tcomDefaultCodeVO.setCodeId(\"COM013\");\n\t\tList<CmmnDetailCode> entrprsMberSttusResult = cmmUseService.selectCmmCodeDetail(comDefaultCodeVO);\n\t\tmodel.addAttribute(\"entrprsMberSttus_result\", entrprsMberSttusResult);\n\n\t\treturn \"egovframework/com/uss/umt/EgovEntrprsManage\";\n\t}\n\n\t/**\n\t * 기업회원 등록화면으로 이동한다.\n\t *\n\t * @param userSearchVO          검색조건정보\n\t * @param entrprsManageInsertVO 기업회원 초기화정보\n\t * @param model                 화면모델\n\t * @return uss/umt/EgovEntrprsInsert\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/uss/umt/EgovEntrprsInsertView.do\", method = RequestMethod.POST)\n\t@RequireAdmin\n\tpublic String insertEntrprsMberView(@ModelAttribute(\"userSearchVO\") UserDefaultVO userSearchVO,\n\t\t\t@ModelAttribute(\"entrprsManageVO\") EntrprsManageInsertVO entrprsManageInsertVO, Model model) throws Exception {\n\n\t\t// 미인증 사용자에 대한 보안처리\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\t\tif (!isAuthenticated) {\n\t\t\treturn \"index\";\n\t\t}\n\n\t\taddEntrprsCodeListToModel(model);\n\n\t\treturn \"egovframework/com/uss/umt/EgovEntrprsInsert\";\n\t}\n\n\t/**\n\t * 기업회원등록처리후 목록화면으로 이동한다.\n\t *\n\t * @param entrprsManageInsertVO 신규기업회원정보 (비밀번호 검증 포함)\n\t * @param bindingResult         입력값검증용 bindingResult",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovMberManageController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java — java 파일",
+        "tags": []
+      },
+      "line": 90,
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "slice": {
+        "endLine": 159,
+        "startLine": 80,
+        "text": "\n\t/**\n\t * 일반회원목록을 조회한다. (pageing)\n\t *\n\t * @param userSearchVO 검색조건정보\n\t * @param model        화면모델\n\t * @return uss/umt/EgovMberManage\n\t * @throws Exception\n\t */\n\t@IncludedInfo(name = \"일반회원관리\", order = 470, gid = 50)\n\t@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")\n\tpublic String selectMberList(@ModelAttribute(\"userSearchVO\") UserDefaultVO userSearchVO, ModelMap model)\n\t\t\tthrows Exception {\n\n\t\t// 미인증 사용자에 대한 보안처리\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\t\tif (!isAuthenticated) {\n\t\t\treturn \"index\";\n\t\t}\n\n\t\t/** EgovPropertyService */\n\t\tuserSearchVO.setPageUnit(propertiesService.getInt(\"pageUnit\"));\n\t\tuserSearchVO.setPageSize(propertiesService.getInt(\"pageSize\"));\n\n\t\t/** pageing */\n\t\tPaginationInfo paginationInfo = new PaginationInfo();\n\t\tpaginationInfo.setCurrentPageNo(userSearchVO.getPageIndex());\n\t\tpaginationInfo.setRecordCountPerPage(userSearchVO.getPageUnit());\n\t\tpaginationInfo.setPageSize(userSearchVO.getPageSize());\n\n\t\tuserSearchVO.setFirstIndex(paginationInfo.getFirstRecordIndex());\n\t\tuserSearchVO.setLastIndex(paginationInfo.getLastRecordIndex());\n\t\tuserSearchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());\n\n\t\tList<MberManageVO> resultList = mberManageService.selectMberList(userSearchVO);\n\t\tmodel.addAttribute(\"resultList\", resultList);\n\n\t\tint totCnt = mberManageService.selectMberListTotCnt(userSearchVO);\n\t\tpaginationInfo.setTotalRecordCount(totCnt);\n\t\tmodel.addAttribute(\"paginationInfo\", paginationInfo);\n\n\t\t// 일반회원 상태코드를 코드정보로부터 조회\n\t\tComDefaultCodeVO comDefaultCodeVO = new ComDefaultCodeVO();\n\t\tcomDefaultCodeVO.setCodeId(\"COM013\");\n\t\tList<CmmnDetailCode> mberSttusResult = cmmUseService.selectCmmCodeDetail(comDefaultCodeVO);\n\t\tmodel.addAttribute(\"entrprsMberSttus_result\", mberSttusResult);// 기업회원상태코드목록\n\n\t\treturn \"egovframework/com/uss/umt/EgovMberManage\";\n\t}\n\n\t/**\n\t * 일반회원등록화면으로 이동한다.\n\t *\n\t * @param userSearchVO        검색조건정보\n\t * @param mberManageInsertVO  일반회원초기화정보\n\t * @param model               화면모델\n\t * @return uss/umt/EgovMberInsert\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/uss/umt/EgovMberInsertView.do\", method = RequestMethod.POST)\n\t@RequireAdmin\n\tpublic String insertMberView(@ModelAttribute(\"userSearchVO\") UserDefaultVO userSearchVO,\n\t\t\t@ModelAttribute(\"mberManageVO\") MberManageInsertVO mberManageInsertVO, Model model) throws Exception {\n\n\t\t// 미인증 사용자에 대한 보안처리\n\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();\n\t\tif (!isAuthenticated) {\n\t\t\treturn \"index\";\n\t\t}\n\n\t\tComDefaultCodeVO comDefaultCodeVO = new ComDefaultCodeVO();\n\n\t\t// 패스워드힌트목록을 코드정보로부터 조회\n\t\tcomDefaultCodeVO.setCodeId(\"COM022\");\n\t\tList<CmmnDetailCode> passwordHintResult = cmmUseService.selectCmmCodeDetail(comDefaultCodeVO);\n\t\t// 성별구분코드를 코드정보로부터 조회\n\t\tcomDefaultCodeVO.setCodeId(\"COM014\");\n\t\tList<CmmnDetailCode> sexdstnCodeResult = cmmUseService.selectCmmCodeDetail(comDefaultCodeVO);\n\t\t// 사용자상태코드를 코드정보로부터 조회\n\t\tcomDefaultCodeVO.setCodeId(\"COM013\");",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovStringUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 43,
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "slice": {
+        "endLine": 112,
+        "startLine": 33,
+        "text": " * See the License for the specific language governing permissions and\n * limitations under the License.\n */\nimport java.io.UnsupportedEncodingException;\nimport java.math.BigDecimal;\nimport java.security.SecureRandom;\nimport java.sql.Timestamp;\nimport java.text.SimpleDateFormat;\nimport java.util.Locale;\n\npublic class EgovStringUtil {\n\t/**\n\t * 빈 문자열 <code>\"\"</code>.\n\t */\n\tpublic static final String EMPTY = \"\";\n\n\t// 221116\t김혜준\t2022 시큐어코딩 조치\n\tprivate static SecureRandom rnd = new SecureRandom();\n\n\t/**\n\t * <p>Padding을 할 수 있는 최대 수치</p>\n\t */\n\t// private static final int PAD_LIMIT = 8192;\n\n\t/**\n\t * <p>An array of <code>String</code>s used for padding.</p>\n\t * <p>Used for efficient space padding. The length of each String expands as needed.</p>\n\t */\n\t/*\n\tprivate static final String[] PADDING = new String[Character.MAX_VALUE];\n\n\tstatic {\n\t\t// space padding is most common, start with 64 chars\n\t\tPADDING[32] = \"                                                                \";\n\t}\n\t */\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 지정한길이에다가 해당 문자열을 붙여주는 메서드.\n\t * @param source 원본 문자열 배열\n\t * @param output 더할문자열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, String output, int slength) {\n\t\tString returnVal = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\treturnVal = source.substring(0, slength) + output;\n\t\t\t} else {\n\t\t\t\treturnVal = source;\n\t\t\t}\n\t\t}\n\t\treturn returnVal;\n\t}\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 해당 문자열을 삭제하는 메서드\n\t * @param source 원본 문자열 배열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, int slength) {\n\t\tString result = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\tresult = source.substring(0, slength);\n\t\t\t} else {\n\t\t\t\tresult = source;\n\t\t\t}\n\t\t}\n\t\treturn result;\n\t}\n\n\t/**\n\t * <p>\n\t * String이 비었거나(\"\") 혹은 null 인지 검증한다.\n\t * </p>\n\t *\n\t * <pre>",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovMberManageController#sbscrbMberView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovMberSbscrbView.do",
+      "line": 433,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "line": 433,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberSbscrbView.do\", method = RequestMethod.POST)"
+      },
+      "stepIds": [
+        "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#updateMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovMberSelectUpdt.do",
+      "line": 331,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "line": 331,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberSelectUpdt.do\", method = RequestMethod.POST)"
+      },
+      "stepIds": [
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/MberManageVO.java",
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#updateMberView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovMberSelectUpdtView.do",
+      "line": 237,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "line": 237,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberSelectUpdtView.do\", method = RequestMethod.POST)"
+      },
+      "stepIds": [
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#withdrawMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovMberWithdraw.do",
+      "line": 404,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "line": 404,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberWithdraw.do\", method = RequestMethod.POST)"
+      },
+      "stepIds": [
+        "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+        "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEmplyrManageController#rlnmCnfirm",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovRlnmCnfirm.do",
+      "line": 569,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 569,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovRlnmCnfirm.do\", method = RequestMethod.POST)"
+      },
+      "stepIds": [
+        "step:POST /uss/umt/EgovRlnmCnfirm.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovRlnmCnfirm.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovEntrprsManageController#sbscrbEntrprsMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovStplatCnfirmEntrprs.do",
+      "line": 433,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "line": 433,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovStplatCnfirmEntrprs.do\", method = RequestMethod.POST)"
+      },
+      "stepIds": [
+        "step:POST /uss/umt/EgovStplatCnfirmEntrprs.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovStplatCnfirmEntrprs.do:src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+        "step:POST /uss/umt/EgovStplatCnfirmEntrprs.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovMberManageController#sbscrbEntrprsMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "flowId": "flow:POST /uss/umt/EgovStplatCnfirmMber.do",
+      "line": 495,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "line": 495,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovStplatCnfirmMber.do\", method = RequestMethod.POST)"
+      },
+      "stepIds": [
+        "step:POST /uss/umt/EgovStplatCnfirmMber.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "step:POST /uss/umt/EgovStplatCnfirmMber.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "header": null,
+  "isHeaderChunk": false,
+  "key": "uss.umt",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java",
+        "line": 19,
+        "snippet": "public class MberManageInsertVO extends MberManageVO {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/uss/umt/service/MberManageInsertVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "line": 90,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovMberSbscrbView.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+        "line": 11,
+        "snippet": "public final class EgovUmtAuthorizationHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovMberManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/MberManageVO.java",
+        "line": 30,
+        "snippet": "public class MberManageVO extends UserDefaultVO{"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/MberManageVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/MberManageVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "line": 90,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      },
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdt.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+        "line": 11,
+        "snippet": "public final class EgovUmtAuthorizationHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUmtAuthorizationHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+        "line": 40,
+        "snippet": "@Controller"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovMberManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "line": 90,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovMberSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovMberManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "line": 90,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      },
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:POST /uss/umt/EgovMberWithdraw.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "stepId": "step:POST /uss/umt/EgovRlnmCnfirm.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 92,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrManage.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepId": "step:POST /uss/umt/EgovRlnmCnfirm.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovEntrprsManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "stepId": "step:POST /uss/umt/EgovStplatCnfirmEntrprs.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+        "line": 19,
+        "snippet": "public class EntrprsManageInsertVO extends EntrprsManageVO {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+      "stepId": "step:POST /uss/umt/EgovStplatCnfirmEntrprs.do:src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "line": 90,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEntrprsManage.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepId": "step:POST /uss/umt/EgovStplatCnfirmEntrprs.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java"
+    },
+    {
+      "layer": "service",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovMberManageService {"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java",
+      "stepId": "step:POST /uss/umt/EgovStplatCnfirmMber.do:src/main/java/egovframework/com/uss/umt/service/EgovMberManageService.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+        "line": 90,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovMberManage.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java",
+      "stepId": "step:POST /uss/umt/EgovStplatCnfirmMber.do:src/main/java/egovframework/com/uss/umt/web/EgovMberManageController.java"
+    }
+  ]
+}

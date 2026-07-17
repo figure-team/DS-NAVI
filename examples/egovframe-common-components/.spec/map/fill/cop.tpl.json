@@ -1,0 +1,2830 @@
+{
+  "businessFlows": [
+    {
+      "edges": [
+        {
+          "from": "n1",
+          "to": "n2"
+        },
+        {
+          "from": "n2",
+          "to": "n3"
+        },
+        {
+          "from": "n2",
+          "to": "n4"
+        },
+        {
+          "from": "n3",
+          "to": "n5"
+        },
+        {
+          "from": "n4",
+          "to": "n5"
+        },
+        {
+          "from": "n5",
+          "label": "인증됨 · 등록",
+          "to": "n6"
+        },
+        {
+          "from": "n5",
+          "label": "인증됨 · 수정",
+          "to": "n7"
+        },
+        {
+          "from": "n5",
+          "label": "인증됨 · 삭제",
+          "to": "n8"
+        },
+        {
+          "from": "n5",
+          "label": "미인증",
+          "to": "n10"
+        },
+        {
+          "from": "n6",
+          "to": "n9"
+        },
+        {
+          "from": "n7",
+          "to": "n9"
+        },
+        {
+          "from": "n8",
+          "to": "n9"
+        },
+        {
+          "from": "n9",
+          "to": "n10"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "n1",
+          "kind": "start",
+          "label": "템플릿 관리 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 68,
+              "snippet": "@RequestMapping(\"/cop/tpl/selectTemplateInfs.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/tpl/selectTemplateInfs.do",
+          "id": "n2",
+          "kind": "activity",
+          "label": "템플릿 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 103,
+              "snippet": "@RequestMapping(\"/cop/tpl/selectTemplateInf.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/tpl/selectTemplateInf.do",
+          "id": "n3",
+          "kind": "activity",
+          "label": "템플릿 상세 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 164,
+              "snippet": "@RequestMapping(\"/cop/tpl/addTemplateInf.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/tpl/addTemplateInf.do",
+          "id": "n4",
+          "kind": "activity",
+          "label": "템플릿 등록 화면 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 231,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 233,
+              "snippet": "\t\tif (isAuthenticated) {"
+            }
+          ],
+          "id": "n5",
+          "kind": "decision",
+          "label": "인증된 사용자 여부"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 128,
+              "snippet": "@RequestMapping(\"/cop/tpl/insertTemplateInf.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/tpl/insertTemplateInf.do",
+          "id": "n6",
+          "kind": "activity",
+          "label": "템플릿 등록"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 186,
+              "snippet": "@RequestMapping(\"/cop/tpl/updateTemplateInf.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/tpl/updateTemplateInf.do",
+          "id": "n7",
+          "kind": "activity",
+          "label": "템플릿 수정"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 226,
+              "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/bbs/deleteTemplateInf.do",
+          "id": "n8",
+          "kind": "activity",
+          "label": "템플릿 삭제"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 238,
+              "snippet": "\t\treturn \"forward:/cop/tpl/selectTemplateInfs.do\";"
+            }
+          ],
+          "id": "n9",
+          "kind": "activity",
+          "label": "목록 화면으로 이동"
+        },
+        {
+          "id": "n10",
+          "kind": "end",
+          "label": "템플릿 관리 종료"
+        }
+      ],
+      "title": "템플릿 정보 관리"
+    },
+    {
+      "edges": [
+        {
+          "from": "p1",
+          "to": "p2"
+        },
+        {
+          "from": "p2",
+          "to": "p3"
+        },
+        {
+          "from": "p3",
+          "label": "동호회",
+          "to": "p4"
+        },
+        {
+          "from": "p3",
+          "label": "커뮤니티",
+          "to": "p5"
+        },
+        {
+          "from": "p3",
+          "label": "그 외",
+          "to": "p6"
+        },
+        {
+          "from": "p4",
+          "to": "p7"
+        },
+        {
+          "from": "p5",
+          "to": "p7"
+        },
+        {
+          "from": "p6",
+          "to": "p7"
+        },
+        {
+          "from": "p7",
+          "to": "p8"
+        },
+        {
+          "from": "p8",
+          "to": "p9"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "p1",
+          "kind": "start",
+          "label": "팝업 요청 시작"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 249,
+              "snippet": "@RequestMapping(\"/cop/tpl/selectTemplateInfsPop.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 252,
+              "snippet": "\t\tString typeFlag = (String) commandMap.get(\"typeFlag\");"
+            }
+          ],
+          "flowRef": "flow:ANY /cop/tpl/selectTemplateInfsPop.do",
+          "id": "p2",
+          "kind": "activity",
+          "label": "팝업 템플릿 목록 요청"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 254,
+              "snippet": "\t\tif (\"CLB\".equals(typeFlag)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 257,
+              "snippet": "\t\t} else if (\"CMY\".equals(typeFlag)) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 260,
+              "snippet": "\t\t} else {"
+            }
+          ],
+          "id": "p3",
+          "kind": "decision",
+          "label": "템플릿 사용 구분"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 256,
+              "snippet": "\t\t\ttmplatInfVO.setTmplatSeCode(\"TMPT03\");"
+            }
+          ],
+          "id": "p4",
+          "kind": "activity",
+          "label": "동호회 템플릿 지정"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 259,
+              "snippet": "\t\t\ttmplatInfVO.setTmplatSeCode(\"TMPT02\");"
+            }
+          ],
+          "id": "p5",
+          "kind": "activity",
+          "label": "커뮤니티 템플릿 지정"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 262,
+              "snippet": "\t\t\ttmplatInfVO.setTmplatSeCode(\"TMPT01\");"
+            }
+          ],
+          "id": "p6",
+          "kind": "activity",
+          "label": "기본 템플릿 지정"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 265,
+              "snippet": "\t\ttmplatInfVO.setPageUnit(propertyService.getInt(\"pageUnit\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 279,
+              "snippet": "\t\tMap<String, Object> map = tmplatService.selectTemplateInfs(tmplatInfVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 282,
+              "snippet": "\t\tpaginationInfo.setTotalRecordCount(totCnt);"
+            }
+          ],
+          "id": "p7",
+          "kind": "activity",
+          "label": "페이징 목록 조회"
+        },
+        {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 284,
+              "snippet": "\t\tmodel.addAttribute(\"resultList\", map.get(\"resultList\"));"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 289,
+              "snippet": "\t\treturn \"egovframework/com/cop/tpl/EgovTemplateInqirePopup\";"
+            }
+          ],
+          "id": "p8",
+          "kind": "activity",
+          "label": "팝업 화면 표시"
+        },
+        {
+          "id": "p9",
+          "kind": "end",
+          "label": "팝업 요청 종료"
+        }
+      ],
+      "title": "템플릿 선택 팝업"
+    }
+  ],
+  "businessRules": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 231,
+          "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 233,
+          "snippet": "\t\tif (isAuthenticated) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 238,
+          "snippet": "\t\treturn \"forward:/cop/tpl/selectTemplateInfs.do\";"
+        }
+      ],
+      "text": "템플릿 삭제·등록·수정 같은 변경 처리는 인증된 사용자인 경우에만 수행한다. 인증되지 않은 요청은 변경 없이 목록 화면으로 되돌아간다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 230,
+          "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 234,
+          "snippet": "\t\t\ttmplatInf.setLastUpdusrId(user.getUniqId());"
+        }
+      ],
+      "text": "변경 처리 시 인증된 사용자의 고유 아이디를 최종수정자 아이디로 기록해 누가 바꿨는지 남긴다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+          "line": 42,
+          "snippet": "    @EgovNullCheck"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+          "line": 43,
+          "snippet": "    @Size(max=2000)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+          "line": 51,
+          "snippet": "    @Size(max=120)"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+          "line": 52,
+          "snippet": "    private String tmplatNm = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+          "line": 55,
+          "snippet": "    @EgovNullCheck"
+        }
+      ],
+      "text": "템플릿 경로·템플릿 명·템플릿 구분코드는 반드시 입력해야 하는 필수 항목이며, 템플릿 경로는 최대 2000자, 템플릿 명은 최대 120자까지만 허용한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 254,
+          "snippet": "\t\tif (\"CLB\".equals(typeFlag)) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 256,
+          "snippet": "\t\t\ttmplatInfVO.setTmplatSeCode(\"TMPT03\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 257,
+          "snippet": "\t\t} else if (\"CMY\".equals(typeFlag)) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 259,
+          "snippet": "\t\t\ttmplatInfVO.setTmplatSeCode(\"TMPT02\");"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 260,
+          "snippet": "\t\t} else {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 262,
+          "snippet": "\t\t\ttmplatInfVO.setTmplatSeCode(\"TMPT01\");"
+        }
+      ],
+      "text": "팝업 템플릿 목록 조회는 요청된 사용 구분에 따라 조회 대상 템플릿 구분코드를 정한다. 동호회 구분이면 동호회용 구분코드, 커뮤니티 구분이면 커뮤니티용 구분코드, 그 외에는 기본 구분코드를 사용한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 265,
+          "snippet": "\t\ttmplatInfVO.setPageUnit(propertyService.getInt(\"pageUnit\"));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 266,
+          "snippet": "\t\ttmplatInfVO.setPageSize(propertyService.getInt(\"pageSize\"));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 280,
+          "snippet": "\t\tint totCnt = Integer.parseInt((String) map.get(\"resultCnt\"));"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 282,
+          "snippet": "\t\tpaginationInfo.setTotalRecordCount(totCnt);"
+        }
+      ],
+      "text": "목록 조회는 시스템 설정에서 읽어온 페이지당 건수와 페이지 크기를 적용해 페이징 처리하며, 전체 건수를 함께 계산해 화면에 전달한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 235,
+          "snippet": "\t\t\ttmplatService.deleteTemplateInf(tmplatInf);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 238,
+          "snippet": "\t\treturn \"forward:/cop/tpl/selectTemplateInfs.do\";"
+        }
+      ],
+      "text": "템플릿 삭제가 끝나면 별도 화면을 그리지 않고 템플릿 목록 조회로 넘겨 갱신된 목록을 보여준다."
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 230,
+          "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 231,
+          "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 25,
+          "snippet": "public class EgovUserDetailsHelper {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 5,
+          "snippet": "public interface EgovUserDetailsService {"
+        }
+      ],
+      "text": "공통 인증 영역과 연계한다. 인증 사용자 정보 도우미를 통해 인증 사용자 정보 서비스를 호출해 접속자 정보와 인증 여부를 확인한 뒤 템플릿 변경을 허용한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 26,
+          "snippet": "public interface EgovCmmUseService {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 34,
+          "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 28,
+          "snippet": "@SuppressWarnings(\"serial\")"
+        }
+      ],
+      "text": "공통코드 영역과 연계한다. 템플릿 등록·수정·상세 화면에 필요한 템플릿 구분 선택 목록을 공통코드 조회 서비스에서 받아온다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 226,
+          "snippet": "\t@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 238,
+          "snippet": "\t\treturn \"forward:/cop/tpl/selectTemplateInfs.do\";"
+        }
+      ],
+      "text": "게시판 영역과 주소를 공유한다. 템플릿 삭제 요청은 게시판 경로로 들어오지만 처리 후에는 템플릿 목록 화면으로 이동한다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 249,
+          "snippet": "\t@RequestMapping(\"/cop/tpl/selectTemplateInfsPop.do\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 254,
+          "snippet": "\t\tif (\"CLB\".equals(typeFlag)) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 257,
+          "snippet": "\t\t} else if (\"CMY\".equals(typeFlag)) {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 289,
+          "snippet": "\t\treturn \"egovframework/com/cop/tpl/EgovTemplateInqirePopup\";"
+        }
+      ],
+      "text": "커뮤니티·동호회 영역에 템플릿 선택 팝업을 제공한다. 요청 구분값에 따라 해당 영역에서 쓸 수 있는 템플릿만 골라 팝업 화면으로 보여준다."
+    }
+  ],
+  "domainId": "domain:cop.tpl",
+  "entities": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+          "line": 26,
+          "snippet": "@SuppressWarnings(\"serial\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+          "line": 47,
+          "snippet": "    private String tmplatId = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+          "line": 52,
+          "snippet": "    private String tmplatNm = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+          "line": 59,
+          "snippet": "    private String useAt = \"\";"
+        }
+      ],
+      "text": "템플릿 정보 — 이 업무의 중심 자료로 템플릿 아이디·명·경로·구분코드·사용여부와 최초등록자·최종수정자 및 그 시점을 담는다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+          "line": 27,
+          "snippet": "public class TemplateInfVO extends TemplateInf implements Serializable {"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+          "line": 36,
+          "snippet": "    private String tmplatSeCodeNm = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+          "line": 48,
+          "snippet": "    private String searchWrd = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+          "line": 57,
+          "snippet": "    private int pageIndex = 1;"
+        }
+      ],
+      "text": "템플릿 조회 조건 정보 — 템플릿 정보를 확장해 검색조건·검색단어·기간·정렬순서와 페이징 항목, 화면 표시용 등록자명·수정자명·구분 코드명을 담는다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 67,
+          "snippet": "\tprivate String uniqId;"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+          "line": 234,
+          "snippet": "\t\t\ttmplatInf.setLastUpdusrId(user.getUniqId());"
+        }
+      ],
+      "text": "로그인 사용자 정보 — 인증된 접속자의 아이디·이름·이메일·사용자구분·조직 정보·고유 아이디를 담으며, 고유 아이디가 템플릿의 등록자·수정자로 기록된다."
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 28,
+          "snippet": "@SuppressWarnings(\"serial\")"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 31,
+          "snippet": "    private String codeId = \"\";"
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 37,
+          "snippet": "    private String codeNm = \"\";"
+        }
+      ],
+      "text": "공통코드 조회 조건 — 템플릿 구분 같은 선택 목록을 화면에 채우기 위한 코드 아이디·상세코드·코드명 등의 조회 조건을 담는다."
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /cop/bbs/deleteTemplateInf.do",
+      "name": "템플릿 정보 삭제",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+            "line": 226,
+            "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+          }
+        ],
+        "text": "등록된 템플릿 정보를 삭제하는 업무 흐름이다. 인증된 사용자인 경우에만 최종수정자 아이디를 남기고 삭제를 수행하며, 처리 후 템플릿 목록 화면으로 이동한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/tpl/addTemplateInf.do",
+      "name": "템플릿 등록 화면 요청",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+            "line": 164,
+            "snippet": "@RequestMapping(\"/cop/tpl/addTemplateInf.do\")"
+          }
+        ],
+        "text": "새 템플릿을 등록하기 위한 입력 화면을 여는 업무 흐름이다. 화면에 필요한 템플릿 구분 공통코드 목록을 함께 준비해 전달한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/tpl/insertTemplateInf.do",
+      "name": "템플릿 정보 등록",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+            "line": 128,
+            "snippet": "@RequestMapping(\"/cop/tpl/insertTemplateInf.do\")"
+          }
+        ],
+        "text": "사용자가 입력한 템플릿 정보를 새로 등록하는 업무 흐름이다. 인증된 사용자 정보를 등록자로 기록하고 템플릿 관리 업무 서비스에 등록을 위임한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/tpl/selectTemplateInf.do",
+      "name": "템플릿 상세 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+            "line": 103,
+            "snippet": "@RequestMapping(\"/cop/tpl/selectTemplateInf.do\")"
+          }
+        ],
+        "text": "선택한 템플릿 한 건의 상세 정보를 조회해 화면에 표시하는 업무 흐름이다. 템플릿 구분 공통코드 목록도 함께 조회한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/tpl/selectTemplateInfs.do",
+      "name": "템플릿 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+            "line": 68,
+            "snippet": "@RequestMapping(\"/cop/tpl/selectTemplateInfs.do\")"
+          }
+        ],
+        "text": "검색 조건과 페이징 정보를 받아 템플릿 목록과 전체 건수를 조회하는 업무 흐름이다. 템플릿 관리의 기본 진입 화면 역할을 한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/tpl/selectTemplateInfsPop.do",
+      "name": "팝업 템플릿 목록 조회",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+            "line": 249,
+            "snippet": "@RequestMapping(\"/cop/tpl/selectTemplateInfsPop.do\")"
+          }
+        ],
+        "text": "다른 화면에서 템플릿을 고르기 위해 여는 팝업 목록 조회 업무 흐름이다. 요청된 사용 구분에 따라 조회할 템플릿 구분코드를 정하고 페이징된 목록을 팝업 화면에 표시한다."
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/tpl/updateTemplateInf.do",
+      "name": "템플릿 정보 수정",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+            "line": 186,
+            "snippet": "@RequestMapping(\"/cop/tpl/updateTemplateInf.do\")"
+          }
+        ],
+        "text": "기존 템플릿 정보를 수정하는 업무 흐름이다. 인증된 사용자 정보를 최종수정자로 기록하고 수정 내용을 템플릿 관리 업무 서비스에 위임한다."
+      }
+    }
+  ],
+  "name": "커뮤니티 템플릿 관리",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 50,
+              "snippet": "\t@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디·이름·이메일 등 신원 항목과 사용자 구분, 조직(부서) 아이디·명, 고유 아이디, 사용자 아이피 등을 보관한다. 아이디·이름·이메일 항목은 빈값 검사 대상이며 이메일은 형식 검사도 함께 적용된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "템플릿 정보 삭제에서 현재 접속자의 신원 정보를 담아 전달하는 데이터 구조다. 인증 사용자 정보 도우미가 돌려준 사용자 객체가 이 구조이며, 여기서 꺼낸 고유 아이디가 템플릿의 등록자·수정자 정보로 기록된다."
+        }
+      },
+      "name": "템플릿 정보 삭제 — 로그인 사용자 정보",
+      "stepId": "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "템플릿 정보 삭제에서 인증된 사용자 정보를 담는 데이터 구조다. 사용자 고유 아이디를 등록자 또는 수정자 정보로 남기는 데 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체를 값 객체 형태로 돌려주고, 권한 정보 목록과 인증 여부(참/거짓)를 제공한다. 인증 여부가 참인 경우에만 템플릿 변경 처리가 이어지므로 이 판정이 변경 업무의 관문이 된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            }
+          ],
+          "text": "템플릿 정보 삭제의 권한 확인 근거를 제공한다. 인증된 사용자 객체, 사용자 권한 목록, 인증 여부를 돌려주어 등록·수정·삭제 처리 전에 요청자가 정당한 사용자인지 판단할 수 있게 한다."
+        }
+      },
+      "name": "템플릿 정보 삭제 — 인증 사용자 정보 서비스",
+      "stepId": "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "템플릿 정보 삭제에서 현재 접속한 사용자의 인증 정보와 권한, 인증 여부를 제공하는 공통 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 33,
+              "snippet": "\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ],
+          "text": "내부에 인증 사용자 정보 서비스 참조 한 개를 보관하며, 이 참조가 설정되어 있어야 인증 사용자 조회와 인증 여부 확인이 가능하다는 불변식을 가진다. 자체 상태를 따로 저장하지 않고 요청을 그대로 위임한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ],
+          "text": "템플릿 정보 삭제에서 인증 사용자 정보 서비스에 대한 단일 접근 창구 역할을 한다. 미리 설정된 인증 사용자 정보 서비스에 인증 사용자 조회·권한 조회·인증 여부 확인 요청을 그대로 넘긴다."
+        }
+      },
+      "name": "템플릿 정보 삭제 — 인증 사용자 정보 도우미",
+      "stepId": "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "템플릿 정보 삭제에서 인증 사용자 정보 서비스를 손쉽게 호출하도록 감싸주는 협력 객체다. 화면 요청 처리 계층은 이 도우미를 통해 인증 사용자와 인증 여부를 확인한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 32,
+              "snippet": "    public void deleteTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 40,
+              "snippet": "    public void insertTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 48,
+              "snippet": "    public void updateTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            }
+          ],
+          "text": "템플릿 정보 등록·수정·삭제는 템플릿 정보 객체 한 건을 받아 처리하며, 목록 조회는 조회 조건 객체를 받아 목록과 건수를 함께 돌려준다. 각 업무 기능은 처리 실패 시 예외로 상위에 알린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovTemplateManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 32,
+              "snippet": "    public void deleteTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 40,
+              "snippet": "    public void insertTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            }
+          ],
+          "text": "템플릿 정보 삭제에서 템플릿에 대한 업무 처리를 총괄한다. 템플릿 정보의 삭제·등록·수정을 수행하고, 목록·상세·미리보기·구분별 목록·화이트리스트 조회를 제공해 화면 요청 처리 계층이 데이터 처리 세부를 알 필요 없게 한다."
+        }
+      },
+      "name": "템플릿 정보 삭제 — 템플릿 관리 업무 서비스",
+      "stepId": "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovTemplateManageService {"
+          }
+        ],
+        "text": "템플릿 정보 삭제의 실제 업무 처리를 담당하는 템플릿 관리 업무 서비스다. 템플릿의 등록·수정·삭제와 목록·상세·미리보기 조회 기능을 하나의 창구로 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 42,
+              "snippet": "    @EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 43,
+              "snippet": "    @Size(max=2000)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 51,
+              "snippet": "    @Size(max=120)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 52,
+              "snippet": "    private String tmplatNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 55,
+              "snippet": "    @EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 56,
+              "snippet": "    private String tmplatSeCode = \"\";"
+            }
+          ],
+          "text": "템플릿 경로·템플릿 명·템플릿 구분코드는 빈값이 될 수 없는 필수 항목이며, 템플릿 경로는 최대 2000자, 템플릿 명은 최대 120자로 길이가 제한된다. 이 밖에 최초등록자 아이디와 시점, 최종수정자 아이디와 시점, 사용여부를 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 26,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 47,
+              "snippet": "    private String tmplatId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 59,
+              "snippet": "    private String useAt = \"\";"
+            }
+          ],
+          "text": "템플릿 정보 삭제에서 다루는 템플릿 한 건을 표현한다. 템플릿 아이디·명·경로·구분코드·사용여부와 최초등록자·최종수정자 및 그 시점을 담아 화면 요청 처리 계층과 템플릿 관리 업무 서비스 사이를 오간다."
+        }
+      },
+      "name": "템플릿 정보 삭제 — 템플릿 정보",
+      "stepId": "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+            "line": 26,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "템플릿 정보 삭제에서 등록·수정·삭제 대상이 되는 템플릿 한 건의 정보를 담는 데이터 구조다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 230,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 231,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 233,
+              "snippet": "\t\tif (isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 234,
+              "snippet": "\t\t\ttmplatInf.setLastUpdusrId(user.getUniqId());"
+            }
+          ],
+          "text": "요청 처리 시 조회 조건과 템플릿 정보를 요청 파라미터로 받아 담고, 인증된 사용자 객체와 인증 여부를 함께 확인한다. 인증된 사용자인 경우에만 등록·수정·삭제 처리를 진행하며, 사용자 고유 아이디를 등록자 또는 수정자 정보로 기록한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 226,
+              "snippet": "\t@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 235,
+              "snippet": "\t\t\ttmplatService.deleteTemplateInf(tmplatInf);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 238,
+              "snippet": "\t\treturn \"forward:/cop/tpl/selectTemplateInfs.do\";"
+            }
+          ],
+          "text": "템플릿 관리 화면의 요청 창구다. 템플릿 정보 삭제 요청 주소로 들어온 호출을 받아 조회 조건과 템플릿 정보를 담은 객체로 정리하고, 인증된 사용자 정보를 확인한 뒤 템플릿 관리 업무 서비스에 처리를 넘긴다. 처리 결과는 화면 모델에 담아 해당 화면 또는 목록 화면으로 이동시킨다."
+        }
+      },
+      "name": "템플릿 정보 삭제 — 템플릿 관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/bbs/deleteTemplateInf.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+            "line": 226,
+            "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+          }
+        ],
+        "text": "템플릿 정보 삭제 요청을 받아 화면 요청 파라미터와 인증 사용자 정보를 확인하고, 실제 처리를 템플릿 관리 업무 서비스에 위임한 뒤 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 40,
+              "snippet": "    private String codeDc = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 아이디·상세코드·코드명·코드설명을 담고, 특정 테이블에서 코드 정보를 뽑아 쓰는 경우를 위한 특정테이블명과 상세 조건 여부·상세 조건 항목을 함께 보관한다. 상세 조건 여부는 기본값이 사용 안 함이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "템플릿 등록 화면 요청에서 화면 선택 목록을 채우기 위한 공통코드 조회 조건을 표현한다. 조회할 코드 아이디를 담아 공통코드 조회 서비스에 넘기면 해당 상세코드 목록이 돌아온다."
+        }
+      },
+      "name": "템플릿 등록 화면 요청 — 공통코드 조회 조건",
+      "stepId": "step:ANY /cop/tpl/addTemplateInf.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "템플릿 등록 화면 요청에서 템플릿 구분 등 공통코드 목록을 조회하기 위한 조건을 담는 데이터 구조다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            }
+          ],
+          "text": "코드 조회 조건 객체를 받아 해당 코드에 속한 상세코드 목록을 조회한다. 여러 조회 조건을 한 번에 넘기면 코드별 목록을 맵 형태로 묶어 돌려주어 화면 한 번의 준비로 여러 선택 목록을 채울 수 있다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "템플릿 등록 화면 요청에서 화면 선택 항목에 쓰이는 공통코드를 공급한다. 코드 조회 조건을 받아 상세코드 목록을 돌려주고, 조직 정보와 그룹 정보를 코드 형태로 돌려주는 기능도 함께 제공한다."
+        }
+      },
+      "name": "템플릿 등록 화면 요청 — 공통코드 조회 서비스",
+      "stepId": "step:ANY /cop/tpl/addTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "템플릿 등록 화면 요청에서 화면에 필요한 템플릿 구분 등 공통코드 목록을 조회하는 공통 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 230,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 231,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 233,
+              "snippet": "\t\tif (isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 234,
+              "snippet": "\t\t\ttmplatInf.setLastUpdusrId(user.getUniqId());"
+            }
+          ],
+          "text": "요청 처리 시 조회 조건과 템플릿 정보를 요청 파라미터로 받아 담고, 인증된 사용자 객체와 인증 여부를 함께 확인한다. 인증된 사용자인 경우에만 등록·수정·삭제 처리를 진행하며, 사용자 고유 아이디를 등록자 또는 수정자 정보로 기록한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 226,
+              "snippet": "\t@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 235,
+              "snippet": "\t\t\ttmplatService.deleteTemplateInf(tmplatInf);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 238,
+              "snippet": "\t\treturn \"forward:/cop/tpl/selectTemplateInfs.do\";"
+            }
+          ],
+          "text": "템플릿 관리 화면의 요청 창구다. 템플릿 등록 화면 요청 요청 주소로 들어온 호출을 받아 조회 조건과 템플릿 정보를 담은 객체로 정리하고, 인증된 사용자 정보를 확인한 뒤 템플릿 관리 업무 서비스에 처리를 넘긴다. 처리 결과는 화면 모델에 담아 해당 화면 또는 목록 화면으로 이동시킨다."
+        }
+      },
+      "name": "템플릿 등록 화면 요청 — 템플릿 관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/tpl/addTemplateInf.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+            "line": 226,
+            "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+          }
+        ],
+        "text": "템플릿 등록 화면 요청 요청을 받아 화면 요청 파라미터와 인증 사용자 정보를 확인하고, 실제 처리를 템플릿 관리 업무 서비스에 위임한 뒤 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 40,
+              "snippet": "    private String codeDc = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 아이디·상세코드·코드명·코드설명을 담고, 특정 테이블에서 코드 정보를 뽑아 쓰는 경우를 위한 특정테이블명과 상세 조건 여부·상세 조건 항목을 함께 보관한다. 상세 조건 여부는 기본값이 사용 안 함이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "템플릿 정보 등록에서 화면 선택 목록을 채우기 위한 공통코드 조회 조건을 표현한다. 조회할 코드 아이디를 담아 공통코드 조회 서비스에 넘기면 해당 상세코드 목록이 돌아온다."
+        }
+      },
+      "name": "템플릿 정보 등록 — 공통코드 조회 조건",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "템플릿 정보 등록에서 템플릿 구분 등 공통코드 목록을 조회하기 위한 조건을 담는 데이터 구조다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 50,
+              "snippet": "\t@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디·이름·이메일 등 신원 항목과 사용자 구분, 조직(부서) 아이디·명, 고유 아이디, 사용자 아이피 등을 보관한다. 아이디·이름·이메일 항목은 빈값 검사 대상이며 이메일은 형식 검사도 함께 적용된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "템플릿 정보 등록에서 현재 접속자의 신원 정보를 담아 전달하는 데이터 구조다. 인증 사용자 정보 도우미가 돌려준 사용자 객체가 이 구조이며, 여기서 꺼낸 고유 아이디가 템플릿의 등록자·수정자 정보로 기록된다."
+        }
+      },
+      "name": "템플릿 정보 등록 — 로그인 사용자 정보",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "템플릿 정보 등록에서 인증된 사용자 정보를 담는 데이터 구조다. 사용자 고유 아이디를 등록자 또는 수정자 정보로 남기는 데 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            }
+          ],
+          "text": "코드 조회 조건 객체를 받아 해당 코드에 속한 상세코드 목록을 조회한다. 여러 조회 조건을 한 번에 넘기면 코드별 목록을 맵 형태로 묶어 돌려주어 화면 한 번의 준비로 여러 선택 목록을 채울 수 있다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "템플릿 정보 등록에서 화면 선택 항목에 쓰이는 공통코드를 공급한다. 코드 조회 조건을 받아 상세코드 목록을 돌려주고, 조직 정보와 그룹 정보를 코드 형태로 돌려주는 기능도 함께 제공한다."
+        }
+      },
+      "name": "템플릿 정보 등록 — 공통코드 조회 서비스",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "템플릿 정보 등록에서 화면에 필요한 템플릿 구분 등 공통코드 목록을 조회하는 공통 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체를 값 객체 형태로 돌려주고, 권한 정보 목록과 인증 여부(참/거짓)를 제공한다. 인증 여부가 참인 경우에만 템플릿 변경 처리가 이어지므로 이 판정이 변경 업무의 관문이 된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            }
+          ],
+          "text": "템플릿 정보 등록의 권한 확인 근거를 제공한다. 인증된 사용자 객체, 사용자 권한 목록, 인증 여부를 돌려주어 등록·수정·삭제 처리 전에 요청자가 정당한 사용자인지 판단할 수 있게 한다."
+        }
+      },
+      "name": "템플릿 정보 등록 — 인증 사용자 정보 서비스",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "템플릿 정보 등록에서 현재 접속한 사용자의 인증 정보와 권한, 인증 여부를 제공하는 공통 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 33,
+              "snippet": "\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ],
+          "text": "내부에 인증 사용자 정보 서비스 참조 한 개를 보관하며, 이 참조가 설정되어 있어야 인증 사용자 조회와 인증 여부 확인이 가능하다는 불변식을 가진다. 자체 상태를 따로 저장하지 않고 요청을 그대로 위임한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ],
+          "text": "템플릿 정보 등록에서 인증 사용자 정보 서비스에 대한 단일 접근 창구 역할을 한다. 미리 설정된 인증 사용자 정보 서비스에 인증 사용자 조회·권한 조회·인증 여부 확인 요청을 그대로 넘긴다."
+        }
+      },
+      "name": "템플릿 정보 등록 — 인증 사용자 정보 도우미",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "템플릿 정보 등록에서 인증 사용자 정보 서비스를 손쉽게 호출하도록 감싸주는 협력 객체다. 화면 요청 처리 계층은 이 도우미를 통해 인증 사용자와 인증 여부를 확인한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 32,
+              "snippet": "    public void deleteTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 40,
+              "snippet": "    public void insertTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 48,
+              "snippet": "    public void updateTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            }
+          ],
+          "text": "템플릿 정보 등록·수정·삭제는 템플릿 정보 객체 한 건을 받아 처리하며, 목록 조회는 조회 조건 객체를 받아 목록과 건수를 함께 돌려준다. 각 업무 기능은 처리 실패 시 예외로 상위에 알린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovTemplateManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 32,
+              "snippet": "    public void deleteTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 40,
+              "snippet": "    public void insertTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            }
+          ],
+          "text": "템플릿 정보 등록에서 템플릿에 대한 업무 처리를 총괄한다. 템플릿 정보의 삭제·등록·수정을 수행하고, 목록·상세·미리보기·구분별 목록·화이트리스트 조회를 제공해 화면 요청 처리 계층이 데이터 처리 세부를 알 필요 없게 한다."
+        }
+      },
+      "name": "템플릿 정보 등록 — 템플릿 관리 업무 서비스",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovTemplateManageService {"
+          }
+        ],
+        "text": "템플릿 정보 등록의 실제 업무 처리를 담당하는 템플릿 관리 업무 서비스다. 템플릿의 등록·수정·삭제와 목록·상세·미리보기 조회 기능을 하나의 창구로 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 42,
+              "snippet": "    @EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 43,
+              "snippet": "    @Size(max=2000)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 51,
+              "snippet": "    @Size(max=120)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 52,
+              "snippet": "    private String tmplatNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 55,
+              "snippet": "    @EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 56,
+              "snippet": "    private String tmplatSeCode = \"\";"
+            }
+          ],
+          "text": "템플릿 경로·템플릿 명·템플릿 구분코드는 빈값이 될 수 없는 필수 항목이며, 템플릿 경로는 최대 2000자, 템플릿 명은 최대 120자로 길이가 제한된다. 이 밖에 최초등록자 아이디와 시점, 최종수정자 아이디와 시점, 사용여부를 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 26,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 47,
+              "snippet": "    private String tmplatId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 59,
+              "snippet": "    private String useAt = \"\";"
+            }
+          ],
+          "text": "템플릿 정보 등록에서 다루는 템플릿 한 건을 표현한다. 템플릿 아이디·명·경로·구분코드·사용여부와 최초등록자·최종수정자 및 그 시점을 담아 화면 요청 처리 계층과 템플릿 관리 업무 서비스 사이를 오간다."
+        }
+      },
+      "name": "템플릿 정보 등록 — 템플릿 정보",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+            "line": 26,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "템플릿 정보 등록에서 등록·수정·삭제 대상이 되는 템플릿 한 건의 정보를 담는 데이터 구조다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 230,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 231,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 233,
+              "snippet": "\t\tif (isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 234,
+              "snippet": "\t\t\ttmplatInf.setLastUpdusrId(user.getUniqId());"
+            }
+          ],
+          "text": "요청 처리 시 조회 조건과 템플릿 정보를 요청 파라미터로 받아 담고, 인증된 사용자 객체와 인증 여부를 함께 확인한다. 인증된 사용자인 경우에만 등록·수정·삭제 처리를 진행하며, 사용자 고유 아이디를 등록자 또는 수정자 정보로 기록한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 226,
+              "snippet": "\t@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 235,
+              "snippet": "\t\t\ttmplatService.deleteTemplateInf(tmplatInf);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 238,
+              "snippet": "\t\treturn \"forward:/cop/tpl/selectTemplateInfs.do\";"
+            }
+          ],
+          "text": "템플릿 관리 화면의 요청 창구다. 템플릿 정보 등록 요청 주소로 들어온 호출을 받아 조회 조건과 템플릿 정보를 담은 객체로 정리하고, 인증된 사용자 정보를 확인한 뒤 템플릿 관리 업무 서비스에 처리를 넘긴다. 처리 결과는 화면 모델에 담아 해당 화면 또는 목록 화면으로 이동시킨다."
+        }
+      },
+      "name": "템플릿 정보 등록 — 템플릿 관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/tpl/insertTemplateInf.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+            "line": 226,
+            "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+          }
+        ],
+        "text": "템플릿 정보 등록 요청을 받아 화면 요청 파라미터와 인증 사용자 정보를 확인하고, 실제 처리를 템플릿 관리 업무 서비스에 위임한 뒤 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 40,
+              "snippet": "    private String codeDc = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 아이디·상세코드·코드명·코드설명을 담고, 특정 테이블에서 코드 정보를 뽑아 쓰는 경우를 위한 특정테이블명과 상세 조건 여부·상세 조건 항목을 함께 보관한다. 상세 조건 여부는 기본값이 사용 안 함이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "템플릿 상세 조회에서 화면 선택 목록을 채우기 위한 공통코드 조회 조건을 표현한다. 조회할 코드 아이디를 담아 공통코드 조회 서비스에 넘기면 해당 상세코드 목록이 돌아온다."
+        }
+      },
+      "name": "템플릿 상세 조회 — 공통코드 조회 조건",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInf.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "템플릿 상세 조회에서 템플릿 구분 등 공통코드 목록을 조회하기 위한 조건을 담는 데이터 구조다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            }
+          ],
+          "text": "코드 조회 조건 객체를 받아 해당 코드에 속한 상세코드 목록을 조회한다. 여러 조회 조건을 한 번에 넘기면 코드별 목록을 맵 형태로 묶어 돌려주어 화면 한 번의 준비로 여러 선택 목록을 채울 수 있다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "템플릿 상세 조회에서 화면 선택 항목에 쓰이는 공통코드를 공급한다. 코드 조회 조건을 받아 상세코드 목록을 돌려주고, 조직 정보와 그룹 정보를 코드 형태로 돌려주는 기능도 함께 제공한다."
+        }
+      },
+      "name": "템플릿 상세 조회 — 공통코드 조회 서비스",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "템플릿 상세 조회에서 화면에 필요한 템플릿 구분 등 공통코드 목록을 조회하는 공통 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 32,
+              "snippet": "    public void deleteTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 40,
+              "snippet": "    public void insertTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 48,
+              "snippet": "    public void updateTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            }
+          ],
+          "text": "템플릿 정보 등록·수정·삭제는 템플릿 정보 객체 한 건을 받아 처리하며, 목록 조회는 조회 조건 객체를 받아 목록과 건수를 함께 돌려준다. 각 업무 기능은 처리 실패 시 예외로 상위에 알린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovTemplateManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 32,
+              "snippet": "    public void deleteTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 40,
+              "snippet": "    public void insertTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            }
+          ],
+          "text": "템플릿 상세 조회에서 템플릿에 대한 업무 처리를 총괄한다. 템플릿 정보의 삭제·등록·수정을 수행하고, 목록·상세·미리보기·구분별 목록·화이트리스트 조회를 제공해 화면 요청 처리 계층이 데이터 처리 세부를 알 필요 없게 한다."
+        }
+      },
+      "name": "템플릿 상세 조회 — 템플릿 관리 업무 서비스",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovTemplateManageService {"
+          }
+        ],
+        "text": "템플릿 상세 조회의 실제 업무 처리를 담당하는 템플릿 관리 업무 서비스다. 템플릿의 등록·수정·삭제와 목록·상세·미리보기 조회 기능을 하나의 창구로 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 230,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 231,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 233,
+              "snippet": "\t\tif (isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 234,
+              "snippet": "\t\t\ttmplatInf.setLastUpdusrId(user.getUniqId());"
+            }
+          ],
+          "text": "요청 처리 시 조회 조건과 템플릿 정보를 요청 파라미터로 받아 담고, 인증된 사용자 객체와 인증 여부를 함께 확인한다. 인증된 사용자인 경우에만 등록·수정·삭제 처리를 진행하며, 사용자 고유 아이디를 등록자 또는 수정자 정보로 기록한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 226,
+              "snippet": "\t@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 235,
+              "snippet": "\t\t\ttmplatService.deleteTemplateInf(tmplatInf);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 238,
+              "snippet": "\t\treturn \"forward:/cop/tpl/selectTemplateInfs.do\";"
+            }
+          ],
+          "text": "템플릿 관리 화면의 요청 창구다. 템플릿 상세 조회 요청 주소로 들어온 호출을 받아 조회 조건과 템플릿 정보를 담은 객체로 정리하고, 인증된 사용자 정보를 확인한 뒤 템플릿 관리 업무 서비스에 처리를 넘긴다. 처리 결과는 화면 모델에 담아 해당 화면 또는 목록 화면으로 이동시킨다."
+        }
+      },
+      "name": "템플릿 상세 조회 — 템플릿 관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInf.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+            "line": 226,
+            "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+          }
+        ],
+        "text": "템플릿 상세 조회 요청을 받아 화면 요청 파라미터와 인증 사용자 정보를 확인하고, 실제 처리를 템플릿 관리 업무 서비스에 위임한 뒤 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 32,
+              "snippet": "    public void deleteTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 40,
+              "snippet": "    public void insertTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 48,
+              "snippet": "    public void updateTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            }
+          ],
+          "text": "템플릿 정보 등록·수정·삭제는 템플릿 정보 객체 한 건을 받아 처리하며, 목록 조회는 조회 조건 객체를 받아 목록과 건수를 함께 돌려준다. 각 업무 기능은 처리 실패 시 예외로 상위에 알린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovTemplateManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 32,
+              "snippet": "    public void deleteTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 40,
+              "snippet": "    public void insertTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            }
+          ],
+          "text": "템플릿 목록 조회에서 템플릿에 대한 업무 처리를 총괄한다. 템플릿 정보의 삭제·등록·수정을 수행하고, 목록·상세·미리보기·구분별 목록·화이트리스트 조회를 제공해 화면 요청 처리 계층이 데이터 처리 세부를 알 필요 없게 한다."
+        }
+      },
+      "name": "템플릿 목록 조회 — 템플릿 관리 업무 서비스",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInfs.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovTemplateManageService {"
+          }
+        ],
+        "text": "템플릿 목록 조회의 실제 업무 처리를 담당하는 템플릿 관리 업무 서비스다. 템플릿의 등록·수정·삭제와 목록·상세·미리보기 조회 기능을 하나의 창구로 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+              "line": 48,
+              "snippet": "    private String searchWrd = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+              "line": 51,
+              "snippet": "    private String sortOrdr = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+              "line": 57,
+              "snippet": "    private int pageIndex = 1;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+              "line": 60,
+              "snippet": "    private int pageUnit = 10;"
+            }
+          ],
+          "text": "검색조건·검색단어·검색시작일·검색종료일·정렬순서·검색사용여부 같은 조회 조건과 현재페이지·페이지개수·페이지사이즈 같은 페이징 항목을 담는다. 페이징 항목은 기본값이 정해져 있어 조건이 비어 있어도 조회가 가능하다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+              "line": 26,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+              "line": 27,
+              "snippet": "public class TemplateInfVO extends TemplateInf implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+              "line": 36,
+              "snippet": "    private String tmplatSeCodeNm = \"\";"
+            }
+          ],
+          "text": "템플릿 목록 조회의 검색 조건·정렬·페이징을 실어 나른다. 템플릿 정보를 확장하므로 템플릿 항목을 그대로 갖고, 여기에 최초 등록자명·최종 수정자명·템플릿 구분 코드명 같은 화면 표시용 이름과 조회 조건을 더한다."
+        }
+      },
+      "name": "템플릿 목록 조회 — 템플릿 조회 조건 정보",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInfs.do:src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+            "line": 26,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "템플릿 목록 조회에서 검색 조건과 페이징 정보를 담아 전달하는 데이터 구조다. 템플릿 정보를 확장해 조회 결과 표시에 필요한 이름 항목도 함께 담는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 230,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 231,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 233,
+              "snippet": "\t\tif (isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 234,
+              "snippet": "\t\t\ttmplatInf.setLastUpdusrId(user.getUniqId());"
+            }
+          ],
+          "text": "요청 처리 시 조회 조건과 템플릿 정보를 요청 파라미터로 받아 담고, 인증된 사용자 객체와 인증 여부를 함께 확인한다. 인증된 사용자인 경우에만 등록·수정·삭제 처리를 진행하며, 사용자 고유 아이디를 등록자 또는 수정자 정보로 기록한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 226,
+              "snippet": "\t@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 235,
+              "snippet": "\t\t\ttmplatService.deleteTemplateInf(tmplatInf);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 238,
+              "snippet": "\t\treturn \"forward:/cop/tpl/selectTemplateInfs.do\";"
+            }
+          ],
+          "text": "템플릿 관리 화면의 요청 창구다. 템플릿 목록 조회 요청 주소로 들어온 호출을 받아 조회 조건과 템플릿 정보를 담은 객체로 정리하고, 인증된 사용자 정보를 확인한 뒤 템플릿 관리 업무 서비스에 처리를 넘긴다. 처리 결과는 화면 모델에 담아 해당 화면 또는 목록 화면으로 이동시킨다."
+        }
+      },
+      "name": "템플릿 목록 조회 — 템플릿 관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInfs.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+            "line": 226,
+            "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+          }
+        ],
+        "text": "템플릿 목록 조회 요청을 받아 화면 요청 파라미터와 인증 사용자 정보를 확인하고, 실제 처리를 템플릿 관리 업무 서비스에 위임한 뒤 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 32,
+              "snippet": "    public void deleteTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 40,
+              "snippet": "    public void insertTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 48,
+              "snippet": "    public void updateTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            }
+          ],
+          "text": "템플릿 정보 등록·수정·삭제는 템플릿 정보 객체 한 건을 받아 처리하며, 목록 조회는 조회 조건 객체를 받아 목록과 건수를 함께 돌려준다. 각 업무 기능은 처리 실패 시 예외로 상위에 알린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovTemplateManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 32,
+              "snippet": "    public void deleteTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 40,
+              "snippet": "    public void insertTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            }
+          ],
+          "text": "팝업 템플릿 목록 조회에서 템플릿에 대한 업무 처리를 총괄한다. 템플릿 정보의 삭제·등록·수정을 수행하고, 목록·상세·미리보기·구분별 목록·화이트리스트 조회를 제공해 화면 요청 처리 계층이 데이터 처리 세부를 알 필요 없게 한다."
+        }
+      },
+      "name": "팝업 템플릿 목록 조회 — 템플릿 관리 업무 서비스",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInfsPop.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovTemplateManageService {"
+          }
+        ],
+        "text": "팝업 템플릿 목록 조회의 실제 업무 처리를 담당하는 템플릿 관리 업무 서비스다. 템플릿의 등록·수정·삭제와 목록·상세·미리보기 조회 기능을 하나의 창구로 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+              "line": 48,
+              "snippet": "    private String searchWrd = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+              "line": 51,
+              "snippet": "    private String sortOrdr = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+              "line": 57,
+              "snippet": "    private int pageIndex = 1;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+              "line": 60,
+              "snippet": "    private int pageUnit = 10;"
+            }
+          ],
+          "text": "검색조건·검색단어·검색시작일·검색종료일·정렬순서·검색사용여부 같은 조회 조건과 현재페이지·페이지개수·페이지사이즈 같은 페이징 항목을 담는다. 페이징 항목은 기본값이 정해져 있어 조건이 비어 있어도 조회가 가능하다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+              "line": 26,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+              "line": 27,
+              "snippet": "public class TemplateInfVO extends TemplateInf implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+              "line": 36,
+              "snippet": "    private String tmplatSeCodeNm = \"\";"
+            }
+          ],
+          "text": "팝업 템플릿 목록 조회의 검색 조건·정렬·페이징을 실어 나른다. 템플릿 정보를 확장하므로 템플릿 항목을 그대로 갖고, 여기에 최초 등록자명·최종 수정자명·템플릿 구분 코드명 같은 화면 표시용 이름과 조회 조건을 더한다."
+        }
+      },
+      "name": "팝업 템플릿 목록 조회 — 템플릿 조회 조건 정보",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInfsPop.do:src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInfVO.java",
+            "line": 26,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "팝업 템플릿 목록 조회에서 검색 조건과 페이징 정보를 담아 전달하는 데이터 구조다. 템플릿 정보를 확장해 조회 결과 표시에 필요한 이름 항목도 함께 담는다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 230,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 231,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 233,
+              "snippet": "\t\tif (isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 234,
+              "snippet": "\t\t\ttmplatInf.setLastUpdusrId(user.getUniqId());"
+            }
+          ],
+          "text": "요청 처리 시 조회 조건과 템플릿 정보를 요청 파라미터로 받아 담고, 인증된 사용자 객체와 인증 여부를 함께 확인한다. 인증된 사용자인 경우에만 등록·수정·삭제 처리를 진행하며, 사용자 고유 아이디를 등록자 또는 수정자 정보로 기록한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 226,
+              "snippet": "\t@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 235,
+              "snippet": "\t\t\ttmplatService.deleteTemplateInf(tmplatInf);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 238,
+              "snippet": "\t\treturn \"forward:/cop/tpl/selectTemplateInfs.do\";"
+            }
+          ],
+          "text": "템플릿 관리 화면의 요청 창구다. 팝업 템플릿 목록 조회 요청 주소로 들어온 호출을 받아 조회 조건과 템플릿 정보를 담은 객체로 정리하고, 인증된 사용자 정보를 확인한 뒤 템플릿 관리 업무 서비스에 처리를 넘긴다. 처리 결과는 화면 모델에 담아 해당 화면 또는 목록 화면으로 이동시킨다."
+        }
+      },
+      "name": "팝업 템플릿 목록 조회 — 템플릿 관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/tpl/selectTemplateInfsPop.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+            "line": 226,
+            "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+          }
+        ],
+        "text": "팝업 템플릿 목록 조회 요청을 받아 화면 요청 파라미터와 인증 사용자 정보를 확인하고, 실제 처리를 템플릿 관리 업무 서비스에 위임한 뒤 결과를 화면에 전달한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 37,
+              "snippet": "    private String codeNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 40,
+              "snippet": "    private String codeDc = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 43,
+              "snippet": "    private String tableNm = \"\";\t//특정테이블에서 코드정보를추출시 사용"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 46,
+              "snippet": "    private String haveDetailCondition = \"N\";"
+            }
+          ],
+          "text": "코드 아이디·상세코드·코드명·코드설명을 담고, 특정 테이블에서 코드 정보를 뽑아 쓰는 경우를 위한 특정테이블명과 상세 조건 여부·상세 조건 항목을 함께 보관한다. 상세 조건 여부는 기본값이 사용 안 함이다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 28,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+              "line": 31,
+              "snippet": "    private String codeId = \"\";"
+            }
+          ],
+          "text": "템플릿 정보 수정에서 화면 선택 목록을 채우기 위한 공통코드 조회 조건을 표현한다. 조회할 코드 아이디를 담아 공통코드 조회 서비스에 넘기면 해당 상세코드 목록이 돌아온다."
+        }
+      },
+      "name": "템플릿 정보 수정 — 공통코드 조회 조건",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "템플릿 정보 수정에서 템플릿 구분 등 공통코드 목록을 조회하기 위한 조건을 담는 데이터 구조다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 41,
+              "snippet": "\t@EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 42,
+              "snippet": "\tprivate String id;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 50,
+              "snippet": "\t@EgovEmailCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "아이디·이름·이메일 등 신원 항목과 사용자 구분, 조직(부서) 아이디·명, 고유 아이디, 사용자 아이피 등을 보관한다. 아이디·이름·이메일 항목은 빈값 검사 대상이며 이메일은 형식 검사도 함께 적용된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 33,
+              "snippet": "public class LoginVO implements Serializable{"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+              "line": 67,
+              "snippet": "\tprivate String uniqId;"
+            }
+          ],
+          "text": "템플릿 정보 수정에서 현재 접속자의 신원 정보를 담아 전달하는 데이터 구조다. 인증 사용자 정보 도우미가 돌려준 사용자 객체가 이 구조이며, 여기서 꺼낸 고유 아이디가 템플릿의 등록자·수정자 정보로 기록된다."
+        }
+      },
+      "name": "템플릿 정보 수정 — 로그인 사용자 정보",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ],
+        "text": "템플릿 정보 수정에서 인증된 사용자 정보를 담는 데이터 구조다. 사용자 고유 아이디를 등록자 또는 수정자 정보로 남기는 데 쓰인다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 42,
+              "snippet": "\tpublic Map<String, List<CmmnDetailCode>> selectCmmCodeDetails(List<ComDefaultCodeVO> comDefaultCodeVOs);"
+            }
+          ],
+          "text": "코드 조회 조건 객체를 받아 해당 코드에 속한 상세코드 목록을 조회한다. 여러 조회 조건을 한 번에 넘기면 코드별 목록을 맵 형태로 묶어 돌려주어 화면 한 번의 준비로 여러 선택 목록을 채울 수 있다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 26,
+              "snippet": "public interface EgovCmmUseService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+              "line": 34,
+              "snippet": "\tpublic List<CmmnDetailCode> selectCmmCodeDetail(ComDefaultCodeVO comDefaultCodeVO);"
+            }
+          ],
+          "text": "템플릿 정보 수정에서 화면 선택 항목에 쓰이는 공통코드를 공급한다. 코드 조회 조건을 받아 상세코드 목록을 돌려주고, 조직 정보와 그룹 정보를 코드 형태로 돌려주는 기능도 함께 제공한다."
+        }
+      },
+      "name": "템플릿 정보 수정 — 공통코드 조회 서비스",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ],
+        "text": "템플릿 정보 수정에서 화면에 필요한 템플릿 구분 등 공통코드 목록을 조회하는 공통 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 18,
+              "snippet": "\tpublic List<String> getAuthorities();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 24,
+              "snippet": "\tpublic Boolean isAuthenticated(); "
+            }
+          ],
+          "text": "인증된 사용자 객체를 값 객체 형태로 돌려주고, 권한 정보 목록과 인증 여부(참/거짓)를 제공한다. 인증 여부가 참인 경우에만 템플릿 변경 처리가 이어지므로 이 판정이 변경 업무의 관문이 된다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 5,
+              "snippet": "public interface EgovUserDetailsService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+              "line": 11,
+              "snippet": "\tpublic Object getAuthenticatedUser();"
+            }
+          ],
+          "text": "템플릿 정보 수정의 권한 확인 근거를 제공한다. 인증된 사용자 객체, 사용자 권한 목록, 인증 여부를 돌려주어 등록·수정·삭제 처리 전에 요청자가 정당한 사용자인지 판단할 수 있게 한다."
+        }
+      },
+      "name": "템플릿 정보 수정 — 인증 사용자 정보 서비스",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ],
+        "text": "템플릿 정보 수정에서 현재 접속한 사용자의 인증 정보와 권한, 인증 여부를 제공하는 공통 서비스다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 33,
+              "snippet": "\tpublic void setEgovUserDetailsService(EgovUserDetailsService egovUserDetailsService) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ],
+          "text": "내부에 인증 사용자 정보 서비스 참조 한 개를 보관하며, 이 참조가 설정되어 있어야 인증 사용자 조회와 인증 여부 확인이 가능하다는 불변식을 가진다. 자체 상태를 따로 저장하지 않고 요청을 그대로 위임한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 25,
+              "snippet": "public class EgovUserDetailsHelper {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 27,
+              "snippet": "\tstatic EgovUserDetailsService egovUserDetailsService;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+              "line": 41,
+              "snippet": "\tpublic static Object getAuthenticatedUser() {"
+            }
+          ],
+          "text": "템플릿 정보 수정에서 인증 사용자 정보 서비스에 대한 단일 접근 창구 역할을 한다. 미리 설정된 인증 사용자 정보 서비스에 인증 사용자 조회·권한 조회·인증 여부 확인 요청을 그대로 넘긴다."
+        }
+      },
+      "name": "템플릿 정보 수정 — 인증 사용자 정보 도우미",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ],
+        "text": "템플릿 정보 수정에서 인증 사용자 정보 서비스를 손쉽게 호출하도록 감싸주는 협력 객체다. 화면 요청 처리 계층은 이 도우미를 통해 인증 사용자와 인증 여부를 확인한다."
+      }
+    },
+    {
+      "detail": {
+        "businessLogic": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 32,
+              "snippet": "    public void deleteTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 40,
+              "snippet": "    public void insertTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 48,
+              "snippet": "    public void updateTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            }
+          ],
+          "text": "템플릿 정보 등록·수정·삭제는 템플릿 정보 객체 한 건을 받아 처리하며, 목록 조회는 조회 조건 객체를 받아 목록과 건수를 함께 돌려준다. 각 업무 기능은 처리 실패 시 예외로 상위에 알린다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 24,
+              "snippet": "public interface EgovTemplateManageService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 32,
+              "snippet": "    public void deleteTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+              "line": 40,
+              "snippet": "    public void insertTemplateInf(TemplateInf tmplatInf) throws Exception;"
+            }
+          ],
+          "text": "템플릿 정보 수정에서 템플릿에 대한 업무 처리를 총괄한다. 템플릿 정보의 삭제·등록·수정을 수행하고, 목록·상세·미리보기·구분별 목록·화이트리스트 조회를 제공해 화면 요청 처리 계층이 데이터 처리 세부를 알 필요 없게 한다."
+        }
+      },
+      "name": "템플릿 정보 수정 — 템플릿 관리 업무 서비스",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+            "line": 24,
+            "snippet": "public interface EgovTemplateManageService {"
+          }
+        ],
+        "text": "템플릿 정보 수정의 실제 업무 처리를 담당하는 템플릿 관리 업무 서비스다. 템플릿의 등록·수정·삭제와 목록·상세·미리보기 조회 기능을 하나의 창구로 제공한다."
+      }
+    },
+    {
+      "detail": {
+        "dataShape": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 42,
+              "snippet": "    @EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 43,
+              "snippet": "    @Size(max=2000)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 51,
+              "snippet": "    @Size(max=120)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 52,
+              "snippet": "    private String tmplatNm = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 55,
+              "snippet": "    @EgovNullCheck"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 56,
+              "snippet": "    private String tmplatSeCode = \"\";"
+            }
+          ],
+          "text": "템플릿 경로·템플릿 명·템플릿 구분코드는 빈값이 될 수 없는 필수 항목이며, 템플릿 경로는 최대 2000자, 템플릿 명은 최대 120자로 길이가 제한된다. 이 밖에 최초등록자 아이디와 시점, 최종수정자 아이디와 시점, 사용여부를 보관한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 26,
+              "snippet": "@SuppressWarnings(\"serial\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 47,
+              "snippet": "    private String tmplatId = \"\";"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+              "line": 59,
+              "snippet": "    private String useAt = \"\";"
+            }
+          ],
+          "text": "템플릿 정보 수정에서 다루는 템플릿 한 건을 표현한다. 템플릿 아이디·명·경로·구분코드·사용여부와 최초등록자·최종수정자 및 그 시점을 담아 화면 요청 처리 계층과 템플릿 관리 업무 서비스 사이를 오간다."
+        }
+      },
+      "name": "템플릿 정보 수정 — 템플릿 정보",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/service/TemplateInf.java",
+            "line": 26,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ],
+        "text": "템플릿 정보 수정에서 등록·수정·삭제 대상이 되는 템플릿 한 건의 정보를 담는 데이터 구조다."
+      }
+    },
+    {
+      "detail": {
+        "request": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 230,
+              "snippet": "\t\tLoginVO user = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 231,
+              "snippet": "\t\tBoolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 233,
+              "snippet": "\t\tif (isAuthenticated) {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 234,
+              "snippet": "\t\t\ttmplatInf.setLastUpdusrId(user.getUniqId());"
+            }
+          ],
+          "text": "요청 처리 시 조회 조건과 템플릿 정보를 요청 파라미터로 받아 담고, 인증된 사용자 객체와 인증 여부를 함께 확인한다. 인증된 사용자인 경우에만 등록·수정·삭제 처리를 진행하며, 사용자 고유 아이디를 등록자 또는 수정자 정보로 기록한다."
+        },
+        "role": {
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 226,
+              "snippet": "\t@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 235,
+              "snippet": "\t\t\ttmplatService.deleteTemplateInf(tmplatInf);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+              "line": 238,
+              "snippet": "\t\treturn \"forward:/cop/tpl/selectTemplateInfs.do\";"
+            }
+          ],
+          "text": "템플릿 관리 화면의 요청 창구다. 템플릿 정보 수정 요청 주소로 들어온 호출을 받아 조회 조건과 템플릿 정보를 담은 객체로 정리하고, 인증된 사용자 정보를 확인한 뒤 템플릿 관리 업무 서비스에 처리를 넘긴다. 처리 결과는 화면 모델에 담아 해당 화면 또는 목록 화면으로 이동시킨다."
+        }
+      },
+      "name": "템플릿 정보 수정 — 템플릿 관리 화면 요청 처리",
+      "stepId": "step:ANY /cop/tpl/updateTemplateInf.do:src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+      "summary": {
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+            "line": 226,
+            "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+          }
+        ],
+        "text": "템플릿 정보 수정 요청을 받아 화면 요청 파라미터와 인증 사용자 정보를 확인하고, 실제 처리를 템플릿 관리 업무 서비스에 위임한 뒤 결과를 화면에 전달한다."
+      }
+    }
+  ],
+  "summary": {
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 68,
+        "snippet": "@RequestMapping(\"/cop/tpl/selectTemplateInfs.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 128,
+        "snippet": "@RequestMapping(\"/cop/tpl/insertTemplateInf.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 186,
+        "snippet": "@RequestMapping(\"/cop/tpl/updateTemplateInf.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 226,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteTemplateInf.do\")"
+      },
+      {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/web/EgovTemplateManageController.java",
+        "line": 249,
+        "snippet": "@RequestMapping(\"/cop/tpl/selectTemplateInfsPop.do\")"
+      }
+    ],
+    "text": "커뮤니티·동호회·게시판에서 사용하는 화면 템플릿을 관리하는 업무 영역이다. 템플릿 목록과 상세를 조회하고, 새 템플릿을 등록하거나 기존 템플릿을 수정·삭제하며, 다른 화면에서 템플릿을 고를 수 있도록 팝업 목록 조회도 제공한다."
+  }
+}

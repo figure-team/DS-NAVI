@@ -1,0 +1,1173 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "uss.mpe-000",
+  "domainId": "domain:uss.mpe",
+  "header": {
+    "name": "마이페이지 개인화 컨텐츠 관리",
+    "summary": {
+      "text": "사용자 마이페이지에 노출할 개인화 컨텐츠를 등록·수정·조회하는 업무 영역이다. 컨텐츠 아이디, 컨텐츠 명, 미리보기 URL, 연결 URL, 설명, 사용 여부를 관리 항목으로 두고, 목록 조회에서 상세 조회, 등록, 수정으로 이어지는 관리자 운영 흐름을 제공한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+          "line": 13,
+          "snippet": " * 상세내용 - 마이페이지의 컨텐츠아이디, 컨텐츠 명, 컨텐츠 URL, 컨텐츠 사용 여부 항목을 관리한다."
+        },
+        {
+          "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+          "line": 7,
+          "snippet": "public interface EgovIndvdlPgeService {"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "마이페이지 컨텐츠: 마이페이지에 노출되는 개인화 컨텐츠 한 건을 나타내는 핵심 업무 정보로, 목록·상세·등록·수정 전 구간에서 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 21,
+            "snippet": "public class IndvdlPgeVO extends ComDefaultVO {"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 11,
+            "snippet": " * 개요 - 마이페이지에 대한 model 클래스를 정의한다."
+          }
+        ]
+      },
+      {
+        "text": "컨텐츠 아이디: 마이페이지 컨텐츠를 식별하는 기본키 항목으로, 상세 조회와 수정 전 처리에서 대상 컨텐츠를 지정하는 데 쓰인다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 31,
+            "snippet": "\tprivate String cntntsId;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 167,
+            "snippet": "          // Primary Key 값 세팅"
+          }
+        ]
+      },
+      {
+        "text": "컨텐츠 표시 정보: 컨텐츠 명, 미리보기 URL, 연결 URL, 설명 항목으로 구성되어 마이페이지 화면에 노출될 내용을 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 38,
+            "snippet": "\tprivate String cntntsNm;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 45,
+            "snippet": "\tprivate String cntntsLinkUrl;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 52,
+            "snippet": "\tprivate String cntcUrl;"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 59,
+            "snippet": "\tprivate String cntntsDc;"
+          }
+        ]
+      },
+      {
+        "text": "컨텐츠 사용 여부: 해당 컨텐츠를 마이페이지에 노출할지 결정하는 운영 상태 항목이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 65,
+            "snippet": "\tprivate String cntntsUseAt;"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "컨텐츠 명, 미리보기 URL, 연결 URL, 설명, 사용 여부는 모두 필수 입력 항목으로 공란을 허용하지 않는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 36,
+            "snippet": "\t@EgovNullCheck"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 64,
+            "snippet": "\t@EgovNullCheck"
+          }
+        ]
+      },
+      {
+        "text": "각 표시 항목은 최대 길이 제한을 둔다. 컨텐츠 명은 100자, 미리보기 URL은 1000자, 연결 URL은 255자, 설명은 250자를 넘을 수 없다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 37,
+            "snippet": "\t@Size(max = 100)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 44,
+            "snippet": "\t@Size(max = 1000)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 51,
+            "snippet": "\t@Size(max = 255)"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 58,
+            "snippet": "\t@Size(max = 250)"
+          }
+        ]
+      },
+      {
+        "text": "등록 시 입력값 검증에 실패하면 저장을 수행하지 않고 등록 화면으로 되돌려 입력을 다시 받는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 143,
+            "snippet": "  \t\tif(bindingResult.hasErrors()){"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 144,
+            "snippet": "  \t\t\treturn \"egovframework/com/uss/mpe/EgovIndvdlPgeRegist\";"
+          }
+        ]
+      },
+      {
+        "text": "수정 시 입력값 검증에 실패하면 수정을 수행하지 않고 수정 화면으로 되돌린다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 189,
+            "snippet": " \t\tif(bindingResult.hasErrors()){"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 190,
+            "snippet": "  \t\t\treturn \"egovframework/com/uss/mpe/EgovIndvdlPgeUpdt\";"
+          }
+        ]
+      },
+      {
+        "text": "등록과 수정이 정상 처리되면 항상 컨텐츠 목록 화면으로 이동시켜 결과를 확인하게 한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 149,
+            "snippet": "          return \"forward:/uss/mpe/selectIndvdlPgeList.do\";"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 195,
+            "snippet": "          return \"forward:/uss/mpe/selectIndvdlPgeList.do\";"
+          }
+        ]
+      },
+      {
+        "text": "수정 전 처리는 컨텐츠 아이디를 기본키로 세팅해 기존 컨텐츠 상세를 먼저 조회한 뒤 수정 화면에 보여준다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 168,
+            "snippet": "          indvdlPgeVO.setCntntsId(cntntsId);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 170,
+            "snippet": "          model.addAttribute(\"indvdlPgeVO\", egovIndvdlPgeService.selectIndvdlPgeDetail(indvdlPgeVO));"
+          }
+        ]
+      },
+      {
+        "text": "컨텐츠 등록은 업무 처리 실패 시 프레임워크 공통 예외로 처리되어 저장이 취소된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+            "line": 15,
+            "snippet": "\tvoid insertIndvdlPge(IndvdlPgeVO indvdlPgeVO) throws FdlException;"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "공통 검색 조건 표준을 따른다. 마이페이지 컨텐츠 정보는 공통 기본 조회 모델을 상속받아 목록 조회의 검색·페이징 규약을 공유한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 21,
+            "snippet": "public class IndvdlPgeVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      {
+        "text": "공통 예외 처리 기반에 의존한다. 컨텐츠 등록 실패는 표준 프레임워크 예외 체계로 전파된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+            "line": 5,
+            "snippet": "import org.egovframe.rte.fdl.cmmn.exception.FdlException;"
+          }
+        ]
+      },
+      {
+        "text": "목록 조회는 전체 건수 집계를 함께 제공해 공통 페이징 화면 구성과 연계된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+            "line": 11,
+            "snippet": "\tint selectIndvdlPgeListCnt(IndvdlPgeVO searchVO);"
+          }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "마이페이지 컨텐츠 관리",
+        "nodes": [
+          {
+            "id": "start",
+            "kind": "start",
+            "label": "관리자 접속"
+          },
+          {
+            "id": "list",
+            "kind": "activity",
+            "label": "컨텐츠 목록 조회",
+            "flowRef": "flow:ANY /uss/mpe/selectIndvdlPgeList.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+                "line": 68,
+                "snippet": "@RequestMapping(value = \"/uss/mpe/selectIndvdlPgeList.do\")"
+              }
+            ]
+          },
+          {
+            "id": "choose",
+            "kind": "decision",
+            "label": "수행할 작업 선택",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+                "line": 7,
+                "snippet": "public interface EgovIndvdlPgeService {"
+              }
+            ]
+          },
+          {
+            "id": "detail",
+            "kind": "activity",
+            "label": "컨텐츠 상세 조회",
+            "flowRef": "flow:ANY /uss/mpe/selectIndvdlPgeDetail.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+                "line": 103,
+                "snippet": "@RequestMapping(\"/uss/mpe/selectIndvdlPgeDetail.do\")"
+              }
+            ]
+          },
+          {
+            "id": "regview",
+            "kind": "activity",
+            "label": "등록 화면 표시",
+            "flowRef": "flow:ANY /uss/mpe/insertIndvdlPgeView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+                "line": 120,
+                "snippet": "@RequestMapping(\"/uss/mpe/insertIndvdlPgeView.do\")"
+              }
+            ]
+          },
+          {
+            "id": "regist",
+            "kind": "activity",
+            "label": "컨텐츠 등록 요청",
+            "flowRef": "flow:ANY /uss/mpe/insertIndvdlPge.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+                "line": 137,
+                "snippet": "@RequestMapping(\"/uss/mpe/insertIndvdlPge.do\")"
+              }
+            ]
+          },
+          {
+            "id": "regvalid",
+            "kind": "decision",
+            "label": "등록 입력값 검증",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+                "line": 143,
+                "snippet": "  \t\tif(bindingResult.hasErrors()){"
+              }
+            ]
+          },
+          {
+            "id": "regsave",
+            "kind": "activity",
+            "label": "컨텐츠 저장",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+                "line": 147,
+                "snippet": "          egovIndvdlPgeService.insertIndvdlPge(indvdlPgeVO);"
+              }
+            ]
+          },
+          {
+            "id": "updview",
+            "kind": "activity",
+            "label": "수정 화면 표시",
+            "flowRef": "flow:ANY /uss/mpe/updateIndvdlPgeView.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+                "line": 160,
+                "snippet": "@RequestMapping(\"/uss/mpe/updateIndvdlPgeView.do\")"
+              }
+            ]
+          },
+          {
+            "id": "update",
+            "kind": "activity",
+            "label": "컨텐츠 수정 요청",
+            "flowRef": "flow:ANY /uss/mpe/updateIndvdlPge.do",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+                "line": 183,
+                "snippet": "@RequestMapping(\"/uss/mpe/updateIndvdlPge.do\")"
+              }
+            ]
+          },
+          {
+            "id": "updvalid",
+            "kind": "decision",
+            "label": "수정 입력값 검증",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+                "line": 189,
+                "snippet": " \t\tif(bindingResult.hasErrors()){"
+              }
+            ]
+          },
+          {
+            "id": "updsave",
+            "kind": "activity",
+            "label": "컨텐츠 변경 반영",
+            "citations": [
+              {
+                "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+                "line": 193,
+                "snippet": "      \tegovIndvdlPgeService.updateIndvdlPge(indvdlPgeVO);"
+              }
+            ]
+          },
+          {
+            "id": "end",
+            "kind": "end",
+            "label": "목록 화면으로 복귀"
+          }
+        ],
+        "edges": [
+          { "from": "start", "to": "list" },
+          { "from": "list", "to": "choose" },
+          { "from": "choose", "to": "detail", "label": "상세 보기" },
+          { "from": "choose", "to": "regview", "label": "신규 등록" },
+          { "from": "choose", "to": "updview", "label": "수정" },
+          { "from": "detail", "to": "end" },
+          { "from": "regview", "to": "regist" },
+          { "from": "regist", "to": "regvalid" },
+          { "from": "regvalid", "to": "regview", "label": "검증 실패" },
+          { "from": "regvalid", "to": "regsave", "label": "검증 통과" },
+          { "from": "regsave", "to": "end" },
+          { "from": "updview", "to": "update" },
+          { "from": "update", "to": "updvalid" },
+          { "from": "updvalid", "to": "updview", "label": "검증 실패" },
+          { "from": "updvalid", "to": "updsave", "label": "검증 통과" },
+          { "from": "updsave", "to": "end" }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/mpe/insertIndvdlPge.do",
+      "name": "마이페이지 컨텐츠 등록",
+      "summary": {
+        "text": "관리자가 입력한 마이페이지 컨텐츠를 검증 후 저장한다. 입력값 검증에 실패하면 등록 화면으로 되돌리고, 통과하면 컨텐츠를 저장한 뒤 목록 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(\"/uss/mpe/insertIndvdlPge.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 147,
+            "snippet": "          egovIndvdlPgeService.insertIndvdlPge(indvdlPgeVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/mpe/insertIndvdlPgeView.do",
+      "name": "마이페이지 컨텐츠 등록 화면 표시",
+      "summary": {
+        "text": "마이페이지 컨텐츠를 신규로 입력할 등록 화면을 제공한다. 등록 요청 전 단계로, 검증 실패 시 되돌아오는 화면과 동일한 등록 화면을 사용한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 120,
+            "snippet": "@RequestMapping(\"/uss/mpe/insertIndvdlPgeView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 144,
+            "snippet": "  \t\t\treturn \"egovframework/com/uss/mpe/EgovIndvdlPgeRegist\";"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/mpe/selectIndvdlPgeDetail.do",
+      "name": "마이페이지 컨텐츠 상세 조회",
+      "summary": {
+        "text": "선택한 마이페이지 컨텐츠 한 건의 상세 내용을 조회해 화면에 보여준다. 컨텐츠 명, 미리보기 URL, 연결 URL, 설명, 사용 여부 등 관리 항목을 확인하는 용도이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 103,
+            "snippet": "@RequestMapping(\"/uss/mpe/selectIndvdlPgeDetail.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+            "line": 13,
+            "snippet": "\tIndvdlPgeVO selectIndvdlPgeDetail(IndvdlPgeVO indvdlPgeVO) throws Exception;"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/mpe/selectIndvdlPgeList.do",
+      "name": "마이페이지 컨텐츠 목록 조회",
+      "summary": {
+        "text": "검색 조건에 맞는 마이페이지 컨텐츠 목록과 전체 건수를 조회해 관리 화면에 보여준다. 등록·수정 처리 후 결과를 확인하기 위해 돌아오는 기본 화면이기도 하다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 68,
+            "snippet": "@RequestMapping(value = \"/uss/mpe/selectIndvdlPgeList.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+            "line": 9,
+            "snippet": "\tList<IndvdlPgeVO> selectIndvdlPgeList(IndvdlPgeVO searchVO);"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+            "line": 11,
+            "snippet": "\tint selectIndvdlPgeListCnt(IndvdlPgeVO searchVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/mpe/updateIndvdlPge.do",
+      "name": "마이페이지 컨텐츠 수정",
+      "summary": {
+        "text": "관리자가 변경한 마이페이지 컨텐츠 내용을 검증 후 반영한다. 검증에 실패하면 수정 화면으로 되돌리고, 통과하면 변경 내용을 반영한 뒤 목록 화면으로 이동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 183,
+            "snippet": "@RequestMapping(\"/uss/mpe/updateIndvdlPge.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 193,
+            "snippet": "      \tegovIndvdlPgeService.updateIndvdlPge(indvdlPgeVO);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/mpe/updateIndvdlPgeView.do",
+      "name": "마이페이지 컨텐츠 수정 화면 표시",
+      "summary": {
+        "text": "수정 대상 컨텐츠 아이디로 기존 컨텐츠 상세를 먼저 조회해 수정 화면에 채워 보여준다. 실제 변경 반영은 이후 수정 요청에서 수행한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 160,
+            "snippet": "@RequestMapping(\"/uss/mpe/updateIndvdlPgeView.do\")"
+          },
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 170,
+            "snippet": "          model.addAttribute(\"indvdlPgeVO\", egovIndvdlPgeService.selectIndvdlPgeDetail(indvdlPgeVO));"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /uss/mpe/insertIndvdlPge.do:src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+      "name": "컨텐츠 등록 업무 처리",
+      "summary": {
+        "text": "등록 요청으로 전달된 마이페이지 컨텐츠를 실제로 저장하는 업무 처리를 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+            "line": 7,
+            "snippet": "public interface EgovIndvdlPgeService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "마이페이지 컨텐츠 관리 업무의 처리 규약을 정의하는 서비스로, 이 흐름에서는 화면 계층에서 넘겨받은 컨텐츠 정보를 저장하는 등록 작업을 조율한다. 목록·상세·등록·수정 작업을 한 서비스에서 함께 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 7,
+              "snippet": "public interface EgovIndvdlPgeService {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 15,
+              "snippet": "\tvoid insertIndvdlPge(IndvdlPgeVO indvdlPgeVO) throws FdlException;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "컨텐츠 등록 작업은 반환값 없이 저장만 수행하며, 처리 중 업무 오류가 발생하면 프레임워크 공통 예외로 전파해 저장을 성립시키지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 15,
+              "snippet": "\tvoid insertIndvdlPge(IndvdlPgeVO indvdlPgeVO) throws FdlException;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 5,
+              "snippet": "import org.egovframe.rte.fdl.cmmn.exception.FdlException;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/mpe/insertIndvdlPge.do:src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+      "name": "컨텐츠 등록 요청 접수",
+      "summary": {
+        "text": "등록 화면에서 입력된 컨텐츠 정보를 받아 검증한 뒤 등록 업무로 위임하고, 처리 후 목록 화면으로 이동시킨다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(\"/uss/mpe/insertIndvdlPge.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "컨텐츠 등록 요청의 진입점 역할을 한다. 입력 컨텐츠 정보를 받아 검증 결과에 따라 등록 화면으로 되돌리거나 등록 업무로 위임하고, 정상 처리되면 컨텐츠 목록 화면으로 이동시킨다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 137,
+              "snippet": "@RequestMapping(\"/uss/mpe/insertIndvdlPge.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 149,
+              "snippet": "          return \"forward:/uss/mpe/selectIndvdlPgeList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "검색 조건과 등록할 컨텐츠 정보를 함께 받으며, 컨텐츠 정보에는 필수·길이 검증이 적용된다. 검증 오류가 있으면 저장하지 않고 등록 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 140,
+              "snippet": "\t\t@Valid @ModelAttribute(\"indvdlPgeVO\") IndvdlPgeVO indvdlPgeVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 143,
+              "snippet": "  \t\tif(bindingResult.hasErrors()){"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 144,
+              "snippet": "  \t\t\treturn \"egovframework/com/uss/mpe/EgovIndvdlPgeRegist\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/mpe/insertIndvdlPgeView.do:src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+      "name": "컨텐츠 등록 화면 요청 접수",
+      "summary": {
+        "text": "신규 컨텐츠 입력을 위한 등록 화면 요청을 받아 등록 화면을 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(\"/uss/mpe/insertIndvdlPge.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "등록 전 단계 화면 요청의 진입점으로, 관리자가 컨텐츠 정보를 입력할 등록 화면을 제공한다. 이 화면에서 입력된 값이 등록 요청으로 이어진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(\"/uss/mpe/insertIndvdlPgeView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 130,
+              "snippet": "      * 컨텐츠를 등록한다."
+            }
+          ]
+        },
+        "request": {
+          "text": "화면 표시 요청이므로 별도 저장 처리는 없고, 반환되는 등록 화면은 등록 검증 실패 시 되돌아가는 화면과 동일하다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 120,
+              "snippet": "@RequestMapping(\"/uss/mpe/insertIndvdlPgeView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 144,
+              "snippet": "  \t\t\treturn \"egovframework/com/uss/mpe/EgovIndvdlPgeRegist\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/mpe/selectIndvdlPgeDetail.do:src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+      "name": "컨텐츠 상세 조회 업무 처리",
+      "summary": {
+        "text": "컨텐츠 아이디로 마이페이지 컨텐츠 한 건의 상세 정보를 조회하는 업무 처리를 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+            "line": 7,
+            "snippet": "public interface EgovIndvdlPgeService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이 흐름에서는 화면 계층이 넘긴 조회 조건으로 컨텐츠 한 건의 상세 정보를 되돌려 주는 조회 업무를 조율한다. 반환 결과가 그대로 상세 화면 표시에 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 13,
+              "snippet": "\tIndvdlPgeVO selectIndvdlPgeDetail(IndvdlPgeVO indvdlPgeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 7,
+              "snippet": "public interface EgovIndvdlPgeService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "상세 조회는 컨텐츠 정보 한 건을 반환하며, 조회 처리 중 오류는 예외로 전파해 호출 화면이 처리하도록 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 13,
+              "snippet": "\tIndvdlPgeVO selectIndvdlPgeDetail(IndvdlPgeVO indvdlPgeVO) throws Exception;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/mpe/selectIndvdlPgeDetail.do:src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+      "name": "컨텐츠 상세 조회 요청 접수",
+      "summary": {
+        "text": "상세 조회 요청을 받아 대상 컨텐츠의 상세 정보를 조회 업무에 위임하고 상세 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(\"/uss/mpe/insertIndvdlPge.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "컨텐츠 상세 조회 요청의 진입점으로, 목록에서 선택된 컨텐츠의 상세 정보를 조회 업무에 위임하고 그 결과를 화면 모델에 실어 상세 화면으로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 103,
+              "snippet": "@RequestMapping(\"/uss/mpe/selectIndvdlPgeDetail.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 13,
+              "snippet": "\tIndvdlPgeVO selectIndvdlPgeDetail(IndvdlPgeVO indvdlPgeVO) throws Exception;"
+            }
+          ]
+        },
+        "request": {
+          "text": "조회 대상 컨텐츠를 지정하는 컨텐츠 아이디를 기본키로 세팅해 조회 조건을 구성하며, 조회 결과를 화면 모델 속성으로 담아 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 168,
+              "snippet": "          indvdlPgeVO.setCntntsId(cntntsId);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 170,
+              "snippet": "          model.addAttribute(\"indvdlPgeVO\", egovIndvdlPgeService.selectIndvdlPgeDetail(indvdlPgeVO));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/mpe/selectIndvdlPgeList.do:src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+      "name": "컨텐츠 목록 조회 업무 처리",
+      "summary": {
+        "text": "검색 조건에 맞는 마이페이지 컨텐츠 목록과 전체 건수를 조회하는 업무 처리를 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+            "line": 7,
+            "snippet": "public interface EgovIndvdlPgeService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이 흐름에서는 검색 조건을 받아 컨텐츠 목록과 함께 페이징 화면 구성에 필요한 전체 건수를 산출하는 조회 업무를 조율한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 9,
+              "snippet": "\tList<IndvdlPgeVO> selectIndvdlPgeList(IndvdlPgeVO searchVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 11,
+              "snippet": "\tint selectIndvdlPgeListCnt(IndvdlPgeVO searchVO);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록과 건수는 동일한 검색 조건으로 각각 조회되며, 목록은 컨텐츠 정보 여러 건, 건수는 정수로 반환되어 페이징 계산의 근거가 된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 9,
+              "snippet": "\tList<IndvdlPgeVO> selectIndvdlPgeList(IndvdlPgeVO searchVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 11,
+              "snippet": "\tint selectIndvdlPgeListCnt(IndvdlPgeVO searchVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/mpe/selectIndvdlPgeList.do:src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+      "name": "컨텐츠 목록 검색 조건 및 결과 정보",
+      "summary": {
+        "text": "목록 조회의 검색 조건과 결과 항목을 함께 담는 마이페이지 컨텐츠 정보 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 21,
+            "snippet": "public class IndvdlPgeVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "목록 조회 흐름에서 검색 조건 전달과 조회 결과 표현을 동시에 맡는 데이터 구조이다. 공통 기본 조회 모델을 상속받아 검색·페이징 표준 항목을 함께 갖춘다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+              "line": 21,
+              "snippet": "public class IndvdlPgeVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+              "line": 11,
+              "snippet": " * 개요 - 마이페이지에 대한 model 클래스를 정의한다."
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "컨텐츠 아이디, 컨텐츠 명, 미리보기 URL, 연결 URL, 설명, 사용 여부 항목으로 구성된다. 컨텐츠 아이디를 제외한 항목은 필수이며 각각 100자·1000자·255자·250자 길이 제한을 지켜야 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+              "line": 31,
+              "snippet": "\tprivate String cntntsId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+              "line": 37,
+              "snippet": "\t@Size(max = 100)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+              "line": 44,
+              "snippet": "\t@Size(max = 1000)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+              "line": 51,
+              "snippet": "\t@Size(max = 255)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+              "line": 58,
+              "snippet": "\t@Size(max = 250)"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+              "line": 65,
+              "snippet": "\tprivate String cntntsUseAt;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/mpe/selectIndvdlPgeList.do:src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+      "name": "컨텐츠 목록 조회 요청 접수",
+      "summary": {
+        "text": "검색 조건을 받아 컨텐츠 목록 조회 업무에 위임하고 결과를 목록 화면에 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(\"/uss/mpe/insertIndvdlPge.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "컨텐츠 목록 조회 요청의 진입점으로, 검색 조건을 받아 목록·건수 조회 업무에 위임하고 결과를 목록 화면에 전달한다. 등록·수정 처리 후 이동해 오는 대상 화면이기도 하다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 68,
+              "snippet": "@RequestMapping(value = \"/uss/mpe/selectIndvdlPgeList.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 149,
+              "snippet": "          return \"forward:/uss/mpe/selectIndvdlPgeList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "검색 조건은 마이페이지 컨텐츠 정보 구조로 받아 목록과 전체 건수 조회에 함께 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 139,
+              "snippet": "\t  \t@ModelAttribute(\"searchVO\") IndvdlPgeVO searchVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 9,
+              "snippet": "\tList<IndvdlPgeVO> selectIndvdlPgeList(IndvdlPgeVO searchVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/mpe/updateIndvdlPge.do:src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+      "name": "컨텐츠 수정 업무 처리",
+      "summary": {
+        "text": "변경된 마이페이지 컨텐츠 내용을 실제로 반영하는 업무 처리를 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+            "line": 7,
+            "snippet": "public interface EgovIndvdlPgeService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이 흐름에서는 화면 계층이 검증을 마치고 넘긴 컨텐츠 정보를 받아 기존 컨텐츠의 변경 내용을 반영하는 수정 업무를 조율한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 17,
+              "snippet": "\tvoid updateIndvdlPge(IndvdlPgeVO indvdlPgeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 7,
+              "snippet": "public interface EgovIndvdlPgeService {"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "수정 작업은 반환값 없이 변경 반영만 수행하며, 등록과 달리 별도 업무 예외를 선언하지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 17,
+              "snippet": "\tvoid updateIndvdlPge(IndvdlPgeVO indvdlPgeVO);"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 15,
+              "snippet": "\tvoid insertIndvdlPge(IndvdlPgeVO indvdlPgeVO) throws FdlException;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/mpe/updateIndvdlPge.do:src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+      "name": "컨텐츠 수정 요청 접수",
+      "summary": {
+        "text": "수정 화면에서 변경된 컨텐츠 정보를 받아 검증한 뒤 수정 업무로 위임하고, 처리 후 목록 화면으로 이동시킨다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(\"/uss/mpe/insertIndvdlPge.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "컨텐츠 수정 요청의 진입점 역할을 한다. 변경된 컨텐츠 정보를 받아 검증 결과에 따라 수정 화면으로 되돌리거나 수정 업무로 위임하고, 정상 처리되면 목록 화면으로 이동시킨다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 183,
+              "snippet": "@RequestMapping(\"/uss/mpe/updateIndvdlPge.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 195,
+              "snippet": "          return \"forward:/uss/mpe/selectIndvdlPgeList.do\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "검색 조건과 변경할 컨텐츠 정보를 함께 받으며 컨텐츠 정보에는 필수·길이 검증이 적용된다. 검증 오류가 있으면 반영하지 않고 수정 화면으로 되돌린다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 186,
+              "snippet": "\t\t@Valid @ModelAttribute(\"indvdlPgeVO\") IndvdlPgeVO indvdlPgeVO,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 189,
+              "snippet": " \t\tif(bindingResult.hasErrors()){"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 190,
+              "snippet": "  \t\t\treturn \"egovframework/com/uss/mpe/EgovIndvdlPgeUpdt\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/mpe/updateIndvdlPgeView.do:src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+      "name": "수정 화면용 컨텐츠 상세 조회 업무 처리",
+      "summary": {
+        "text": "수정 화면에 채워 넣을 기존 컨텐츠의 상세 정보를 조회하는 업무 처리를 담당한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+            "line": 7,
+            "snippet": "public interface EgovIndvdlPgeService {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "이 흐름에서는 수정 대상 컨텐츠 아이디로 기존 컨텐츠 상세를 조회해 수정 화면 초기값을 마련하는 조회 업무를 조율한다. 변경 반영은 이 단계에서 수행하지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 13,
+              "snippet": "\tIndvdlPgeVO selectIndvdlPgeDetail(IndvdlPgeVO indvdlPgeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 153,
+              "snippet": "       * 컨텐츠정보 수정 전 처리"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "상세 조회는 컨텐츠 정보 한 건을 반환하며 조회 오류는 예외로 전파한다. 수정 반영은 별도의 수정 작업에서 수행된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 13,
+              "snippet": "\tIndvdlPgeVO selectIndvdlPgeDetail(IndvdlPgeVO indvdlPgeVO) throws Exception;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/EgovIndvdlPgeService.java",
+              "line": 17,
+              "snippet": "\tvoid updateIndvdlPge(IndvdlPgeVO indvdlPgeVO);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/mpe/updateIndvdlPgeView.do:src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+      "name": "수정 화면 컨텐츠 정보 구조",
+      "summary": {
+        "text": "수정 화면에 표시할 기존 컨텐츠 항목을 담는 마이페이지 컨텐츠 정보 구조이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+            "line": 21,
+            "snippet": "public class IndvdlPgeVO extends ComDefaultVO {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "수정 전 처리 흐름에서 조회 조건인 컨텐츠 아이디를 담아 전달하고, 조회된 기존 컨텐츠 내용을 수정 화면 초기값으로 실어 나르는 데이터 구조이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+              "line": 21,
+              "snippet": "public class IndvdlPgeVO extends ComDefaultVO {"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 168,
+              "snippet": "          indvdlPgeVO.setCntntsId(cntntsId);"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "컨텐츠 아이디를 식별 항목으로 두고, 컨텐츠 명·미리보기 URL·연결 URL·설명·사용 여부를 관리 항목으로 갖는다. 수정 저장 시 필수 여부와 길이 제한 불변식을 지켜야 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+              "line": 31,
+              "snippet": "\tprivate String cntntsId;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+              "line": 38,
+              "snippet": "\tprivate String cntntsNm;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+              "line": 45,
+              "snippet": "\tprivate String cntntsLinkUrl;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+              "line": 52,
+              "snippet": "\tprivate String cntcUrl;"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/service/IndvdlPgeVO.java",
+              "line": 64,
+              "snippet": "\t@EgovNullCheck"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/mpe/updateIndvdlPgeView.do:src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+      "name": "컨텐츠 수정 화면 요청 접수",
+      "summary": {
+        "text": "수정 대상 컨텐츠 아이디를 받아 기존 상세를 조회하고 수정 화면에 채워 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+            "line": 137,
+            "snippet": "@RequestMapping(\"/uss/mpe/insertIndvdlPge.do\")"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "수정 전 처리 요청의 진입점으로, 전달된 컨텐츠 아이디로 기존 컨텐츠 상세를 조회 업무에 위임하고 그 결과를 화면 모델에 담아 수정 화면을 반환한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 160,
+              "snippet": "@RequestMapping(\"/uss/mpe/updateIndvdlPgeView.do\")"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 172,
+              "snippet": "          return \"egovframework/com/uss/mpe/EgovIndvdlPgeUpdt\";"
+            }
+          ]
+        },
+        "request": {
+          "text": "필수 요청 파라미터로 컨텐츠 아이디를 받고 검색 조건을 함께 유지한다. 받은 아이디를 기본키로 세팅해 상세 조회 조건을 구성한 뒤 조회 결과를 화면 모델 속성으로 전달한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 161,
+              "snippet": "      public String updateIndvdlPgeView(@RequestParam(\"cntntsId\") String cntntsId ,"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 167,
+              "snippet": "          // Primary Key 값 세팅"
+            },
+            {
+              "filePath": "src/main/java/egovframework/com/uss/mpe/web/EgovIndvdlPgeController.java",
+              "line": 170,
+              "snippet": "          model.addAttribute(\"indvdlPgeVO\", egovIndvdlPgeService.selectIndvdlPgeDetail(indvdlPgeVO));"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

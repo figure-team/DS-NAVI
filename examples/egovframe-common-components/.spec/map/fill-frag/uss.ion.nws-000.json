@@ -1,0 +1,1003 @@
+{
+  "schemaVersion": 1,
+  "chunkId": "uss.ion.nws-000",
+  "domainId": "domain:uss.ion.nws",
+  "header": {
+    "name": "뉴스 관리",
+    "summary": {
+      "text": "기관이 대내외에 알리는 뉴스(소식) 게시물을 등록·조회·수정·삭제하는 업무 영역이다. 뉴스 목록 화면을 시작점으로 상세 조회, 등록, 수정, 삭제가 하나의 컨트롤러에서 제공되며, 뉴스에는 제목·내용·출처·게시일자와 첨부파일을 함께 관리한다. 등록자·수정자 정보는 로그인한 사용자 정보에서 자동으로 채워진다.",
+      "citations": [
+        { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 76, "snippet": "@RequestMapping(value = \"/uss/ion/nws/selectNewsList.do\")" },
+        { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 7, "snippet": "public interface EgovNewsService {" }
+      ]
+    },
+    "entities": [
+      {
+        "text": "뉴스 정보 — 뉴스 ID를 식별자로 하여 뉴스제목, 뉴스내용, 뉴스출처, 게시일자, 첨부파일ID와 최초등록자·최종수정자 정보를 담는 이 업무의 중심 데이터이다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 30, "snippet": "public class NewsVO extends ComDefaultVO {" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 35, "snippet": "private String newsId;" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 40, "snippet": "private String newsSj;" }
+        ]
+      },
+      {
+        "text": "첨부파일 정보 — 첨부파일 아이디와 파일연번, 원파일명, 저장파일명, 파일저장경로로 뉴스에 붙는 파일을 표현한다. 뉴스 한 건은 하나의 첨부파일 아이디로 묶인 여러 파일을 가진다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java", "line": 26, "snippet": "public String atchFileId = \"\";" },
+          { "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java", "line": 54, "snippet": "public String orignlFileNm = \"\";" },
+          { "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java", "line": 58, "snippet": "public String streFileNm = \"\";" }
+        ]
+      },
+      {
+        "text": "로그인 사용자 정보 — 뉴스 등록·수정 시 등록자와 수정자를 남기기 위해 사용하는 인증 사용자 정보로, 고유아이디를 통해 작성자를 식별한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 33, "snippet": "public class LoginVO implements Serializable{" },
+          { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 67, "snippet": "private String uniqId;" }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "뉴스제목은 최대 100자로 제한되며, 뉴스제목·뉴스내용은 필수 입력 항목으로 검증된다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 39, "snippet": "@Size(max=100)" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 40, "snippet": "private String newsSj;" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 45, "snippet": "private String newsCn;" }
+        ]
+      },
+      {
+        "text": "입력값 검증에 실패하면 저장하지 않고 입력 내용을 그대로 담아 등록 화면을 다시 보여준다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 144, "snippet": "public String insertNews(final MultipartHttpServletRequest multiRequest, @Valid @ModelAttribute(\"newsVO\") NewsVO newsVO, BindingResult bindingResult, ModelMap model) throws Exception {" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 204, "snippet": "public String updateNewsInfo(final MultipartHttpServletRequest multiRequest, @Valid @ModelAttribute(\"newsVO\") NewsVO newsVO, BindingResult bindingResult, ModelMap model) throws Exception {" }
+        ]
+      },
+      {
+        "text": "첨부파일이 업로드된 경우에만 파일을 저장하고, 저장 결과로 받은 첨부파일 아이디를 뉴스 정보에 연결한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 159, "snippet": "fvoList = fileUtil.parseFileInf(files, \"NEWS_\", 0, \"\", \"\");" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 160, "snippet": "atchFileId = fileMngService.insertFileInfs(fvoList); // 파일이 생성되고나면 생성된 첨부파일 ID를 리턴한다." }
+        ]
+      },
+      {
+        "text": "수정 시에는 기존 첨부파일 아이디가 없으면 첨부파일을 새로 등록하고, 이미 있으면 기존 첨부파일 묶음에 이어서 파일을 추가·수정한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 220, "snippet": "atchFileId = fileMngService.insertFileInfs(fvoList);" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 227, "snippet": "List<FileVO> fvoList = fileUtil.parseFileInf(files, \"NEWS_\", fileKeyParam, atchFileId, \"\");" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 228, "snippet": "fileMngService.updateFileInfs(fvoList);" }
+        ]
+      },
+      {
+        "text": "최초등록자와 최종수정자는 화면 입력값이 아니라 로그인한 사용자의 고유아이디로 채워지며, 로그인 정보가 없으면 빈 값으로 처리한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 167, "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 234, "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();" }
+        ]
+      },
+      {
+        "text": "등록·수정·삭제 처리가 끝나면 개별 결과 화면을 두지 않고 항상 뉴스 목록 조회로 되돌아간다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 254, "snippet": "return \"forward:/uss/ion/nws/selectNewsList.do\";" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 252, "snippet": "egovNewsService.deleteNews(newsVO);" }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "공통 파일관리 업무와 연계하여 뉴스 첨부파일의 저장·수정을 위임한다. 뉴스 업무는 파일 저장 방식을 직접 다루지 않고 첨부파일 아이디만 보관한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java", "line": 46, "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 160, "snippet": "atchFileId = fileMngService.insertFileInfs(fvoList); // 파일이 생성되고나면 생성된 첨부파일 ID를 리턴한다." }
+        ]
+      },
+      {
+        "text": "공통 인증 업무와 연계하여 현재 로그인한 사용자 정보를 조회하고, 이를 뉴스의 등록자·수정자 정보로 사용한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 41, "snippet": "public static Object getAuthenticatedUser() {" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 167, "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();" }
+        ]
+      },
+      {
+        "text": "공통 문자열 처리 유틸리티를 이용해 로그인 정보에서 꺼낸 값의 빈 값 처리를 표준화한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 43, "snippet": "public class EgovStringUtil {" },
+          { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 47, "snippet": "public static final String EMPTY = \"\";" }
+        ]
+      }
+    ],
+    "businessFlows": [
+      {
+        "title": "뉴스 관리",
+        "nodes": [
+          { "id": "s1", "kind": "start", "label": "뉴스 메뉴 진입" },
+          {
+            "id": "a1", "kind": "activity", "label": "뉴스 목록 조회",
+            "flowRef": "flow:ANY /uss/ion/nws/selectNewsList.do",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 76, "snippet": "@RequestMapping(value = \"/uss/ion/nws/selectNewsList.do\")" } ]
+          },
+          {
+            "id": "a2", "kind": "activity", "label": "뉴스 상세 조회",
+            "flowRef": "flow:ANY /uss/ion/nws/selectNewsDetail.do",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 113, "snippet": "NewsVO vo = egovNewsService.selectNewsDetail(newsVO);" } ]
+          },
+          {
+            "id": "a3", "kind": "activity", "label": "뉴스 등록 화면 표시",
+            "flowRef": "flow:ANY /uss/ion/nws/insertNewsView.do",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 127, "snippet": "@RequestMapping(\"/uss/ion/nws/insertNewsView.do\")" } ]
+          },
+          {
+            "id": "a4", "kind": "activity", "label": "뉴스 등록 요청",
+            "flowRef": "flow:ANY /uss/ion/nws/insertNews.do",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 143, "snippet": "@RequestMapping(\"/uss/ion/nws/insertNews.do\")" } ]
+          },
+          {
+            "id": "d1", "kind": "decision", "label": "입력값 오류 여부",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 144, "snippet": "public String insertNews(final MultipartHttpServletRequest multiRequest, @Valid @ModelAttribute(\"newsVO\") NewsVO newsVO, BindingResult bindingResult, ModelMap model) throws Exception {" } ]
+          },
+          {
+            "id": "a9", "kind": "activity", "label": "등록 화면 재표시",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 143, "snippet": "@RequestMapping(\"/uss/ion/nws/insertNews.do\")" } ]
+          },
+          {
+            "id": "a5", "kind": "activity", "label": "첨부파일 저장",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 159, "snippet": "fvoList = fileUtil.parseFileInf(files, \"NEWS_\", 0, \"\", \"\");" } ]
+          },
+          {
+            "id": "a6", "kind": "activity", "label": "등록자 정보 설정",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 167, "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();" } ]
+          },
+          {
+            "id": "a7", "kind": "activity", "label": "뉴스 정보 등록",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 172, "snippet": "egovNewsService.insertNews(newsVO);" } ]
+          },
+          {
+            "id": "a8", "kind": "activity", "label": "뉴스 수정 화면 표시",
+            "flowRef": "flow:ANY /uss/ion/nws/updateNewsView.do",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 187, "snippet": "model.addAttribute(\"newsVO\", egovNewsService.selectNewsDetail(newsVO));" } ]
+          },
+          {
+            "id": "a10", "kind": "activity", "label": "뉴스 수정 요청",
+            "flowRef": "flow:ANY /uss/ion/nws/updateNews.do",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 203, "snippet": "@RequestMapping(\"/uss/ion/nws/updateNews.do\")" } ]
+          },
+          {
+            "id": "d2", "kind": "decision", "label": "기존 첨부파일 존재 여부",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 219, "snippet": "List<FileVO> fvoList = fileUtil.parseFileInf(files, \"NEWS_\", 0, atchFileId, \"\");" } ]
+          },
+          {
+            "id": "a11", "kind": "activity", "label": "첨부파일 신규 등록",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 220, "snippet": "atchFileId = fileMngService.insertFileInfs(fvoList);" } ]
+          },
+          {
+            "id": "a12", "kind": "activity", "label": "기존 첨부파일 수정",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 228, "snippet": "fileMngService.updateFileInfs(fvoList);" } ]
+          },
+          {
+            "id": "a13", "kind": "activity", "label": "뉴스 정보 수정",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 238, "snippet": "egovNewsService.updateNews(newsVO);" } ]
+          },
+          {
+            "id": "a14", "kind": "activity", "label": "뉴스 삭제",
+            "flowRef": "flow:ANY /uss/ion/nws/deleteNews.do",
+            "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 252, "snippet": "egovNewsService.deleteNews(newsVO);" } ]
+          },
+          { "id": "e1", "kind": "end", "label": "뉴스 목록으로 이동" }
+        ],
+        "edges": [
+          { "from": "s1", "to": "a1" },
+          { "from": "a1", "to": "a2" },
+          { "from": "a1", "to": "a3" },
+          { "from": "a1", "to": "a8" },
+          { "from": "a1", "to": "a14" },
+          { "from": "a2", "to": "e1" },
+          { "from": "a3", "to": "a4" },
+          { "from": "a4", "to": "d1" },
+          { "from": "d1", "to": "a9", "label": "오류 있음" },
+          { "from": "d1", "to": "a5", "label": "오류 없음" },
+          { "from": "a9", "to": "e1" },
+          { "from": "a5", "to": "a6" },
+          { "from": "a6", "to": "a7" },
+          { "from": "a7", "to": "e1" },
+          { "from": "a8", "to": "a10" },
+          { "from": "a10", "to": "d2" },
+          { "from": "d2", "to": "a11", "label": "첨부파일 없음" },
+          { "from": "d2", "to": "a12", "label": "첨부파일 있음" },
+          { "from": "a11", "to": "a13" },
+          { "from": "a12", "to": "a13" },
+          { "from": "a13", "to": "e1" },
+          { "from": "a14", "to": "e1" }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/ion/nws/deleteNews.do",
+      "name": "뉴스 삭제",
+      "summary": {
+        "text": "목록 또는 상세 화면에서 선택한 뉴스 한 건을 삭제한다. 삭제 대상 뉴스 정보를 받아 뉴스 서비스에 삭제를 위임하고, 처리 후에는 뉴스 목록 조회로 되돌아간다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 250, "snippet": "@RequestMapping(\"/uss/ion/nws/deleteNews.do\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 252, "snippet": "egovNewsService.deleteNews(newsVO);" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/nws/insertNews.do",
+      "name": "뉴스 등록",
+      "summary": {
+        "text": "등록 화면에서 입력한 뉴스 제목·내용·출처와 첨부파일을 받아 새 뉴스를 등록한다. 입력값 검증을 먼저 수행하고, 첨부파일이 있으면 공통 파일관리로 저장한 뒤 받은 첨부파일 아이디를 뉴스에 연결하며, 로그인 사용자 정보로 등록자·수정자를 채운 후 저장하고 목록으로 이동한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 143, "snippet": "@RequestMapping(\"/uss/ion/nws/insertNews.do\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 172, "snippet": "egovNewsService.insertNews(newsVO);" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/nws/insertNewsView.do",
+      "name": "뉴스 등록 화면 조회",
+      "summary": {
+        "text": "새 뉴스를 작성하기 위한 빈 등록 화면을 제공한다. 실제 저장은 수행하지 않고 입력 화면만 표시하는 진입 단계이다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 127, "snippet": "@RequestMapping(\"/uss/ion/nws/insertNewsView.do\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 128, "snippet": "public String insertNewsView(@ModelAttribute(\"newsVO\") NewsVO newsVO, ModelMap model) throws Exception {" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/nws/selectNewsDetail.do",
+      "name": "뉴스 상세 조회",
+      "summary": {
+        "text": "목록에서 선택한 뉴스 한 건의 상세 내용을 조회한다. 뉴스 서비스에서 제목·내용·출처·게시일자·첨부파일 정보를 가져와 상세 화면에 전달한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 111, "snippet": "@RequestMapping(\"/uss/ion/nws/selectNewsDetail.do\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 113, "snippet": "NewsVO vo = egovNewsService.selectNewsDetail(newsVO);" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/nws/selectNewsList.do",
+      "name": "뉴스 목록 조회",
+      "summary": {
+        "text": "뉴스 업무의 진입 화면으로, 검색 조건과 페이지 정보에 따라 뉴스 목록과 전체 건수를 조회해 화면에 표시한다. 등록·수정·삭제 처리가 끝난 뒤 되돌아오는 기준 화면이기도 하다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 76, "snippet": "@RequestMapping(value = \"/uss/ion/nws/selectNewsList.do\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 93, "snippet": "List<NewsVO> resultList = egovNewsService.selectNewsList(newsVO);" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 96, "snippet": "int totCnt = egovNewsService.selectNewsListCnt(newsVO);" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/nws/updateNews.do",
+      "name": "뉴스 수정",
+      "summary": {
+        "text": "수정 화면에서 변경한 뉴스 내용과 추가 첨부파일을 받아 기존 뉴스를 갱신한다. 입력값 검증 후 기존 첨부파일 아이디 유무에 따라 파일을 새로 등록하거나 기존 묶음에 이어 붙이고, 로그인 사용자 정보로 최종수정자를 채운 뒤 저장하고 목록으로 이동한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 203, "snippet": "@RequestMapping(\"/uss/ion/nws/updateNews.do\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 238, "snippet": "egovNewsService.updateNews(newsVO);" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/nws/updateNewsView.do",
+      "name": "뉴스 수정 화면 조회",
+      "summary": {
+        "text": "수정 대상 뉴스의 현재 내용을 상세 조회해 수정 화면에 미리 채워 보여준다. 저장은 수행하지 않고 수정 입력을 준비하는 단계이다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 185, "snippet": "@RequestMapping(\"/uss/ion/nws/updateNewsView.do\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 187, "snippet": "model.addAttribute(\"newsVO\", egovNewsService.selectNewsDetail(newsVO));" }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /uss/ion/nws/deleteNews.do:src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java",
+      "name": "뉴스 서비스 - 삭제 처리",
+      "summary": {
+        "text": "뉴스 업무 서비스가 전달받은 뉴스 정보를 기준으로 해당 뉴스 한 건을 삭제한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 7, "snippet": "public interface EgovNewsService {" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 19, "snippet": "void deleteNews(NewsVO newsVO);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 삭제 흐름에서 실제 삭제 업무를 책임지는 서비스 계약이다. 화면·요청 처리와 분리되어, 삭제 대상 뉴스 정보를 받아 삭제 작업만 수행하도록 정의되어 있다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 7, "snippet": "public interface EgovNewsService {" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 19, "snippet": "void deleteNews(NewsVO newsVO);" }
+          ]
+        },
+        "businessLogic": {
+          "text": "삭제는 뉴스 정보 하나를 인자로 받아 반환값 없이 처리되며, 조회·등록·수정과 함께 하나의 뉴스 서비스 계약에 묶여 뉴스 한 건의 생애주기를 담당한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 19, "snippet": "void deleteNews(NewsVO newsVO);" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 15, "snippet": "NewsVO selectNewsDetail(NewsVO newsVO) throws Exception;" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/deleteNews.do:src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java",
+      "name": "뉴스 삭제 요청 접수",
+      "summary": {
+        "text": "뉴스 삭제 요청을 받아 삭제 대상 뉴스 정보를 서비스에 넘기고, 처리 후 뉴스 목록 조회로 이동시킨다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 250, "snippet": "@RequestMapping(\"/uss/ion/nws/deleteNews.do\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 252, "snippet": "egovNewsService.deleteNews(newsVO);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "삭제 화면 요청의 진입점으로, 자체 판단 없이 삭제 대상 뉴스 정보를 뉴스 서비스에 그대로 위임한 뒤 결과 화면 대신 뉴스 목록 조회로 넘긴다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 250, "snippet": "@RequestMapping(\"/uss/ion/nws/deleteNews.do\")" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 254, "snippet": "return \"forward:/uss/ion/nws/selectNewsList.do\";" }
+          ]
+        },
+        "request": {
+          "text": "삭제 대상은 화면에서 넘어온 뉴스 정보 한 건으로 받으며, 별도의 입력 검증이나 권한 확인 절차 없이 곧바로 삭제 처리를 호출한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 251, "snippet": "public String deleteNews(@ModelAttribute(\"newsVO\") NewsVO newsVO) throws Exception {" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 252, "snippet": "egovNewsService.deleteNews(newsVO);" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/insertNews.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보 참조 - 등록",
+      "summary": {
+        "text": "뉴스 등록 시 등록자·수정자 아이디를 채우기 위해 로그인한 사용자의 고유아이디를 담은 사용자 정보를 사용한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 33, "snippet": "public class LoginVO implements Serializable{" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 167, "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 등록 흐름에서 인증된 사용자를 표현하는 데이터 구조로, 뉴스의 최초등록자·최종수정자 아이디를 공급하는 협력 객체 역할을 한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 33, "snippet": "public class LoginVO implements Serializable{" },
+            { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 67, "snippet": "private String uniqId;" }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·이름·이메일 등 사용자 식별 항목을 담으며, 아이디와 이름, 이메일은 빈 값이 아니어야 한다는 검증이 붙어 있다. 뉴스 업무가 실제로 사용하는 값은 사용자 식별용 고유아이디이다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 67, "snippet": "private String uniqId;" },
+            { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 33, "snippet": "public class LoginVO implements Serializable{" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/insertNews.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "공통 파일관리 서비스 - 첨부파일 등록",
+      "summary": {
+        "text": "뉴스에 첨부된 여러 파일의 정보를 일괄 등록하고, 생성된 첨부파일 아이디를 돌려주어 뉴스와 파일을 연결한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java", "line": 21, "snippet": "public interface EgovFileMngService {" },
+          { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java", "line": 46, "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 등록 흐름에서 첨부파일 정보의 영속 처리를 전담하는 공통 서비스이다. 뉴스 업무는 파일 저장 절차를 직접 알지 못하고, 파일 목록을 넘긴 뒤 반환된 첨부파일 아이디만 뉴스에 보관한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java", "line": 46, "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 160, "snippet": "atchFileId = fileMngService.insertFileInfs(fvoList); // 파일이 생성되고나면 생성된 첨부파일 ID를 리턴한다." }
+          ]
+        },
+        "businessLogic": {
+          "text": "여러 파일 정보를 한 번에 등록하면서 이들을 하나의 첨부파일 아이디로 묶어 반환하는 것이 핵심 규칙이며, 같은 계약 안에서 목록 조회·수정·삭제도 함께 제공한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java", "line": 46, "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;" },
+            { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java", "line": 54, "snippet": "public void updateFileInfs(List<FileVO> fvoList) throws Exception;" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/insertNews.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "name": "첨부파일 업로드 처리 - 등록",
+      "summary": {
+        "text": "업로드된 파일들을 지정된 저장 경로에 저장하고, 확장자·크기·저장경로 등 파일 정보 목록을 만들어 돌려준다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java", "line": 60, "snippet": "@Component(\"EgovFileMngUtil\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 159, "snippet": "fvoList = fileUtil.parseFileInf(files, \"NEWS_\", 0, \"\", \"\");" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 등록 흐름에서 실제 업로드 파일을 물리 저장소에 옮기고, 후속 등록 처리에 필요한 파일 정보 목록으로 변환하는 역할을 맡는다. 뉴스 첨부파일은 접두어를 붙인 이름 규칙으로 저장된다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java", "line": 60, "snippet": "@Component(\"EgovFileMngUtil\")" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 159, "snippet": "fvoList = fileUtil.parseFileInf(files, \"NEWS_\", 0, \"\", \"\");" }
+          ]
+        },
+        "businessLogic": {
+          "text": "저장 경로가 지정되지 않으면 기본 저장 경로 설정을 사용하고, 첨부파일 아이디가 없으면 새 아이디를 채번한다. 저장 폴더가 없으면 생성하며, 원본 파일명이 비어 있는 항목은 건너뛴다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java", "line": 76, "snippet": "public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam," },
+            { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java", "line": 60, "snippet": "@Component(\"EgovFileMngUtil\")" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/insertNews.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 조회 - 등록",
+      "summary": {
+        "text": "현재 인증된 사용자 정보를 가져와 뉴스 등록자 정보를 채우는 데 사용한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 25, "snippet": "public class EgovUserDetailsHelper {" },
+          { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 41, "snippet": "public static Object getAuthenticatedUser() {" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 등록 흐름에서 인증 업무와의 연결 창구 역할을 하는 협력 객체로, 인증된 사용자 정보를 뉴스 업무에 공급한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 25, "snippet": "public class EgovUserDetailsHelper {" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 167, "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();" }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 객체, 사용자 권한 목록, 인증 여부의 세 가지 정보를 제공하며, 뉴스 등록에서는 이 중 인증된 사용자 객체를 사용한다. 사용자 정보가 없을 수 있으므로 호출 측에서 빈 값 처리를 한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 41, "snippet": "public static Object getAuthenticatedUser() {" },
+            { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 58, "snippet": "public static Boolean isAuthenticated() {" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/insertNews.do:src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java",
+      "name": "뉴스 서비스 - 등록 처리",
+      "summary": {
+        "text": "첨부파일 아이디와 등록자 정보까지 채워진 뉴스 정보를 받아 새 뉴스를 저장한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 13, "snippet": "void insertNews(NewsVO newsVO) throws FdlException;" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 172, "snippet": "egovNewsService.insertNews(newsVO);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 등록 흐름의 마지막 업무 처리 단계로, 화면 처리에서 완성된 뉴스 정보를 받아 실제 등록을 조율한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 7, "snippet": "public interface EgovNewsService {" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 13, "snippet": "void insertNews(NewsVO newsVO) throws FdlException;" }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록 처리 과정에서 뉴스 아이디 채번이 이루어지므로 채번 실패 상황을 별도의 예외로 알리도록 계약되어 있다는 점이 조회·삭제 계약과 다른 특징이다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 13, "snippet": "void insertNews(NewsVO newsVO) throws FdlException;" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 17, "snippet": "void updateNews(NewsVO newsVO);" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/insertNews.do:src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java",
+      "name": "뉴스 정보 구성 - 등록",
+      "summary": {
+        "text": "화면에서 입력한 제목·내용·출처와 첨부파일 아이디, 등록자 정보를 담아 저장 대상 뉴스 정보를 구성한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 30, "snippet": "public class NewsVO extends ComDefaultVO {" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 40, "snippet": "private String newsSj;" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 등록 흐름 전체를 관통하는 데이터 구조로, 화면 입력값을 담는 동시에 검증 대상이 되고, 첨부파일 아이디와 등록자 정보가 덧붙여진 뒤 서비스로 전달된다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 30, "snippet": "public class NewsVO extends ComDefaultVO {" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 172, "snippet": "egovNewsService.insertNews(newsVO);" }
+          ]
+        },
+        "dataShape": {
+          "text": "뉴스 ID를 식별자로, 뉴스제목·뉴스내용·뉴스출처·게시일자·첨부파일ID와 등록·수정 이력 항목을 가진다. 뉴스제목은 필수이며 100자를 넘을 수 없고, 뉴스내용도 필수 입력 항목이다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 35, "snippet": "private String newsId;" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 39, "snippet": "@Size(max=100)" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 45, "snippet": "private String newsCn;" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/insertNews.do:src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java",
+      "name": "뉴스 등록 요청 접수",
+      "summary": {
+        "text": "뉴스 등록 요청을 받아 입력값을 검증하고, 첨부파일 저장과 등록자 정보 설정을 거쳐 뉴스 등록을 수행한 뒤 목록으로 이동시킨다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 143, "snippet": "@RequestMapping(\"/uss/ion/nws/insertNews.do\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 172, "snippet": "egovNewsService.insertNews(newsVO);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "등록 요청의 진입점으로서 입력값 검증, 첨부파일 저장 위임, 등록자 정보 채우기, 뉴스 서비스 호출까지의 순서를 조율하고, 처리 후 뉴스 목록 조회로 넘긴다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 143, "snippet": "@RequestMapping(\"/uss/ion/nws/insertNews.do\")" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 254, "snippet": "return \"forward:/uss/ion/nws/selectNewsList.do\";" }
+          ]
+        },
+        "request": {
+          "text": "파일 업로드가 포함된 요청과 뉴스 입력 정보를 함께 받고 검증 결과를 확인한다. 첨부파일은 지정된 업로드 항목에서 꺼내 저장하며, 등록자 아이디는 요청 파라미터가 아니라 인증된 사용자 정보에서 가져온다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 144, "snippet": "public String insertNews(final MultipartHttpServletRequest multiRequest, @Valid @ModelAttribute(\"newsVO\") NewsVO newsVO, BindingResult bindingResult, ModelMap model) throws Exception {" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 159, "snippet": "fvoList = fileUtil.parseFileInf(files, \"NEWS_\", 0, \"\", \"\");" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 167, "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/insertNews.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 빈 값 처리 - 등록",
+      "summary": {
+        "text": "로그인 사용자에게서 꺼낸 등록자 아이디를 표준화된 방식으로 빈 값 처리하는 공통 문자열 유틸리티를 사용한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 43, "snippet": "public class EgovStringUtil {" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 167, "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 등록 흐름에서 값이 없을 때의 표기를 통일하기 위해 쓰이는 공통 협력 객체로, 등록자 아이디를 뉴스 정보에 담기 전 문자열로 정규화한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 43, "snippet": "public class EgovStringUtil {" },
+            { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 47, "snippet": "public static final String EMPTY = \"\";" }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열을 공통 상수로 정의해 값 없음의 표현을 하나로 유지하며, 지정 길이 초과 문자열 자르기 같은 문자열 가공 규칙도 함께 제공한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 47, "snippet": "public static final String EMPTY = \"\";" },
+            { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 95, "snippet": "public static String cutString(String source, int slength) {" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/insertNewsView.do:src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java",
+      "name": "뉴스 등록 화면 요청 접수",
+      "summary": {
+        "text": "새 뉴스를 작성할 빈 등록 화면 요청을 받아 입력 화면을 제공한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 127, "snippet": "@RequestMapping(\"/uss/ion/nws/insertNewsView.do\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 128, "snippet": "public String insertNewsView(@ModelAttribute(\"newsVO\") NewsVO newsVO, ModelMap model) throws Exception {" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "등록 업무의 시작 화면을 여는 진입점으로, 저장이나 파일 처리 없이 입력 화면만 내려주고 실제 저장은 별도의 등록 요청에서 처리한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 127, "snippet": "@RequestMapping(\"/uss/ion/nws/insertNewsView.do\")" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 143, "snippet": "@RequestMapping(\"/uss/ion/nws/insertNews.do\")" }
+          ]
+        },
+        "request": {
+          "text": "빈 뉴스 정보와 화면 전달용 모델을 받아 등록 화면 구성을 준비하며, 별도의 입력값 검증이나 권한 확인 절차는 두지 않는다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 128, "snippet": "public String insertNewsView(@ModelAttribute(\"newsVO\") NewsVO newsVO, ModelMap model) throws Exception {" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 127, "snippet": "@RequestMapping(\"/uss/ion/nws/insertNewsView.do\")" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/selectNewsDetail.do:src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java",
+      "name": "뉴스 서비스 - 상세 조회",
+      "summary": {
+        "text": "요청된 뉴스 한 건의 상세 내용을 조회해 화면에 전달할 뉴스 정보를 돌려준다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 15, "snippet": "NewsVO selectNewsDetail(NewsVO newsVO) throws Exception;" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 113, "snippet": "NewsVO vo = egovNewsService.selectNewsDetail(newsVO);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "상세 조회 흐름에서 뉴스 한 건의 내용을 가져오는 업무를 맡으며, 상세 화면뿐 아니라 수정 화면의 초기값 조회에도 재사용된다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 15, "snippet": "NewsVO selectNewsDetail(NewsVO newsVO) throws Exception;" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 187, "snippet": "model.addAttribute(\"newsVO\", egovNewsService.selectNewsDetail(newsVO));" }
+          ]
+        },
+        "businessLogic": {
+          "text": "조회 조건이 담긴 뉴스 정보를 받아 뉴스 한 건을 반환하는 단순 조회 계약이며, 목록 조회 및 건수 조회와 함께 뉴스 조회 업무를 이룬다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 15, "snippet": "NewsVO selectNewsDetail(NewsVO newsVO) throws Exception;" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 9, "snippet": "List<NewsVO> selectNewsList(NewsVO newsVO);" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/selectNewsDetail.do:src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java",
+      "name": "뉴스 상세 조회 요청 접수",
+      "summary": {
+        "text": "뉴스 상세 조회 요청을 받아 서비스에서 뉴스 한 건을 조회하고 상세 화면에 전달한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 111, "snippet": "@RequestMapping(\"/uss/ion/nws/selectNewsDetail.do\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 113, "snippet": "NewsVO vo = egovNewsService.selectNewsDetail(newsVO);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "상세 조회 요청의 진입점으로, 조회 조건을 뉴스 서비스에 위임하고 돌려받은 뉴스 한 건을 화면에 넘기는 중계 역할만 수행한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 111, "snippet": "@RequestMapping(\"/uss/ion/nws/selectNewsDetail.do\")" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 113, "snippet": "NewsVO vo = egovNewsService.selectNewsDetail(newsVO);" }
+          ]
+        },
+        "request": {
+          "text": "조회 대상 뉴스 정보와 화면 전달용 모델을 받아 처리하며, 등록·수정과 달리 입력값 검증이나 파일 처리 없이 조회만 수행한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 112, "snippet": "public String selectNewsDetail(@ModelAttribute(\"newsVO\") NewsVO newsVO, ModelMap model) throws Exception {" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 111, "snippet": "@RequestMapping(\"/uss/ion/nws/selectNewsDetail.do\")" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/selectNewsList.do:src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java",
+      "name": "뉴스 서비스 - 목록 조회",
+      "summary": {
+        "text": "검색 조건에 맞는 뉴스 목록과 전체 건수를 조회해 목록 화면 구성에 필요한 자료를 제공한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 9, "snippet": "List<NewsVO> selectNewsList(NewsVO newsVO);" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 11, "snippet": "int selectNewsListCnt(NewsVO newsVO);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "목록 조회 흐름에서 화면에 뿌릴 뉴스 목록과 페이지 표시에 필요한 전체 건수를 함께 책임진다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 9, "snippet": "List<NewsVO> selectNewsList(NewsVO newsVO);" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 93, "snippet": "List<NewsVO> resultList = egovNewsService.selectNewsList(newsVO);" }
+          ]
+        },
+        "businessLogic": {
+          "text": "목록과 건수를 별도의 조회로 나누어 제공하는 것이 규칙이며, 두 조회 모두 같은 검색 조건 정보를 입력으로 받아 목록 표시와 페이지 계산이 동일한 기준을 따르게 한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 11, "snippet": "int selectNewsListCnt(NewsVO newsVO);" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 96, "snippet": "int totCnt = egovNewsService.selectNewsListCnt(newsVO);" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/selectNewsList.do:src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java",
+      "name": "뉴스 조회 조건 구성",
+      "summary": {
+        "text": "목록 조회에 사용할 검색 조건과 페이지 정보를 담고, 조회 결과 뉴스 항목을 표현하는 데이터 구조로 쓰인다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 30, "snippet": "public class NewsVO extends ComDefaultVO {" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 93, "snippet": "List<NewsVO> resultList = egovNewsService.selectNewsList(newsVO);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "목록 조회 흐름에서 입력으로는 검색 조건을, 출력으로는 목록 각 행의 뉴스 정보를 담는 양방향 데이터 구조 역할을 한다. 공통 조회 조건 구조를 확장해 검색·페이지 항목을 물려받는다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 30, "snippet": "public class NewsVO extends ComDefaultVO {" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 9, "snippet": "List<NewsVO> selectNewsList(NewsVO newsVO);" }
+          ]
+        },
+        "dataShape": {
+          "text": "목록 행 표시에 필요한 뉴스 ID·뉴스제목·게시일자와 첨부파일ID 등을 가지며, 제목은 100자 제한과 필수 규칙이 걸려 있어 조회 결과 표기도 이 범위 안에서 이루어진다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 35, "snippet": "private String newsId;" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 39, "snippet": "@Size(max=100)" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 40, "snippet": "private String newsSj;" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/selectNewsList.do:src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java",
+      "name": "뉴스 목록 조회 요청 접수",
+      "summary": {
+        "text": "뉴스 목록 화면 요청을 받아 검색 조건에 따른 목록과 전체 건수를 조회하고 화면에 전달한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 76, "snippet": "@RequestMapping(value = \"/uss/ion/nws/selectNewsList.do\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 93, "snippet": "List<NewsVO> resultList = egovNewsService.selectNewsList(newsVO);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 업무의 기준 화면을 담당하는 진입점으로, 검색 조건을 서비스에 넘겨 목록과 건수를 받아 화면에 전달한다. 등록·수정·삭제 처리 후 되돌아오는 목적지이기도 하다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 76, "snippet": "@RequestMapping(value = \"/uss/ion/nws/selectNewsList.do\")" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 254, "snippet": "return \"forward:/uss/ion/nws/selectNewsList.do\";" }
+          ]
+        },
+        "request": {
+          "text": "검색 조건과 페이지 정보가 담긴 뉴스 정보를 받아 목록 조회와 건수 조회를 차례로 수행하며, 별도의 입력 검증이나 파일 처리는 하지 않는다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 77, "snippet": "public String selectNewsList(@ModelAttribute(\"newsVO\") NewsVO newsVO, ModelMap model) throws Exception {" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 96, "snippet": "int totCnt = egovNewsService.selectNewsListCnt(newsVO);" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/updateNews.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보 참조 - 수정",
+      "summary": {
+        "text": "뉴스 수정 시 최종수정자 아이디를 채우기 위해 로그인한 사용자의 고유아이디를 담은 사용자 정보를 사용한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 33, "snippet": "public class LoginVO implements Serializable{" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 234, "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 수정 흐름에서 인증된 사용자를 표현하는 데이터 구조로, 수정 이력에 남길 최종수정자 아이디를 공급한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 33, "snippet": "public class LoginVO implements Serializable{" },
+            { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 67, "snippet": "private String uniqId;" }
+          ]
+        },
+        "dataShape": {
+          "text": "사용자 아이디·이름·이메일 등 인증 사용자 항목을 담으며, 뉴스 수정에서는 그중 사용자 식별용 고유아이디만 사용한다. 사용자 정보가 없을 수 있어 호출 측에서 빈 값으로 대체한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 67, "snippet": "private String uniqId;" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 234, "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/updateNews.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "공통 파일관리 서비스 - 첨부파일 수정",
+      "summary": {
+        "text": "수정 흐름에서 첨부파일을 새로 등록하거나 기존 첨부파일 묶음의 최대 파일 연번을 확인해 파일 정보를 갱신한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java", "line": 54, "snippet": "public void updateFileInfs(List<FileVO> fvoList) throws Exception;" },
+          { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java", "line": 88, "snippet": "public int getMaxFileSN(FileVO fvo) throws Exception;" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 수정 흐름에서 첨부파일 영속 처리를 전담하며, 기존 첨부파일 아이디가 있으면 현재 파일 연번의 최대값을 알려주어 이어붙이기가 가능하게 하고, 없으면 새 첨부파일 묶음을 만든다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java", "line": 88, "snippet": "public int getMaxFileSN(FileVO fvo) throws Exception;" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 228, "snippet": "fileMngService.updateFileInfs(fvoList);" }
+          ]
+        },
+        "businessLogic": {
+          "text": "첨부파일 묶음 안에서 파일 연번이 중복되지 않도록 최대 연번을 구해 다음 번호부터 붙이는 것이 핵심 규칙이며, 신규 등록과 수정이 별도의 계약으로 나뉘어 있다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java", "line": 88, "snippet": "public int getMaxFileSN(FileVO fvo) throws Exception;" },
+            { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java", "line": 46, "snippet": "public String insertFileInfs(List<FileVO> fvoList) throws Exception;" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/updateNews.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "name": "첨부파일 업로드 처리 - 수정",
+      "summary": {
+        "text": "수정 시 추가로 업로드된 파일들을 저장하고, 기존 첨부파일 아이디와 이어지는 파일 정보 목록을 만들어 돌려준다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java", "line": 60, "snippet": "@Component(\"EgovFileMngUtil\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 227, "snippet": "List<FileVO> fvoList = fileUtil.parseFileInf(files, \"NEWS_\", fileKeyParam, atchFileId, \"\");" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 수정 흐름에서 새로 올라온 파일을 저장소에 옮기고, 기존 첨부파일 아이디와 이어지는 연번을 부여한 파일 정보 목록을 만들어 파일관리 서비스로 넘길 수 있게 한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java", "line": 60, "snippet": "@Component(\"EgovFileMngUtil\")" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 227, "snippet": "List<FileVO> fvoList = fileUtil.parseFileInf(files, \"NEWS_\", fileKeyParam, atchFileId, \"\");" }
+          ]
+        },
+        "businessLogic": {
+          "text": "전달받은 첨부파일 아이디가 있으면 그 아이디를 그대로 사용하고 없을 때만 새로 채번하며, 저장 경로가 지정되지 않으면 기본 저장 경로 설정을 따른다. 저장 폴더가 없으면 만들고 원본 파일명이 없는 항목은 저장하지 않는다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java", "line": 76, "snippet": "public List<FileVO> parseFileInf(Map<String, MultipartFile> files, String keyStr, int fileKeyParam," },
+            { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java", "line": 60, "snippet": "@Component(\"EgovFileMngUtil\")" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/updateNews.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "name": "첨부파일 정보 구성 - 수정",
+      "summary": {
+        "text": "기존 첨부파일 아이디를 담아 현재 등록된 파일의 최대 연번을 조회하고, 저장된 파일 정보를 표현하는 데 사용된다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java", "line": 26, "snippet": "public String atchFileId = \"\";" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 228, "snippet": "fileMngService.updateFileInfs(fvoList);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 수정 흐름에서 첨부파일 한 건을 표현하는 데이터 구조로, 조회 조건(첨부파일 아이디)을 담는 용도와 저장 대상 파일 정보를 담는 용도로 함께 쓰인다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java", "line": 26, "snippet": "public String atchFileId = \"\";" },
+            { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java", "line": 88, "snippet": "public int getMaxFileSN(FileVO fvo) throws Exception;" }
+          ]
+        },
+        "dataShape": {
+          "text": "첨부파일 아이디로 묶이고 파일연번으로 구분되며, 원파일명과 저장파일명, 파일저장경로, 파일크기, 확장자를 가진다. 같은 첨부파일 아이디 아래 여러 파일이 연번으로 이어진다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java", "line": 26, "snippet": "public String atchFileId = \"\";" },
+            { "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java", "line": 54, "snippet": "public String orignlFileNm = \"\";" },
+            { "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java", "line": 58, "snippet": "public String streFileNm = \"\";" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/updateNews.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 조회 - 수정",
+      "summary": {
+        "text": "현재 인증된 사용자 정보를 가져와 뉴스의 최종수정자 정보를 채우는 데 사용한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 41, "snippet": "public static Object getAuthenticatedUser() {" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 234, "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 수정 흐름에서 인증 업무와의 연결 창구 역할을 하며, 수정 이력에 남길 사용자 정보를 뉴스 업무에 공급한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 25, "snippet": "public class EgovUserDetailsHelper {" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 234, "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();" }
+          ]
+        },
+        "dataShape": {
+          "text": "인증된 사용자 객체, 사용자 권한 목록, 인증 여부를 제공하며, 뉴스 수정에서는 인증된 사용자 객체만 사용한다. 인증 정보가 없는 경우를 고려해 호출 측에서 빈 값 처리를 한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 41, "snippet": "public static Object getAuthenticatedUser() {" },
+            { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 58, "snippet": "public static Boolean isAuthenticated() {" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/updateNews.do:src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java",
+      "name": "뉴스 정보 구성 - 수정",
+      "summary": {
+        "text": "수정 화면에서 변경한 제목·내용·출처와 첨부파일 아이디, 최종수정자 정보를 담아 갱신 대상 뉴스 정보를 구성한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 30, "snippet": "public class NewsVO extends ComDefaultVO {" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 238, "snippet": "egovNewsService.updateNews(newsVO);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 수정 흐름의 중심 데이터 구조로, 화면 입력값을 담아 검증을 받고 첨부파일 아이디와 최종수정자 정보가 채워진 뒤 서비스로 전달된다. 기존 첨부파일 아이디의 유무를 판단하는 근거도 이 구조에서 나온다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 30, "snippet": "public class NewsVO extends ComDefaultVO {" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 219, "snippet": "List<FileVO> fvoList = fileUtil.parseFileInf(files, \"NEWS_\", 0, atchFileId, \"\");" }
+          ]
+        },
+        "dataShape": {
+          "text": "뉴스 ID를 식별자로 하고 뉴스제목·뉴스내용·뉴스출처·게시일자·첨부파일ID와 수정 이력 항목을 가진다. 수정 시에도 제목 필수·100자 제한과 내용 필수 규칙이 동일하게 적용된다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 35, "snippet": "private String newsId;" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 39, "snippet": "@Size(max=100)" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/NewsVO.java", "line": 45, "snippet": "private String newsCn;" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/updateNews.do:src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java",
+      "name": "뉴스 수정 요청 접수",
+      "summary": {
+        "text": "뉴스 수정 요청을 받아 입력값을 검증하고, 첨부파일 신규/기존 여부에 따라 파일을 처리한 뒤 최종수정자 정보를 채워 수정을 수행하고 목록으로 이동시킨다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 203, "snippet": "@RequestMapping(\"/uss/ion/nws/updateNews.do\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 238, "snippet": "egovNewsService.updateNews(newsVO);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "수정 요청의 진입점으로 입력값 검증, 첨부파일 분기 처리, 최종수정자 정보 설정, 뉴스 서비스 호출의 순서를 조율하며, 처리 후 뉴스 목록 조회로 넘긴다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 203, "snippet": "@RequestMapping(\"/uss/ion/nws/updateNews.do\")" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 254, "snippet": "return \"forward:/uss/ion/nws/selectNewsList.do\";" }
+          ]
+        },
+        "request": {
+          "text": "파일 업로드가 포함된 요청과 수정 대상 뉴스 정보를 함께 받아 검증 결과를 확인한다. 기존 첨부파일 아이디가 비어 있으면 파일을 새로 등록하고, 있으면 기존 묶음에 이어 붙이며, 최종수정자 아이디는 요청값이 아닌 인증 사용자 정보에서 가져온다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 204, "snippet": "public String updateNewsInfo(final MultipartHttpServletRequest multiRequest, @Valid @ModelAttribute(\"newsVO\") NewsVO newsVO, BindingResult bindingResult, ModelMap model) throws Exception {" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 220, "snippet": "atchFileId = fileMngService.insertFileInfs(fvoList);" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 234, "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/updateNews.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 빈 값 처리 - 수정",
+      "summary": {
+        "text": "로그인 사용자에게서 꺼낸 최종수정자 아이디를 표준화된 방식으로 빈 값 처리하는 공통 문자열 유틸리티를 사용한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 43, "snippet": "public class EgovStringUtil {" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 234, "snippet": "LoginVO loginVO = (LoginVO) EgovUserDetailsHelper.getAuthenticatedUser();" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "뉴스 수정 흐름에서 값이 없을 때의 표기를 통일하기 위해 쓰이는 공통 협력 객체로, 최종수정자 아이디를 뉴스 정보에 담기 전 문자열로 정규화한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 43, "snippet": "public class EgovStringUtil {" },
+            { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 47, "snippet": "public static final String EMPTY = \"\";" }
+          ]
+        },
+        "dataShape": {
+          "text": "빈 문자열을 공통 상수로 정의해 값 없음 표현을 하나로 유지하며, 길이 초과 문자열 자르기 등 문자열 가공 규칙을 함께 제공한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 47, "snippet": "public static final String EMPTY = \"\";" },
+            { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 95, "snippet": "public static String cutString(String source, int slength) {" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/updateNewsView.do:src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java",
+      "name": "뉴스 서비스 - 수정 화면 초기값 조회",
+      "summary": {
+        "text": "수정 대상 뉴스의 현재 내용을 상세 조회해 수정 화면의 초기값으로 제공한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 15, "snippet": "NewsVO selectNewsDetail(NewsVO newsVO) throws Exception;" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 187, "snippet": "model.addAttribute(\"newsVO\", egovNewsService.selectNewsDetail(newsVO));" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "수정 화면 조회 흐름에서 기존 뉴스 내용을 가져오는 업무를 맡으며, 상세 조회 계약을 그대로 재사용해 상세 화면과 수정 화면이 같은 내용을 보게 한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 15, "snippet": "NewsVO selectNewsDetail(NewsVO newsVO) throws Exception;" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 113, "snippet": "NewsVO vo = egovNewsService.selectNewsDetail(newsVO);" }
+          ]
+        },
+        "businessLogic": {
+          "text": "이 단계는 조회만 수행하고 어떤 값도 변경하지 않으며, 실제 갱신은 별도의 수정 계약에서 이루어진다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 15, "snippet": "NewsVO selectNewsDetail(NewsVO newsVO) throws Exception;" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/service/EgovNewsService.java", "line": 17, "snippet": "void updateNews(NewsVO newsVO);" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/nws/updateNewsView.do:src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java",
+      "name": "뉴스 수정 화면 요청 접수",
+      "summary": {
+        "text": "뉴스 수정 화면 요청을 받아 기존 뉴스 내용을 조회하고 수정 화면에 미리 채워 전달한다.",
+        "citations": [
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 185, "snippet": "@RequestMapping(\"/uss/ion/nws/updateNewsView.do\")" },
+          { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 187, "snippet": "model.addAttribute(\"newsVO\", egovNewsService.selectNewsDetail(newsVO));" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "수정 업무의 시작 화면을 여는 진입점으로, 기존 내용을 조회해 화면에 넘길 뿐 저장은 하지 않으며 실제 갱신은 별도의 수정 요청에서 처리한다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 185, "snippet": "@RequestMapping(\"/uss/ion/nws/updateNewsView.do\")" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 203, "snippet": "@RequestMapping(\"/uss/ion/nws/updateNews.do\")" }
+          ]
+        },
+        "request": {
+          "text": "수정 대상 뉴스 정보와 화면 전달용 모델을 받아 상세 조회 결과를 화면 항목으로 담아주며, 입력값 검증이나 파일 처리는 수행하지 않는다.",
+          "citations": [
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 186, "snippet": "public String updateNewsView(@ModelAttribute(\"newsVO\") NewsVO newsVO, ModelMap model) throws Exception {" },
+            { "filePath": "src/main/java/egovframework/com/uss/ion/nws/web/EgovNewsController.java", "line": 187, "snippet": "model.addAttribute(\"newsVO\", egovNewsService.selectNewsDetail(newsVO));" }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,178 @@
+{
+  "domainId": "domain:sym.log.lgm",
+  "files": [
+    {
+      "className": "EgovSysLogService",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java — java 파일",
+        "tags": []
+      },
+      "line": 22,
+      "relPath": "src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java",
+      "slice": {
+        "endLine": 55,
+        "startLine": 12,
+        "text": " *    2009. 3. 11.  이삼섭      최초생성\n *    2011. 7. 01.  이기하      패키지 분리(sym.log -> sym.log.lgm)\n *\n * @author 공통 서비스 개발팀 이삼섭\n * @since 2009. 3. 11.\n * @version\n * @see\n *\n */\n\npublic interface EgovSysLogService {\n\t\n\t/**\n\t * 시스템 로그정보를 생성한다.\n\t *\n\t * @param SysLog\n\t */\n\tpublic void logInsertSysLog(SysLog sysLog) throws Exception;\n\n\t/**\n\t * 시스템 로그정보를 요약한다.\n\t *\n\t * @param\n\t */\n\tpublic void logInsertSysLogSummary() throws Exception;\n\t\n\t/**\n\t * 시스템 로그정보 목록을 조회한다.\n\t *\n\t * @param SysLog\n\t */\n\tpublic Map<String, Object> selectSysLogInf(SysLog sysLog) throws Exception;\n\n\t/**\n\t * 시스템로그 상세정보를 조회한다.\n\t *\n\t * @param sysLog\n\t * @return sysLog\n\t * @throws Exception\n\t */\n\tpublic SysLog selectSysLog(SysLog sysLog) throws Exception;\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "SysLog",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java",
+      "slice": {
+        "endLine": 94,
+        "startLine": 15,
+        "text": " *    2011. 7. 01.     이기하      패키지 분리(sym.log -> sym.log.lgm)\n *    2011.09.14       서준식      화면에 검색일자를 표시하기위한 멤버변수 추가.\n *    2017.09.19       이정은      검색시작일_화면용, 검색종료일_화면용 삭제\n * @author 공통 서비스 개발팀 이삼섭\n * @since 2009. 3. 11.\n * @version\n * @see\n *\n */\n\npublic class SysLog implements Serializable{\n\n\n\tprivate static final long serialVersionUID = 540569951549295059L;\n\t\n\t/**\n\t * 에러횟수\n\t */\n\tprivate int errorCo = 0;\n\t/**\n\t * 에러코드\n\t */\n\tprivate String errorCode = \"\";\n\t/**\n\t * 에러코드 명\n\t */\n\tprivate String errorCodeNm = \"\";\n\t/**\n\t * 에러구분\n\t */\n\tprivate String errorSe = \"\";\n\t/**\n\t * 기관코드\n\t */\n\tprivate String insttCode = \"\";\n\t/**\n\t * 기관코드 명\n\t */\n\tprivate String insttCodeNm = \"\";\n\t/**\n\t * 업무구분코드\n\t */\n\tprivate String jobSeCode = \"\";\n\n\t/**\n\t * 업무구분코드명\n\t */\n\tprivate String jobSeCodeNm = \"\";\n\t/**\n\t * 메서드명\n\t */\n\tprivate String methodNm = \"\";\n\t/**\n\t * 발생일자\n\t */\n\tprivate String occrrncDe = \"\";\n\t/**\n\t * 처리횟수\n\t */\n\tprivate int processCo = 0;\n\t/**\n\t * 처리구분코드\n\t */\n\tprivate String processSeCode = \"\";\n\t/**\n\t * 처리구분코드명\n\t */\n\tprivate String processSeCodeNm = \"\";\n\t/**\n\t * 처리시간\n\t */\n\tprivate String processTime = \"\";\n\t/**\n\t * 요청아이디\n\t */\n\tprivate String requstId = \"\";\n\t/**\n\t * 요청자아이디\n\t */\n\tprivate String rqesterId = \"\";",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovSysLogController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java — java 파일",
+        "tags": []
+      },
+      "line": 97,
+      "relPath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+      "slice": {
+        "endLine": 107,
+        "startLine": 87,
+        "text": "\t}\n\n\t/**\n\t * 시스템 로그 상세 조회\n\t *\n\t * @param sysLog\n\t * @param model\n\t * @return sym/log/lgm/EgovSysLogInqire\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/sym/log/lgm/SelectSysLogDetail.do\")\n\tpublic String selectSysLog(@ModelAttribute(\"searchVO\") SysLog sysLog, @RequestParam(\"requstId\") String requstId,\n\t\t\tModelMap model) throws Exception {\n\n\t\tsysLog.setRequstId(requstId.trim());\n\n\t\tSysLog vo = sysLogService.selectSysLog(sysLog);\n\t\tmodel.addAttribute(\"result\", vo);\n\t\treturn \"egovframework/com/sym/log/lgm/EgovSysLogDetail\";\n\t}\n}",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovSysLogController#selectSysLog",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+      "flowId": "flow:ANY /sym/log/lgm/SelectSysLogDetail.do",
+      "line": 97,
+      "stepIds": [
+        "step:ANY /sym/log/lgm/SelectSysLogDetail.do:src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+        "step:ANY /sym/log/lgm/SelectSysLogDetail.do:src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java",
+        "step:ANY /sym/log/lgm/SelectSysLogDetail.do:src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovSysLogController#selectSysLogInf",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+      "flowId": "flow:ANY /sym/log/lgm/SelectSysLogList.do",
+      "line": 58,
+      "stepIds": [
+        "step:ANY /sym/log/lgm/SelectSysLogList.do:src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+        "step:ANY /sym/log/lgm/SelectSysLogList.do:src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java",
+        "step:ANY /sym/log/lgm/SelectSysLogList.do:src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "sym.log.lgm",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java",
+      "stepId": "step:ANY /sym/log/lgm/SelectSysLogDetail.do:src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java",
+      "stepId": "step:ANY /sym/log/lgm/SelectSysLogDetail.do:src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+      "stepId": "step:ANY /sym/log/lgm/SelectSysLogDetail.do:src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java",
+      "stepId": "step:ANY /sym/log/lgm/SelectSysLogList.do:src/main/java/egovframework/com/sym/log/lgm/service/EgovSysLogService.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java",
+      "stepId": "step:ANY /sym/log/lgm/SelectSysLogList.do:src/main/java/egovframework/com/sym/log/lgm/service/SysLog.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java",
+      "stepId": "step:ANY /sym/log/lgm/SelectSysLogList.do:src/main/java/egovframework/com/sym/log/lgm/web/EgovSysLogController.java"
+    }
+  ]
+}

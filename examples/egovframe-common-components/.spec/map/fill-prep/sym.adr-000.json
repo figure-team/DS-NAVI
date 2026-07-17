@@ -1,0 +1,248 @@
+{
+  "chunkId": "sym.adr-000",
+  "domainId": "domain:sym.adr",
+  "domainName": "",
+  "files": [
+    {
+      "className": "EgovWebUtil",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/cmm/EgovWebUtil.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "slice": {
+        "endLine": 94,
+        "startLine": 15,
+        "text": " *\t2017-02-07   이정은      시큐어코딩(ES) - 시큐어코딩 경로 조작 및 자원 삽입[CWE-22, CWE-23, CWE-95, CWE-99]\n *  2018.08.17   신용호      filePathBlackList 수정\n *  2018.10.10   신용호      . => \\\\.으로 수정\n *  2022.05.10   정진오      clearXSS() 메소드 추가\n *  2022.06.09   김장하      NSR 보안조치 (removeOSCmdRisk 함수에 윈도우 다중 명령 실행 키워드 추가)\n *  2023.08.10   신용호      removeLDAPInjectionRisk() 오류 수정\n *  2024.12.04   신용호      filePathBlackList() basePath 추가\n * </pre>\n */\n\npublic class EgovWebUtil {\n\tpublic static String clearXSSMinimum(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\"\", \"&#34;\");\n\t\treturnValue = returnValue.replaceAll(\"\\'\", \"&#39;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSSMaximum(String value) {\n\t\tString returnValue = value;\n\t\treturnValue = clearXSSMinimum(returnValue);\n\n\t\treturnValue = returnValue.replace(\"%00\", \"\");\n\n\t\treturnValue = returnValue.replaceAll(\"%\", \"&#37;\");\n\n\t\t// \\\\. => .\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\\\\\\\\\", \"\"); // ..\\\n\t\treturnValue = returnValue.replaceAll(\"\\\\./\", \"\"); // ./\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSS(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3C\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3E\", \"&gt;\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String filePathBlackList(String value) {\n\t\tString returnValue = value;\n\t\tif (returnValue == null || returnValue.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\t/**\n\t * 파일경로 보안취약점 조치\n\t * # 주의사항\n\t * 1. basePath는 반드시 지정해야 한다.\n\t * 2. basePath는 ROOT Path \"/\" 사용 금지 한다.",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovAdressCntcController",
+      "kgHint": {
+        "summary": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java — java 파일",
+        "tags": []
+      },
+      "line": 43,
+      "relPath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+      "slice": {
+        "endLine": 112,
+        "startLine": 33,
+        "text": "public class EgovAdressCntcController {\n\n\t/**\n\t * 도로명주소 안내시스템에서 제공하는 Open API를 호출하여 주소 정보를 얻어온다.\n\t *\n\t * @param req\n\t * @param model\n\t * @param response\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/sym/adr/getAdressCntcApi.do\")\n\tpublic void getAddrApi(HttpServletRequest req, ModelMap model, HttpServletResponse response) throws Exception {\n\n\t\tString currentPage = req.getParameter(\"currentPage\");\n\t\tString countPerPage = req.getParameter(\"countPerPage\");\n\t\tString confmKey = req.getParameter(\"confmKey\");\n\t\tString keyword = req.getParameter(\"keyword\");\n\t\t\n\t\t// currentPage/countPerPage는 숫자만 허용한다. 비정상값 차단 및 쿼리 파라미터 인젝션 방어.\n\t\tif (currentPage == null || !currentPage.matches(\"\\\\d+\") || countPerPage == null || !countPerPage.matches(\"\\\\d+\")) {\n\t\t\tresponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);\n\t\t\treturn;\n\t\t}\n\t\t\n\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApi.do?currentPage=\" + currentPage + \"&countPerPage=\"\n\t\t\t+ countPerPage + \"&keyword=\" + URLEncoder.encode(keyword, \"UTF-8\") + \"&confmKey=\"\n\t\t\t+ URLEncoder.encode(confmKey, \"UTF-8\");\n\t\tURL url = new URL(EgovWebUtil.filePathBlackList(apiUrl));\n\t\ttry (BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), \"UTF-8\"));) {//2022.01 Resources should be closed\n\t\t\tStringBuffer sb = new StringBuffer();\n\t\t\tString tempStr = null;\n\t\t\twhile (true) {\n\t\t\t\ttempStr = br.readLine();\n\t\t\t\tif (tempStr == null) {\n\t\t\t\t\tbreak;\n\t\t\t\t}\n\t\t\t\tsb.append(tempStr);\n\t\t\t}\n\n\t\t\tresponse.setCharacterEncoding(\"UTF-8\");\n\t\t\tresponse.setContentType(\"text/xml\");\n\t\t\tresponse.getWriter().write(EgovWebUtil.clearXSSMaximum(sb.toString()));\n\t\t}\n\t}\n\n\t/**\n\t * 도로명주소 안내시스템에서 제공하는 Test용 Open API를 호출하여 주소 정보를 얻어온다.\n\t * @param req\n\t * @param model\n\t * @param response\n\t * @throws Exception\n\t */\n\t@RequestMapping(value = \"/sym/adr/getAdressCntcTestApi.do\")\n\tpublic void getAddrApiTest(HttpServletRequest req, ModelMap model, HttpServletResponse response) throws Exception {\n\n\t\tString currentPage = req.getParameter(\"currentPage\");\n\t\tString countPerPage = req.getParameter(\"countPerPage\");\n\t\tString confmKey = req.getParameter(\"confmKey\");\n\t\tString keyword = req.getParameter(\"keyword\");\n\t\t\n\t\t// currentPage/countPerPage는 숫자만 허용한다. 비정상값 차단 및 쿼리 파라미터 인젝션 방어.\n\t\tif (currentPage == null || !currentPage.matches(\"\\\\d+\") || countPerPage == null || !countPerPage.matches(\"\\\\d+\")) {\n\t\t\tresponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);\n\t\t\treturn;\n\t\t}\n\t\t\n\t\tString apiUrl = \"http://www.juso.go.kr/addrlink/addrLinkApiTest.do?currentPage=\" + currentPage\n\t\t\t+ \"&countPerPage=\" + countPerPage + \"&keyword=\" + URLEncoder.encode(keyword, \"UTF-8\") + \"&confmKey=\"\n\t\t\t+ URLEncoder.encode(confmKey, \"UTF-8\");\n\t\tURL url = new URL(EgovWebUtil.filePathBlackList(apiUrl));\n\t\ttry(BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), \"UTF-8\"));){//2022.01 Resources should be closed\n\t\t\tStringBuffer sb = new StringBuffer();\n\t\t\tString tempStr = null;\n\t\t\twhile (true) {\n\t\t\t\ttempStr = br.readLine();\n\t\t\t\tif (tempStr == null) {\n\t\t\t\t\tbreak;\n\t\t\t\t}\n\t\t\t\tsb.append(tempStr);\n\t\t\t}",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "EgovAdressCntcController#getAddrApi",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+      "flowId": "flow:ANY /sym/adr/getAdressCntcApi.do",
+      "line": 43,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+        "line": 43,
+        "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcApi.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/adr/getAdressCntcApi.do:src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+        "step:ANY /sym/adr/getAdressCntcApi.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovAdressCntcController#selectMainMenuHome",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+      "flowId": "flow:ANY /sym/adr/getAdressCntcInitPage.do",
+      "line": 127,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+        "line": 127,
+        "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcInitPage.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/adr/getAdressCntcInitPage.do:src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java"
+      ]
+    },
+    {
+      "entryPoint": "EgovAdressCntcController#getAddrApiTest",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+      "flowId": "flow:ANY /sym/adr/getAdressCntcTestApi.do",
+      "line": 85,
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+        "line": 85,
+        "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcTestApi.do\")"
+      },
+      "stepIds": [
+        "step:ANY /sym/adr/getAdressCntcTestApi.do:src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+        "step:ANY /sym/adr/getAdressCntcTestApi.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "header": {
+    "flowIndex": [
+      {
+        "entryPoint": "EgovAdressCntcController#getAddrApi",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+        "flowId": "flow:ANY /sym/adr/getAdressCntcApi.do",
+        "line": 43,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 43,
+          "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcApi.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovAdressCntcController#selectMainMenuHome",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+        "flowId": "flow:ANY /sym/adr/getAdressCntcInitPage.do",
+        "line": 127,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 127,
+          "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcInitPage.do\")"
+        }
+      },
+      {
+        "entryPoint": "EgovAdressCntcController#getAddrApiTest",
+        "entryType": "http",
+        "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+        "flowId": "flow:ANY /sym/adr/getAdressCntcTestApi.do",
+        "line": 85,
+        "preCite": {
+          "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+          "line": 85,
+          "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcTestApi.do\")"
+        }
+      }
+    ]
+  },
+  "isHeaderChunk": true,
+  "key": "sym.adr",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "stepId": "step:ANY /sym/adr/getAdressCntcApi.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+        "line": 43,
+        "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcApi.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+      "stepId": "step:ANY /sym/adr/getAdressCntcApi.do:src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+        "line": 43,
+        "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcApi.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+      "stepId": "step:ANY /sym/adr/getAdressCntcInitPage.do:src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java"
+    },
+    {
+      "layer": "unknown",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      },
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "stepId": "step:ANY /sym/adr/getAdressCntcTestApi.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+    },
+    {
+      "layer": "api",
+      "preCite": {
+        "filePath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+        "line": 43,
+        "snippet": "@RequestMapping(value = \"/sym/adr/getAdressCntcApi.do\")"
+      },
+      "relPath": "src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java",
+      "stepId": "step:ANY /sym/adr/getAdressCntcTestApi.do:src/main/java/egovframework/com/sym/adr/web/EgovAdressCntcController.java"
+    }
+  ]
+}

@@ -43,10 +43,11 @@ const MAX_SOURCE_FILE_BYTES = 1024 * 1024;
 
 function graphFileCandidates(fileName: string): string[] {
   const graphDir = process.env.GRAPH_DIR;
+  // GRAPH_DIR 명시 = 그 프로젝트가 유일한 진실 — cwd/모노레포 루트로 폴백하면
+  // 다른 프로젝트(자기분석) 산출물이 분석 대상 데이터로 둔갑한다(보고서 오염 사고).
+  // 폴백은 GRAPH_DIR 없이 띄우는 self-analysis 워크플로 전용.
+  if (graphDir) return [path.resolve(graphDir, `.understand-anything/${fileName}`)];
   return [
-    ...(graphDir
-      ? [path.resolve(graphDir, `.understand-anything/${fileName}`)]
-      : []),
     path.resolve(process.cwd(), `.understand-anything/${fileName}`),
     path.resolve(process.cwd(), `../../../.understand-anything/${fileName}`),
   ];
@@ -61,8 +62,10 @@ function findGraphFile(fileName: string): string | null {
 // 같은 우선순위(GRAPH_DIR → cwd → 모노레포 루트)로 해석한다.
 function specMapFileCandidates(fileName: string): string[] {
   const graphDir = process.env.GRAPH_DIR;
+  // graphFileCandidates 와 동일 규칙 — GRAPH_DIR 명시 시 폴백 금지(루트의 스테일
+  // work-summary.json 이 예제 데모의 보고서로 서빙되던 오염의 재발 방지).
+  if (graphDir) return [path.resolve(graphDir, `.spec/map/${fileName}`)];
   return [
-    ...(graphDir ? [path.resolve(graphDir, `.spec/map/${fileName}`)] : []),
     path.resolve(process.cwd(), `.spec/map/${fileName}`),
     path.resolve(process.cwd(), `../../../.spec/map/${fileName}`),
   ];
@@ -2683,13 +2686,13 @@ export default defineConfig({
           }
           // 골든셋 기준선(품질 화면) — 프로젝트 `.spec/golden/baseline.json` 이 있으면 서빙.
           if (pathname === "/golden-baseline.json") {
-            const goldenCandidates = [
-              ...(process.env.GRAPH_DIR
-                ? [path.resolve(process.env.GRAPH_DIR, ".spec/golden/baseline.json")]
-                : []),
-              path.resolve(process.cwd(), ".spec/golden/baseline.json"),
-              path.resolve(process.cwd(), "../../../.spec/golden/baseline.json"),
-            ];
+            // specMapFileCandidates 와 동일 규칙 — GRAPH_DIR 명시 시 폴백 금지.
+            const goldenCandidates = process.env.GRAPH_DIR
+              ? [path.resolve(process.env.GRAPH_DIR, ".spec/golden/baseline.json")]
+              : [
+                  path.resolve(process.cwd(), ".spec/golden/baseline.json"),
+                  path.resolve(process.cwd(), "../../../.spec/golden/baseline.json"),
+                ];
             const goldenFile = goldenCandidates.find((c) => fs.existsSync(c));
             if (!goldenFile) {
               sendJson(res, 404, { error: "golden baseline not found" });

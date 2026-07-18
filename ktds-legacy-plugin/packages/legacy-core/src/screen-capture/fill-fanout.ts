@@ -35,6 +35,11 @@ import {
   type BundleFile,
 } from '../domain-map/bundle.js'
 import { DEFAULT_CHUNK_CHAR_CAP } from '../domain-map/fill-fanout.js'
+import {
+  assignScreenDomains,
+  loadDomainAssignContext,
+  type DomainAssignSummary,
+} from './domain-assign.js'
 import { RoutesReportSchema, MethodCallGraphSchema } from '../domain-map/types.js'
 import type { ResolvedCall } from '../domain-map/types.js'
 import {
@@ -808,6 +813,8 @@ export interface MergeScreenFillResult {
   unmatchedJsps: string[]
   /** 병합 후 validate 게이트 결과. */
   validation: ReturnType<typeof validateScreensFile>
+  /** 병합 후 결정론 도메인 배정 요약(domain-assign.ts — 화면설계서 그룹 축). */
+  domainAssign: DomainAssignSummary
 }
 
 /** KG 가 있으면 unmatchedJsps 를 재계산한다(understand-screens.mjs recomputeUnmatched 동형). */
@@ -976,11 +983,18 @@ export async function mergeScreenFillFragments(
     )
   }
 
+  // 결정론 도메인 배정 — domain 은 채움 필드(mechanical 밖)라 위 해시 검증과 무관.
+  // LLM 조각 계약에는 domain 이 없다(의도) — 배정은 엔진 소유(domain-assign.ts).
+  const { screens: assignedScreens, summary: domainAssign } = assignScreenDomains(
+    mergedScreens,
+    loadDomainAssignContext(projectRoot),
+  )
+
   // unmatchedJsps 재계산(KG 있을 때만) — 없으면 본체 값 보존.
-  const recomputed = recomputeUnmatched(projectRoot, mergedScreens, file.fragments)
+  const recomputed = recomputeUnmatched(projectRoot, assignedScreens, file.fragments)
   const merged: ScreensFile = ScreensFileSchema.parse({
     ...file,
-    screens: [...mergedScreens].sort((a, b) => a.id.localeCompare(b.id)),
+    screens: [...assignedScreens].sort((a, b) => a.id.localeCompare(b.id)),
     unmatchedJsps: recomputed ?? file.unmatchedJsps,
     mechanicalHash: newHash,
   })
@@ -997,5 +1011,6 @@ export async function mergeScreenFillFragments(
     handlersDemoted,
     unmatchedJsps: merged.unmatchedJsps,
     validation: validateScreensFile(merged),
+    domainAssign,
   }
 }

@@ -1,7 +1,7 @@
 ---
 name: understand-screens
 description: 화면설계서 생성 — 실제 앱 기동·캡처(Stage A) 후 이벤트별 동작을 근거 기반으로 채움(Stage B), 대시보드 화면설계서 탭 데이터
-argument-hint: ["[projectRoot]", "[capture|fill-prep|fill-audit|fill-merge|validate|status]"]
+argument-hint: ["[projectRoot]", "[capture|fill-prep|fill-audit|fill-merge|assign-domains|validate|status]"]
 ---
 
 # /understand-screens
@@ -19,7 +19,8 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> capture 
 # → Stage B: 규모 게이트에 따라 인라인 채움 또는 팬아웃(아래 "Stage B 채움 계약")
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> fill-prep    # 팬아웃 청크 준비
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> fill-audit   # 조각 감사(JSON)
-node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> fill-merge   # 조각 병합
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> fill-merge   # 조각 병합(+도메인 배정)
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> assign-domains # 도메인 재배정(백필·confirm 재확정 후)
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> validate     # 게이트
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> status       # 요약
 ```
@@ -30,6 +31,33 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> status  
 - 선행(권장): `.spec/map/routes.json`(understand-map 스캔) — 있으면 이벤트→핸들러가
   결정론 `[확정]`(file:line)으로 선기입된다. `.understand-anything/knowledge-graph.json` 이
   있으면 JSP 전수 대조(unmatchedJsps)가 활성화된다.
+
+## 실행 가능성 판정 게이트 (capture 전 필수)
+
+> **원칙: 부재 ≠ 불가.** "앱을 못 띄운다 / 계정을 모른다 / 캡처 불가"라는 **부정 결론은
+> 미검증 상태로 단정하지 않는다.** 관찰한 부재 신호(로컬 DB 미기동·`mvnw` 없음·Security
+> 인증 등)는 "실행 불가"의 증거가 아니라 "아직 확인 안 한 것"이다. 단정 전 아래 반증을
+> **먼저 확인**하고, 못 했으면 "미검증 — 다음에 X 확인"으로만 보고한다.
+
+`screens` 설정이나 실행 중인 앱이 없어 capture 가 멈출 때, "이 앱은 못 띄운다"로 결론내기
+전에 이 순서로 반증을 확인한다(대부분 리포 안에 실행 근거가 있다):
+
+1. **런북**: `README`/`README.md`/`docs`의 "구동/실행/설치" 절 — 실행 방법이 대개 명시돼 있다.
+2. **CI 워크플로**(`.github/workflows/*.yml` 등): CI 가 빌드/실행하면 **실행 가능이 증명된
+   것**이고, 워크플로에 JDK 버전·빌드 명령·서비스 컨테이너(DB)가 그대로 적혀 있다.
+3. **스키마·시드**: `script/`·`db/`·`sql/`의 DDL/DML — 전체 스키마+시드 데이터(계정 포함)가
+   동봉된 경우가 많다(예: eGovFrame `script/{ddl,dml,comment}/<db>/`).
+4. **인증 우회·시드 계정·공개 로그인정보**: 데모 인증 모드(예 `Globals.Auth=dummy`),
+   DML 에 INSERT 된 테스트 계정, README 가 링크하는 공개 로그인정보 — **계정은 유추 대상이
+   아니라 문서화된 표준값**일 수 있다. 이걸 확인한 뒤에만 "계정을 사용자에게 요청"한다.
+5. **환경 프로브는 음성 결과에서 한 겹 더**: `command -v X` 실패 = "도구 없음"이 아니라
+   데몬 미기동(예 Docker Desktop 미실행)·버전 매니저(sdkman/brew) 경로·미설치 뿐일 수
+   있다. 다음 계층까지 확인하고 결론낸다.
+
+**두 질문을 분리해 보고한다**: ① 이 앱이 **설계상 실행되게 만들어졌나**(런북/CI 로 판정)
+② **이 머신에 셋업돼 있나**(DB·빌드도구 프로브). ②의 공백은 **"셋업 단계"**로 보고하지
+"막다른 길"로 보고하지 않는다. **사용자 결정에 영향을 주는 부정 결론(예 "제외 권장")은
+검증을 마친 뒤에만** AskUserQuestion 선택지로 만든다 — 미검증 전제를 선택지에 넣지 않는다.
 
 ## 산출물
 
@@ -58,7 +86,11 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> status  
 
 1. **화면 단위**: `jspFile`(핸들러 메서드의 ForwardResolution/뷰 반환을 코드로 확인 —
    근거 file:line 을 `summary.text` 에 포함), `graphNodeId`(`file:<jspFile>`, KG 에 실존할
-   때만), `domain`(뷰 폴더), `title`(한국어), `summary{text,confidence}`.
+   때만), `title`(한국어), `summary{text,confidence}`.
+   `domain` 은 **채우지 않는다** — 엔진 결정론 배정 소관(fill-merge 가 자동 수행,
+   단독 재배정은 `assign-domains`). 확정 플랜 조인(뷰 폴더=플랜 키 → 핸들러 근거
+   다수결, 공통 크롬 제외) → 뷰 폴더/URL 파생 폴백 순. 2026-07-18 이전엔 LLM 채움
+   필드였으나 팬아웃 계약 누락으로 전 화면이 "기타"로 뭉치는 결함이 있었다.
    서버측 forward 로 다른 화면이 렌더된 경우(비로그인 → 로그인 폼 등, `contentSignature`
    별칭 의심 참조) **실제 렌더된 JSP** 를 적고 summary 에 forward 사유를 명기한다.
 2. **주석 단위**: `description`(범례 문장 — 필드는 용도, 액션/링크는 수행 동작),

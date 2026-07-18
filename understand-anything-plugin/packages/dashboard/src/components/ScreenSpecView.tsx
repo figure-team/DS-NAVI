@@ -87,11 +87,11 @@ const KIND_SECTION: Record<string, string> = {
   link: "링크(이동)",
 };
 
+/**
+ * 파생 폴더 키(플랜 밖) 한국어 라벨 — 플랜 도메인은 domainGraph 이름을 동적으로 쓰고,
+ * 이 표는 뷰 폴더 파생값(common 등)의 최후 보정용으로만 남긴다.
+ */
 const DOMAIN_LABEL: Record<string, string> = {
-  account: "계정(account)",
-  cart: "장바구니(cart)",
-  catalog: "카탈로그(catalog)",
-  order: "주문(order)",
   common: "공통(common)",
 };
 const KIND_LABEL: Record<string, string> = {
@@ -413,16 +413,45 @@ export default function ScreenSpecView() {
   // 이미 로드돼 있어 엔진·데이터 변경 없이 계산 가능).
   const commonHrefs = useMemo(() => computeCommonHrefs(file?.screens ?? []), [file]);
 
+  // 좌측 섹션 축 — screens[].domain(엔진 결정론 배정, 플랜 도메인 key)을
+  // 상단도메인 그룹이 있으면 그룹으로 접고(egov 136 도메인 과립화 방지),
+  // 없으면 도메인 단위. 라벨은 domainGraph 한국어명(키 병기), 미배정은 "기타".
+  const domainGroupsRaw = useDashboardStore((s) => s.domainGroups);
+  const sectionOf = useMemo(() => {
+    const nameByKey = new Map<string, string>();
+    for (const n of domainGraph?.nodes ?? []) {
+      if (n.type === "domain") nameByKey.set(n.id.replace(/^domain:/, ""), n.name);
+    }
+    const groupByKey = new Map<string, { key: string; name: string }>();
+    for (const g of domainGroupsRaw) {
+      for (const mk of g.memberKeys) groupByKey.set(mk, { key: g.key, name: g.name });
+    }
+    return (domain: string | null): { key: string; label: string } => {
+      if (!domain) return { key: "기타", label: "기타" };
+      const g = groupByKey.get(domain);
+      if (g) return { key: g.key, label: g.name };
+      const name = nameByKey.get(domain);
+      if (name && name !== domain) return { key: domain, label: `${name}(${domain})` };
+      return { key: domain, label: DOMAIN_LABEL[domain] ?? domain };
+    };
+  }, [domainGraph, domainGroupsRaw]);
+
   const ql = q.trim().toLowerCase();
   const groups = useMemo(() => {
-    const byDomain = new Map<string, Screen[]>();
+    const bySection = new Map<string, { label: string; screens: Screen[] }>();
     for (const s of file?.screens ?? []) {
       if (ql && !screenHay(s).includes(ql)) continue;
-      const key = s.domain ?? "기타";
-      byDomain.set(key, [...(byDomain.get(key) ?? []), s]);
+      const sec = sectionOf(s.domain);
+      const cur = bySection.get(sec.key);
+      if (cur) cur.screens.push(s);
+      else bySection.set(sec.key, { label: sec.label, screens: [s] });
     }
-    return [...byDomain.entries()].sort(([a], [b]) => a.localeCompare(b));
-  }, [file, ql, screenHay]);
+    // 기타는 항상 마지막, 나머지는 라벨 사전순.
+    return [...bySection.entries()].sort(
+      ([ak, a], [bk, b]) =>
+        Number(ak === "기타") - Number(bk === "기타") || a.label.localeCompare(b.label),
+    );
+  }, [file, ql, screenHay, sectionOf]);
 
   const sel = useMemo(
     () => file?.screens.find((s) => s.id === selId) ?? file?.screens[0] ?? null,
@@ -452,14 +481,14 @@ export default function ScreenSpecView() {
     setTrim(sel ? (TRIM_CACHE.get(sel.id) ?? null) : null);
   }, [sel]);
 
-  // ?screen= 딥링크/선택 시 해당 도메인 그룹만 자동 전개(기본은 전부 접힘 유지).
+  // ?screen= 딥링크/선택 시 해당 섹션만 자동 전개(기본은 전부 접힘 유지).
   useEffect(() => {
     if (!selId || !file) return;
     const s = file.screens.find((x) => x.id === selId);
     if (!s) return;
-    const key = s.domain ?? "기타";
+    const key = sectionOf(s.domain).key;
     setOpenDomains((prev) => (prev.has(key) ? prev : new Set(prev).add(key)));
-  }, [selId, file]);
+  }, [selId, file, sectionOf]);
   const toggleDomain = (d: string) =>
     setOpenDomains((prev) => {
       const next = new Set(prev);
@@ -816,7 +845,7 @@ export default function ScreenSpecView() {
               width="full"
             />
           </div>
-          {groups.map(([domain, screens]) => {
+          {groups.map(([domain, { label, screens }]) => {
             // 검색 중에는 접힘 상태를 무시하고 매칭 그룹을 전부 펼쳐 보여준다.
             const open = ql !== "" || openDomains.has(domain);
             return (
@@ -842,7 +871,7 @@ export default function ScreenSpecView() {
                     ▸
                   </span>
                   <span className="truncate text-text-primary" style={{ fontSize: 12.5, fontWeight: 650 }}>
-                    {DOMAIN_LABEL[domain] ?? domain}
+                    {label}
                   </span>
                   <span
                     className="tabular-nums text-text-muted bg-elevated rounded-full"

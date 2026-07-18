@@ -207,16 +207,19 @@ function idPath(screenId: string): string | null {
 }
 
 /**
- * URL 경로의 디렉터리를 "."-조인해 플랜 도메인 키와 최장 접두 일치를 찾는다 —
- * egov 류 모듈 URL(`sym/tbm/tbr/xxx.do` ↔ 도메인 키 `sym.tbm.tbr`)의 결정론 조인.
- * 일치가 없으면 null(일반 폴더 파생으로 폴백).
+ * 경로 디렉터리 세그먼트 윈도우를 "."-조인해 플랜 도메인 키와 일치를 찾는다 —
+ * egov 류 모듈 경로(URL `sym/tbm/tbr/xxx.do`·JSP `…/jsp/egovframework/com/uss/umt/X.jsp`
+ * ↔ 도메인 키 `sym.tbm.tbr`/`uss.umt`)의 결정론 조인. 가장 이른 시작 위치에서
+ * 가장 긴 일치를 채택(결정론). 일치가 없으면 null(일반 폴더 파생으로 폴백).
  */
-function planKeyFromUrlPath(path: string | null, planKeys: ReadonlySet<string>): string | null {
-  if (!path) return null
+function planKeyFromPath(path: string | null, planKeys: ReadonlySet<string>): string | null {
+  if (!path || planKeys.size === 0) return null
   const dirs = path.split('/').filter(Boolean).slice(0, -1)
-  for (let n = dirs.length; n >= 1; n--) {
-    const cand = dirs.slice(0, n).join('.')
-    if (planKeys.has(cand)) return cand
+  for (let start = 0; start < dirs.length; start++) {
+    for (let end = dirs.length; end > start; end--) {
+      const cand = dirs.slice(start, end).join('.')
+      if (planKeys.has(cand)) return cand
+    }
   }
   return null
 }
@@ -258,10 +261,16 @@ export function assignScreenDomains(
 
   // ⓪①② — 화면 단위 조인.
   const joined: Array<string | null> = screens.map((s, i) => {
+    // ⓪ 뷰 경로 → 플랜 키: 파생 폴더 단일 일치 or 경로 윈도우 "."-조인 일치.
     const folder = viewFolder[i]
     if (folder && planKeys.has(folder)) {
       byMethod.viewFolder++
       return folder
+    }
+    const jspPlanKey = planKeyFromPath(s.jspFile, planKeys)
+    if (jspPlanKey) {
+      byMethod.viewFolder++
+      return jspPlanKey
     }
     const h = domainFromHandlers(s, ctx, commonChrome)
     if (h) {
@@ -285,8 +294,8 @@ export function assignScreenDomains(
       byMethod.viewFolder++
     }
     if (!domain) {
-      // URL 경로 → 플랜 키 최장 접두 일치가 일반 폴더 파생보다 우선(실제 도메인 정합).
-      const planMatch = planKeyFromUrlPath(idPath(s.id), planKeys)
+      // URL 경로 → 플랜 키 일치가 일반 폴더 파생보다 우선(실제 도메인 정합).
+      const planMatch = planKeyFromPath(idPath(s.id), planKeys)
       if (planMatch) {
         domain = planMatch
         byMethod.urlFolder++

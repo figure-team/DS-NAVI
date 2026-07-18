@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { type DomainAssignSummary } from './domain-assign.js';
+import { type ViewResolveSummary } from './view-resolve.js';
 import { validateScreensFile } from './assemble.js';
 /** `.spec/map/screens-fill-prep/` — 청크(팬아웃 입력) 디렉터리 이름. */
 export declare const SCREEN_FILL_PREP_DIR = "screens-fill-prep";
@@ -199,6 +201,10 @@ export interface MergeScreenFillResult {
     unmatchedJsps: string[];
     /** 병합 후 validate 게이트 결과. */
     validation: ReturnType<typeof validateScreensFile>;
+    /** 병합 후 결정론 도메인 배정 요약(domain-assign.ts — 화면설계서 그룹 축). */
+    domainAssign: DomainAssignSummary;
+    /** 병합 후 ViewResolver 해석 요약(view-resolve.ts — Spring 뷰 이름→JSP 실경로). */
+    viewResolve: ViewResolveSummary;
 }
 /**
  * 조각의 **채움 필드만** screens.json 본체에 병합한다. 불변 봉인 필드

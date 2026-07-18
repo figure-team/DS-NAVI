@@ -40,6 +40,7 @@ import {
   loadDomainAssignContext,
   type DomainAssignSummary,
 } from './domain-assign.js'
+import { resolveScreenViews, type ViewResolveSummary } from './view-resolve.js'
 import { RoutesReportSchema, MethodCallGraphSchema } from '../domain-map/types.js'
 import type { ResolvedCall } from '../domain-map/types.js'
 import {
@@ -815,6 +816,8 @@ export interface MergeScreenFillResult {
   validation: ReturnType<typeof validateScreensFile>
   /** 병합 후 결정론 도메인 배정 요약(domain-assign.ts — 화면설계서 그룹 축). */
   domainAssign: DomainAssignSummary
+  /** 병합 후 ViewResolver 해석 요약(view-resolve.ts — Spring 뷰 이름→JSP 실경로). */
+  viewResolve: ViewResolveSummary
 }
 
 /** KG 가 있으면 unmatchedJsps 를 재계산한다(understand-screens.mjs recomputeUnmatched 동형). */
@@ -983,10 +986,17 @@ export async function mergeScreenFillFragments(
     )
   }
 
+  // ViewResolver 해석 — Spring 뷰 이름(조각의 jspFile)·미채움 jspFile 을 실경로로
+  // 확정한 뒤 도메인을 배정한다(해석된 jspFile 이 뷰 폴더 파생의 입력이 되도록 순서 고정).
+  const { screens: resolvedScreens, summary: viewResolve } = resolveScreenViews(
+    mergedScreens,
+    projectRoot,
+  )
+
   // 결정론 도메인 배정 — domain 은 채움 필드(mechanical 밖)라 위 해시 검증과 무관.
   // LLM 조각 계약에는 domain 이 없다(의도) — 배정은 엔진 소유(domain-assign.ts).
   const { screens: assignedScreens, summary: domainAssign } = assignScreenDomains(
-    mergedScreens,
+    resolvedScreens,
     loadDomainAssignContext(projectRoot),
   )
 
@@ -1012,5 +1022,6 @@ export async function mergeScreenFillFragments(
     unmatchedJsps: merged.unmatchedJsps,
     validation: validateScreensFile(merged),
     domainAssign,
+    viewResolve,
   }
 }

@@ -5,6 +5,10 @@
 export { SCREENS_FILENAME, SCREEN_OVERRIDES_FILENAME, SCREENS_DIRNAME, ANNOTATION_KEY_RE, BBoxSchema, AnnotationKindSchema, EventTypeSchema, MechanicalSchema, HandlerEvidenceSchema, HandlerSchema, AnnotationSchema, ScreenCaptureInfoSchema, ScreenSchema, MissingScreenSchema, ScreensFileSchema, ScreenAnnotationOverrideSchema, ScreenOverrideEntrySchema, ScreenOverridesSchema, } from './types.js';
 export type { BBox, AnnotationKind, EventType, Mechanical, HandlerEvidence, Handler, Annotation, ScreenCaptureInfo, Screen, MissingScreen, ScreensFile, ScreenOverrideEntry, ScreenOverrides, RawElement, } from './types.js';
 export { CIRCLED_DIGITS, CIRCLED_LETTERS, CIRCLED_UPPER, badgeGlyph, classifyKind, pickLabel, classifyElements, } from './classify.js';
+export { assignScreenDomains, assignScreenDomainsOnDisk, loadDomainAssignContext, deriveFolderGroups, } from './domain-assign.js';
+export { loadViewResolverConfigs, resolveViewName, extractReturnViewNames, resolveScreenViews, resolveScreenViewsOnDisk, } from './view-resolve.js';
+export type { ViewResolverConfig, ViewResolveSummary } from './view-resolve.js';
+export type { DomainAssignContext, DomainAssignSummary } from './domain-assign.js';
 export { normalizeActionPath, candidatePaths, joinRoutes } from './routes-join.js';
 export type { RouteJoinContext, NormalizedAction } from './routes-join.js';
 export { normalizeUrl, relativePath, screenKey, slugify, screenIdFor, capturePathFor, shouldVisit, detectFragments, listJspFilesFromGraph, domainForJsp, reconcileJsps, } from './discover.js';

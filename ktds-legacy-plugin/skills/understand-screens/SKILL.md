@@ -1,7 +1,7 @@
 ---
 name: understand-screens
 description: 화면설계서 생성 — 실제 앱 기동·캡처(Stage A) 후 이벤트별 동작을 근거 기반으로 채움(Stage B), 대시보드 화면설계서 탭 데이터
-argument-hint: ["[projectRoot]", "[capture|fill-prep|fill-audit|fill-merge|assign-domains|validate|status]"]
+argument-hint: ["[projectRoot]", "[capture|fill-prep|fill-audit|fill-merge|resolve-views|assign-domains|validate|status]"]
 ---
 
 # /understand-screens
@@ -19,7 +19,8 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> capture 
 # → Stage B: 규모 게이트에 따라 인라인 채움 또는 팬아웃(아래 "Stage B 채움 계약")
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> fill-prep    # 팬아웃 청크 준비
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> fill-audit   # 조각 감사(JSON)
-node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> fill-merge   # 조각 병합(+도메인 배정)
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> fill-merge   # 조각 병합(+뷰 해석·도메인 배정)
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> resolve-views  # ViewResolver 해석(Spring 뷰 이름→JSP 실경로, 백필용)
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> assign-domains # 도메인 재배정(백필·confirm 재확정 후)
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> validate     # 게이트
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> status       # 요약
@@ -87,6 +88,9 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> status  
 1. **화면 단위**: `jspFile`(핸들러 메서드의 ForwardResolution/뷰 반환을 코드로 확인 —
    근거 file:line 을 `summary.text` 에 포함), `graphNodeId`(`file:<jspFile>`, KG 에 실존할
    때만), `title`(한국어), `summary{text,confidence}`.
+   Spring ViewResolver 프로젝트(egov 류)는 뷰 이름만 적어도 된다 — fill-merge 의
+   `resolve-views` 단계가 prefix/suffix 설정을 읽어 repo 실경로로 결정론 확정한다
+   (라우트→메서드 리터럴로 미채움분도 자동 채움, 분기 뷰는 보류).
    `domain` 은 **채우지 않는다** — 엔진 결정론 배정 소관(fill-merge 가 자동 수행,
    단독 재배정은 `assign-domains`). 확정 플랜 조인(뷰 폴더=플랜 키 → 핸들러 근거
    다수결, 공통 크롬 제외) → 뷰 폴더/URL 파생 폴백 순. 2026-07-18 이전엔 LLM 채움

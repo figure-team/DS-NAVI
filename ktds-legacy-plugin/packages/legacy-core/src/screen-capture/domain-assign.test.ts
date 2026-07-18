@@ -72,6 +72,10 @@ function ctx(over: Partial<DomainAssignContext> = {}): DomainAssignContext {
   }
 }
 
+function screenFxPath(id: string, jspFile: string): Screen {
+  return screen(id, [ann(1)], { jspFile })
+}
+
 const ROOTS = new Map([
   ['web/AccountBean.java', 'account'],
   ['web/CartBean.java', 'cart'],
@@ -250,6 +254,17 @@ describe('assignScreenDomains — 파생 폴백', () => {
     const r = assignScreenDomains(screens, ctx())
     expect(r.screens.map((s) => s.domain)).toEqual(['sym', 'sym', 'uss'])
     expect(r.summary.byMethod.urlFolder).toBe(3)
+  })
+
+  it('jspFile 경로 윈도우 "."-조인이 플랜 키와 일치하면 그 도메인으로 배정한다(egov 실경로)', () => {
+    const r = assignScreenDomains(
+      [
+        screenFxPath('screen:a', 'src/main/webapp/WEB-INF/jsp/egovframework/com/uss/umt/EgovMberManage.jsp'),
+        screenFxPath('screen:b', 'src/main/webapp/WEB-INF/jsp/egovframework/com/sym/tbm/tbr/EgovList.jsp'),
+      ],
+      ctx({ domainByRoot: new Map([['w/A.java', 'uss.umt'], ['w/B.java', 'sym.tbm.tbr']]) }),
+    )
+    expect(r.screens.map((s) => s.domain)).toEqual(['uss.umt', 'sym.tbm.tbr'])
   })
 
   it('URL 경로의 "."-조인이 플랜 키와 일치하면 일반 폴더 파생보다 우선한다(egov 모듈 URL)', () => {

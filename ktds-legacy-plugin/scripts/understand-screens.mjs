@@ -30,7 +30,7 @@ const projectRoot = process.argv[2] || process.cwd()
 const command = process.argv[3] || 'status'
 // 알 수 없는 모드는 거부한다 — 조용히 status 로 떨어지면 오타(예: fill-merg)가 무해한 요약
 // 출력으로 위장돼 단계 누락을 눈치채지 못한다(policy 쪽 1단계 폴스루 사고와 동일 계열).
-const KNOWN_COMMANDS = ['capture', 'fill-prep', 'fill-audit', 'fill-merge', 'assign-domains', 'validate', 'status']
+const KNOWN_COMMANDS = ['capture', 'fill-prep', 'fill-audit', 'fill-merge', 'resolve-views', 'assign-domains', 'validate', 'status']
 if (!KNOWN_COMMANDS.includes(command)) {
   console.error(`알 수 없는 모드: ${command} — 사용 가능: ${KNOWN_COMMANDS.join(' | ')}`)
   process.exit(2)
@@ -172,6 +172,32 @@ if (command === 'fill-merge') {
   console.log(`  산출물: ${result.screensPath}`)
   console.log('다음 단계: validate (게이트 재확인) → /understand-dashboard 화면설계서 탭 열람.')
   process.exit(result.validation.ok ? 0 : 1)
+}
+
+// ── ViewResolver 해석(Spring 뷰 이름→JSP 실경로) ───────────────────────────
+// fill-merge 가 자동 수행하지만, 백필은 이 단독 모드로(이후 assign-domains 권장).
+if (command === 'resolve-views') {
+  const { resolveScreenViewsOnDisk } = engine
+  let r
+  try {
+    r = resolveScreenViewsOnDisk(projectRoot)
+  } catch (err) {
+    console.error(`resolve-views 실패: ${err.message}`)
+    process.exit(2)
+  }
+  const s = r.summary
+  console.log(`ViewResolver 해석 완료 — ${projectRoot}`)
+  if (s.configs === 0) {
+    console.log('  리졸버 설정 없음 — 변경 없음(Stripes 류 직반환 프로젝트는 해당 없음).')
+  } else {
+    console.log(
+      `  리졸버 설정 ${s.configs}건 · 뷰이름→실경로 치환 ${s.rewritten} · 라우트 리터럴 채움 ${s.filledFromRoute}` +
+        ` · 분기 뷰 보류 ${s.ambiguous} · 미해결 ${s.unresolved}/${s.total}`,
+    )
+  }
+  console.log(`  산출물: ${r.screensPath}`)
+  console.log('다음 단계: assign-domains(도메인 재배정) → validate.')
+  process.exit(0)
 }
 
 // ── 결정론 도메인 재배정(화면설계서 그룹 축) ───────────────────────────────

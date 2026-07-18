@@ -30,6 +30,8 @@ import { normalizeCitationText, isTrivialSnippet, verifyCitation } from '../doma
 import { CitationSchema } from '../domain-map/fill.js';
 import { BundleFileSchema, sliceFile, DEFAULT_SLICE_LINES, } from '../domain-map/bundle.js';
 import { DEFAULT_CHUNK_CHAR_CAP } from '../domain-map/fill-fanout.js';
+import { assignScreenDomains, loadDomainAssignContext, } from './domain-assign.js';
+import { resolveScreenViews } from './view-resolve.js';
 import { RoutesReportSchema, MethodCallGraphSchema } from '../domain-map/types.js';
 import { ScreensFileSchema, HandlerSchema, ANNOTATION_KEY_RE, SCREENS_FILENAME, } from './types.js';
 import { computeMechanicalHash, validateScreensFile } from './assemble.js';
@@ -828,11 +830,17 @@ export async function mergeScreenFillFragments(projectRoot) {
         throw new Error(`mechanicalHash 변동 감지 — 병합이 봉인 필드를 건드렸습니다(버그). ` +
             `기대 ${file.mechanicalHash.slice(0, 12)}… 실제 ${newHash.slice(0, 12)}…`);
     }
+    // ViewResolver 해석 — Spring 뷰 이름(조각의 jspFile)·미채움 jspFile 을 실경로로
+    // 확정한 뒤 도메인을 배정한다(해석된 jspFile 이 뷰 폴더 파생의 입력이 되도록 순서 고정).
+    const { screens: resolvedScreens, summary: viewResolve } = resolveScreenViews(mergedScreens, projectRoot);
+    // 결정론 도메인 배정 — domain 은 채움 필드(mechanical 밖)라 위 해시 검증과 무관.
+    // LLM 조각 계약에는 domain 이 없다(의도) — 배정은 엔진 소유(domain-assign.ts).
+    const { screens: assignedScreens, summary: domainAssign } = assignScreenDomains(resolvedScreens, loadDomainAssignContext(projectRoot));
     // unmatchedJsps 재계산(KG 있을 때만) — 없으면 본체 값 보존.
-    const recomputed = recomputeUnmatched(projectRoot, mergedScreens, file.fragments);
+    const recomputed = recomputeUnmatched(projectRoot, assignedScreens, file.fragments);
     const merged = ScreensFileSchema.parse({
         ...file,
-        screens: [...mergedScreens].sort((a, b) => a.id.localeCompare(b.id)),
+        screens: [...assignedScreens].sort((a, b) => a.id.localeCompare(b.id)),
         unmatchedJsps: recomputed ?? file.unmatchedJsps,
         mechanicalHash: newHash,
     });
@@ -847,6 +855,8 @@ export async function mergeScreenFillFragments(projectRoot) {
         handlersDemoted,
         unmatchedJsps: merged.unmatchedJsps,
         validation: validateScreensFile(merged),
+        domainAssign,
+        viewResolve,
     };
 }
 //# sourceMappingURL=fill-fanout.js.map

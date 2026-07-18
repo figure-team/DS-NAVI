@@ -53,6 +53,14 @@ export {
   loadDomainAssignContext,
   deriveFolderGroups,
 } from './domain-assign.js'
+export {
+  loadViewResolverConfigs,
+  resolveViewName,
+  extractReturnViewNames,
+  resolveScreenViews,
+  resolveScreenViewsOnDisk,
+} from './view-resolve.js'
+export type { ViewResolverConfig, ViewResolveSummary } from './view-resolve.js'
 export type { DomainAssignContext, DomainAssignSummary } from './domain-assign.js'
 export { normalizeActionPath, candidatePaths, joinRoutes } from './routes-join.js'
 export type { RouteJoinContext, NormalizedAction } from './routes-join.js'

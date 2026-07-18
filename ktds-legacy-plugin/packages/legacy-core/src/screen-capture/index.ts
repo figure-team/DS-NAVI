@@ -47,6 +47,13 @@ export {
   pickLabel,
   classifyElements,
 } from './classify.js'
+export {
+  assignScreenDomains,
+  assignScreenDomainsOnDisk,
+  loadDomainAssignContext,
+  deriveFolderGroups,
+} from './domain-assign.js'
+export type { DomainAssignContext, DomainAssignSummary } from './domain-assign.js'
 export { normalizeActionPath, candidatePaths, joinRoutes } from './routes-join.js'
 export type { RouteJoinContext, NormalizedAction } from './routes-join.js'
 export {

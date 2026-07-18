@@ -68,7 +68,7 @@
 | 상류 변경 | 낡아지는 하류 |
 |---|---|
 | 코드(커밋) 변경 | [1]부터 전부 — 산출물의 `gitCommit`/`generatedFromCommit`/`sourceCommit` 스탬프가 어긋남 |
-| confirm 재확정(경계·그룹 변경) | skeleton·domain-graph·bundle/fill·**rtm.json**·impact 흐름 귀속·docs·정책 domain 모드 |
+| confirm 재확정(경계·그룹 변경) | skeleton·domain-graph·bundle/fill·**rtm.json**·impact 흐름 귀속·docs·정책 domain 모드·**screens 도메인 배정**(`understand-screens assign-domains` 재실행 — 배정은 확정 플랜 조인 기반, 2026-07-18 결정론 승격) |
 | screens 재캡처(Stage A) | Stage B 채움 전체(mechanicalHash 변경) |
 | policy 1단계 재생성(모드 생략 실행) | `<!-- policy-fill -->` 규범 진술 섹션 초기화(의도된 동작 — 조각 있으면 fill-merge 로 복원) |
 

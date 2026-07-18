@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * /understand-screens CLI 오케스트레이터 — 화면설계서 파이프라인.
- * 사용: node understand-screens.mjs <projectRoot> [capture|fill-prep|fill-audit|fill-merge|validate|status]
+ * 사용: node understand-screens.mjs <projectRoot> [capture|fill-prep|fill-audit|fill-merge|assign-domains|validate|status]
  *
  *  capture    : Stage A 결정론 캡처(러너 위임 — 앱 기동/크롤/시나리오/screens.json).
  *  fill-prep  : Stage B 대규모 팬아웃용 청크 준비 — screens.json 을 화면 N개 자립
@@ -30,7 +30,7 @@ const projectRoot = process.argv[2] || process.cwd()
 const command = process.argv[3] || 'status'
 // 알 수 없는 모드는 거부한다 — 조용히 status 로 떨어지면 오타(예: fill-merg)가 무해한 요약
 // 출력으로 위장돼 단계 누락을 눈치채지 못한다(policy 쪽 1단계 폴스루 사고와 동일 계열).
-const KNOWN_COMMANDS = ['capture', 'fill-prep', 'fill-audit', 'fill-merge', 'validate', 'status']
+const KNOWN_COMMANDS = ['capture', 'fill-prep', 'fill-audit', 'fill-merge', 'assign-domains', 'validate', 'status']
 if (!KNOWN_COMMANDS.includes(command)) {
   console.error(`알 수 없는 모드: ${command} — 사용 가능: ${KNOWN_COMMANDS.join(' | ')}`)
   process.exit(2)
@@ -174,6 +174,29 @@ if (command === 'fill-merge') {
   process.exit(result.validation.ok ? 0 : 1)
 }
 
+// ── 결정론 도메인 재배정(화면설계서 그룹 축) ───────────────────────────────
+// fill-merge 가 자동 수행하지만, 백필·confirm 재확정 후 재정합은 이 단독 모드로.
+if (command === 'assign-domains') {
+  const { assignScreenDomainsOnDisk } = engine
+  let r
+  try {
+    r = assignScreenDomainsOnDisk(projectRoot)
+  } catch (err) {
+    console.error(`assign-domains 실패: ${err.message}`)
+    process.exit(2)
+  }
+  const m = r.summary.byMethod
+  console.log(`화면 도메인 재배정 완료 — ${projectRoot}`)
+  console.log(
+    `  배정 ${r.summary.assigned}/${r.summary.total}` +
+      ` (핸들러 조인 ${m.handlerJoin} · 뷰파일 조인 ${m.viewFileJoin} · 뷰폴더 파생 ${m.viewFolder}` +
+      ` · URL 파생 ${m.urlFolder} · 미배정 ${m.unassigned})`,
+  )
+  console.log(`  산출물: ${r.screensPath}`)
+  console.log('다음 단계: validate → 대시보드 화면설계서 그룹 확인.')
+  process.exit(0)
+}
+
 const v = validateScreensFile(file)
 const pct = (x) => (x === null ? '-' : `${Math.round(x * 100)}%`)
 
@@ -188,6 +211,14 @@ if (command === 'validate') {
   if (v.stats) {
     console.log(
       `화면 ${v.stats.screenCount} / 주석 ${v.stats.annotationCount} / 확정율 ${pct(v.stats.confirmedActionRate)} / 설명 채움률 ${pct(v.stats.descriptionRate)} / JSP 매핑률 ${pct(v.stats.jspMappedRate)}`,
+    )
+  }
+  {
+    const screens = file.screens ?? []
+    const domainAssigned = screens.filter((s) => s.domain != null).length
+    console.log(
+      `도메인 배정 ${domainAssigned}/${screens.length}` +
+        (domainAssigned < screens.length ? ' — assign-domains 로 재배정 가능(화면설계서 그룹 축)' : ''),
     )
   }
   const recomputed = recomputeUnmatched(file)

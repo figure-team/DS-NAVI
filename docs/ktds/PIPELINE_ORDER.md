@@ -33,7 +33,11 @@
 
 [5] /understand-screens  capture(Stage A) → fill(Stage B, 규모 게이트: 화면≤10∧주석≤60 인라인, 초과 팬아웃) → validate
      └→ .understand-anything/screens.json + screens/*.png
-        선행: understanding.config.json(screens 섹션) 필수,
+        선행: understanding.config.json(screens 섹션) 필수 — 없으면 capture 가 routes.json
+              census 로 초안 자동 생성(scaffold, 2026-07-19: baseUrl contextPath 추정·
+              startCommand pom/gradle 감지·seedUrls GET-safe 목록성) 후 확인 정지.
+              로그인 계정·셀렉터만 사람이 채운다(scaffold 가 [4]-map 뒤인 이유 = 재료가
+              routes.json — init 시점엔 빈 껍데기밖에 못 만든다).
               routes.json 권장(핸들러 [확정] 선기입), knowledge-graph.json 권장(unmatchedJsps
               전수 대조 — [3] map 이 자동 생성하므로 순서만 지키면 항상 충족)
 

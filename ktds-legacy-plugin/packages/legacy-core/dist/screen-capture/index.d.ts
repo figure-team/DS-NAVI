@@ -13,6 +13,8 @@ export { normalizeActionPath, candidatePaths, joinRoutes } from './routes-join.j
 export type { RouteJoinContext, NormalizedAction } from './routes-join.js';
 export { triageMissing, selectCensusSeeds } from './triage.js';
 export type { CensusRoute, TriageOptions, CensusSeedOptions } from './triage.js';
+export { detectStartCommand, scaffoldScreensConfig, scaffoldScreensConfigOnDisk, } from './scaffold.js';
+export type { BuildSignals, ScaffoldInput, ScaffoldSummary } from './scaffold.js';
 export { normalizeUrl, relativePath, screenKey, slugify, screenIdFor, capturePathFor, shouldVisit, detectFragments, listJspFilesFromGraph, domainForJsp, reconcileJsps, } from './discover.js';
 export { computeContentSignature, mechanicalProjection, computeMechanicalHash, buildScreensFile, serializeScreens, validateScreensFile, } from './assemble.js';
 export type { BuildScreensInput, ScreensValidationIssue, ScreensValidationStats, ScreensValidationResult, } from './assemble.js';

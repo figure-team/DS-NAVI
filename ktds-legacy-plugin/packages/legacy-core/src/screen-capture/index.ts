@@ -74,6 +74,12 @@ export type { RouteJoinContext, NormalizedAction } from './routes-join.js'
 export { triageMissing, selectCensusSeeds } from './triage.js'
 export type { CensusRoute, TriageOptions, CensusSeedOptions } from './triage.js'
 export {
+  detectStartCommand,
+  scaffoldScreensConfig,
+  scaffoldScreensConfigOnDisk,
+} from './scaffold.js'
+export type { BuildSignals, ScaffoldInput, ScaffoldSummary } from './scaffold.js'
+export {
   normalizeUrl,
   relativePath,
   screenKey,

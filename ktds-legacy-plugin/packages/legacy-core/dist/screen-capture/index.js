@@ -8,6 +8,7 @@ export { assignScreenDomains, assignScreenDomainsOnDisk, loadDomainAssignContext
 export { loadViewResolverConfigs, resolveViewName, extractReturnViewNames, resolveScreenViews, resolveScreenViewsOnDisk, } from './view-resolve.js';
 export { normalizeActionPath, candidatePaths, joinRoutes } from './routes-join.js';
 export { triageMissing, selectCensusSeeds } from './triage.js';
+export { detectStartCommand, scaffoldScreensConfig, scaffoldScreensConfigOnDisk, } from './scaffold.js';
 export { normalizeUrl, relativePath, screenKey, slugify, screenIdFor, capturePathFor, shouldVisit, detectFragments, listJspFilesFromGraph, domainForJsp, reconcileJsps, } from './discover.js';
 export { computeContentSignature, mechanicalProjection, computeMechanicalHash, buildScreensFile, serializeScreens, validateScreensFile, } from './assemble.js';
 export { loadPlaywright } from './playwright-loader.js';

@@ -30,7 +30,7 @@ const projectRoot = process.argv[2] || process.cwd()
 const command = process.argv[3] || 'status'
 // 알 수 없는 모드는 거부한다 — 조용히 status 로 떨어지면 오타(예: fill-merg)가 무해한 요약
 // 출력으로 위장돼 단계 누락을 눈치채지 못한다(policy 쪽 1단계 폴스루 사고와 동일 계열).
-const KNOWN_COMMANDS = ['capture', 'fill-prep', 'fill-audit', 'fill-merge', 'resolve-views', 'assign-domains', 'validate', 'status']
+const KNOWN_COMMANDS = ['scaffold', 'capture', 'fill-prep', 'fill-audit', 'fill-merge', 'resolve-views', 'assign-domains', 'validate', 'status']
 if (!KNOWN_COMMANDS.includes(command)) {
   console.error(`알 수 없는 모드: ${command} — 사용 가능: ${KNOWN_COMMANDS.join(' | ')}`)
   process.exit(2)
@@ -54,6 +54,30 @@ function recomputeUnmatched(file) {
   } catch {
     return null
   }
+}
+
+// ── screens 설정 스캐폴딩(초안 자동 생성) ──────────────────────────────────
+// capture 가 섹션 부재 시 자동 수행하지만, 재생성(--force)은 이 단독 모드로.
+if (command === 'scaffold') {
+  const { scaffoldScreensConfigOnDisk } = engine
+  let r
+  try {
+    r = scaffoldScreensConfigOnDisk(projectRoot, { force: flags.includes('--force') })
+  } catch (err) {
+    console.error(`scaffold 실패: ${err.message}`)
+    process.exit(2)
+  }
+  const s = r.summary
+  console.log(`screens 설정 초안 생성 완료 — ${r.configPath}`)
+  console.log(`  라우트 census ${s.routesTotal}건 → 크롤 시드 ${s.seedUrls}건 (GET-safe 목록성)`)
+  console.log(`  baseUrl: ${s.baseUrl}`)
+  console.log(`  startCommand: ${s.startCommand ? s.startCommand.join(' ') : '(미감지 — 생략)'}`)
+  console.log('')
+  console.log('확인 필요:')
+  for (const n of s.notes) console.log(`  - ${n}`)
+  console.log('')
+  console.log('초안을 검토·수정한 뒤 capture 를 실행하세요.')
+  process.exit(0)
 }
 
 if (command === 'capture') {

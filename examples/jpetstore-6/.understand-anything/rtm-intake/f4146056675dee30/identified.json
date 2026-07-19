@@ -1,0 +1,274 @@
+{
+  "request": {
+    "id": "REQ-001",
+    "name": "네이버 로그인 추가",
+    "raw": "네이버 로그인 기능 추가.",
+    "source": "고객 요청",
+    "requestedAt": null
+  },
+  "requirements": [
+    {
+      "id": "SFR-010",
+      "category": "SFR",
+      "name": "네이버 소셜 로그인",
+      "type": "functional",
+      "nfrCategory": null,
+      "priority": "HIGH",
+      "status": "ACTIVE",
+      "derivedFrom": null,
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": { "details": [], "inputs": "", "outputs": "", "flow": "", "preceding": [], "exceptions": [], "acceptance": [], "verify": "" },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "로그인 폼(Account.action?signon 화면) 내부에 네이버 로그인 버튼을 노출하고, 클릭 시 네이버 OAuth 인증 플로우로 진입한다(사용자 결정: 로그인폼 내부 배치 — Q-2).",
+          "kind": "rule",
+          "fnIds": ["flow:ANY /actions/Account.action?signon", "to-be:auth/naver-callback"],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            { "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 149, "snippet": "@DefaultHandler" }
+          ],
+          "screenRefs": [
+            { "screenId": "screen:actions/Cart.action__removeItemFromCart_workingItemId", "annotationNo": 2, "note": "로그인 폼 진입 링크(Sign In) — 번들에 로그인 폼 자체 캡처는 없어 정확한 폼 레이아웃은 [추정]. 삽입 지점 근거는 signonForm 핸들러(AccountActionBean.java:149)." }
+          ],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-2",
+          "text": "네이버 인증이 성공하면 기존 로그인 성공 처리(계정 세션 등록)와 동일한 방식으로 세션을 구성한다.",
+          "kind": "rule",
+          "fnIds": ["flow:ANY /actions/Account.action?signon"],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            { "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 161, "snippet": "account = accountService.getAccount(getUsername(), getPassword());" },
+            { "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 163, "snippet": "if (account == null) {" }
+          ],
+          "screenRefs": [],
+          "policyRefs": [
+            { "doc": "policy-domain-account.md", "section": "4", "ruleId": "PL-001", "note": "기존 로그인 실패 처리 규칙 — 네이버 로그인 실패 시 동일 정책 적용 검토" }
+          ]
+        },
+        {
+          "id": "AC-3",
+          "text": "네이버 로그인 실패(인증 거부·오류) 시 기존 아이디/비밀번호 로그인 실패와 동일하게 오류 메시지를 표시하고 로그인 화면으로 되돌린다.",
+          "kind": "rule",
+          "fnIds": ["flow:ANY /actions/Account.action?signon"],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            { "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 164, "snippet": "String value = \"Invalid username or password.  Signon failed.\";" },
+            { "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 167, "snippet": "return new ForwardResolution(SIGNON);" }
+          ],
+          "screenRefs": [],
+          "policyRefs": [
+            { "doc": "policy-domain-account.md", "section": "4", "ruleId": "PL-001", "note": "" }
+          ]
+        },
+        {
+          "id": "AC-4",
+          "text": "네이버 인증으로 반환된 이메일이 기존 ACCOUNT.EMAIL 과 일치하는 계정이 있으면 신규 계정을 생성하지 않고 기존 계정과 자동 연동한다(사용자 결정: 기존 계정과 연동 — Q-3).",
+          "kind": "rule",
+          "fnIds": ["flow:ANY /actions/Account.action?signon", "to-be:auth/naver-account-link"],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            { "file": "src/main/resources/database/jpetstore-hsqldb-data.sql", "line": 38 }
+          ],
+          "screenRefs": [],
+          "policyRefs": []
+        }
+      ],
+      "changeset": {
+        "added": ["to-be:auth/naver-callback", "to-be:auth/naver-account-link"],
+        "modified": ["flow:ANY /actions/Account.action?signon"],
+        "removed": [],
+        "revived": [],
+        "evidence": [
+          { "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 159 }
+        ]
+      },
+      "screenRefs": [
+        { "screenId": "screen:actions/Cart.action__removeItemFromCart_workingItemId", "annotationNo": 2, "note": "로그인 화면 진입 링크(Sign In)" }
+      ],
+      "policyRefs": [
+        { "doc": "policy-domain-account.md", "section": "4", "ruleId": "PL-001", "note": "" }
+      ]
+    },
+    {
+      "id": "SIR-010",
+      "category": "SIR",
+      "name": "네이버 OAuth2 연동",
+      "type": "nonfunctional",
+      "nfrCategory": "other",
+      "priority": "HIGH",
+      "status": "ACTIVE",
+      "derivedFrom": "SFR-010",
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": { "details": [], "inputs": "", "outputs": "", "flow": "", "preceding": [], "exceptions": [], "acceptance": [], "verify": "" },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "네이버 OAuth2 인증서버로 인가요청(authorize)을 보내고, 콜백에서 인가코드를 액세스 토큰으로 교환한다.",
+          "kind": "rule",
+          "fnIds": ["to-be:auth/naver-oauth-client"],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-2",
+          "text": "발급받은 액세스 토큰으로 네이버 프로필 API(닉네임·이메일 등)를 조회해 계정 연계에 사용한다.",
+          "kind": "rule",
+          "fnIds": ["to-be:auth/naver-oauth-client"],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        }
+      ],
+      "changeset": {
+        "added": ["to-be:auth/naver-oauth-client"],
+        "modified": [],
+        "removed": [],
+        "revived": [],
+        "evidence": []
+      },
+      "screenRefs": [],
+      "policyRefs": []
+    },
+    {
+      "id": "DAR-010",
+      "category": "DAR",
+      "name": "네이버 계정 연계 데이터",
+      "type": "nonfunctional",
+      "nfrCategory": "other",
+      "priority": "HIGH",
+      "status": "ACTIVE",
+      "derivedFrom": "SFR-010",
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": { "details": [], "inputs": "", "outputs": "", "flow": "", "preceding": [], "exceptions": [], "acceptance": [], "verify": "" },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "네이버 로그인 사용자와 기존 로컬 계정을 연계하기 위해 별도 연계 테이블(예: NAVER_ACCOUNT_LINK)을 신설하여 ACCOUNT.userid 와 네이버 고유 식별자를 매핑해 저장한다. SIGNON.PASSWORD(NOT NULL) 제약은 건드리지 않는다(사용자 결정: 별도 연계 테이블 신설 — Q-1).",
+          "kind": "rule",
+          "fnIds": ["to-be:auth/naver-account-link"],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            { "file": "src/main/resources/database/jpetstore-hsqldb-data.sql", "line": 37 },
+            { "file": "src/main/resources/database/jpetstore-hsqldb-data.sql", "line": 32 }
+          ],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-2",
+          "text": "연계 테이블은 ACCOUNT.userid 를 외래키로 참조해 계정과 네이버 식별자 사이의 연동 관계를 맺는다.",
+          "kind": "rule",
+          "fnIds": ["to-be:auth/naver-account-link"],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            { "file": "src/main/resources/database/jpetstore-hsqldb-data.sql", "line": 37 }
+          ],
+          "screenRefs": [],
+          "policyRefs": []
+        }
+      ],
+      "changeset": {
+        "added": ["to-be:auth/naver-account-link"],
+        "modified": [],
+        "removed": [],
+        "revived": [],
+        "evidence": []
+      },
+      "screenRefs": [],
+      "policyRefs": []
+    },
+    {
+      "id": "SER-010",
+      "category": "SER",
+      "name": "소셜 로그인 세션 보안",
+      "type": "nonfunctional",
+      "nfrCategory": "security",
+      "priority": "MEDIUM",
+      "status": "ACTIVE",
+      "derivedFrom": "SFR-010",
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": { "details": [], "inputs": "", "outputs": "", "flow": "", "preceding": [], "exceptions": [], "acceptance": [], "verify": "" },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "네이버 로그인 성공 후에도 기존 인증 상태 판정 규칙(인증 표시·계정 정보·아이디 보유)을 동일하게 적용해 세션 위조를 방지한다.",
+          "kind": "rule",
+          "fnIds": ["flow:ANY /actions/Account.action?signon"],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-2",
+          "text": "네이버로부터 받은 액세스 토큰은 세션에 원문으로 저장하지 않는다(로그인 성공 시 비밀번호를 세션에 남기지 않는 기존 처리와 동일 원칙).",
+          "kind": "rule",
+          "fnIds": ["flow:ANY /actions/Account.action?signon"],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        }
+      ],
+      "changeset": {
+        "added": [],
+        "modified": ["flow:ANY /actions/Account.action?signon"],
+        "removed": [],
+        "revived": [],
+        "evidence": []
+      },
+      "screenRefs": [],
+      "policyRefs": []
+    }
+  ],
+  "questions": [
+    {
+      "id": "Q-1",
+      "text": "SIGNON.PASSWORD 가 NOT NULL(varchar(25))인데 네이버 로그인 사용자는 비밀번호가 없다 — SIGNON 에 예외값(임의값/해시)을 채우는가, ACCOUNT 에 네이버 식별자 컬럼(예: NAVER_ID)을 추가해 소셜 계정을 별도로 다루는가, 아니면 별도 연계 테이블을 신설하는가?",
+      "targetReqId": "DAR-010",
+      "axis": "data",
+      "answer": "별도 연계 테이블 신설",
+      "answeredAt": "2026-07-19T08:04:51.417Z"
+    },
+    {
+      "id": "Q-2",
+      "text": "번들에 실제 로그인 폼 화면(예: Account.action?signonForm) 캡처가 선정되지 않았다 — 확인된 것은 Cart 화면의 'Sign In' 링크뿐이다. 네이버 로그인 버튼을 로그인 폼 내부에 넣을지, 이 링크 위치(메뉴)에 별도로 노출할지 확인이 필요하다.",
+      "targetReqId": "SFR-010",
+      "axis": "screen",
+      "answer": "로그인폼 내부",
+      "answeredAt": "2026-07-19T08:04:51.417Z"
+    },
+    {
+      "id": "Q-3",
+      "text": "네이버로 처음 로그인한 사용자가 기존 ACCOUNT 레코드(이메일 등)와 일치하면 자동으로 기존 계정과 연동하는가, 아니면 항상 신규 계정으로 생성하는가?",
+      "targetReqId": "SFR-010",
+      "axis": "domain",
+      "answer": "기존 계정과 연동",
+      "answeredAt": "2026-07-19T08:04:51.417Z"
+    }
+  ]
+}

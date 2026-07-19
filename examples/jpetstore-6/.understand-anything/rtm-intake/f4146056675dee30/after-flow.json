@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "flows": [
+    {
+      "domainId": "domain:account",
+      "baseTitle": "로그인",
+      "nodes": [
+        { "id": "s", "kind": "start", "label": "로그인 시작" },
+        {
+          "id": "a1",
+          "kind": "activity",
+          "label": "로그인 화면 표시",
+          "flowRef": "flow:ANY /actions/Account.action",
+          "verdict": "GROUNDED",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 151, "snippet": "    return new ForwardResolution(SIGNON);", "status": "ok" }
+          ]
+        },
+        {
+          "id": "a2",
+          "kind": "activity",
+          "label": "아이디·비밀번호 입력",
+          "verdict": "GROUNDED",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 76, "snippet": "  @Validate(required = true, on = { \"signon\", \"newAccount\", \"editAccount\" })", "status": "ok" }
+          ]
+        },
+        {
+          "id": "a3",
+          "kind": "activity",
+          "label": "계정 조회",
+          "flowRef": "flow:ANY /actions/Account.action?signon",
+          "verdict": "GROUNDED",
+          "change": "modified",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 161, "snippet": "    account = accountService.getAccount(getUsername(), getPassword());", "status": "ok" }
+          ]
+        },
+        {
+          "id": "d1",
+          "kind": "decision",
+          "label": "일치 계정 있는가",
+          "verdict": "GROUNDED",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 163, "snippet": "    if (account == null) {", "status": "ok" }
+          ]
+        },
+        {
+          "id": "a4",
+          "kind": "activity",
+          "label": "실패 안내 후 입력값 초기화",
+          "verdict": "GROUNDED",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 164, "snippet": "      String value = \"Invalid username or password.  Signon failed.\";", "status": "ok" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 166, "snippet": "      clear();", "status": "ok" }
+          ]
+        },
+        {
+          "id": "a5",
+          "kind": "activity",
+          "label": "비밀번호 제거",
+          "verdict": "GROUNDED",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 169, "snippet": "      account.setPassword(null);", "status": "ok" }
+          ]
+        },
+        {
+          "id": "a6",
+          "kind": "activity",
+          "label": "선호 분류 상품 목록 조회",
+          "verdict": "GROUNDED",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 170, "snippet": "      myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());", "status": "ok" }
+          ]
+        },
+        {
+          "id": "a7",
+          "kind": "activity",
+          "label": "세션에 계정 등록",
+          "verdict": "GROUNDED",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 171, "snippet": "      authenticated = true;", "status": "ok" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 174, "snippet": "      s.setAttribute(\"accountBean\", this);", "status": "ok" }
+          ]
+        },
+        {
+          "id": "a8",
+          "kind": "activity",
+          "label": "카탈로그 화면으로 이동",
+          "verdict": "GROUNDED",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 175, "snippet": "      return new RedirectResolution(CatalogActionBean.class);", "status": "ok" }
+          ]
+        },
+        { "id": "e1", "kind": "end", "label": "로그인 실패" },
+        { "id": "e2", "kind": "end", "label": "로그인 완료" },
+        {
+          "id": "naver-btn",
+          "kind": "activity",
+          "label": "네이버 로그인 버튼 클릭",
+          "flowRef": "to-be:auth/naver-callback",
+          "change": "added"
+        },
+        {
+          "id": "naver-auth",
+          "kind": "activity",
+          "label": "네이버 OAuth 인증 및 콜백 처리",
+          "flowRef": "to-be:auth/naver-callback",
+          "change": "added"
+        },
+        {
+          "id": "naver-ok",
+          "kind": "decision",
+          "label": "네이버 인증 성공했는가",
+          "flowRef": "to-be:auth/naver-callback",
+          "change": "added"
+        },
+        {
+          "id": "naver-link",
+          "kind": "decision",
+          "label": "기존 계정과 이메일 일치하는가",
+          "flowRef": "to-be:auth/naver-account-link",
+          "change": "added"
+        },
+        {
+          "id": "naver-new",
+          "kind": "activity",
+          "label": "네이버 식별자 연계 정보 신규 저장",
+          "flowRef": "to-be:auth/naver-account-link",
+          "change": "added"
+        }
+      ],
+      "edges": [
+        { "from": "s", "to": "a1" },
+        { "from": "a1", "to": "a2" },
+        { "from": "a2", "to": "a3" },
+        { "from": "a3", "to": "d1" },
+        { "from": "d1", "label": "NO", "to": "a4" },
+        { "from": "d1", "label": "YES", "to": "a5" },
+        { "from": "a4", "to": "e1" },
+        { "from": "a5", "to": "a6" },
+        { "from": "a6", "to": "a7" },
+        { "from": "a7", "to": "a8" },
+        { "from": "a8", "to": "e2" },
+        { "from": "a1", "to": "naver-btn", "change": "added" },
+        { "from": "naver-btn", "to": "naver-auth", "change": "added" },
+        { "from": "naver-auth", "to": "naver-ok", "change": "added" },
+        { "from": "naver-ok", "label": "NO", "to": "a4", "change": "added" },
+        { "from": "naver-ok", "label": "YES", "to": "naver-link", "change": "added" },
+        { "from": "naver-link", "label": "YES", "to": "a5", "change": "added" },
+        { "from": "naver-link", "label": "NO", "to": "naver-new", "change": "added" },
+        { "from": "naver-new", "to": "a5", "change": "added" }
+      ],
+      "note": "[추정] a1(로그인 화면 표시)에서 네이버 버튼 분기(AC-1, Q-2=로그인폼 내부) 삽입. 인증 실패는 기존 a4(실패 안내) 노드로 합류(AC-3, 동일 오류 처리). 인증 성공 후 이메일 일치 시 a5(비밀번호 제거)로 합류해 기존 세션 구성 로직을 재사용(AC-2, Q-3=기존 계정과 연동), 불일치 시 naver-new(연계 테이블 신규 저장, DAR-010)를 거쳐 동일하게 a5로 합류. a3(계정 조회)는 changeset.modified 대상 flow에 속해 modified로 표시했으나 활동 자체(비밀번호 조회)는 로컬 로그인 경로에서 불변."
+    }
+  ]
+}

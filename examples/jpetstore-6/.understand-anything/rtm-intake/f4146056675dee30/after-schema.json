@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "tables": [
+    {
+      "name": "NAVER_ACCOUNT_LINK",
+      "change": "added",
+      "columns": [
+        { "name": "naver_id", "type": "varchar(80)", "note": "네이버 고유 식별자 — DAR-010 AC-1" },
+        { "name": "userid", "type": "varchar(80)", "note": "ACCOUNT.userid 참조 — DAR-010 AC-1/AC-2" }
+      ],
+      "pk": ["naver_id"],
+      "fks": [
+        { "columns": ["userid"], "refTable": "ACCOUNT", "refColumns": ["userid"] }
+      ],
+      "note": "DAR-010 AC-1/AC-2 — 네이버 로그인 사용자와 기존 ACCOUNT 를 연계하는 별도 테이블(사용자 결정: 별도 연계 테이블 신설, Q-1). SIGNON.PASSWORD(NOT NULL) 제약은 건드리지 않는다."
+    }
+  ]
+}

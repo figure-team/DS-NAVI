@@ -1113,26 +1113,75 @@ function pickModel(raw: unknown): string | null {
   return typeof raw === "string" && HEADLESS_MODEL_WHITELIST.has(raw) ? raw : null;
 }
 
-// ── ktds: 구조 탭 "영향도 분석" — 자연어 → claude -p "/understand-impact <q>" ─────
+// ── ktds: 변경·영향 "자연어 영향 탐색" — 시드 게이트 2단계 ─────────────────────
 // 대시보드 dev server가 분석 대상 프로젝트(GRAPH_DIR)에서 claude 를 헤드리스로 spawn.
-// 스킬이 .understand-anything/impact-overlay.json 을 갱신 → 프론트가 재로드해 색칠.
+// 종전엔 단일 spawn 이 시드 선택~analyze 까지 자율 수행했다(IMPACT_AUTONOMY_DIRECTIVE).
+// /understand-impact SKILL §1 은 "✋ 확인 게이트(생략 불가)"로 시드 확정을 사람에게 두는데
+// 그 게이트를 지시문 한 줄로 무력화한 구조였다 — 2단계 분할로 게이트를 UI 로 복원한다:
+//   페이즈 A(candidates): POST /impact-analyze — 자연어 → 시드 **후보**만
+//     .understand-anything/impact-candidates.json 에 쓰고 멈춤(스킬 본연의 게이트 정지와 정렬).
+//   페이즈 B(analyze):   POST /impact-analyze-run — 사용자가 확정한 경로만으로 analyze 실행
+//     (시드 재량 금지). 종료 시 impact.json 의 시드와 확정 경로를 대조해 원장에 seedMatch 기록.
 const MAX_IMPACT_QUERY_BYTES = 16 * 1024;
+/** 페이즈 B 확정 시드 개수 상한 — UI 체크박스 확정 규모의 방어적 상한. */
+const MAX_IMPACT_SEED_PATHS = 100;
+const IMPACT_CANDIDATES_FILE = "impact-candidates.json";
+
+function impactCandidatesPath(projectRoot: string): string {
+  return path.join(projectRoot, ".understand-anything", IMPACT_CANDIDATES_FILE);
+}
 
 // /understand-impact SKILL.md 는 "✋ 확인 게이트(생략 불가)"로 시드 승인을 사람에게
 // 요구한다 → 헤드리스 claude -p 는 후보만 제시하고 멈춰 analyze 를 안 돌리고 overlay 미생성.
 // 대시보드 자동 실행 경로에서는 승인을 사전 부여로 간주하고 analyze 까지 완주하도록 지시한다.
-const IMPACT_AUTONOMY_DIRECTIVE = headlessDirective(
+/**
+ * 페이즈 A — 시드 **후보 제안까지만**. SKILL §1 의 게이트 정지가 스킬의 기본 동작이므로
+ * 이 지시문은 "후보를 파일로 남기라"만 덧붙인다(임의 analyze 진행 금지를 재확인).
+ */
+const IMPACT_CANDIDATES_DIRECTIVE = headlessDirective(
   "위 요청은 대시보드에서 자동 실행된 헤드리스 작업이다.",
-  "(시드 선택 승인은 이미 부여됨), 자연어를 가장 적절한 변경 시드 파일로 직접 매핑·확정한 뒤 " +
-    "멈추지 말고 analyze 단계까지 끝까지 실행하여 .understand-anything/impact-overlay.json 을 반드시 생성하라.",
+  " SKILL.md §1(시드 매핑)만 수행하라 — seeds 카탈로그로 위 자연어를 시드 **후보** 파일로 매핑해 " +
+    "`.understand-anything/impact-candidates.json` 에 JSON 으로 쓰고 **멈춰라. analyze 는 실행하지 마라** " +
+    "(✋확인 게이트는 대시보드 UI 가 대신한다 — 사용자가 후보를 확정하면 별도 실행이 온다). " +
+    '형식: {"query":"<질의 원문>","generatedAt":"<ISO8601>","candidates":[{"path":"<프로젝트 상대경로>",' +
+    '"reason":"<질의와의 연결 한 줄>","routeId":"<route:… 또는 null>","line":<카탈로그의 근거 라인 정수 또는 null>}]}. ' +
+    "path 는 seeds 카탈로그에 실재하는 파일만 쓴다(지어내기 금지). 매핑할 후보가 없으면 candidates 를 " +
+    "빈 배열로 쓰고 이유를 보고하라.",
 );
 
-type ImpactJob = ClaudeJobBase & { query: string | null; model: string | null };
+/** 페이즈 B — 사용자 확정 시드만으로 analyze. 시드 재량을 지시문에서 명시적으로 회수한다. */
+function impactAnalyzeRunDirective(paths: string[]): string {
+  return headlessDirective(
+    "위 요청은 대시보드에서 자동 실행된 헤드리스 작업이다.",
+    " 시드는 사용자가 대시보드에서 이미 **확정**했다(✋확인 게이트 통과) — 시드 매핑·후보 제시를 건너뛰고 " +
+      "SKILL.md §2 대로 정확히 다음 인자만으로 analyze 를 실행하라: " +
+      paths.map((p) => `--path ${p}`).join(" ") +
+      " . **시드를 추가·제거·교체하지 마라.** analyze 완료 후 " +
+      ".understand-anything/impact-overlay.json 생성까지 확인하고 멈춰라.",
+  );
+}
 
-// 모듈 스코프 단일 job(서버 수명 동안 추적). 동시 실행은 409로 차단.
-const impactTracker = new ClaudeJobTracker<{ query: string | null; model: string | null }>({
+type ImpactPhase = "candidates" | "analyze";
+type ImpactJob = ClaudeJobBase & {
+  query: string | null;
+  model: string | null;
+  /** 어느 페이즈의 spawn 인가 — 프론트가 완료 후처리(후보 로드 vs 오버레이 리로드)를 가른다. */
+  phase: ImpactPhase | null;
+  /** 페이즈 B 에서 사용자가 확정한 시드 경로(프로젝트 상대) — 원장 seedMatch 대조 입력. */
+  confirmedPaths: string[] | null;
+};
+
+// 모듈 스코프 단일 job(서버 수명 동안 추적). 동시 실행은 409로 차단 — 페이즈 A/B 가 공유한다.
+const impactTracker = new ClaudeJobTracker<{
+  query: string | null;
+  model: string | null;
+  phase: ImpactPhase | null;
+  confirmedPaths: string[] | null;
+}>({
   query: null,
   model: null,
+  phase: null,
+  confirmedPaths: null,
 });
 
 /** 분석 대상 프로젝트 루트 — GRAPH_DIR 우선, 없으면 knowledge-graph.json 위치에서 유도. */
@@ -1143,8 +1192,10 @@ function impactProjectRoot(): string | null {
 }
 
 /**
- * POST /impact-analyze — { query } 자연어로 claude -p "/understand-impact <query>" 실행.
+ * POST /impact-analyze — 페이즈 A: { query } 자연어로 시드 **후보만** 제안받는다.
  * 즉시 202 + job 반환, 프로세스는 백그라운드 지속(프론트가 /impact-status 폴링).
+ * 원장에는 기록하지 않는다 — 루트 슬롯을 갱신하지 않는 준비 단계라 실패/무산이
+ * 분석 이력으로 남으면 원장이 오염된다(analyze 는 페이즈 B 가 기록).
  */
 function handleImpactAnalyzePost(
   req: import("http").IncomingMessage,
@@ -1177,17 +1228,160 @@ function handleImpactAnalyzePost(
         sendJson(res, 400, { error: "Missing 'query'" });
         return;
       }
-      const jobId = impactTracker.begin({ query, model });
+      // stale 방지 — 이전 실행의 후보가 새 질의의 후보로 둔갑하지 않게 스폰 전에 지운다.
+      try {
+        fs.rmSync(impactCandidatesPath(projectRoot), { force: true });
+      } catch {
+        // 삭제 실패는 무시(신선도 검사가 2차 방어)
+      }
+      const jobId = impactTracker.begin({ query, model, phase: "candidates", confirmedPaths: null });
+      const launched = runClaudeSkill({
+        prompt: `/understand-impact ${query}${IMPACT_CANDIDATES_DIRECTIVE}`,
+        cwd: projectRoot,
+        jobId,
+        tracker: impactTracker,
+        model: model ?? undefined,
+        onSpawnError: () =>
+          sendJson(res, 500, { error: "Failed to launch claude", job: impactTracker.snapshot() }),
+        // exit 0 이어도 후보 파일이 이 job 에서 생성되지 않았으면 실질 실패 — 삭제 후 미생성이므로
+        // 부재 자체가 판정이지만, 만의 하나 삭제가 실패했을 때를 위해 mtime 신선도로 판정한다.
+        onClose: (code) => {
+          if (!impactTracker.finish(jobId, code)) return;
+          if (impactTracker.job.status !== "done") return;
+          const startedMs = impactTracker.job.startedAt
+            ? Date.parse(impactTracker.job.startedAt)
+            : Number.NaN;
+          const mtime = artifactMtimeMs(impactCandidatesPath(projectRoot));
+          const fresh =
+            !Number.isNaN(mtime) && (Number.isNaN(startedMs) || mtime >= startedMs - 1000);
+          if (!fresh) {
+            impactTracker.job.status = "failed";
+            impactTracker.appendTail(
+              "\n[phase A] impact-candidates.json 이 생성되지 않아 실패 처리\n",
+            );
+          }
+        },
+      });
+      if (!launched) return;
+      sendJson(res, 202, { job: impactTracker.snapshot() });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
+/**
+ * 페이즈 B 시드 경로 검증 — 프로젝트 내부 상대경로·실존 파일만 통과.
+ * 하나라도 어긋나면 전체 거부(부분 진행 금지 — 사용자가 확정한 집합 그대로여야 게이트다).
+ */
+function validateSeedPaths(
+  projectRoot: string,
+  raw: unknown,
+): { ok: true; paths: string[] } | { ok: false; error: string } {
+  if (!Array.isArray(raw) || raw.length === 0) {
+    return { ok: false, error: "paths (non-empty array) is required" };
+  }
+  if (raw.length > MAX_IMPACT_SEED_PATHS) {
+    return { ok: false, error: `too many paths (max ${MAX_IMPACT_SEED_PATHS})` };
+  }
+  const paths: string[] = [];
+  const seen = new Set<string>();
+  for (const item of raw) {
+    if (typeof item !== "string" || !item.trim()) {
+      return { ok: false, error: "paths must be non-empty strings" };
+    }
+    const p = item.trim();
+    if (p.includes("\0")) return { ok: false, error: `invalid path: ${p}` };
+    if (path.isAbsolute(p)) return { ok: false, error: `absolute path not allowed: ${p}` };
+    const normalized = path.normalize(p);
+    if (
+      normalized === "." ||
+      normalized === ".." ||
+      normalized.startsWith(`..${path.sep}`) ||
+      path.isAbsolute(normalized)
+    ) {
+      return { ok: false, error: `path escapes project: ${p}` };
+    }
+    const rel = normalized.split(path.sep).join("/");
+    let stat: fs.Stats;
+    try {
+      stat = fs.statSync(path.resolve(projectRoot, normalized));
+    } catch {
+      return { ok: false, error: `path not found in project: ${rel}` };
+    }
+    if (!stat.isFile()) return { ok: false, error: `not a file: ${rel}` };
+    if (!seen.has(rel)) {
+      seen.add(rel);
+      paths.push(rel);
+    }
+  }
+  return { ok: true, paths };
+}
+
+/**
+ * POST /impact-analyze-run — 페이즈 B: { paths, query?, model? } 사용자 확정 시드로 analyze.
+ * 원장 기록·WAL·스냅샷은 종전 단일 실행과 동일 규약이되, 확정 시드(seedGate)와
+ * 산출 시드 대조 결과(seedMatch)가 원장 항목에 추가로 실린다.
+ */
+function handleImpactAnalyzeRunPost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  if (impactTracker.running) {
+    sendJson(res, 409, {
+      error: "An impact analysis is already running",
+      job: impactTracker.snapshot(),
+    });
+    return;
+  }
+  const projectRoot = impactProjectRoot();
+  if (!projectRoot) {
+    sendJson(res, 404, { error: "No project found. Run /understand first." });
+    return;
+  }
+  collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
+    .then((body) => {
+      let parsed: { paths?: unknown; query?: unknown; model?: unknown };
+      try {
+        parsed = JSON.parse(body) as typeof parsed;
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const checked = validateSeedPaths(projectRoot, parsed.paths);
+      if (!checked.ok) {
+        sendJson(res, 400, { error: checked.error });
+        return;
+      }
+      // 질의 원문은 원장 표시용 — 페이즈 A 를 거쳤으면 프론트가 들고 있고, 비어 있으면
+      // 후보 파일의 query 로 폴백한다(직접 경로 지정 실행도 원장에서 식별 가능해야 한다).
+      let query = typeof parsed.query === "string" ? parsed.query.trim() : "";
+      if (!query) {
+        try {
+          const cand = JSON.parse(
+            fs.readFileSync(impactCandidatesPath(projectRoot), "utf-8"),
+          ) as { query?: unknown };
+          if (typeof cand.query === "string") query = cand.query;
+        } catch {
+          // 후보 파일 부재/파손 → 질의 미상으로 기록
+        }
+      }
+      const model = pickModel(parsed.model);
+      const jobId = impactTracker.begin({
+        query,
+        model,
+        phase: "analyze",
+        confirmedPaths: checked.paths,
+      });
       // WAL: 스폰 전 pending 마커 — 서버가 job 도중 재시작해 close 핸들러를 잃어도
-      // /impact-history 조회 시 reconcile 이 산출물 mtime 으로 결과를 복원한다(질의문·모델 보존).
+      // /impact-history 조회 시 reconcile 이 산출물 mtime 으로 결과를 복원한다(확정 시드 보존).
       writePendingMarker(impactHistoryDir(projectRoot), {
         jobId,
         query,
         model,
         startedAt: impactTracker.job.startedAt,
+        confirmedPaths: checked.paths,
       });
       const launched = runClaudeSkill({
-        prompt: `/understand-impact ${query}${IMPACT_AUTONOMY_DIRECTIVE}`,
+        prompt: `/understand-impact ${query}${impactAnalyzeRunDirective(checked.paths)}`,
         cwd: projectRoot,
         jobId,
         tracker: impactTracker,
@@ -1239,6 +1433,16 @@ interface ImpactHistoryEntry {
    * 슬롯을 고아로 오판한다.
    */
   rootSlot: boolean;
+  /**
+   * 시드 확정 경로 — "user-confirmed" = 사용자가 후보를 확정한 페이즈 B 실행.
+   * 부재/null = 구 자율 실행(LLM 이 시드를 골랐다) 또는 RTM 요청 유래(rootSlot:false 로 구분).
+   */
+  seedGate: "user-confirmed" | null;
+  /**
+   * 산출 impact.json 의 시드가 확정 경로와 일치했나 — false 는 spawn 된 claude 가
+   * 지시를 벗어나 시드를 바꿨다는 뜻(원장에 경고로 노출). 대조 불가(비확정 실행)면 null.
+   */
+  seedMatch: boolean | null;
 }
 
 function impactHistoryDir(projectRoot: string): string {
@@ -1292,6 +1496,28 @@ function recordImpactHistory(projectRoot: string, job: ImpactJob): void {
         }
       }
     }
+    // 시드 대조(페이즈 B) — 산출 impact.json 의 seeds[].relPath 집합이 사용자가 확정한
+    // 경로 집합과 일치하는지. 불일치는 spawn 이 지시를 벗어난 것 — 원장에 경고로 남는다.
+    const confirmed = Array.isArray(job.confirmedPaths) ? job.confirmedPaths : null;
+    let seedMatch: boolean | null = null;
+    if (confirmed && files.includes("impact.json")) {
+      try {
+        const parsed = JSON.parse(
+          fs.readFileSync(path.join(snapDir, "impact.json"), "utf-8"),
+        ) as { seeds?: Array<{ relPath?: unknown }> };
+        // 엔진 relPath 표기 편차(역슬래시·선행 ./) 방어 — 표기 차이로 불일치 오탐을 내지 않는다.
+        const canon = (p: string): string => p.replace(/\\/g, "/").replace(/^\.\//, "");
+        const actual = new Set(
+          (parsed.seeds ?? [])
+            .map((s) => (typeof s.relPath === "string" ? canon(s.relPath) : ""))
+            .filter(Boolean),
+        );
+        seedMatch =
+          actual.size === confirmed.length && confirmed.every((p) => actual.has(p));
+      } catch {
+        seedMatch = false; // 산출 파싱 불가 = 대조 실패로 기록(조용한 통과 금지)
+      }
+    }
     const entry: ImpactHistoryEntry = {
       jobId,
       query: job.query ?? "",
@@ -1304,6 +1530,8 @@ function recordImpactHistory(projectRoot: string, job: ImpactJob): void {
       gitCommit,
       files,
       rootSlot: true, // 서버가 띄운 /understand-impact 는 정의상 루트 슬롯을 갱신한다
+      seedGate: confirmed ? "user-confirmed" : null,
+      seedMatch,
     };
     for (const drop of appendLedgerEntry(dir, entry, IMPACT_HISTORY_MAX)) {
       try {
@@ -1338,6 +1566,11 @@ function reconcileImpactHistory(projectRoot: string): void {
         finishedAt: fresh ? new Date(artifactMs).toISOString() : new Date().toISOString(),
         exitCode: null,
         tail: "",
+        // pending 마커는 페이즈 B(analyze)만 남긴다 — 확정 시드를 복원해 seedMatch 대조 유지.
+        phase: "analyze",
+        confirmedPaths: Array.isArray(pending.confirmedPaths)
+          ? pending.confirmedPaths.filter((p): p is string => typeof p === "string")
+          : null,
       });
     },
   });
@@ -2349,6 +2582,8 @@ export default defineConfig({
             pathname === "/doc" ||
             pathname === "/doc-xlsx" ||
             pathname === "/impact-analyze" ||
+            pathname === "/impact-analyze-run" ||
+            pathname === "/impact-candidates.json" ||
             pathname === "/impact-status" ||
             pathname === "/impact-history" ||
             pathname === "/impact-history-item" ||
@@ -2527,10 +2762,30 @@ export default defineConfig({
             return;
           }
 
-          // ktds: 구조 탭 "영향도 분석" — claude -p "/understand-impact <q>" 실행/상태.
+          // ktds: 변경·영향 "자연어 영향 탐색" — 시드 게이트 2단계 실행/상태.
           if (pathname === "/impact-analyze") {
             if (req.method === "POST") handleImpactAnalyzePost(req, res);
-            else sendJson(res, 405, { error: "Use POST to start impact analysis" });
+            else sendJson(res, 405, { error: "Use POST to propose seed candidates" });
+            return;
+          }
+          if (pathname === "/impact-analyze-run") {
+            if (req.method === "POST") handleImpactAnalyzeRunPost(req, res);
+            else sendJson(res, 405, { error: "Use POST to run analysis with confirmed seeds" });
+            return;
+          }
+          // 페이즈 A 산출(시드 후보) 열람 — 사용자 확정 UI 의 데이터 소스.
+          if (pathname === "/impact-candidates.json") {
+            const candRoot = impactProjectRoot();
+            const candFile = candRoot ? impactCandidatesPath(candRoot) : null;
+            if (!candFile || !fs.existsSync(candFile)) {
+              sendJson(res, 404, { error: "No seed candidates. Run impact-analyze first." });
+              return;
+            }
+            try {
+              sendJson(res, 200, JSON.parse(fs.readFileSync(candFile, "utf-8")));
+            } catch {
+              sendJson(res, 500, { error: "Failed to read candidates" });
+            }
             return;
           }
           if (pathname === "/impact-status") {

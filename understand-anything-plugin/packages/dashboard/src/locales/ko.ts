@@ -289,24 +289,39 @@ export const ko = {
     seed: "변경예정",
     affected: "영향받음",
   },
-  // ktds: 구조 탭 "영향도 분석" 버튼/모달 — 자연어 → claude -p /understand-impact
+  // ktds: 변경·영향 "자연어 영향 탐색" 버튼/모달 — 시드 게이트 2단계
+  // (자연어 → 시드 후보 제안 → 사용자 확정 → analyze).
   impactAnalyze: {
-    title: "변경 영향도 분석",
+    title: "자연어 영향 탐색",
     description:
-      "변경하려는 내용을 자연어로 설명하세요. 분석이 끝나면 그래프 탭에 변경/영향 노드가 표시됩니다.",
+      "변경하려는 내용을 자연어로 설명하세요. 먼저 시드 후보를 제안받고, 확정한 시드로만 분석이 실행됩니다. 결과는 이 변경·영향 메뉴(및 구조 그래프 오버레이)에 반영됩니다.",
+    intakeHint:
+      "탐색용 분석입니다 — 정식 요청 접수·요구사항 분해는 추적표 → 요청 세션에서 진행하세요.",
     placeholder: "예: 카카오 소셜 로그인을 추가하려고 해",
-    run: "분석 실행",
+    run: "시드 후보 제안받기",
     submitting: "시작 중…",
     cancel: "취소",
-    running: "영향도 분석 중",
-    runningHint: "영향도 분석이 진행 중입니다 — 클릭하여 입력 보기",
+    running: "영향 탐색 중",
+    runningHint: "영향 탐색이 진행 중입니다 — 클릭하여 보기",
     alreadyRunning: "이미 분석이 진행 중입니다. 완료 후 다시 실행하세요.",
     errNoServer: "쓰기 가능한 dev server가 아니어서 분석을 실행할 수 없습니다.",
     errGeneric: "분석 실행에 실패했습니다.",
     modelDefault: "세션 모델(기본)",
     modelAria: "분석 모델 선택",
-    toastDone: "영향도 분석 완료 — 그래프 탭에 결과를 표시했습니다.",
+    toastDone: "영향도 분석 완료 — 변경·영향 메뉴에 결과를 기록했습니다.",
     toastFailed: "영향도 분석에 실패했습니다. 콘솔/로그를 확인하세요.",
+    // 시드 게이트 단계(페이즈 A 산출 → 사용자 확정 → 페이즈 B)
+    candidatesTitle: "시드 후보 확정",
+    candidatesDesc:
+      "질의에 대해 제안된 시드 후보입니다. 분석에 쓸 파일을 확정하세요 — 시드는 모델이 아니라 사용자가 정합니다.",
+    candidatesEmpty: "제안된 후보가 없습니다. 질의를 바꾸거나 경로를 직접 추가하세요.",
+    candidatesLoadFailed: "시드 후보를 불러오지 못했습니다.",
+    candidatesFor: "질의",
+    addPathPlaceholder: "직접 추가: 프로젝트 상대 경로",
+    addPath: "추가",
+    analyzeRun: "이 시드로 분석",
+    newQuery: "새 질의",
+    toastCandidates: "시드 후보 준비 — 후보를 확정하면 분석이 실행됩니다.",
   },
   layer: {
     defaultName: "레이어",

@@ -291,22 +291,36 @@ export const en = {
   },
   // ktds: structure tab "Impact analysis" button/modal — NL → claude -p /understand-impact
   impactAnalyze: {
-    title: "Change Impact Analysis",
+    title: "Impact Exploration (Natural Language)",
     description:
-      "Describe the change you intend to make in natural language. When the analysis finishes, changed/affected nodes are highlighted on the Graph tab.",
+      "Describe the change you intend to make in natural language. Seed candidates are proposed first; the analysis runs only on the seeds you confirm. Results land in this Change Impact menu (and the structure graph overlay).",
+    intakeHint:
+      "This is an exploratory analysis — for formal request intake and requirement breakdown, use Traceability → Request Sessions.",
     placeholder: "e.g. I want to add Kakao social login",
-    run: "Run analysis",
+    run: "Propose seed candidates",
     submitting: "Starting…",
     cancel: "Cancel",
-    running: "Analyzing impact",
-    runningHint: "Impact analysis in progress — click to view input",
+    running: "Exploring impact",
+    runningHint: "Impact exploration in progress — click to view",
     alreadyRunning: "An analysis is already running. Try again once it finishes.",
     errNoServer: "Cannot run analysis: not a writable dev server.",
     errGeneric: "Failed to start analysis.",
     modelDefault: "Session model (default)",
     modelAria: "Select analysis model",
-    toastDone: "Impact analysis complete — results highlighted on the Graph tab.",
+    toastDone: "Impact analysis complete — results recorded in the Change Impact menu.",
     toastFailed: "Impact analysis failed. Check the console/logs.",
+    // Seed-gate step (phase A result → user confirmation → phase B)
+    candidatesTitle: "Confirm seed candidates",
+    candidatesDesc:
+      "Proposed seed candidates for your query. Confirm the files to analyze — you decide the seeds, not the model.",
+    candidatesEmpty: "No candidates were proposed. Refine the query or add paths manually.",
+    candidatesLoadFailed: "Failed to load seed candidates.",
+    candidatesFor: "Query",
+    addPathPlaceholder: "Add manually: project-relative path",
+    addPath: "Add",
+    analyzeRun: "Analyze with these seeds",
+    newQuery: "New query",
+    toastCandidates: "Seed candidates ready — confirm them to run the analysis.",
   },
   layer: {
     defaultName: "Layer",

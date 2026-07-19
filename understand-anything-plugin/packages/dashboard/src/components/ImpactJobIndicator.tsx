@@ -2,13 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { useDashboardStore } from "../store";
 import { useI18n } from "../contexts/I18nContext";
 
-// ktds: 구조 탭 "영향도 분석" 진행 인디케이터 + 완료 토스트. 헤더에 항상 마운트되어
+// ktds: 변경·영향 "자연어 영향 탐색" 진행 인디케이터 + 완료 토스트. 헤더에 항상 마운트되어
 // 모달을 닫거나 다른 탭을 봐도 job 상태를 추적한다(전역 store.impactJob 구독).
 // - running 동안 GET /impact-status 폴링
-// - running → done 전이 시 impact-overlay.json 재로드 + 완료 토스트
+// - 페이즈 A(candidates) done → 모달 자동 오픈(후보 확정 단계) + 준비 토스트
+// - 페이즈 B(analyze) done → impact-overlay.json 재로드 + 완료 토스트
 // - running → failed 전이 시 실패 토스트
 export default function ImpactJobIndicator() {
   const status = useDashboardStore((s) => s.impactJob.status);
+  const phase = useDashboardStore((s) => s.impactJob.phase);
   const pollImpactStatus = useDashboardStore((s) => s.pollImpactStatus);
   const reloadImpactOverlay = useDashboardStore((s) => s.reloadImpactOverlay);
   const openImpactModal = useDashboardStore((s) => s.openImpactModal);
@@ -29,16 +31,22 @@ export default function ImpactJobIndicator() {
     return () => clearInterval(id);
   }, [status, pollImpactStatus]);
 
-  // 상태 전이 후처리.
+  // 상태 전이 후처리 — 페이즈에 따라 갈린다.
   useEffect(() => {
     if (prev.current === "running" && status === "done") {
-      void reloadImpactOverlay();
-      setToast({ kind: "done", msg: t.impactAnalyze.toastDone });
+      if (phase === "candidates") {
+        // 페이즈 A 완료 = 시드 후보 준비 — 오버레이는 아직 없다. 확정 단계로 이끈다.
+        openImpactModal();
+        setToast({ kind: "done", msg: t.impactAnalyze.toastCandidates });
+      } else {
+        void reloadImpactOverlay();
+        setToast({ kind: "done", msg: t.impactAnalyze.toastDone });
+      }
     } else if (prev.current === "running" && status === "failed") {
       setToast({ kind: "failed", msg: t.impactAnalyze.toastFailed });
     }
     prev.current = status;
-  }, [status, reloadImpactOverlay, t]);
+  }, [status, phase, reloadImpactOverlay, openImpactModal, t]);
 
   // 토스트 자동 사라짐.
   useEffect(() => {

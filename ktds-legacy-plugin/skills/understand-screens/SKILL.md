@@ -68,6 +68,12 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> status  
   굽지 않음 — 대시보드가 오버레이 렌더).
 - `missing[]` — 도달 실패 정직 보고(`http-*`/`redirected-to:*`/`scenario-failed` 등).
   조용한 누락 금지. `unmatchedJsps[]` 가 비어야 전수 커버.
+  routes census(`.spec/map/routes.json`)가 있으면 각 건에 **트리아지**(`triage.class`)가
+  결정론 부여된다(SCREENS_MISSING_TRIAGE_DESIGN §2): `dead-menu`(라우트 자체 부재 —
+  진짜 도달 불가) / `stale-url`(같은 디렉터리에 현행 후보 라우트 실존 — `candidateRoute`
+  로 제시) / `param-required`(400+라우트 실존) / `auth-gated`(로그인 리다이렉트) /
+  `server-error` / `route-missing-hit`(라우트 실존인데 404 — 배포 누락 의심) 등.
+  트리아지·`seededFrom` 은 Stage A 기계 사실이라 mechanicalHash 봉인 대상이다.
 
 ## Stage B 채움 계약 (호스트 수행)
 
@@ -157,6 +163,13 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> status  
 - **팝업/새창**: window.open → 별도 화면(`openedFrom`); alert/confirm → 기본 dismiss
   (스텝 `dialog: accept` 로 변경).
 - **HTTP 오류**: 캡처 대신 `http-<status>` 보고 — 깨진 링크는 그 자체로 QA 근거.
+- **census 보조 시드**(config `screens.censusSeed`, 기본 활성): 크롤·시나리오가 끝난 뒤
+  routes census 의 **미방문 GET-safe 라우트**(목록성 leaf `…List/…ListView/…Main/…Index`
+  만, `insert|update|delete|regist|action|save|modify|remove|login|logout` 토큰은 항상
+  제외 — 비인증 GET-만 원칙의 연장)를 재시도해 메뉴가 낡아 놓친 실존 화면을 회수한다.
+  회수 화면은 `seededFrom: "routes-census"` 로 표기(메뉴 링크 없음 = 메뉴 정비 후보).
+  로그인 필요 앱은 `censusSeed.scenarioId` 로 해당 시나리오의 인증 컨텍스트에서 수행.
+  예산은 `censusSeed.maxPages`(기본 40, 0=비활성) — 초과분은 로그로 정직 보고.
 
 ## 출력 해석
 

@@ -30,6 +30,8 @@ export interface Screen {
   domain: string | null;
   scenario: string | null;
   openedFrom: string | null;
+  /** routes census 보조 시드로만 도달한 화면(메뉴 링크 없음) — 구버전 산출물엔 없다. */
+  seededFrom?: "routes-census" | null;
   graphNodeId: string | null;
   capture: { path: string; width: number; height: number; capturedAt: string };
   summary: { text: string; confidence: string } | null;

@@ -17,6 +17,7 @@
 | `RTM_INTAKE_WORKSPACE_DESIGN.md` | 새 요청 = 추적표 "요청 세션" 탭 워크스페이스 | W1~W5 구현 완료 + 07-17 개편으로 일부 낡음(아래 드리프트 참조) |
 | `RTM_IMPACT_GATE_DESIGN.md` | 인테이크↔impact 근거 게이트 (2차 개정판) | **제안 상태 — 사용자 승인 전** |
 | `RTM_AFTER_FLOW_DESIGN.md` | ② 에프터 업무흐름도 초안(after-flow.json) — 비포·에프터의 구조 diff | 2026-07-17 신설 |
+| `SCREENS_MISSING_TRIAGE_DESIGN.md` | 화면설계서 missing 트리아지 — routes census 교차검증·보조 시드 | **제안 상태 — 사용자 승인 전**(2026-07-19, egov 25건 실측 기반) |
 | `FEATURE_VERIFICATION_GUIDE.md` | 전 기능 점검 절차 | ⚠️ emit을 fill 없이 돌리면 그래프 클로버 주의 포함 |
 | `VERSION_TRACKING.md` | 버전 체계 | Scheme A(5파일)+Scheme B(2파일) |
 | `front-redesign/` (pmpl-proto.html 등) | 디자인 프로토 원본 | 신규 메뉴 탭/표 스타일의 수치 기준 |

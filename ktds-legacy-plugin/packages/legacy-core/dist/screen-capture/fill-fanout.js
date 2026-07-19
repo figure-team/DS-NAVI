@@ -825,7 +825,7 @@ export async function mergeScreenFillFragments(projectRoot) {
         });
     }
     // 불변 봉인 재확인: 채움은 기계 필드를 건드리지 않으므로 해시가 그대로여야 한다.
-    const newHash = computeMechanicalHash(mergedScreens);
+    const newHash = computeMechanicalHash(mergedScreens, file.missing);
     if (newHash !== file.mechanicalHash) {
         throw new Error(`mechanicalHash 변동 감지 — 병합이 봉인 필드를 건드렸습니다(버그). ` +
             `기대 ${file.mechanicalHash.slice(0, 12)}… 실제 ${newHash.slice(0, 12)}…`);

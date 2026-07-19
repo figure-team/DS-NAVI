@@ -28,12 +28,36 @@ import SearchInput from "./ui/SearchInput";
  * (판정·라벨 유도는 screenSpecAnnotations.ts).
  */
 
+/** missing 트리아지(엔진 결정론 부여) — 구버전 산출물엔 없다. */
+interface MissingTriage {
+  class: string;
+  routeExists: boolean;
+  candidateRoute: { path: string; handler: string | null; filePath: string | null; line: number | null } | null;
+}
 interface ScreensFile {
   baseUrl: string;
   screens: Screen[];
   unmatchedJsps: string[];
   fragments: string[];
-  missing: Array<{ url: string; reason: string }>;
+  missing: Array<{ url: string; reason: string; triage?: MissingTriage | null }>;
+}
+
+/** 트리아지 분류 → 한국어 라벨(도달실패 칩 모달의 사유 접두). */
+const TRIAGE_LABELS: Record<string, string> = {
+  "dead-menu": "죽은 메뉴 — 코드에 라우트 없음",
+  "stale-url": "낡은 URL — 현행 라우트 존재",
+  "param-required": "필수 파라미터 누락",
+  "auth-gated": "인증 게이트",
+  "redirect-other": "리다이렉트",
+  "server-error": "서버 오류",
+  "route-missing-hit": "라우트 존재·404 — 배포 누락 의심",
+  unknown: "미분류",
+};
+function missingReasonText(m: { reason: string; triage?: MissingTriage | null }): string {
+  if (!m.triage) return m.reason;
+  const label = TRIAGE_LABELS[m.triage.class] ?? m.triage.class;
+  const cand = m.triage.candidateRoute ? ` → 현행 후보 ${m.triage.candidateRoute.path}` : "";
+  return `[${label}]${cand} · ${m.reason}`;
 }
 interface AnnOverride { description?: string; label?: string; note?: string; hidden?: boolean }
 interface ScreenOverride {
@@ -811,7 +835,7 @@ export default function ScreenSpecView() {
               title={`도달 실패 ${file.missing.length}건`}
               sub="— 요청했으나 응답에 실패한 URL"
               items={file.missing.map(
-                (m): DbUnresolved => ({ ref: m.url, reason: m.reason, severity: "warn" }),
+                (m): DbUnresolved => ({ ref: m.url, reason: missingReasonText(m), severity: "warn" }),
               )}
             />
           )}
@@ -1012,11 +1036,16 @@ export default function ScreenSpecView() {
               </MetaRow>
             )}
             {/* 2군: 맥락(도달 시나리오·진입 경로·설명) — 1군과 구분선 하나로만 나눈다 */}
-            {(sel.scenario || sel.openedFrom || summaryInfo) && (
+            {(sel.scenario || sel.openedFrom || sel.seededFrom || summaryInfo) && (
               <div style={{ borderTop: "1px solid var(--color-border-subtle)", marginTop: 3, paddingTop: 3 }}>
                 {sel.scenario && (
                   <MetaRow label="도달 시나리오" help="캡처 봇이 이 화면에 도달하려고 먼저 수행한 사전 절차(예: signon=로그인 후, order-flow=주문 진행 중, error=오류 유도)">
                     {sel.scenario}
+                  </MetaRow>
+                )}
+                {sel.seededFrom === "routes-census" && (
+                  <MetaRow label="도달 방식" help="앱 메뉴/링크로는 연결돼 있지 않아, 코드 라우트 전수조사(routes census)의 URL 직접 접근으로만 도달한 화면 — 메뉴 정비 후보">
+                    census 시드 (메뉴 링크 없음)
                   </MetaRow>
                 )}
                 {sel.openedFrom && (

@@ -44,6 +44,21 @@ export const ScreensConfigSchema = z.object({
   exclude: z.array(z.string()).default([]),
   /** 크롤 시드 추가 URL(baseUrl 상대) — 링크로 발견 불가한 화면(검색 결과 등). */
   seedUrls: z.array(z.string()).default([]),
+  /**
+   * routes census 보조 시드(SCREENS_MISSING_TRIAGE_DESIGN §3) — 크롤·시나리오가 끝난 뒤
+   * .spec/map/routes.json 의 미방문 GET-safe 라우트(목록성 leaf 만, 부작용 계열 deny)를
+   * 재시도해 메뉴가 낡아 놓친 실존 화면을 회수한다. scenarioId 를 주면 해당 시나리오의
+   * 인증 컨텍스트 안에서(captureAfter 후) 수행한다(로그인 필요 앱).
+   */
+  censusSeed: z
+    .object({
+      enabled: z.boolean().default(true),
+      /** 보조 시드 캡처 상한(0 = 비활성). 크롤 maxPages 와 별도 예산. */
+      maxPages: z.number().int().default(40),
+      /** 이 id 의 시나리오 컨텍스트에서 수행(미지정 = 비인증 크롤 직후). */
+      scenarioId: z.string().nullable().default(null),
+    })
+    .default({ enabled: true, maxPages: 40, scenarioId: null }),
   /** 상태 필요 화면 도달 시나리오(로그인, 장바구니 담기 등). */
   scenarios: z
     .array(

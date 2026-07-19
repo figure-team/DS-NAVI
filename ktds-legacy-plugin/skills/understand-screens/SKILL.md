@@ -1,7 +1,7 @@
 ---
 name: understand-screens
 description: 화면설계서 생성 — 실제 앱 기동·캡처(Stage A) 후 이벤트별 동작을 근거 기반으로 채움(Stage B), 대시보드 화면설계서 탭 데이터
-argument-hint: ["[projectRoot]", "[capture|fill-prep|fill-audit|fill-merge|resolve-views|assign-domains|validate|status]"]
+argument-hint: ["[projectRoot]", "[scaffold|capture|fill-prep|fill-audit|fill-merge|resolve-views|assign-domains|validate|status]"]
 ---
 
 # /understand-screens
@@ -15,6 +15,7 @@ argument-hint: ["[projectRoot]", "[capture|fill-prep|fill-audit|fill-merge|resol
 ## 실행
 
 ```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> scaffold    # screens 설정 초안(--force 재생성)
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> capture     # Stage A
 # → Stage B: 규모 게이트에 따라 인라인 채움 또는 팬아웃(아래 "Stage B 채움 계약")
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> fill-prep    # 팬아웃 청크 준비
@@ -27,8 +28,13 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> status  
 ```
 
 - 선행: `understanding.config.json` 의 `screens` 섹션(baseUrl, startCommand, scenarios 등).
-  없으면 capture 가 예시와 함께 안내 후 종료한다. 로그인/권한 화면은 **시나리오**(테스트
-  계정 포함)로 도달한다 — 계정 정보는 도구가 유추할 수 없으므로 사용자에게 요청한다.
+  없으면 capture 가 **routes census 로 초안을 자동 생성**(scaffold)하고 확인 정지한다 —
+  baseUrl(contextPath 추정)·startCommand(pom/gradle 플러그인 감지)·seedUrls(GET-safe 목록성
+  라우트)는 자동, **로그인 계정·셀렉터는 코드에서 유추 불가**하므로 scenarios 는 빈 채로
+  남는다. 사용자가 초안의 "확인 필요" 항목을 채운 뒤 capture 를 재실행한다(추정값으로
+  말없이 진행하지 않는다). 초안 재생성은 `scaffold --force`. 로그인/권한 화면은
+  **시나리오**(테스트 계정 포함)로 도달한다 — 계정 정보는 도구가 유추할 수 없으므로
+  사용자에게 요청한다(첫 capture 의 auth-gated 트리아지가 대상 화면을 알려준다).
 - 선행(권장): `.spec/map/routes.json`(understand-map 스캔) — 있으면 이벤트→핸들러가
   결정론 `[확정]`(file:line)으로 선기입된다. `.understand-anything/knowledge-graph.json` 이
   있으면 JSP 전수 대조(unmatchedJsps)가 활성화된다.

@@ -59,21 +59,40 @@ const {
 // ── 설정/입력 로드 ──────────────────────────────────────────────────────────
 const cfg = loadConfig(projectRoot)
 if (!cfg?.screens) {
-  console.error(
-    'understanding.config.json 에 screens 섹션이 없습니다. 예시:\n' +
-      JSON.stringify(
-        {
-          screens: {
-            baseUrl: 'http://localhost:8080/앱컨텍스트',
-            startCommand: ['./mvnw', 'cargo:run'],
-            readyPath: '/',
-            scenarios: [],
+  // 섹션 부재 = 진입장벽 — 정적 예시 대신 routes census 로 초안을 자동 생성하고,
+  // 사용자 확인 정지(추정 baseUrl/startCommand 로 말없이 캡처를 진행하지 않는다).
+  const { scaffoldScreensConfigOnDisk } = engine
+  try {
+    const r = scaffoldScreensConfigOnDisk(projectRoot)
+    const s = r.summary
+    console.error('understanding.config.json 에 screens 섹션이 없어 초안을 자동 생성했습니다.')
+    console.error(`  ${r.configPath}`)
+    console.error(`  라우트 census ${s.routesTotal}건 → 크롤 시드 ${s.seedUrls}건 (GET-safe 목록성)`)
+    console.error(`  baseUrl: ${s.baseUrl}`)
+    console.error(`  startCommand: ${s.startCommand ? s.startCommand.join(' ') : '(미감지 — 생략)'}`)
+    console.error('')
+    console.error('확인 필요:')
+    for (const n of s.notes) console.error(`  - ${n}`)
+    console.error('')
+    console.error('초안을 검토·수정한 뒤 capture 를 다시 실행하세요.')
+  } catch (err) {
+    console.error(`screens 섹션이 없고 초안 생성도 불가합니다: ${err.message}`)
+    console.error(
+      '직접 작성 예시:\n' +
+        JSON.stringify(
+          {
+            screens: {
+              baseUrl: 'http://localhost:8080/앱컨텍스트',
+              startCommand: ['./mvnw', 'cargo:run'],
+              readyPath: '/',
+              scenarios: [],
+            },
           },
-        },
-        null,
-        2,
-      ),
-  )
+          null,
+          2,
+        ),
+    )
+  }
   process.exit(2)
 }
 const sc = cfg.screens

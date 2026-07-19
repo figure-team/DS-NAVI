@@ -139,7 +139,7 @@ export default function RequirementView() {
     setSearchParams((prev) => { if (v) prev.set(k, v); else prev.delete(k); return prev; }, { replace });
 
   if (!model) return null;
-  if (model.requirements.length === 0) return <div className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6, maxWidth: 560 }}>등록된 요청이 없습니다. <code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>＋ 새 요청</code> 으로 자연어 요청을 분해·문서화하거나 rtm-requirements.json 으로 작성합니다.</div>;
+  if (model.requirements.length === 0) return <div className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6, maxWidth: 560 }}>등록된 요청이 없습니다.</div>;
 
   // 요청(REQ)별 그룹핑 — 한 요청이 여러 요구사항으로 분해된다.
   const groups = new Map<string, Requirement[]>();

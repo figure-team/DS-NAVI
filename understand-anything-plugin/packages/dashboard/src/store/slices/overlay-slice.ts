@@ -2,6 +2,8 @@
 // diff/impact/risk 3채널 오버레이 + 영향도 분석 job.
 import type { StateCreator } from "zustand";
 import type {
+  ImpactCandidatesData,
+  ImpactJobPhase,
   ImpactJobState,
   ImpactJobStatus,
   OverlayChannelData,
@@ -30,13 +32,25 @@ export interface OverlaySlice {
   toggleOverlay: (source: OverlaySource) => void;
   clearDiffOverlay: () => void;
 
-  // ktds: 구조 탭 "영향도 분석" — 자연어 입력 모달 + claude -p 실행 job(전역 상태).
+  // ktds: 변경·영향 "자연어 영향 탐색" — 자연어 입력 모달 + claude -p 실행 job(전역 상태).
+  // 시드 게이트 2단계: 페이즈 A(후보 제안) → 사용자 확정 → 페이즈 B(확정 시드로 analyze).
   impactModalOpen: boolean;
   impactJob: ImpactJobState;
+  /** 페이즈 A 산출(시드 후보) — 모달 확정 UI 의 데이터. */
+  impactCandidates: ImpactCandidatesData | null;
   openImpactModal: () => void;
   closeImpactModal: () => void;
-  /** 자연어 query를 POST /impact-analyze로 보내 분석 시작(running). model 미지정=세션 모델. */
+  /** 페이즈 A: 자연어 query를 POST /impact-analyze로 보내 후보 제안 시작. model 미지정=세션 모델. */
   startImpactAnalysis: (query: string, model?: string) => Promise<{ ok: boolean; error?: string }>;
+  /** 페이즈 A 산출 로드: GET /impact-candidates.json → impactCandidates. */
+  loadImpactCandidates: () => Promise<{ ok: boolean; error?: string }>;
+  /** 페이즈 B: 확정 시드 경로로 POST /impact-analyze-run — analyze 실행 시작. */
+  startImpactAnalyzeRun: (
+    paths: string[],
+    model?: string,
+  ) => Promise<{ ok: boolean; error?: string }>;
+  /** job·후보를 idle 로 리셋(새 질의 시작 전). 실행 중엔 무시. */
+  resetImpactJob: () => void;
   /** GET /impact-status 폴링 결과로 job 상태 동기화. */
   pollImpactStatus: () => Promise<void>;
   /** impact-overlay.json 재fetch → impact 채널 적재 + 명시 활성. */
@@ -99,9 +113,10 @@ export const createOverlaySlice: StateCreator<DashboardStore, [], [], OverlaySli
       affectedNodeIds: new Set<string>(),
     }),
 
-  // ── ktds: 구조 탭 "영향도 분석" job ────────────────────────────────────────
+  // ── ktds: 변경·영향 "자연어 영향 탐색" job(시드 게이트 2단계) ────────────────
   impactModalOpen: false,
-  impactJob: { status: "idle", jobId: null, query: null, exitCode: null, error: null },
+  impactJob: { status: "idle", jobId: null, query: null, exitCode: null, error: null, phase: null },
+  impactCandidates: null,
   openImpactModal: () => set({ impactModalOpen: true }),
   closeImpactModal: () => set({ impactModalOpen: false }),
 
@@ -118,7 +133,10 @@ export const createOverlaySlice: StateCreator<DashboardStore, [], [], OverlaySli
         body: JSON.stringify(model ? { query: q, model } : { query: q }),
       });
       const data = (await res.json().catch(() => null)) as
-        | { job?: { jobId?: string | null; query?: string | null }; error?: string }
+        | {
+            job?: { jobId?: string | null; query?: string | null; phase?: ImpactJobPhase | null };
+            error?: string;
+          }
         | null;
       // 409 = 이미 실행 중 → running 으로 동기화하고 성공 취급(모달 닫힘).
       if (!res.ok && res.status !== 409) {
@@ -131,12 +149,98 @@ export const createOverlaySlice: StateCreator<DashboardStore, [], [], OverlaySli
           query: data?.job?.query ?? q,
           exitCode: null,
           error: null,
+          phase: data?.job?.phase ?? "candidates",
+        },
+        impactCandidates: null, // 새 질의 — 이전 후보는 낡음
+      });
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : String(err) };
+    }
+  },
+
+  loadImpactCandidates: async () => {
+    const { accessToken } = get();
+    if (!accessToken) return { ok: false, error: "no-write-server" };
+    try {
+      const res = await fetch(
+        `/impact-candidates.json?token=${encodeURIComponent(accessToken)}&t=${Date.now()}`,
+      );
+      if (!res.ok) return { ok: false, error: `HTTP ${res.status}` };
+      const data = (await res.json().catch(() => null)) as
+        | { query?: unknown; generatedAt?: unknown; candidates?: unknown }
+        | null;
+      if (!data || !Array.isArray(data.candidates)) return { ok: false, error: "bad-shape" };
+      const candidates = data.candidates
+        .filter(
+          (c): c is { path: string; reason?: unknown; routeId?: unknown; line?: unknown } =>
+            !!c && typeof (c as { path?: unknown }).path === "string",
+        )
+        .map((c) => ({
+          path: c.path,
+          reason: typeof c.reason === "string" ? c.reason : "",
+          routeId: typeof c.routeId === "string" ? c.routeId : null,
+          line: typeof c.line === "number" ? c.line : null,
+        }));
+      set({
+        impactCandidates: {
+          query: typeof data.query === "string" ? data.query : "",
+          generatedAt: typeof data.generatedAt === "string" ? data.generatedAt : "",
+          candidates,
         },
       });
       return { ok: true };
     } catch (err) {
       return { ok: false, error: err instanceof Error ? err.message : String(err) };
     }
+  },
+
+  startImpactAnalyzeRun: async (paths, model) => {
+    if (paths.length === 0) return { ok: false, error: "empty-paths" };
+    const { accessToken, impactJob } = get();
+    if (!accessToken) return { ok: false, error: "no-write-server" };
+    try {
+      const res = await fetch(`/impact-analyze-run?token=${encodeURIComponent(accessToken)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          paths,
+          // 원장 표시용 질의 원문 — 페이즈 A 의 질의를 그대로 잇는다.
+          ...(impactJob.query ? { query: impactJob.query } : {}),
+          ...(model ? { model } : {}),
+        }),
+      });
+      const data = (await res.json().catch(() => null)) as
+        | {
+            job?: { jobId?: string | null; query?: string | null; phase?: ImpactJobPhase | null };
+            error?: string;
+          }
+        | null;
+      if (!res.ok && res.status !== 409) {
+        return { ok: false, error: data?.error ?? `HTTP ${res.status}` };
+      }
+      set((s) => ({
+        impactJob: {
+          status: "running",
+          jobId: data?.job?.jobId ?? null,
+          query: data?.job?.query ?? s.impactJob.query,
+          exitCode: null,
+          error: null,
+          phase: data?.job?.phase ?? "analyze",
+        },
+      }));
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : String(err) };
+    }
+  },
+
+  resetImpactJob: () => {
+    if (get().impactJob.status === "running") return; // 실행 중 리셋 금지(서버 job 은 계속 돈다)
+    set({
+      impactJob: { status: "idle", jobId: null, query: null, exitCode: null, error: null, phase: null },
+      impactCandidates: null,
+    });
   },
 
   pollImpactStatus: async () => {
@@ -146,7 +250,15 @@ export const createOverlaySlice: StateCreator<DashboardStore, [], [], OverlaySli
       const res = await fetch(`/impact-status?token=${encodeURIComponent(accessToken)}`);
       if (!res.ok) return;
       const data = (await res.json().catch(() => null)) as
-        | { job?: { status?: ImpactJobStatus; jobId?: string | null; exitCode?: number | null } }
+        | {
+            job?: {
+              status?: ImpactJobStatus;
+              jobId?: string | null;
+              exitCode?: number | null;
+              query?: string | null;
+              phase?: ImpactJobPhase | null;
+            };
+          }
         | null;
       const job = data?.job;
       if (!job?.status) return;
@@ -156,6 +268,9 @@ export const createOverlaySlice: StateCreator<DashboardStore, [], [], OverlaySli
           status: job.status as ImpactJobStatus,
           jobId: job.jobId ?? s.impactJob.jobId,
           exitCode: job.exitCode ?? null,
+          // 서버가 진실원본 — 새로고침 복구 시 질의·페이즈도 서버 값으로 동기화.
+          query: job.query ?? s.impactJob.query,
+          phase: job.phase ?? s.impactJob.phase,
         },
       }));
     } catch {

@@ -56,14 +56,30 @@ export interface OverlayChannelData {
 /** 오버레이 채널 식별자 — diff(실측)/impact(예측)/risk(정적 품질, 토글 전용). */
 export type OverlaySource = "diff" | "impact" | "risk";
 
-/** ktds: 구조 탭 "영향도 분석"(claude -p /understand-impact) 실행 상태. */
+/** ktds: 변경·영향 "자연어 영향 탐색"(claude -p /understand-impact) 실행 상태. */
 export type ImpactJobStatus = "idle" | "running" | "done" | "failed";
+/** 시드 게이트 2단계 — candidates(후보 제안, 페이즈 A) / analyze(확정 시드 분석, 페이즈 B). */
+export type ImpactJobPhase = "candidates" | "analyze";
 export interface ImpactJobState {
   status: ImpactJobStatus;
   jobId: string | null;
   query: string | null;
   exitCode: number | null;
   error: string | null;
+  phase: ImpactJobPhase | null;
+}
+
+/** 페이즈 A 산출(impact-candidates.json)의 시드 후보 1건. */
+export interface ImpactCandidate {
+  path: string;
+  reason: string;
+  routeId: string | null;
+  line: number | null;
+}
+export interface ImpactCandidatesData {
+  query: string;
+  generatedAt: string;
+  candidates: ImpactCandidate[];
 }
 
 /**

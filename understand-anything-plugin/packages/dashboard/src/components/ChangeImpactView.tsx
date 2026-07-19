@@ -170,6 +170,25 @@ interface HistoryEntry {
    * false = 요청별 실행(추적표 인테이크의 코드영향 검증) — 열람은 되지만 슬롯의 주인은 아니다.
    */
   rootSlot?: boolean;
+  /** "user-confirmed" = 사용자가 시드 후보를 확정한 실행. 부재 = 구 자율 실행(LLM 시드). */
+  seedGate?: "user-confirmed" | null;
+  /** 산출 시드 ↔ 확정 시드 대조 — false 는 spawn 이 지시를 벗어난 것(경고 표식). */
+  seedMatch?: boolean | null;
+}
+
+/** 원장 실행 유형 배지 — 시드를 누가 정했나(근거 등급이 갈리는 축). */
+function seedOriginBadge(e: HistoryEntry): { label: string; tone: BadgeTone; title: string } {
+  if (e.rootSlot === false) {
+    return {
+      label: "RTM 요청",
+      tone: "info",
+      title: "추적표 요청 세션의 코드영향 검증 — 시드는 changeset 결정론 조인",
+    };
+  }
+  if (e.seedGate === "user-confirmed") {
+    return { label: "시드 확정", tone: "ok", title: "사용자가 시드 후보를 확정한 실행" };
+  }
+  return { label: "자율(구)", tone: "mut", title: "구 자율 실행 — LLM 이 시드를 골랐다(게이트 이전)" };
 }
 
 type Status = "loading" | "ready" | "empty" | "error";
@@ -602,7 +621,7 @@ export default function ChangeImpactView() {
         </span>
       </TopBarSlot>
       <TopBarSlot slot="actions">
-        <BtnAccent onClick={openImpactModal}>자연어 영향 분석</BtnAccent>
+        <BtnAccent onClick={openImpactModal}>자연어 영향 탐색</BtnAccent>
       </TopBarSlot>
       {reviewInfoOpen && (
         <UnresolvedModal
@@ -631,13 +650,14 @@ export default function ChangeImpactView() {
           <div className="fold">분석 기록 ({history.length})</div>
           {history.length === 0 ? (
             <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "4px 8px", lineHeight: 1.5 }}>
-              아직 기록 없음 — 자연어 영향 분석을 실행하면 여기 쌓입니다.
+              아직 기록 없음 — 자연어 영향 탐색을 실행하면 여기 쌓입니다.
             </div>
           ) : (
             history.map((e) => {
               const openable = e.files.includes("impact.json");
               const isCurrent = e.jobId === currentJobId;
               const on = activeRun ? activeRun === e.jobId : isCurrent;
+              const origin = seedOriginBadge(e);
               return (
                 <button
                   key={e.jobId}
@@ -658,6 +678,14 @@ export default function ChangeImpactView() {
                   </span>
                   <span className="st">
                     {isCurrent && <Badge tone="info">최신</Badge>}
+                    <span title={origin.title}>
+                      <Badge tone={origin.tone}>{origin.label}</Badge>
+                    </span>
+                    {e.seedMatch === false && (
+                      <span title="산출 시드가 확정 시드와 다릅니다 — 실행이 지시를 벗어났을 수 있음">
+                        <Badge tone="warn">시드 불일치</Badge>
+                      </span>
+                    )}
                     <Badge tone={e.status === "done" ? "ok" : "err"}>
                       {e.status === "done" ? "완료" : "실패"}
                     </Badge>

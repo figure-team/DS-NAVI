@@ -25,6 +25,11 @@ export declare const ScreensConfigSchema: z.ZodObject<{
     maxPages: z.ZodDefault<z.ZodNumber>;
     exclude: z.ZodDefault<z.ZodArray<z.ZodString>>;
     seedUrls: z.ZodDefault<z.ZodArray<z.ZodString>>;
+    censusSeed: z.ZodDefault<z.ZodObject<{
+        enabled: z.ZodDefault<z.ZodBoolean>;
+        maxPages: z.ZodDefault<z.ZodNumber>;
+        scenarioId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    }, z.core.$strip>>;
     scenarios: z.ZodDefault<z.ZodArray<z.ZodObject<{
         id: z.ZodString;
         title: z.ZodOptional<z.ZodString>;
@@ -70,6 +75,11 @@ export declare const ConfigSchema: z.ZodObject<{
         maxPages: z.ZodDefault<z.ZodNumber>;
         exclude: z.ZodDefault<z.ZodArray<z.ZodString>>;
         seedUrls: z.ZodDefault<z.ZodArray<z.ZodString>>;
+        censusSeed: z.ZodDefault<z.ZodObject<{
+            enabled: z.ZodDefault<z.ZodBoolean>;
+            maxPages: z.ZodDefault<z.ZodNumber>;
+            scenarioId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        }, z.core.$strip>>;
         scenarios: z.ZodDefault<z.ZodArray<z.ZodObject<{
             id: z.ZodString;
             title: z.ZodOptional<z.ZodString>;

@@ -27,6 +27,9 @@ export function computeContentSignature(input) {
 export function mechanicalProjection(screens) {
     return screens.map((s) => ({
         id: s.id,
+        // seededFrom 은 Stage A 기계 사실(census 시드 유래) — 있을 때만 투영에 포함해
+        // 트리아지 이전 산출물(필드 부재)의 해시를 바이트 동일하게 보존한다(하위호환).
+        ...(s.seededFrom ? { seededFrom: s.seededFrom } : {}),
         annotations: s.annotations.map((a) => ({
             kind: a.kind,
             no: a.no,
@@ -37,13 +40,30 @@ export function mechanicalProjection(screens) {
         })),
     }));
 }
-/** mechanical 투영의 sha256 — Stage B 변조 기계검증 앵커. */
-export function computeMechanicalHash(screens) {
-    return createHash('sha256').update(stableJson(mechanicalProjection(screens))).digest('hex');
+/**
+ * mechanical 투영의 sha256 — Stage B 변조 기계검증 앵커.
+ * missing 트리아지(§2.1)도 Stage A 기계 사실이라 해시 범위에 포함하되, 트리아지가
+ * 하나도 없는 파일(구버전 산출물)은 기존 투영 그대로 해시해 하위호환을 지킨다.
+ */
+export function computeMechanicalHash(screens, missing = []) {
+    const projection = mechanicalProjection(screens);
+    const hasTriage = missing.some((m) => m.triage != null);
+    const payload = hasTriage
+        ? {
+            missingTriage: missing.map((m) => ({
+                url: m.url,
+                reason: m.reason,
+                triage: m.triage ?? null,
+            })),
+            screens: projection,
+        }
+        : projection;
+    return createHash('sha256').update(stableJson(payload)).digest('hex');
 }
 /** screens.json 조립 — id ASC 정렬, unmatchedJsps 대조, zod 검증 후 반환. */
 export function buildScreensFile(input) {
     const screens = [...input.screens].sort((a, b) => a.id.localeCompare(b.id));
+    const missing = [...input.missing].sort((a, b) => a.url.localeCompare(b.url));
     const file = {
         schemaVersion: 1,
         generatedAt: input.generatedAt,
@@ -53,8 +73,8 @@ export function buildScreensFile(input) {
         screens,
         unmatchedJsps: reconcileJsps(input.graphJsps, screens, input.fragments),
         fragments: [...input.fragments].sort(),
-        missing: [...input.missing].sort((a, b) => a.url.localeCompare(b.url)),
-        mechanicalHash: computeMechanicalHash(screens),
+        missing,
+        mechanicalHash: computeMechanicalHash(screens, missing),
     };
     return ScreensFileSchema.parse(file);
 }
@@ -78,7 +98,7 @@ export function validateScreensFile(raw) {
     }
     const file = parsed.data;
     const issues = [];
-    const expectedHash = computeMechanicalHash(file.screens);
+    const expectedHash = computeMechanicalHash(file.screens, file.missing);
     if (file.mechanicalHash !== expectedHash) {
         issues.push({
             screenId: null,

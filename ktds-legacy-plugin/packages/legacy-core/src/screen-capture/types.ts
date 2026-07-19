@@ -121,6 +121,11 @@ export const ScreenSchema = z.object({
    * 렌더한 경우를 별칭 의심으로 감지하는 데 쓴다(validate/status 보고).
    */
   contentSignature: z.string().nullable(),
+  /**
+   * 이 화면을 발견한 보조 시드 출처 — 크롤/시나리오 내비게이션으로 도달한 화면은 미기재.
+   * 'routes-census': 메뉴에 링크가 없어 routes.json GET-safe 보조 시드로만 도달(§3).
+   */
+  seededFrom: z.enum(['routes-census']).nullable().optional(),
   capture: ScreenCaptureInfoSchema,
   /** Stage B 화면 개요. */
   summary: z.object({ text: z.string(), confidence: z.enum(CONFIDENCE_VALUES) }).nullable(),
@@ -128,10 +133,54 @@ export const ScreenSchema = z.object({
 })
 export type Screen = z.infer<typeof ScreenSchema>
 
+/**
+ * missing 트리아지 분류(SCREENS_MISSING_TRIAGE_DESIGN §2.1) — routes census 교차검증으로
+ * 결정론 부여. 위→아래 첫 매치:
+ * - param-required: 4xx(400) 인데 요청 URL 이 census 에 실존 — 필수 파라미터 누락 호출.
+ * - server-error: http-5xx.
+ * - auth-gated: 로그인 경로로 리다이렉트(또는 401/403 + 라우트 실존) — 인증 게이트.
+ * - redirect-other: 그 외 리다이렉트.
+ * - route-missing-hit: 404 인데 census 에 실존 — 배포 누락/프로파일 미활성 의심.
+ * - stale-url: 404 + census 부재 + 같은 디렉터리에 유사 후보 실존 — 낡은 메뉴 URL.
+ * - dead-menu: 404 + census 부재 + 후보 없음 — 죽은 메뉴(코드에서 제거된 화면).
+ * - unknown: 그 외(goto-failed, scenario-failed 등).
+ */
+export const MISSING_TRIAGE_CLASSES = [
+  'dead-menu',
+  'stale-url',
+  'param-required',
+  'auth-gated',
+  'redirect-other',
+  'server-error',
+  'route-missing-hit',
+  'unknown',
+] as const
+export const MissingTriageClassSchema = z.enum(MISSING_TRIAGE_CLASSES)
+export type MissingTriageClass = z.infer<typeof MissingTriageClassSchema>
+
+/** stale-url 판정 시 제시하는 현행 라우트 후보(§2.2 결정론 매칭, 오매칭 시 null). */
+export const MissingTriageCandidateSchema = z.object({
+  path: z.string(),
+  handler: z.string().nullable(),
+  filePath: z.string().nullable(),
+  line: z.number().int().nullable(),
+})
+export type MissingTriageCandidate = z.infer<typeof MissingTriageCandidateSchema>
+
+export const MissingTriageSchema = z.object({
+  class: MissingTriageClassSchema,
+  /** 요청 URL 자체가 census 에 있나(있는데 404 면 route-missing-hit). */
+  routeExists: z.boolean(),
+  candidateRoute: MissingTriageCandidateSchema.nullable(),
+})
+export type MissingTriage = z.infer<typeof MissingTriageSchema>
+
 /** 도달 실패 화면의 정직 보고(조용한 스킵 금지). */
 export const MissingScreenSchema = z.object({
   url: z.string(),
   reason: z.string(),
+  /** routes census 교차검증 트리아지 — census(routes.json) 없으면 미부여(하위호환). */
+  triage: MissingTriageSchema.nullable().optional(),
 })
 export type MissingScreen = z.infer<typeof MissingScreenSchema>
 

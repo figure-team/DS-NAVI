@@ -50,6 +50,8 @@ const {
   shouldVisit,
   relativePath,
   gitCommitHash,
+  triageMissing,
+  selectCensusSeeds,
   SCREENS_FILENAME,
   SCREENS_DIRNAME,
 } = engine
@@ -111,7 +113,10 @@ const readyUrl = new URL(sc.readyPath.replace(/^\//, ''), baseURL).href
 async function probe(url) {
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(3000), redirect: 'manual' })
-    return res.status < 500
+    // 4xx 도 "미준비"다 — Tomcat 은 웹앱 배포 전에 포트만 먼저 열고 404 를 내므로,
+    // status<500 프로브는 cold-start 레이스로 캡처 전체를 미배포 상태에서 시작시킨다
+    // (2026-07-19 egov 실측: 로그인 실패 연쇄로 202건 auth-gated 오염).
+    return res.status < 400
   } catch {
     return false
   }
@@ -127,8 +132,10 @@ async function ensureAppUp() {
     console.error(`앱이 응답하지 않습니다(${readyUrl}). startCommand 설정 또는 수동 기동이 필요합니다.`)
     process.exit(2)
   }
-  mkdirSync(screensDir, { recursive: true })
-  const logPath = join(screensDir, 'app.log')
+  // screens/ 밖에 둔다 — 메인이 캡처 직전 screens/ 를 rmSync 하므로 안에 두면
+  // 기동 로그가 삭제돼 실패 진단이 불가능해진다(2026-07-19 실측).
+  mkdirSync(uaDir, { recursive: true })
+  const logPath = join(uaDir, 'screens-app.log')
   const logFd = openSync(logPath, 'w')
   console.log(`앱 기동: ${sc.startCommand.join(' ')} (log: ${logPath})`)
   appProc = spawn(sc.startCommand[0], sc.startCommand.slice(1), {
@@ -234,7 +241,11 @@ const sha256 = (data) => createHash('sha256').update(data).digest('hex')
 const relUrl = (u) => `${relativePath(u, ctxPath)}${u.search}`
 const resolveUrl = (rel) => new URL(rel.replace(/^\//, ''), baseURL).href
 
-async function captureScreen(page, urlObj, { scenario = null, openedFrom = null } = {}) {
+async function captureScreen(
+  page,
+  urlObj,
+  { scenario = null, openedFrom = null, seededFrom = null } = {},
+) {
   let id = screenIdFor(urlObj, ctxPath)
   if (usedIds.has(id)) {
     if (!scenario) return null
@@ -260,6 +271,8 @@ async function captureScreen(page, urlObj, { scenario = null, openedFrom = null 
     domain: null,
     scenario,
     openedFrom,
+    // census 보조 시드 유래(§3) — 크롤/시나리오 내비게이션 도달 화면은 미기재(해시 하위호환).
+    ...(seededFrom ? { seededFrom } : {}),
     contentSignature: computeContentSignature({
       title: sig.title,
       headings: sig.headings,
@@ -343,6 +356,51 @@ async function crawl(browser) {
   console.log(`크롤 완료: ${captured}화면.`)
 }
 
+// ── census 보조 시드(§3) — 메뉴가 낡아 못 찾은 실존 화면을 routes.json 으로 회수 ──
+let censusSeedDone = false
+async function censusSeedPass(page, { scenario = null } = {}) {
+  if (censusSeedDone) return
+  const cs = sc.censusSeed // 항상 존재(config zod default)
+  if (!cs.enabled || cs.maxPages <= 0) return
+  const routes = routesReport.routes ?? []
+  if (routes.length === 0) return
+  censusSeedDone = true
+  const toUrl = (p) => normalizeUrl(resolveUrl(p), baseURL)
+  const seeds = selectCensusSeeds(routes, {
+    isVisited: (p) => {
+      const u = toUrl(p)
+      return !u || visitedKeys.has(screenKey(u, ctxPath)) || usedIds.has(screenIdFor(u, ctxPath))
+    },
+    isExcluded: (p) => {
+      const u = toUrl(p)
+      return !u || !shouldVisit(u, sc.exclude)
+    },
+  })
+  if (seeds.length === 0) {
+    console.log('census 보조 시드: 미방문 GET-safe 라우트 없음.')
+    return
+  }
+  const budget = Math.min(seeds.length, cs.maxPages)
+  console.log(
+    `census 보조 시드 시작(GET-safe 목록성 라우트, ${scenario ? `시나리오 ${scenario} 컨텍스트` : '비인증 컨텍스트'}): ` +
+      `후보 ${seeds.length}건 중 ${budget}건 시도` +
+      (seeds.length > budget ? ` — ${seeds.length - budget}건은 예산(censusSeed.maxPages) 초과로 미시도` : ''),
+  )
+  let captured = 0
+  for (const seed of seeds.slice(0, budget)) {
+    const u = toUrl(seed.path)
+    if (!u) continue
+    visitedKeys.add(screenKey(u, ctxPath))
+    const finalU = await safeGoto(page, u.href, u)
+    if (!finalU) continue
+    if (usedIds.has(screenIdFor(finalU, ctxPath))) continue
+    if ((await captureScreen(page, finalU, { scenario, seededFrom: 'routes-census' })) !== null) {
+      captured++
+    }
+  }
+  console.log(`census 보조 시드 완료: ${captured}화면 회수.`)
+}
+
 async function runScenario(browser, scenario) {
   console.log(`시나리오 실행: ${scenario.id}${scenario.title ? ` (${scenario.title})` : ''}`)
   const context = await browser.newContext({
@@ -396,6 +454,10 @@ async function runScenario(browser, scenario) {
       if (!finalU) continue
       lastScreenId = (await captureScreen(page, finalU, { scenario: scenario.id })) ?? lastScreenId
     }
+    // 인증 필요 앱: 이 시나리오의 로그인 상태를 재사용해 census 보조 시드를 수행(§3).
+    if (sc.censusSeed?.scenarioId === scenario.id) {
+      await censusSeedPass(page, { scenario: scenario.id })
+    }
   } catch (err) {
     missing.push({
       url: `scenario:${scenario.id}`,
@@ -418,9 +480,30 @@ try {
   try {
     await crawl(browser)
     for (const scenario of sc.scenarios) await runScenario(browser, scenario)
+    // scenarioId 미지정(또는 해당 시나리오 부재) 시 비인증 컨텍스트로 census 보조 시드.
+    if (!censusSeedDone) {
+      const context = await browser.newContext({
+        viewport: sc.viewport,
+        deviceScaleFactor: 1,
+        reducedMotion: 'reduce',
+      })
+      const page = await context.newPage()
+      page.on('dialog', (d) => d.dismiss().catch(() => {}))
+      try {
+        await censusSeedPass(page)
+      } finally {
+        await context.close()
+      }
+    }
   } finally {
     await browser.close()
   }
+
+  // T1 트리아지(§2) — routes census 가 있을 때만(없으면 미부여, 하위호환).
+  const triagedMissing =
+    (routesReport.routes ?? []).length > 0
+      ? triageMissing(missing, routesReport.routes, { loginPaths: [sc.readyPath] })
+      : missing
 
   const file = buildScreensFile({
     generatedAt: new Date().toISOString(),
@@ -430,7 +513,7 @@ try {
     screens,
     fragments,
     graphJsps,
-    missing,
+    missing: triagedMissing,
   })
   writeFileSync(join(uaDir, SCREENS_FILENAME), serializeScreens(file))
 
@@ -444,7 +527,16 @@ try {
   console.log(`fragment ${file.fragments.length}건, 미매핑 JSP ${file.unmatchedJsps.length}건(Stage B 에서 매핑)`)
   if (file.missing.length) {
     console.log(`도달 실패/리다이렉트 보고 ${file.missing.length}건:`)
-    for (const m of file.missing) console.log(`  - ${m.url}: ${m.reason}`)
+    for (const m of file.missing) {
+      const t = m.triage
+        ? ` [${m.triage.class}${m.triage.candidateRoute ? ` → 후보 ${m.triage.candidateRoute.path}` : ''}]`
+        : ''
+      console.log(`  - ${m.url}: ${m.reason}${t}`)
+    }
+  }
+  const seeded = file.screens.filter((s) => s.seededFrom === 'routes-census').length
+  if (seeded > 0) {
+    console.log(`census 보조 시드 회수 화면 ${seeded}건(seededFrom: routes-census — 메뉴 링크 없음).`)
   }
   const sigGroups = new Map()
   for (const s of file.screens) {

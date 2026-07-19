@@ -14,8 +14,12 @@ export declare function mechanicalProjection(screens: Screen[]): Array<{
     id: string;
     annotations: unknown[];
 }>;
-/** mechanical 투영의 sha256 — Stage B 변조 기계검증 앵커. */
-export declare function computeMechanicalHash(screens: Screen[]): string;
+/**
+ * mechanical 투영의 sha256 — Stage B 변조 기계검증 앵커.
+ * missing 트리아지(§2.1)도 Stage A 기계 사실이라 해시 범위에 포함하되, 트리아지가
+ * 하나도 없는 파일(구버전 산출물)은 기존 투영 그대로 해시해 하위호환을 지킨다.
+ */
+export declare function computeMechanicalHash(screens: Screen[], missing?: MissingScreen[]): string;
 export interface BuildScreensInput {
     generatedAt: string;
     gitCommit: string | null;

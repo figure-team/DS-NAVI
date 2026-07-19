@@ -16,6 +16,10 @@ export {
   AnnotationSchema,
   ScreenCaptureInfoSchema,
   ScreenSchema,
+  MISSING_TRIAGE_CLASSES,
+  MissingTriageClassSchema,
+  MissingTriageCandidateSchema,
+  MissingTriageSchema,
   MissingScreenSchema,
   ScreensFileSchema,
   ScreenAnnotationOverrideSchema,
@@ -32,6 +36,9 @@ export type {
   Annotation,
   ScreenCaptureInfo,
   Screen,
+  MissingTriageClass,
+  MissingTriageCandidate,
+  MissingTriage,
   MissingScreen,
   ScreensFile,
   ScreenOverrideEntry,
@@ -64,6 +71,8 @@ export type { ViewResolverConfig, ViewResolveSummary } from './view-resolve.js'
 export type { DomainAssignContext, DomainAssignSummary } from './domain-assign.js'
 export { normalizeActionPath, candidatePaths, joinRoutes } from './routes-join.js'
 export type { RouteJoinContext, NormalizedAction } from './routes-join.js'
+export { triageMissing, selectCensusSeeds } from './triage.js'
+export type { CensusRoute, TriageOptions, CensusSeedOptions } from './triage.js'
 export {
   normalizeUrl,
   relativePath,

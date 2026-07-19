@@ -211,3 +211,60 @@ describe('validateScreensFile', () => {
     expect(computeMechanicalHash([s1, s2])).not.toBe(computeMechanicalHash([s2, s1]))
   })
 })
+
+describe('트리아지/seededFrom 해시 봉인 (SCREENS_MISSING_TRIAGE_DESIGN §4)', () => {
+  const TRIAGE = {
+    class: 'stale-url' as const,
+    routeExists: false,
+    candidateRoute: { path: '/a/xList.do', handler: null, filePath: null, line: null },
+  }
+
+  it('하위호환: triage/seededFrom 이 전무하면 기존 해시를 바이트 동일 재현', () => {
+    const screens = [screen('screen:a', [ann(1, 'field')])]
+    const legacyHash = computeMechanicalHash(screens)
+    // missing 이 있어도 triage 가 없으면 해시는 화면 투영만으로 계산된다(구버전 산출물 보호).
+    expect(computeMechanicalHash(screens, [{ url: 'a/x.do', reason: 'http-404' }])).toBe(legacyHash)
+    expect(computeMechanicalHash(screens, [])).toBe(legacyHash)
+  })
+
+  it('triage 가 붙으면 해시 범위에 포함 — 변조 시 mismatch 검출', () => {
+    const f = buildScreensFile(
+      input([screen('screen:a', [ann(1, 'field')])], {
+        missing: [{ url: 'a/x.do', reason: 'http-404', triage: TRIAGE }],
+      }),
+    )
+    expect(validateScreensFile(f).ok).toBe(true)
+    const tampered = structuredClone(f)
+    tampered.missing[0].triage = { ...TRIAGE, class: 'dead-menu', candidateRoute: null }
+    const r = validateScreensFile(tampered)
+    expect(r.ok).toBe(false)
+    expect(r.issues.some((i) => i.code === 'mechanical-hash-mismatch')).toBe(true)
+  })
+
+  it('seededFrom 도 해시 봉인 — 제거/추가 변조 검출, zod 통과', () => {
+    const f = buildScreensFile(
+      input([
+        screen('screen:a', [ann(1, 'field')]),
+        screen('screen:b', [ann(1, 'link')], { seededFrom: 'routes-census' }),
+      ]),
+    )
+    expect(validateScreensFile(f).ok).toBe(true)
+    const tampered = structuredClone(f)
+    delete tampered.screens[1].seededFrom
+    const r = validateScreensFile(tampered)
+    expect(r.ok).toBe(false)
+    expect(r.issues.some((i) => i.code === 'mechanical-hash-mismatch')).toBe(true)
+  })
+
+  it('동일 입력 결정론(byte-diff=0) — triage 포함 시에도', () => {
+    const make = () =>
+      serializeScreens(
+        buildScreensFile(
+          input([screen('screen:a', [ann(1, 'field')], { seededFrom: 'routes-census' })], {
+            missing: [{ url: 'a/x.do', reason: 'http-404', triage: TRIAGE }],
+          }),
+        ),
+      )
+    expect(make()).toBe(make())
+  })
+})

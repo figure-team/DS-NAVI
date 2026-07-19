@@ -226,6 +226,32 @@ if (command === 'assign-domains') {
 const v = validateScreensFile(file)
 const pct = (x) => (x === null ? '-' : `${Math.round(x * 100)}%`)
 
+/** missing 트리아지 요약 한 줄(+미부여 경고) — validate/status 공용. */
+function reportTriage() {
+  const missing = file.missing ?? []
+  if (missing.length === 0) return
+  const counts = new Map()
+  for (const m of missing) {
+    const c = m.triage?.class ?? '(미부여)'
+    counts.set(c, (counts.get(c) ?? 0) + 1)
+  }
+  const parts = [...counts.entries()].map(([c, n]) => `${c} ${n}`)
+  console.log(`도달실패 트리아지: ${parts.join(' · ')}`)
+  const staleWithCandidate = missing.filter((m) => m.triage?.candidateRoute)
+  for (const m of staleWithCandidate) {
+    console.log(`  - ${m.url} → 현행 후보 ${m.triage.candidateRoute.path}`)
+  }
+  const untriaged = missing.filter((m) => m.triage == null).length
+  if (untriaged > 0 && existsSync(join(projectRoot, '.spec', 'map', 'routes.json'))) {
+    console.log(
+      `  ⚠️ routes.json 이 있는데 트리아지 미부여 ${untriaged}건 — 구버전 캡처 산출물입니다. ` +
+        're-capture 시 자동 분류됩니다(스키마 회귀 보호를 위해 실패 처리는 하지 않음).',
+    )
+  }
+  const seeded = (file.screens ?? []).filter((s) => s.seededFrom === 'routes-census').length
+  if (seeded > 0) console.log(`census 보조 시드 회수 화면 ${seeded}건(메뉴 링크 없이 도달).`)
+}
+
 if (command === 'validate') {
   let ok = v.ok
   if (v.issues.length) {
@@ -261,6 +287,7 @@ if (command === 'validate') {
   } else {
     console.log('미매핑 JSP 0건 — 비-fragment 뷰 전수 커버.')
   }
+  reportTriage()
   console.log(ok ? '검증 통과.' : '검증 실패.')
   process.exit(ok ? 0 : 1)
 }
@@ -276,6 +303,7 @@ console.log(`화면 ${st.screenCount}건 (주석 ${st.annotationCount}건)`)
 console.log(`핸들러 확정율(action/link): ${pct(st.confirmedActionRate)}`)
 console.log(`설명 채움률: ${pct(st.descriptionRate)} / JSP 매핑률: ${pct(st.jspMappedRate)}`)
 console.log(`fragment ${file.fragments?.length ?? 0}건 / 미매핑 JSP ${st.unmatchedJspCount}건 / 도달실패 보고 ${file.missing?.length ?? 0}건`)
+reportTriage()
 const sigGroups = new Map()
 for (const s of file.screens ?? []) {
   if (!s.contentSignature) continue

@@ -243,6 +243,96 @@ export function checkAnswerGate(
 }
 
 /** 문답 1건 — 질문 원문을 함께 싣는다(질문이 개정으로 바뀌어도 "그때 뭘 묻고 답했나"가 보존된다). */
+// ── 단계 산출물 감사(2026-07-20) ─────────────────────────────────────────────
+// **완결의 진실은 디스크다** — 종전 단계 판정은 spawn 의 exit code 만 믿었다. LLM 이 지시를
+// 어기고 파일을 안 써도 exit 0 이면 `produced` 로 찍혀 사용자에게 "완료"로 보였다(2026-07-20
+// opencode 라이브에서 ③ 목록표 미산출이 조용히 통과 — 호스트 무관 구조 결함). fill-audit 계열이
+// 채움에 대해 하는 일을 인테이크 단계에 대해 한다.
+//
+// ★ ②는 필수 산출물이 **없다**(의도) — `changeset.modified` 가 없거나 전부 `to-be:`(신규)면
+//   `rtm-intake.mjs code-impact` 가 "시드 없음"으로 정상 종료하고 impact-run.json 을 안 쓴다
+//   (SKILL §B --step 2 · 스크립트 seeds.length===0 분기). 여기서 필수로 걸면 정당한 신규 요청이
+//   전부 실패로 뒤집힌다.
+
+/** 단계 산출물 감사 결과. `ok:false` 면 missing 에 사람이 읽을 산출물 이름이 담긴다. */
+export interface RtmStepAudit {
+  ok: boolean;
+  missing: string[];
+}
+
+/** ⑤ 명세서 파일명 규약 — `요구사항명세서_{요구사항ID}.md` (요구사항 1건당 1파일). */
+const SPEC_DOC_PREFIX = "요구사항명세서_";
+
+function jsonOrNull(file: string): unknown {
+  try {
+    return JSON.parse(fs.readFileSync(file, "utf8"));
+  } catch {
+    return null; // 부재·파싱 실패 모두 "확인 불가" — 호출자가 missing 으로 처리한다
+  }
+}
+
+/** identified.json 의 요구사항 id 목록(⑥ 투영 감사의 기대집합). 못 읽으면 빈 배열. */
+function identifiedRequirementIds(dir: string): string[] {
+  const v = jsonOrNull(path.join(dir, "identified.json")) as
+    | { requirements?: { id?: unknown }[] }
+    | null;
+  if (!v || !Array.isArray(v.requirements)) return [];
+  return v.requirements.map((r) => r?.id).filter((id): id is string => typeof id === "string");
+}
+
+/**
+ * 단계 k 가 **실제로 산출물을 남겼는지** 디스크로 확인한다. exit 0 을 완료로 승격하기 전의 게이트.
+ *
+ * `base` = 세션 원장 루트(`.understand-anything/rtm-intake`), `projectDataDir` = 그 부모
+ * (`.understand-anything`) — ⑥은 세션 밖 `rtm-requirements.json` 에 투영하므로 필요하다.
+ * 감사 대상이 없는 단계(②)는 항상 ok — "검사 안 함"과 "통과"를 구분하지 않는 이유는 호출자가
+ * 어차피 같은 처리를 하기 때문이고, 위 주석이 그 의도를 남긴다.
+ */
+export function auditRtmStepArtifacts(
+  base: string,
+  sid: string,
+  step: number,
+  projectDataDir: string,
+): RtmStepAudit {
+  const dir = rtmSessionDir(base, sid);
+  if (!dir) return { ok: false, missing: ["세션 디렉터리(무효 sid)"] };
+  const has = (name: string): boolean => fs.existsSync(path.join(dir, name));
+  const miss: string[] = [];
+
+  if (step === 1 && !has("identified.json")) miss.push("identified.json");
+  // step 2: 필수 산출물 없음(위 ★ 참조).
+  if (step === 3 && !has("요구사항목록표.md")) miss.push("요구사항목록표.md");
+  if (step === 4 && !has("요구사항정의서.md")) miss.push("요구사항정의서.md");
+  if (step === 5) {
+    let specs: string[] = [];
+    try {
+      specs = fs.readdirSync(dir).filter((f) => f.startsWith(SPEC_DOC_PREFIX) && f.endsWith(".md"));
+    } catch {
+      /* 디렉터리를 못 읽으면 아래 미산출로 떨어진다 */
+    }
+    // 기대 건수는 ①의 요구사항 수 — 1건이라도 빠지면 "명세서를 만들었다"가 참이 아니다.
+    const expected = identifiedRequirementIds(dir);
+    const missingIds = expected.filter((id) => !specs.includes(`${SPEC_DOC_PREFIX}${id}.md`));
+    if (specs.length === 0) miss.push(`${SPEC_DOC_PREFIX}{요구사항ID}.md`);
+    else if (missingIds.length > 0)
+      miss.push(...missingIds.map((id) => `${SPEC_DOC_PREFIX}${id}.md`));
+  }
+  if (step === 6) {
+    // 파일 존재만으로는 부족하다 — rtm-requirements.json 은 **이 세션 이전부터 있다**.
+    // 이 세션의 요구사항 id 가 실제로 투영됐는지가 ⑥의 완결 조건이다.
+    const expected = identifiedRequirementIds(dir);
+    const projected = jsonOrNull(path.join(projectDataDir, "rtm-requirements.json"));
+    if (projected === null) miss.push("rtm-requirements.json");
+    else {
+      const blob = JSON.stringify(projected);
+      const notProjected = expected.filter((id) => !blob.includes(`"${id}"`));
+      if (notProjected.length > 0)
+        miss.push(...notProjected.map((id) => `rtm-requirements.json 의 ${id} 투영`));
+    }
+  }
+  return { ok: miss.length === 0, missing: miss };
+}
+
 export interface QaEntry {
   qid: string;
   question: string;

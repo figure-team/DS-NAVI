@@ -6,6 +6,12 @@
   <em>LLM + 정적 분석 하이브리드 · <a href="https://github.com/Egonex-AI/Understand-Anything">Understand Anything</a> 기반 ktds 포크</em>
 </p>
 
+<p align="center">
+  📖 <a href="가이드.md">사용 가이드(대시보드·메뉴 공통)</a>
+  &nbsp;·&nbsp; 🤖 <a href="가이드-claude.md">Claude Code로 시작하기</a>
+  &nbsp;·&nbsp; ⚡ <a href="가이드-opencode.md">opencode로 시작하기</a>
+</p>
+
 ---
 
 ## 왜 만들었나

@@ -2588,6 +2588,7 @@ export default defineConfig({
             pathname === "/impact-history" ||
             pathname === "/impact-history-item" ||
             pathname === "/rtm.json" ||
+            pathname === "/run-ledger.json" ||
             pathname === "/rtm-overrides.json" ||
             pathname === "/rtm-override" ||
             pathname === "/rtm-req-override" ||
@@ -2972,6 +2973,8 @@ export default defineConfig({
               ? "domain-graph.json"
               : pathname === "/rtm.json"
               ? "rtm.json"
+              : pathname === "/run-ledger.json"
+              ? "run-ledger.json"
               : pathname === "/system-map.json"
               ? "system-map.json"
               : pathname === "/screens.json"

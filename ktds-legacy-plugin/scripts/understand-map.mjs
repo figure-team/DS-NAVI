@@ -29,6 +29,7 @@
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { existsSync, readFileSync } from 'node:fs'
+import { appendRunLedger, runStartedAt } from './lib/run-ledger.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const distEntry = join(here, '..', 'packages', 'legacy-core', 'dist', 'index.js')
@@ -70,6 +71,10 @@ const FANOUT_GATE_DOMAINS = 8
 const FANOUT_GATE_FLOWS = 60
 
 const engine = await import(distEntry)
+
+// 실행 원장 대상 — 사용자 가시 상태를 바꾸는 단계만(내부 준비 단계 fill-*/bundle 등은 제외).
+const LEDGERED_SUBS = new Set(['scan', 'plan', 'confirm', 'emit'])
+const runBegan = runStartedAt()
 
 switch (sub) {
   case 'scan':
@@ -113,6 +118,11 @@ switch (sub) {
       `'${sub}' 은 지원하지 않는 서브커맨드입니다. 사용 가능: scan | plan | confirm | group-input | map | bundle | fill-prep | fill-audit | fill-merge | emit | emit-kg | templates.`,
     )
     process.exit(2)
+}
+
+// 실행 원장 — .spec/map 산출물은 결정론(byte-diff=0)이라 시각을 못 싣는다. 실행 사실은 원장에만.
+if (LEDGERED_SUBS.has(sub)) {
+  appendRunLedger(projectRoot, { tool: 'understand-map', action: sub, startedAt: runBegan })
 }
 
 async function runScan() {

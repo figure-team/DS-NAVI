@@ -36,6 +36,7 @@ const FILES = [
   "impact-overlay.json",
   "system-map.json",
   "rtm.json",
+  "run-ledger.json",
   "screens.json",
   "screen-overrides.json",
 ];

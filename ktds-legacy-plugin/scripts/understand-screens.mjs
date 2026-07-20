@@ -15,6 +15,7 @@ import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { appendRunLedger, runStartedAt } from './lib/run-ledger.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const distEntry = join(here, '..', 'packages', 'legacy-core', 'dist', 'index.js')
@@ -81,11 +82,16 @@ if (command === 'scaffold') {
 }
 
 if (command === 'capture') {
+  const runBegan = runStartedAt()
   const r = spawnSync(
     process.execPath,
     [join(here, 'understand-screens-capture.mjs'), projectRoot],
     { stdio: 'inherit' },
   )
+  // 실행 원장 — 성공 캡처만 기록(캡처는 라이브 앱 기동이라 원래 비결정론).
+  if ((r.status ?? 1) === 0) {
+    appendRunLedger(projectRoot, { tool: 'understand-screens', action: 'capture', startedAt: runBegan })
+  }
   process.exit(r.status ?? 1)
 }
 
@@ -152,6 +158,7 @@ if (command === 'fill-audit') {
 }
 
 if (command === 'fill-merge') {
+  const runBeganMerge = runStartedAt()
   const { mergeScreenFillFragments } = engine
   let result
   try {
@@ -195,6 +202,13 @@ if (command === 'fill-merge') {
   console.log('')
   console.log(`  산출물: ${result.screensPath}`)
   console.log('다음 단계: validate (게이트 재확인) → /understand-dashboard 화면설계서 탭 열람.')
+  // 실행 원장 — Stage B 병합 완료(게이트 실패여도 병합 자체는 일어났으므로 기록).
+  appendRunLedger(projectRoot, {
+    tool: 'understand-screens',
+    action: 'fill-merge',
+    startedAt: runBeganMerge,
+    summary: `채움 반영 화면 ${result.screensFilled}개`,
+  })
   process.exit(result.validation.ok ? 0 : 1)
 }
 

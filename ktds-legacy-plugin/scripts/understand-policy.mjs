@@ -14,6 +14,7 @@
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { appendRunLedger, runStartedAt } from './lib/run-ledger.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const distEntry = join(here, '..', 'packages', 'legacy-core', 'dist', 'index.js')
@@ -27,6 +28,7 @@ if (!existsSync(distEntry)) {
 }
 
 const projectRoot = process.argv[2] || process.cwd()
+const runBegan = runStartedAt()
 
 const engine = await import(distEntry)
 const {
@@ -218,6 +220,13 @@ if (process.argv[3] === 'domain') {
     console.log('  템플릿 없음 — 빌더 기본 구조로 렌더(domain-policy/domain.md 두면 헤딩/열 override 가능).')
   }
   console.log('분기 위치·조건식 = 결정론 [확정]. 업무분류(권한/상태/계산)·의미 = SKILL 보강에서 [추정](합성 금지).')
+  // 실행 원장 — 정책서 산출물은 결정론이라 시각을 못 싣는다. 실행 사실은 원장에만.
+  appendRunLedger(projectRoot, {
+    tool: 'understand-policy',
+    action: 'domain',
+    startedAt: runBegan,
+    summary: `도메인 정책서 ${meta.length}종`,
+  })
   process.exit(0)
 }
 
@@ -343,3 +352,11 @@ if (s.준수 + s.문서에만 > 0) {
   console.log(`  policy-input 일부 미처리: ${reconcile.unresolved.map((u) => u.ref).join(', ')}`)
 }
 console.log('앵커(file:line)는 결정론 [확정]. 규범 진술·값은 SKILL 보강에서 [추정]로 채운다(합성 금지).')
+
+// 실행 원장 — 정책서 산출물은 결정론이라 시각을 못 싣는다. 실행 사실은 원장에만.
+appendRunLedger(projectRoot, {
+  tool: 'understand-policy',
+  action: 'category',
+  startedAt: runBegan,
+  summary: `정책서 ${meta.length}종 · 신호 ${signals.signals.length}건`,
+})

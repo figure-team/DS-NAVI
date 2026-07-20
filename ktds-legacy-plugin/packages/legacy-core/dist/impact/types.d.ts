@@ -42,6 +42,7 @@ export declare const ImpactOptionsSchema: z.ZodObject<{
         impl: "impl";
         mybatis: "mybatis";
         "mapper-xml": "mapper-xml";
+        "api-call": "api-call";
     }>>>;
     fanInThreshold: z.ZodDefault<z.ZodNumber>;
 }, z.core.$strip>;
@@ -81,6 +82,7 @@ export declare const AffectedFileSchema: z.ZodObject<{
         impl: "impl";
         mybatis: "mybatis";
         "mapper-xml": "mapper-xml";
+        "api-call": "api-call";
     }>>;
     minDepth: z.ZodNumber;
     citation: z.ZodNullable<z.ZodObject<{
@@ -303,6 +305,7 @@ export declare const ImpactResultSchema: z.ZodObject<{
         impl: "impl";
         mybatis: "mybatis";
         "mapper-xml": "mapper-xml";
+        "api-call": "api-call";
     }>>;
     fanInThreshold: z.ZodNumber;
     seeds: z.ZodArray<z.ZodObject<{
@@ -333,6 +336,7 @@ export declare const ImpactResultSchema: z.ZodObject<{
                 impl: "impl";
                 mybatis: "mybatis";
                 "mapper-xml": "mapper-xml";
+                "api-call": "api-call";
             }>>;
             minDepth: z.ZodNumber;
             citation: z.ZodNullable<z.ZodObject<{
@@ -463,6 +467,7 @@ export declare const ImpactResultSchema: z.ZodObject<{
                 impl: "impl";
                 mybatis: "mybatis";
                 "mapper-xml": "mapper-xml";
+                "api-call": "api-call";
             }>>;
             minDepth: z.ZodNumber;
             citation: z.ZodNullable<z.ZodObject<{

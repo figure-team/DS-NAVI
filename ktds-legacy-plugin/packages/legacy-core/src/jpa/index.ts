@@ -23,6 +23,7 @@ export type {
 export {
   extractJpaModel,
   extractJpaFromSource,
+  extractJpaFromKotlinSource,
   parseDerivedQuery,
   snakeCase,
 } from './extract.js'

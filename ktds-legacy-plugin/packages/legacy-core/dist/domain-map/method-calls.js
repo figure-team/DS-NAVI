@@ -18,7 +18,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { extractJavaFacts, } from './java-facts.js';
 import { gitCommitHash } from './persist.js';
-import { JAVA_FACTS_SALT } from './edges.js';
+import { JAVA_FACTS_SALT, KOTLIN_FACTS_SALT } from './edges.js';
+import { extractKotlinFacts } from './kotlin-facts.js';
 function cmp(a, b) {
     return a < b ? -1 : a > b ? 1 : 0;
 }
@@ -496,13 +497,15 @@ export async function buildMethodCallGraph(projectRoot, census, cache) {
     // edges 가 먼저 채운 팩트도 read-your-writes 로 재사용(콜드 포함, 리뷰 R1).
     // null 값 = 판독 실패 파일(제외 동작 동일).
     const factsSec = cache?.section('java-facts', JAVA_FACTS_SALT);
+    const factsKtSec = cache?.section('kotlin-facts', KOTLIN_FACTS_SALT);
     const javaFacts = new Map();
-    const javaRels = census.files
-        .filter((f) => f.lang === 'java')
-        .map((f) => f.relPath)
-        .sort(cmp);
-    for (const rel of javaRels) {
-        const hit = factsSec?.get(rel);
+    const rels = census.files
+        .filter((f) => f.lang === 'java' || f.lang === 'kotlin')
+        .map((f) => ({ relPath: f.relPath, lang: f.lang }))
+        .sort((a, b) => cmp(a.relPath, b.relPath));
+    for (const { relPath: rel, lang } of rels) {
+        const sec = lang === 'kotlin' ? factsKtSec : factsSec;
+        const hit = sec?.get(rel);
         if (hit !== undefined) {
             if (hit !== null)
                 javaFacts.set(rel, hit);
@@ -515,13 +518,13 @@ export async function buildMethodCallGraph(projectRoot, census, cache) {
         catch {
             // null 캐시는 fingerprint 도 'absent' 일 때만(일시 오류 박제 방지, 리뷰 R2).
             if (cache?.isAbsent(rel))
-                factsSec?.put(rel, null);
+                sec?.put(rel, null);
             continue;
         }
         try {
-            const facts = await extractJavaFacts(rel, src);
+            const facts = lang === 'kotlin' ? await extractKotlinFacts(rel, src) : await extractJavaFacts(rel, src);
             javaFacts.set(rel, facts);
-            factsSec?.put(rel, facts);
+            sec?.put(rel, facts);
         }
         catch {
             // 파싱 실패 파일은 facts 없이 둔다(증거 없는 호출 금지). 추출 실패는 캐시하지

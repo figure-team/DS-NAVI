@@ -35,6 +35,8 @@ export const STRONG_EDGE_KINDS: readonly EdgeKind[] = [
   'impl',
   'mybatis',
   'mapper-xml',
+  // 프런트 화면→백엔드 라우트 결선 — 런타임 실호출 근거(fetch/axios 리터럴)라 강엣지.
+  'api-call',
 ] as const
 
 export const DEFAULT_IMPACT_DEPTH_CAP = 12 // slices DEFAULT_DEPTH_CAP 과 대칭

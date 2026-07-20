@@ -32,6 +32,8 @@ export const STRONG_EDGE_KINDS = [
     'impl',
     'mybatis',
     'mapper-xml',
+    // 프런트 화면→백엔드 라우트 결선 — 런타임 실호출 근거(fetch/axios 리터럴)라 강엣지.
+    'api-call',
 ];
 export const DEFAULT_IMPACT_DEPTH_CAP = 12; // slices DEFAULT_DEPTH_CAP 과 대칭
 export const DEFAULT_FAN_IN_THRESHOLD = 24; // 역방향 fan-in 이 이를 넘으면 hub 후보

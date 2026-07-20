@@ -44,6 +44,7 @@ export declare const RouteFrameworkSchema: z.ZodEnum<{
     webxml: "webxml";
     jsp: "jsp";
     nextjs: "nextjs";
+    "react-router": "react-router";
 }>;
 export type RouteFramework = z.infer<typeof RouteFrameworkSchema>;
 /** 단일 라우트 엔트리. */
@@ -73,6 +74,7 @@ export declare const RouteEntrySchema: z.ZodObject<{
         webxml: "webxml";
         jsp: "jsp";
         nextjs: "nextjs";
+        "react-router": "react-router";
     }>;
     filePath: z.ZodString;
     line: z.ZodNumber;
@@ -134,6 +136,7 @@ export declare const RoutesReportSchema: z.ZodObject<{
             webxml: "webxml";
             jsp: "jsp";
             nextjs: "nextjs";
+            "react-router": "react-router";
         }>;
         filePath: z.ZodString;
         line: z.ZodNumber;
@@ -167,7 +170,8 @@ export type RoutesReport = z.infer<typeof RoutesReportSchema>;
  * 엣지 종류 — 파일↔파일 의존을 한정한다.
  * import(import 문) / injection(@Autowired·@Resource·@Inject) / field-type(평범한 필드 타입) /
  * ctor-param(생성자 파라미터 타입) / extends / implements / impl(인터페이스→구현) /
- * mybatis(SqlSession 문자열 호출→매퍼) / mapper-xml(매퍼 인터페이스→매퍼 XML).
+ * mybatis(SqlSession 문자열 호출→매퍼) / mapper-xml(매퍼 인터페이스→매퍼 XML) /
+ * api-call(프런트 fetch/axios 리터럴→백엔드 라우트 파일 — 화면↔API 결선).
  */
 export declare const EdgeKindSchema: z.ZodEnum<{
     import: "import";
@@ -179,6 +183,7 @@ export declare const EdgeKindSchema: z.ZodEnum<{
     impl: "impl";
     mybatis: "mybatis";
     "mapper-xml": "mapper-xml";
+    "api-call": "api-call";
 }>;
 export type EdgeKind = z.infer<typeof EdgeKindSchema>;
 /** 단일 엣지 — source/target 은 census relPath. */
@@ -195,6 +200,7 @@ export declare const EdgeRecordSchema: z.ZodObject<{
         impl: "impl";
         mybatis: "mybatis";
         "mapper-xml": "mapper-xml";
+        "api-call": "api-call";
     }>;
     line: z.ZodNullable<z.ZodNumber>;
 }, z.core.$strip>;
@@ -226,6 +232,7 @@ export declare const EdgesReportSchema: z.ZodObject<{
             impl: "impl";
             mybatis: "mybatis";
             "mapper-xml": "mapper-xml";
+            "api-call": "api-call";
         }>;
         line: z.ZodNullable<z.ZodNumber>;
     }, z.core.$strip>>;

@@ -30,7 +30,14 @@ export const RouteMethodSchema = z.enum([
 /** 라우트 종류 — api(데이터) / form(뷰 제출) / page(렌더) / servlet(레거시). */
 export const RouteKindSchema = z.enum(['api', 'form', 'page', 'servlet']);
 /** 라우트 프레임워크. */
-export const RouteFrameworkSchema = z.enum(['spring', 'stripes', 'webxml', 'jsp', 'nextjs']);
+export const RouteFrameworkSchema = z.enum([
+    'spring',
+    'stripes',
+    'webxml',
+    'jsp',
+    'nextjs',
+    'react-router',
+]);
 /** 단일 라우트 엔트리. */
 export const RouteEntrySchema = z.object({
     routeId: z.string(),
@@ -84,7 +91,8 @@ export const RoutesReportSchema = z.object({
  * 엣지 종류 — 파일↔파일 의존을 한정한다.
  * import(import 문) / injection(@Autowired·@Resource·@Inject) / field-type(평범한 필드 타입) /
  * ctor-param(생성자 파라미터 타입) / extends / implements / impl(인터페이스→구현) /
- * mybatis(SqlSession 문자열 호출→매퍼) / mapper-xml(매퍼 인터페이스→매퍼 XML).
+ * mybatis(SqlSession 문자열 호출→매퍼) / mapper-xml(매퍼 인터페이스→매퍼 XML) /
+ * api-call(프런트 fetch/axios 리터럴→백엔드 라우트 파일 — 화면↔API 결선).
  */
 export const EdgeKindSchema = z.enum([
     'import',
@@ -96,6 +104,7 @@ export const EdgeKindSchema = z.enum([
     'impl',
     'mybatis',
     'mapper-xml',
+    'api-call',
 ]);
 /** 단일 엣지 — source/target 은 census relPath. */
 export const EdgeRecordSchema = z.object({

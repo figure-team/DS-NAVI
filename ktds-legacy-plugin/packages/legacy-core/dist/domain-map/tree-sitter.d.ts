@@ -1,5 +1,5 @@
 import type { Node } from 'web-tree-sitter';
-export type LangId = 'java' | 'typescript' | 'tsx';
+export type LangId = 'java' | 'kotlin' | 'typescript' | 'tsx';
 /**
  * 소스를 파싱해 루트 노드를 반환한다.
  * 호출자는 더 이상 필요 없을 때 `tree.delete()` 로 해제할 수 있다(선택).

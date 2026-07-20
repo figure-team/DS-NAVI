@@ -11,6 +11,8 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Node } from 'web-tree-sitter'
 import { extractJavaFacts, type JavaFileFacts } from './java-facts.js'
+import { extractKotlinFacts } from './kotlin-facts.js'
+import { extractTsImportEdges } from './ts-imports.js'
 import { parseSource } from './tree-sitter.js'
 import type { ScanCacheSession } from '../scan-cache/index.js'
 import type { CensusReport, EdgeKind, EdgeRecord, EdgesReport, Unresolved } from './types.js'
@@ -18,8 +20,10 @@ import type { CensusReport, EdgeKind, EdgeRecord, EdgesReport, Unresolved } from
 /**
  * W8 캐시 섹션 salt — JavaFileFacts 형태(java-facts.ts)나 mybatis namespace 수집 의미가
  * 바뀌면 bump. `java-facts` 섹션은 method-calls.ts 와 공유(동일 extractJavaFacts 출력).
+ * `kotlin-facts` 섹션은 kotlin-facts.ts 출력 전용 — Java 와 독립적으로 salt 를 올린다.
  */
 export const JAVA_FACTS_SALT = 'v1'
+export const KOTLIN_FACTS_SALT = 'v1'
 const MYBATIS_NS_SALT = 'v1'
 
 /** 주입 어노테이션(필드/생성자). */
@@ -160,6 +164,7 @@ export async function extractEdges(
   cache?: ScanCacheSession,
 ): Promise<EdgesReport> {
   const javaFiles = census.files.filter((f) => f.lang === 'java')
+  const kotlinFiles = census.files.filter((f) => f.lang === 'kotlin')
   const xmlFiles = census.files.filter(
     (f) => f.lang === 'xml' && f.relPath.endsWith('Mapper.xml'),
   )
@@ -167,6 +172,7 @@ export async function extractEdges(
   // W8: 파일단위 팩트 캐시 — null 값 = 판독 실패 파일(기존 동작대로 제외).
   // mybatis ns 는 소비부가 정렬 순회라 배열(집합 원소)로 저장해도 동일 결과.
   const factsSec = cache?.section<JavaFileFacts | null>('java-facts', JAVA_FACTS_SALT)
+  const factsKtSec = cache?.section<JavaFileFacts | null>('kotlin-facts', KOTLIN_FACTS_SALT)
   const nsSec = cache?.section<string[] | null>('mybatis-ns', MYBATIS_NS_SALT)
 
   // 1) Java 팩트 + (mybatis 탐지용) 파싱 루트를 relPath 정렬 순으로 수집.
@@ -205,6 +211,30 @@ export async function extractEdges(
       nsSec?.put(f.relPath, [...ns])
     } catch {
       // 증거 없는 엣지 금지 — facts 없이 둔다.
+    }
+  }
+
+  // 1b) Kotlin 팩트 — JavaFileFacts 동형(kotlin-facts.ts). MyBatis ns 스캔은 Java 전용이라 없음.
+  const sortedKotlin = [...kotlinFiles].sort((a, b) => cmp(a.relPath, b.relPath))
+  for (const f of sortedKotlin) {
+    const hit = factsKtSec?.get(f.relPath)
+    if (hit !== undefined) {
+      if (hit !== null) factsByPath.set(f.relPath, hit)
+      continue
+    }
+    let src: string
+    try {
+      src = readFileSync(join(projectRoot, f.relPath), 'utf8')
+    } catch {
+      if (cache?.isAbsent(f.relPath)) factsKtSec?.put(f.relPath, null)
+      continue
+    }
+    try {
+      const facts = await extractKotlinFacts(f.relPath, src)
+      factsByPath.set(f.relPath, facts)
+      factsKtSec?.put(f.relPath, facts)
+    } catch {
+      // 증거 없는 엣지 금지 — Java 루프와 동일 규약(그 파일만 제외, 추출 실패는 미캐시).
     }
   }
 
@@ -323,6 +353,9 @@ export async function extractEdges(
     }
   }
 
+  // TS/TSX/JS import 그래프 — 상대 임포트를 census 파일로 결정론 해소(kind='import').
+  edges.push(...(await extractTsImportEdges(projectRoot, census)))
+
   return {
     schemaVersion: 1,
     gitCommit: census.gitCommit,
@@ -331,8 +364,8 @@ export async function extractEdges(
   }
 }
 
-/** 엣지 중복제거 + (source,target,kind,line) 정렬. */
-function dedupSortEdges(edges: EdgeRecord[]): EdgeRecord[] {
+/** 엣지 중복제거 + (source,target,kind,line) 정렬 — api-call 후병합(extract.ts)도 재사용. */
+export function dedupSortEdges(edges: EdgeRecord[]): EdgeRecord[] {
   const seen = new Set<string>()
   const out: EdgeRecord[] = []
   for (const e of edges) {

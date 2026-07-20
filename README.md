@@ -71,9 +71,9 @@ DS-NAVI는 이 세 가지를 정면으로 다룬다. 코드에서 **근거(file:
 
 ```
 분석 대상 프로젝트
- ├─ /understand           → .understand-anything/knowledge-graph.json   (코드 지식그래프)
- ├─ /understand-map 외    → .spec/map/*.json                            (업무지도·DB·RTM·영향·정책·실적)
- └─ /understand-docs      → .spec/wiki/*.md                             (SI 산출물 문서)
+ ├─ /understand-map 외    → .spec/map/*.json                            (업무지도·구조·DB·RTM·영향·정책·실적)
+ ├─ /understand-docs      → .spec/wiki/*.md                             (SI 산출물 문서)
+ └─ (선택) /understand    → .understand-anything/knowledge-graph.json   (지식그래프 메뉴 전용 — 파이프라인 은퇴)
                                    │
                                    ▼
 대시보드(React SPA) ── 토큰 게이트 dev 서버가 위 산출물을 서빙

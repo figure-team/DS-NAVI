@@ -68,6 +68,32 @@ opencode run --command understand "$(pwd)"
 opencode run --command understand-dashboard "$(pwd)"
 ```
 
+## 대시보드 헤드리스 스폰 — opencode 전환 (`UA_HEADLESS_CLI`)
+
+대시보드의 자동 실행 3계열(변경·영향 분석, RTM 인테이크 ①~⑥·답변개정, RTM 변경관리)은 dev 서버가
+CLI 를 헤드리스로 spawn 한다. 기본은 `claude` 이고, **환경변수 하나로 opencode 로 전환**한다:
+
+```bash
+UA_HEADLESS_CLI=opencode \
+UNDERSTAND_ACCESS_TOKEN=<token> GRAPH_DIR=<분석 프로젝트 절대경로> \
+pnpm dev:dashboard --port <n> --strictPort
+```
+
+전제 2가지(분석 대상 프로젝트 쪽):
+1. **어댑터 설치** — spawn 은 `cwd=<분석 프로젝트>` 로 뜨므로 그 프로젝트에 `.opencode/` 가 있어야
+   커맨드가 발견된다: `install.sh dev --project <분석 프로젝트>`.
+2. **`opencode.json` 에 `permission.question: "deny"`** — 헤드리스에서 모델이 question 툴을 부르면
+   무한 행(upstream #11899)이라 반드시 막는다(`--dangerously-skip-permissions` 는 deny 를 존중한다).
+
+플래그 매핑(어댑터 `server/claude-headless.ts` `buildHeadlessSpawnPlan`, 1.17.11 실측):
+
+| claude | opencode |
+| --- | --- |
+| `-p "/cmd <args>"` | `run --command cmd -- "<args>"` (`--` 필수 — 인자가 `-` 로 시작) |
+| `--permission-mode bypassPermissions` | `--dangerously-skip-permissions` |
+| `--model opus\|sonnet\|haiku` | `UA_OPENCODE_MODEL_<TIER>` env 로 `provider/model` 매핑, 미설정 시 플래그 생략(=opencode 기본 모델) |
+| `--session-id` / `--resume` (인테이크 D1) | **생략** — 개정 디렉티브가 자기완결형(답·산출·번들을 디스크에서 재독, §4.3)이라 결과 동일·토큰만 추가. 흔적은 job tail 의 `[headless-cli]` 노트 |
+
 ## 검증 상태
 
 opencode 1.15.13 (인증=OpenAI) 기준 실증:

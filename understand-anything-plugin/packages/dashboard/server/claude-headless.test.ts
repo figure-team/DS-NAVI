@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   CLAUDE_JOB_TAIL_MAX,
   ClaudeJobTracker,
+  buildHeadlessSpawnPlan,
+  headlessCliFromEnv,
   headlessDirective,
   newJobId,
   runClaudeSkill,
@@ -54,6 +56,75 @@ describe("headlessDirective", () => {
         `보고하고 멈춰라. **삭제 금지·이력 보존**(상태를 폐기로만), CR 문서(과업내용변경요청서·변경영향분석서)를 ` +
         `생성하고 추적표를 재생성한다. 확정·후속조치 수행은 사람이 한다.`,
     );
+  });
+});
+
+describe("headlessCliFromEnv", () => {
+  it("UA_HEADLESS_CLI=opencode 만 opencode — 그 외(미설정·오타)는 claude", () => {
+    expect(headlessCliFromEnv({})).toBe("claude");
+    expect(headlessCliFromEnv({ UA_HEADLESS_CLI: "opencode" })).toBe("opencode");
+    expect(headlessCliFromEnv({ UA_HEADLESS_CLI: "OpenCode" })).toBe("claude");
+  });
+});
+
+describe("buildHeadlessSpawnPlan", () => {
+  const PROMPT = "/understand-rtm --intake --session ab12 --step 1\n\n디렉티브";
+
+  it("claude: 기존 args 와 바이트 동일(additive 보장) — 전 조합", () => {
+    expect(buildHeadlessSpawnPlan({ cli: "claude", prompt: "P" })).toEqual({
+      bin: "claude",
+      args: ["-p", "P", "--permission-mode", "bypassPermissions"],
+      notes: [],
+    });
+    expect(
+      buildHeadlessSpawnPlan({ cli: "claude", prompt: "P", model: "sonnet", resume: "U1", sessionId: "U2" }).args,
+    ).toEqual(["-p", "P", "--permission-mode", "bypassPermissions", "--model", "sonnet", "--resume", "U1"]);
+    expect(buildHeadlessSpawnPlan({ cli: "claude", prompt: "P", sessionId: "U2" }).args).toEqual([
+      "-p", "P", "--permission-mode", "bypassPermissions", "--session-id", "U2",
+    ]);
+  });
+
+  it("opencode: /커맨드 분리 + --dangerously-skip-permissions + `--` 뒤 message(인자가 - 로 시작해도 안전)", () => {
+    const plan = buildHeadlessSpawnPlan({ cli: "opencode", prompt: PROMPT, env: {} });
+    expect(plan.bin).toBe("opencode");
+    expect(plan.args).toEqual([
+      "run", "--command", "understand-rtm", "--dangerously-skip-permissions",
+      "--", "--intake --session ab12 --step 1\n\n디렉티브",
+    ]);
+    expect(plan.notes).toEqual([]);
+  });
+
+  it("opencode: 인자 없는 커맨드는 `--` 를 붙이지 않는다", () => {
+    expect(buildHeadlessSpawnPlan({ cli: "opencode", prompt: "/understand-dashboard", env: {} }).args).toEqual([
+      "run", "--command", "understand-dashboard", "--dangerously-skip-permissions",
+    ]);
+  });
+
+  it("opencode: 모델 티어는 UA_OPENCODE_MODEL_<TIER> 매핑 — 미설정이면 플래그 생략 + note", () => {
+    const mapped = buildHeadlessSpawnPlan({
+      cli: "opencode", prompt: PROMPT, model: "sonnet",
+      env: { UA_OPENCODE_MODEL_SONNET: "anthropic/claude-sonnet-4-5" },
+    });
+    expect(mapped.args).toContain("anthropic/claude-sonnet-4-5");
+    expect(mapped.notes).toEqual([]);
+
+    const unmapped = buildHeadlessSpawnPlan({ cli: "opencode", prompt: PROMPT, model: "opus", env: {} });
+    expect(unmapped.args.join(" ")).not.toContain("--model");
+    expect(unmapped.notes.join(" ")).toContain("UA_OPENCODE_MODEL_OPUS");
+  });
+
+  it("opencode: resume/sessionId 는 생략하고 note 만 남긴다(1차 방식 — 개정 디렉티브가 자기완결·§4.3)", () => {
+    const plan = buildHeadlessSpawnPlan({ cli: "opencode", prompt: PROMPT, resume: "U1", sessionId: "U2", env: {} });
+    const flat = plan.args.slice(0, 4).join(" "); // `--` 뒤 message 제외한 실제 플래그 영역
+    expect(flat).not.toContain("U1");
+    expect(flat).not.toContain("U2");
+    expect(plan.notes.join(" ")).toContain("대화 연속성");
+  });
+
+  it("opencode: 슬래시 커맨드가 아니면 프롬프트 전체를 message 로 + note", () => {
+    const plan = buildHeadlessSpawnPlan({ cli: "opencode", prompt: "그냥 텍스트", env: {} });
+    expect(plan.args).toEqual(["run", "--dangerously-skip-permissions", "--", "그냥 텍스트"]);
+    expect(plan.notes.length).toBe(1);
   });
 });
 
@@ -204,6 +275,25 @@ describe("runClaudeSkill", () => {
     runClaudeSkill({ prompt: "P", cwd: process.cwd(), jobId, tracker: t, command: "echo" });
     await until(() => t.job.status !== "running");
     expect(t.job.tail.trim()).toBe("-p P --permission-mode bypassPermissions");
+  });
+
+  it("cli:opencode — run/--command 조립 + resume 생략 note 가 tail 에 남는다(echo 셔임)", async () => {
+    const t = new ClaudeJobTracker<Record<string, never>>({});
+    const jobId = t.begin({});
+    runClaudeSkill({
+      prompt: "/understand-rtm --intake --session ab12 --step 1 --revise",
+      cwd: process.cwd(),
+      jobId,
+      tracker: t,
+      cli: "opencode",
+      command: "echo",
+      resume: UUID,
+    });
+    await until(() => t.job.status !== "running");
+    expect(t.job.tail).toContain("[headless-cli] 대화 연속성");
+    expect(t.job.tail).toContain("run --command understand-rtm --dangerously-skip-permissions");
+    expect(t.job.tail).toContain("-- --intake --session ab12 --step 1 --revise");
+    expect(t.job.tail).not.toContain(UUID);
   });
 
   it("비 0 exit → failed", async () => {

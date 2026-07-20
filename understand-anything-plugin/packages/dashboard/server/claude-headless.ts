@@ -110,13 +110,81 @@ export class ClaudeJobTracker<Extra extends Record<string, unknown>> {
   }
 }
 
+// ── 헤드리스 CLI 어댑터(opencode 포팅) ──────────────────────────────────────
+// 스폰 플래그 조립을 순수 함수로 분리한다 — claude 경로는 기존과 **바이트 동일**해야 하고
+// (아래 테스트가 단언), opencode 경로는 설치본 1.17.11 실측 규약을 따른다:
+//   - 커맨드 실행: `opencode run --command <name> -- "<args>"` — 슬래시 문법 불가(#5073),
+//     인자가 `-` 로 시작하므로 `--` 구분자가 **필수**(없으면 yargs 가 usage 만 찍고 요청 미도달, 실측).
+//   - 권한 우회: `--dangerously-skip-permissions`(문서의 --auto 는 이 버전에 없음, --help 실측).
+//     ★ 별도로 스폰 대상 프로젝트 opencode.json 에 `permission.question:"deny"` 를 깔아야
+//     헤드리스 question-툴 무한 행(upstream #11899)을 막는다 — 여기서는 강제할 수 없다.
+//   - 대화 연속성: `--session-id` 등가물 없음 → resume/sessionId 는 **생략**한다. 인테이크 개정
+//     디렉티브가 자기완결형(§4.3 — 답·산출·번들을 디스크에서 재독)이라 결과가 같다(토큰만 더 씀).
+//   - 모델: `-m provider/model` 형식이라 claude 티어명(opus/sonnet/haiku)을 그대로 못 쓴다 —
+//     `UA_OPENCODE_MODEL_<TIER>` env 로 매핑하고, 미설정이면 플래그 생략(=opencode 기본 모델).
+
+export type HeadlessCli = "claude" | "opencode";
+
+/** 헤드리스 스폰 CLI 선택 — 대시보드 dev 서버 기동 시 `UA_HEADLESS_CLI=opencode` 로 전환. */
+export function headlessCliFromEnv(env: NodeJS.ProcessEnv = process.env): HeadlessCli {
+  return env.UA_HEADLESS_CLI === "opencode" ? "opencode" : "claude";
+}
+
+export interface HeadlessSpawnPlan {
+  bin: string;
+  args: string[];
+  /** 요청과 다르게 조립된 지점의 관측 기록 — 호출측이 tail 에 남긴다(디버깅용). */
+  notes: string[];
+}
+
+export function buildHeadlessSpawnPlan(opts: {
+  cli: HeadlessCli;
+  prompt: string;
+  model?: string;
+  resume?: string;
+  sessionId?: string;
+  env?: NodeJS.ProcessEnv;
+}): HeadlessSpawnPlan {
+  if (opts.cli !== "opencode") {
+    const args = ["-p", opts.prompt, "--permission-mode", "bypassPermissions"];
+    if (opts.model) args.push("--model", opts.model);
+    if (opts.resume) args.push("--resume", opts.resume);
+    else if (opts.sessionId) args.push("--session-id", opts.sessionId);
+    return { bin: "claude", args, notes: [] };
+  }
+
+  const env = opts.env ?? process.env;
+  const notes: string[] = [];
+  const args = ["run"];
+  // 프롬프트는 전 호출부가 `/understand-* <인자·디렉티브>` 꼴 — 커맨드명과 나머지를 분리한다.
+  const m = opts.prompt.match(/^\/([A-Za-z0-9][\w-]*)[ \t]*([\s\S]*)$/);
+  const message = m ? m[2] : opts.prompt;
+  if (m) args.push("--command", m[1]);
+  else notes.push(`슬래시 커맨드 아님 — 프롬프트 전체를 message 로 전달`);
+  args.push("--dangerously-skip-permissions");
+  if (opts.model) {
+    const mapped = env[`UA_OPENCODE_MODEL_${opts.model.toUpperCase()}`];
+    if (mapped) args.push("--model", mapped);
+    else
+      notes.push(
+        `모델 '${opts.model}' 매핑 없음(UA_OPENCODE_MODEL_${opts.model.toUpperCase()} 미설정) — opencode 기본 모델 사용`,
+      );
+  }
+  if (opts.resume || opts.sessionId)
+    notes.push(`대화 연속성(resume/session-id) 미지원 — 생략(개정 디렉티브가 디스크 재독으로 자기완결)`);
+  if (message) args.push("--", message);
+  return { bin: "opencode", args, notes };
+}
+
 export interface RunClaudeSkillOptions<Extra extends Record<string, unknown>> {
   prompt: string;
   cwd: string;
   /** begin() 이 발급한 jobId — 모든 핸들러가 이 값으로 현재성(現在性)을 판정한다. */
   jobId: string;
   tracker: ClaudeJobTracker<Extra>;
-  /** 테스트/포팅용 CLI 이름 오버라이드(기본 "claude"). */
+  /** 헤드리스 CLI 종류(기본 = UA_HEADLESS_CLI env). 플래그 조립 규약이 통째로 갈린다. */
+  cli?: HeadlessCli;
+  /** 테스트/포팅용 CLI 실행 파일 오버라이드(기본 = cli 에 따라 "claude"/"opencode"). */
   command?: string;
   /**
    * 세션 기본 대신 사용할 모델(whitelist: opus/sonnet/haiku). 값이 있으면 spawn args 에
@@ -156,16 +224,32 @@ export function runClaudeSkill<Extra extends Record<string, unknown>>(
 ): boolean {
   const { prompt, cwd, jobId, tracker } = opts;
   let child: ReturnType<typeof spawn>;
-  const args = ["-p", prompt, "--permission-mode", "bypassPermissions"];
-  // 모델 미전달(기본) 이면 플래그 없이 세션 모델을 쓴다 — 프로젝트 공통 규약.
-  if (opts.model) args.push("--model", opts.model);
-  // 대화 연속성(D1) — 둘 다 미전달(기본)이면 플래그가 붙지 않아 **기존 호출의 args 가 바이트 동일**하다.
-  // resume 이 sessionId 를 이긴다: "이 대화를 이어라"가 "이 id 로 새로 열어라"보다 구체적인 의도고,
-  // 둘 다 넘기는 건 호출자 실수인데 그때 새 대화를 열면 이어가려던 맥락이 조용히 사라진다.
-  if (opts.resume) args.push("--resume", opts.resume);
-  else if (opts.sessionId) args.push("--session-id", opts.sessionId);
+  // 플래그 조립은 순수 함수로 위임 — claude 경로는 기존과 바이트 동일(테스트 단언), opencode 는
+  // 실측 규약(--command/--dangerously-skip-permissions/`--` 구분자) 적용. 모델 미전달(기본)이면
+  // 플래그 없이 세션(claude)/기본(opencode) 모델을 쓴다 — 프로젝트 공통 규약. 대화 연속성(D1)은
+  // claude 만: resume 이 sessionId 를 이긴다("이어라"가 "새로 열어라"보다 구체적 의도 — 둘 다는
+  // 호출자 실수인데 그때 새 대화를 열면 이어가려던 맥락이 조용히 사라진다).
+  const cli = opts.cli ?? headlessCliFromEnv();
+  const plan = buildHeadlessSpawnPlan({
+    cli,
+    prompt,
+    model: opts.model,
+    resume: opts.resume,
+    sessionId: opts.sessionId,
+  });
+  for (const note of plan.notes) tracker.appendTail(`[headless-cli] ${note}\n`);
   try {
-    child = spawn(opts.command ?? "claude", args, { cwd, env: process.env });
+    // ★ opencode 헤드리스 spawn 함정 2개(둘 다 1.17.11 실측, claude 경로는 기존값 유지):
+    //   1) stdin 을 "ignore" 로 닫아야 한다 — non-TTY 의 **열린** stdin 파이프를 주면 EOF 를
+    //      기다리며 LLM 스트림 시작 전에 무한 행(`tail -f /dev/null |` 재현, `</dev/null` 정상).
+    //   2) env.PWD 를 cwd 로 덮어써야 한다 — spawn 의 cwd 옵션은 PWD env 를 갱신하지 않아
+    //      부모(dev 서버, packages/dashboard) 디렉터리가 새어 들어가고, opencode 가 프로젝트
+    //      해석에 PWD 를 우선하므로 커맨드 미발견(UnknownError) 이 된다(env PWD=<딴 곳> 재현).
+    child = spawn(opts.command ?? plan.bin, plan.args, {
+      cwd,
+      env: cli === "opencode" ? { ...process.env, PWD: cwd } : process.env,
+      stdio: [cli === "opencode" ? "ignore" : "pipe", "pipe", "pipe"],
+    });
   } catch (err) {
     if (tracker.fail(jobId, err instanceof Error ? err.message : String(err))) {
       opts.onSpawnError?.();

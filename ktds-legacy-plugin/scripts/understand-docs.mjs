@@ -11,6 +11,7 @@
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
+import { appendRunLedger, runStartedAt } from './lib/run-ledger.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const distEntry = join(here, '..', 'packages', 'legacy-core', 'dist', 'index.js')
@@ -24,6 +25,7 @@ if (!existsSync(distEntry)) {
 }
 
 const projectRoot = process.argv[2] || process.cwd()
+const runBegan = runStartedAt()
 
 const engine = await import(distEntry)
 const {
@@ -348,3 +350,11 @@ if (overridden.length > 0) {
 console.log(`  xlsx 병기: 문서 ${xlsxDocs.length}종${rtmXlsx ? ' + rtm.xlsx(요구/기능 원장)' : ''} → doc-output/*.xlsx`)
 console.log(`  위키 볼트: .spec/wiki/ (${vault.files.length}개 파일, index.md 허브 포함)`)
 console.log('모든 표 행/주장은 file:line 근거 + 신뢰도 태그를 갖는다(AC-9). 생성물은 편집·확정 가능(D3).')
+
+// 실행 원장 — 문서 산출물은 결정론이라 시각을 못 싣는다. 실행 사실은 원장에만.
+appendRunLedger(projectRoot, {
+  tool: 'understand-docs',
+  action: 'generate',
+  startedAt: runBegan,
+  summary: `문서 ${docs.length}종 · 위키 ${vault.files.length}파일`,
+})

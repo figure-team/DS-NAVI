@@ -11,6 +11,7 @@
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs'
+import { appendRunLedger, runStartedAt } from './lib/run-ledger.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const distEntry = join(here, '..', 'packages', 'legacy-core', 'dist', 'index.js')
@@ -24,6 +25,7 @@ if (!existsSync(distEntry)) {
 }
 
 const projectRoot = process.argv[2] || process.cwd()
+const runBegan = runStartedAt()
 const engine = await import(distEntry)
 const { buildRtm, applyRequirements, applyOverlay, attachTestScenarios, buildMyBatisModel, isMapperXmlDocument } = engine
 // P1c 근거 게이트 — 배럴(rtm/index.ts)이 동시 편집 중이라 아직 export 를 못 얹었다. 파일 경로
@@ -219,3 +221,11 @@ if (diags.length > 0) {
   if (diags.length > 12) console.log(`    … 외 ${diags.length - 12}건`)
 }
 console.log('모든 추적 셀은 file:line 근거 + 신뢰도 태그를 갖는다(grounding 보존). 요구사항/이력/편집·확정은 후속(R3~R5).')
+
+// 실행 원장 — rtm.json 은 결정론(byte-diff=0)이라 시각을 못 싣는다. 실행 사실은 원장에만.
+appendRunLedger(projectRoot, {
+  tool: 'understand-rtm',
+  action: 'bake',
+  startedAt: runBegan,
+  summary: `도메인 ${model.domains.length} · 기능 ${model.functions.length} · 근거율 ${rate}%`,
+})

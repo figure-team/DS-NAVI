@@ -52,12 +52,56 @@ interface RiskLite {
   topScore: number | null;
 }
 
+/** 인테이크 세션 요약 — /rtm-intake-sessions 응답의 존재 필드만. */
+interface IntakeSessionLite {
+  sid: string;
+  request: string;
+  createdAt: string;
+  producedStep: number;
+  confirmedStep: number;
+  discarded: boolean;
+  running: boolean;
+}
+
+/** 영향분석 실행 원장 — /impact-history 항목의 존재 필드만. */
+interface ImpactRunLite {
+  query: string;
+  startedAt: string | null;
+  finishedAt: string | null;
+  status: string;
+}
+
+/** 엔진 실행 원장 — /run-ledger.json 항목(결정론 산출물 밖의 실행 사실 기록). */
+interface RunLedgerEntry {
+  tool: string;
+  action: string;
+  finishedAt: string | null;
+  summary: string | null;
+}
+
 interface FeedItem {
   at: string; // ISO
   dot: string; // CSS color
   title: ReactNode;
   sub: string;
 }
+
+/** 실행 원장 tool:action → 사용자 표기(모르는 조합은 원문 그대로 — 정직한 폴백). */
+const RUN_LABELS: Record<string, string> = {
+  "understand-map:scan": "도메인 맵 스캔",
+  "understand-map:plan": "도메인 플랜 생성",
+  "understand-map:confirm": "도메인 경계 확정",
+  "understand-map:emit": "도메인 그래프 생성",
+  "understand-rtm:bake": "추적표 재생성",
+  "understand-docs:generate": "산출물 문서 생성",
+  "understand-policy:domain": "도메인 정책서 생성",
+  "understand-policy:category": "정책서 생성",
+  "understand-screens:capture": "화면 캡처 실행",
+  "understand-screens:fill-merge": "화면설계서 채움 병합",
+};
+
+/** 인테이크 단계 번호 표기(①~⑥). */
+const STEP_CIRCLED = ["", "①", "②", "③", "④", "⑤", "⑥"];
 
 /**
  * 홈 (FRONT_REDESIGN §5.1) — P0 승인 시안(mockup-shell-home.html)과 1:1 정합.
@@ -68,7 +112,6 @@ export default function HomePage() {
   const { accessToken } = useOutletContext<ShellContext>();
   const graph = useDashboardStore((s) => s.graph);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
-  const impactOverlay = useDashboardStore((s) => s.impactOverlayData);
   const diffOverlay = useDashboardStore((s) => s.diffOverlayData);
   const { t } = useI18n();
   const [rtm, setRtm] = useState<RtmSummary | null>(null);
@@ -78,6 +121,9 @@ export default function HomePage() {
   const [work, setWork] = useState<WorkSummaryLite | null>(null);
   const [risk, setRisk] = useState<RiskLite | null>(null);
   const [dataStats, setDataStats] = useState<DataLite | null>(null);
+  const [intakeSessions, setIntakeSessions] = useState<IntakeSessionLite[]>([]);
+  const [impactRuns, setImpactRuns] = useState<ImpactRunLite[]>([]);
+  const [runLedger, setRunLedger] = useState<RunLedgerEntry[]>([]);
 
   // 홈 전용 요약 데이터 — 없으면(404) 해당 카드/타일만 숨긴다.
   useEffect(() => {
@@ -165,6 +211,25 @@ export default function HomePage() {
         });
       })
       .catch(() => {});
+    // 최근 활동 소스 3종 — 인테이크 세션·영향분석 원장·엔진 실행 원장(부재 404 = 항목 skip).
+    fetch(dataUrl("rtm-intake-sessions", accessToken))
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data && Array.isArray(data.sessions)) setIntakeSessions(data.sessions as IntakeSessionLite[]);
+      })
+      .catch(() => {});
+    fetch(dataUrl("impact-history", accessToken))
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data && Array.isArray(data.entries)) setImpactRuns(data.entries as ImpactRunLite[]);
+      })
+      .catch(() => {});
+    fetch(dataUrl("run-ledger.json", accessToken))
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data && Array.isArray(data.entries)) setRunLedger(data.entries as RunLedgerEntry[]);
+      })
+      .catch(() => {});
   }, [accessToken]);
 
   const stats = useMemo(() => {
@@ -196,7 +261,9 @@ export default function HomePage() {
     };
   }, [docs]);
 
-  // 최근 활동 — 타임스탬프가 실재하는 이벤트만(문서 확정, 오버레이 생성, 분석 실행).
+  // 최근 활동 — 타임스탬프가 실재하는 이벤트만. 사람의 결정(요청 접수·단계 컨펌·문서 확정)과
+  // 사람이 시킨 실행(영향분석·엔진 실행 원장). 결정론 산출물엔 시각이 없으므로(byte-diff=0
+  // 계약) 엔진 실행은 run-ledger.json(산출물 밖 원장)에서 읽는다.
   const feed = useMemo<FeedItem[]>(() => {
     const items: FeedItem[] = [];
     for (const d of docs ?? []) {
@@ -213,12 +280,50 @@ export default function HomePage() {
         });
       }
     }
-    if (impactOverlay?.generatedAt) {
+    // 요청 인테이크 — 폐기 세션 제외. 시각 = 접수(createdAt).
+    for (const s of intakeSessions) {
+      if (s.discarded || !s.createdAt) continue;
+      const state = s.running
+        ? "진행 중"
+        : s.confirmedStep >= 6
+        ? "⑥ 확정 완료"
+        : `${STEP_CIRCLED[s.producedStep] ?? s.producedStep} 산출`;
       items.push({
-        at: impactOverlay.generatedAt,
+        at: s.createdAt,
         dot: "var(--color-accent)",
-        title: <>영향도 분석 완료</>,
-        sub: `${fmtWhen(impactOverlay.generatedAt)} · 영향 노드 ${impactOverlay.affected.length}`,
+        title: (
+          <>
+            요청 「{s.request}」 <b className="font-semibold">{state}</b>
+          </>
+        ),
+        sub: fmtWhen(s.createdAt),
+      });
+    }
+    // 영향분석 실행 원장 — 실패는 경고색으로 정직 표기.
+    for (const e of impactRuns) {
+      const at = e.finishedAt ?? e.startedAt;
+      if (!at) continue;
+      const failed = e.status === "error";
+      items.push({
+        at,
+        dot: failed ? "var(--color-status-error)" : "var(--color-status-info)",
+        title: (
+          <>
+            영향분석 「{e.query}」 {failed ? "실패" : e.status === "done" ? "완료" : e.status}
+          </>
+        ),
+        sub: fmtWhen(at),
+      });
+    }
+    // 엔진 실행 원장 — map/rtm/docs/policy/screens 의 실행 사실(결정론 산출물 밖 기록).
+    for (const e of runLedger) {
+      if (!e.finishedAt) continue;
+      const label = RUN_LABELS[`${e.tool}:${e.action}`] ?? `${e.tool} ${e.action}`;
+      items.push({
+        at: e.finishedAt,
+        dot: "var(--color-text-muted)",
+        title: <>{label}</>,
+        sub: e.summary ? `${fmtWhen(e.finishedAt)} · ${e.summary}` : fmtWhen(e.finishedAt),
       });
     }
     if (diffOverlay?.generatedAt) {
@@ -229,6 +334,7 @@ export default function HomePage() {
         sub: fmtWhen(diffOverlay.generatedAt),
       });
     }
+    // 은퇴한 /understand 경로 호환 — meta.json 이 있는(UA 분석) 프로젝트에서만 발화.
     if (meta?.lastAnalyzedAt) {
       items.push({
         at: meta.lastAnalyzedAt,
@@ -237,8 +343,8 @@ export default function HomePage() {
         sub: fmtWhen(meta.lastAnalyzedAt),
       });
     }
-    return items.sort((a, b) => (a.at < b.at ? 1 : -1)).slice(0, 4);
-  }, [docs, impactOverlay, diffOverlay, meta]);
+    return items.sort((a, b) => (a.at < b.at ? 1 : -1)).slice(0, 5);
+  }, [docs, intakeSessions, impactRuns, runLedger, diffOverlay, meta]);
 
   if (!graph) {
     return (
@@ -494,26 +600,27 @@ export default function HomePage() {
               ))}
             </div>
           )}
-          {feed.length > 0 && (
-            <div className="bg-panel border border-border-subtle rounded-[10px] px-5 py-4 card-shadow">
-              <h3 className="text-[13px] font-bold text-text-secondary mb-3">최근 활동</h3>
-              {feed.map((item, i) => (
-                <div
-                  key={i}
-                  className="flex gap-2.5 py-[9px] border-t border-border-subtle first:border-t-0 text-[13px]"
-                >
-                  <span
-                    className="w-[7px] h-[7px] rounded-full shrink-0 mt-[6px]"
-                    style={{ background: item.dot }}
-                  />
-                  <div className="min-w-0">
-                    <div className="truncate">{item.title}</div>
-                    <div className="text-[12px] text-text-muted">{item.sub}</div>
-                  </div>
+          <div className="bg-panel border border-border-subtle rounded-[10px] px-5 py-4 card-shadow">
+            <h3 className="text-[13px] font-bold text-text-secondary mb-3">최근 활동</h3>
+            {feed.length === 0 && (
+              <div className="text-[12.5px] text-text-muted py-2">기록된 활동 없음</div>
+            )}
+            {feed.map((item, i) => (
+              <div
+                key={i}
+                className="flex gap-2.5 py-[9px] border-t border-border-subtle first:border-t-0 text-[13px]"
+              >
+                <span
+                  className="w-[7px] h-[7px] rounded-full shrink-0 mt-[6px]"
+                  style={{ background: item.dot }}
+                />
+                <div className="min-w-0">
+                  <div className="truncate">{item.title}</div>
+                  <div className="text-[12px] text-text-muted">{item.sub}</div>
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
         </section>
       </div>
     </div>

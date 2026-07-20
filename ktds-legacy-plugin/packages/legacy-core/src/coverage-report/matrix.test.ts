@@ -31,15 +31,31 @@ afterEach(() => {
 describe('coverage-matrix — 지원 수준 선언·미지원 표면화 (W9)', () => {
   it('tierOf: 명시 없는 (언어,기능) 은 none, 선언은 그대로', () => {
     expect(tierOf('routes', 'java')).toBe('full')
-    expect(tierOf('routes', 'kotlin')).toBe('none')
+    expect(tierOf('routes', 'python')).toBe('none')
     expect(tierOf('edges', 'xml')).toBe('partial')
     expect(tierOf('complexity', 'jsp')).toBe('none')
+  })
+
+  it('kotlin 지원 선언 고정 — 핵심 5축 full, batch 는 partial(Quartz/Executor 미탐지)', () => {
+    expect(tierOf('routes', 'kotlin')).toBe('full')
+    expect(tierOf('edges', 'kotlin')).toBe('full')
+    expect(tierOf('method-calls', 'kotlin')).toBe('full')
+    expect(tierOf('jpa', 'kotlin')).toBe('full')
+    expect(tierOf('complexity', 'kotlin')).toBe('full')
+    expect(tierOf('batch', 'kotlin')).toBe('partial')
+    expect(bestTierOf('kotlin')).toBe('full')
+    expect(coreTierOf('kotlin')).toBe('full')
+    // TS/TSX: import·api-call 엣지 partial + complexity full — core 는 최고 tier 라 full.
+    expect(tierOf('edges', 'tsx')).toBe('partial')
+    expect(tierOf('complexity', 'typescript')).toBe('full')
+    expect(bestTierOf('tsx')).toBe('full')
+    expect(coreTierOf('tsx')).toBe('full')
   })
 
   it('best vs core: sql 은 db-schema 가 덮어 best=full 이지만 구조분석 core=none', () => {
     expect(bestTierOf('sql')).toBe('full')
     expect(coreTierOf('sql')).toBe('none')
-    expect(bestTierOf('kotlin')).toBe('none')
+    expect(bestTierOf('python')).toBe('none')
     expect(bestTierOf('java')).toBe('full')
     // C1/C2 정정 고정: yaml/gradle 은 liveDbSignals 산출 언어(partial), java 는 db-schema 행 없음.
     expect(tierOf('db-schema', 'yaml')).toBe('partial')
@@ -49,20 +65,22 @@ describe('coverage-matrix — 지원 수준 선언·미지원 표면화 (W9)', (
     expect(tierOf('interfaces', 'properties')).toBe('none')
   })
 
-  it('computeLangSupport: kotlin/Pro*C 는 미지원, cmd 는 부분 지원, sql/md 는 미지원 아님', () => {
+  it('computeLangSupport: python/Pro*C 는 미지원, cmd 는 부분 지원, kotlin/sql/md 는 미지원 아님', () => {
     writeFile(root, 'src/A.java', 'public class A {}\n')
-    writeFile(root, 'src/B.kt', 'class B\n')
-    writeFile(root, 'src/C.kt', 'class C\n')
+    writeFile(root, 'src/B.py', 'class B: pass\n')
+    writeFile(root, 'src/C.py', 'class C: pass\n')
+    writeFile(root, 'src/K.kt', 'class K\n')
     writeFile(root, 'src/legacy/D.pc', 'EXEC SQL SELECT 1;\n')
     writeFile(root, 'db/schema.sql', 'CREATE TABLE t (id INT);\n')
     writeFile(root, 'bin/run.cmd', 'java -jar app.jar\n')
     writeFile(root, 'README.md', '# 문서 — denylist 제외\n')
 
     const ls = computeLangSupport(buildCensus(root))
-    expect(ls.unsupportedFiles).toBe(3) // kotlin 2 + pc 1 (sql/cmd/md 제외)
+    expect(ls.unsupportedFiles).toBe(3) // python 2 + pc 1 (kotlin/sql/cmd/md 제외)
     expect(ls.partialFiles).toBe(1) // cmd — 좁은 관용구(batch)만이라 별도 표면화(C6)
     const byLang = Object.fromEntries(ls.byLang.map((r) => [r.lang, r]))
-    expect(byLang['kotlin']).toMatchObject({ files: 2, best: 'none', core: 'none' })
+    expect(byLang['python']).toMatchObject({ files: 2, best: 'none', core: 'none' })
+    expect(byLang['kotlin']).toMatchObject({ files: 1, best: 'full', core: 'full' })
     expect(byLang['pc']).toMatchObject({ files: 1, best: 'none' })
     expect(byLang['sql']).toMatchObject({ best: 'full', core: 'none' })
     expect(byLang['cmd']).toMatchObject({ best: 'partial' })
@@ -111,19 +129,22 @@ describe('coverage-matrix — 문서 drift (CI 고정)', () => {
 })
 
 describe('coverage-matrix — 스캔 통합(e2e): 미지원이 coverage.json 에 표면화', () => {
-  it('kotlin 혼입 프로젝트: langSupport 계상 + 렌더 경고 문구', async () => {
+  it('python 혼입 프로젝트: langSupport 계상 + 렌더 경고 문구(kotlin 은 지원이라 미계상)', async () => {
     writeFile(root, 'src/A.java', 'public class A { void a() {} }\n')
-    writeFile(root, 'src/B.kt', 'class B { fun b() {} }\n')
+    writeFile(root, 'src/B.py', 'def b(): pass\n')
+    writeFile(root, 'src/K.kt', 'class K { fun k() {} }\n')
     const { coverage } = await scanDomainMap(root)
     expect(coverage.langSupport?.unsupportedFiles).toBe(1)
+    const python = coverage.langSupport!.byLang.find((l) => l.lang === 'python')
+    expect(python).toMatchObject({ files: 1, best: 'none' })
     const kotlin = coverage.langSupport!.byLang.find((l) => l.lang === 'kotlin')
-    expect(kotlin).toMatchObject({ files: 1, best: 'none' })
+    expect(kotlin).toMatchObject({ files: 1, best: 'full', core: 'full' })
     // 산출 파일에도 실렸는지(스키마 라운드트립).
     const onDisk = JSON.parse(readFileSync(join(root, '.spec', 'map', 'coverage.json'), 'utf8'))
     expect(onDisk.langSupport.unsupportedFiles).toBe(1)
     // 사람용 렌더에 [미확인] 경고.
     const text = renderCoverageReport(coverage)
     expect(text).toContain('스캐너 미지원 소스 1파일 [미확인]')
-    expect(text).toContain('kotlin 1')
+    expect(text).toContain('python 1')
   })
 })

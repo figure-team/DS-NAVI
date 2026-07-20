@@ -56,11 +56,15 @@ export const COVERAGE_MATRIX: CapabilityCoverage[] = [
     label: '진입점(라우트)',
     byLang: {
       java: { tier: 'full', note: 'Spring(@RequestMapping 계열·composed·상수 해석)·Stripes' },
+      kotlin: {
+        tier: 'full',
+        note: 'Spring 어노테이션·companion const 상수 해석(composed 정의는 Java 쪽만 — 그래머 한계)',
+      },
       xml: { tier: 'partial', note: 'web.xml 서블릿 매핑만' },
       jsp: { tier: 'partial', note: '페이지 파일 = 진입점(URL 관례)' },
-      typescript: { tier: 'partial', note: 'Next.js 파일 라우팅(app/pages)' },
-      tsx: { tier: 'partial', note: 'Next.js 파일 라우팅(app/pages)' },
-      javascript: { tier: 'partial', note: 'Next.js 파일 라우팅(app/pages)' },
+      typescript: { tier: 'partial', note: 'Next.js 파일 라우팅(app/pages)·react-router 설정/JSX' },
+      tsx: { tier: 'partial', note: 'Next.js 파일 라우팅(app/pages)·react-router 설정/JSX' },
+      javascript: { tier: 'partial', note: 'Next.js 파일 라우팅(app/pages)·react-router 설정/JSX' },
     },
   },
   {
@@ -68,6 +72,7 @@ export const COVERAGE_MATRIX: CapabilityCoverage[] = [
     label: '배치 진입점',
     byLang: {
       java: { tier: 'full', note: '@Scheduled·main()·Quartz Java API·Executor·Timer' },
+      kotlin: { tier: 'partial', note: '@Scheduled·top-level fun main(Quartz/Executor 미탐지)' },
       xml: { tier: 'partial', note: 'Quartz CronTrigger·task:scheduled·spring-batch 잡' },
       sh: { tier: 'partial', note: 'java 실행 라인 탐지' },
       bat: { tier: 'partial', note: 'java 실행 라인 탐지' },
@@ -80,7 +85,14 @@ export const COVERAGE_MATRIX: CapabilityCoverage[] = [
     label: '구조 의존(엣지)',
     byLang: {
       java: { tier: 'full', note: 'import·injection·field-type·ctor-param·extends/implements·impl' },
+      kotlin: {
+        tier: 'full',
+        note: 'import·field-type(val/var 프로퍼티)·ctor-param(주생성자)·extends/implements·impl(MyBatis 제외)',
+      },
       xml: { tier: 'partial', note: '*Mapper.xml namespace ↔ 매퍼 인터페이스(MyBatis)' },
+      typescript: { tier: 'partial', note: 'import 그래프(상대 임포트 해소)·api-call(fetch/axios 리터럴·BFF 래퍼→라우트)' },
+      tsx: { tier: 'partial', note: 'import 그래프(상대 임포트 해소)·api-call(fetch/axios 리터럴·BFF 래퍼→라우트)' },
+      javascript: { tier: 'partial', note: 'import 그래프(상대 임포트 해소)·api-call(fetch/axios 리터럴·BFF 래퍼→라우트)' },
     },
   },
   {
@@ -88,6 +100,10 @@ export const COVERAGE_MATRIX: CapabilityCoverage[] = [
     label: '메서드 호출 그래프',
     byLang: {
       java: { tier: 'full', note: '8-receiver 해소(field/param/local/self/super/static/return-type/external)' },
+      kotlin: {
+        tier: 'full',
+        note: 'JavaFileFacts 동형 팩트로 동일 해소기 재사용(top-level 함수·확장 수신자는 미해소 정직 표기)',
+      },
     },
   },
   {
@@ -107,6 +123,10 @@ export const COVERAGE_MATRIX: CapabilityCoverage[] = [
     label: 'JPA/Spring Data',
     byLang: {
       java: { tier: 'full', note: '@Entity 계열·JpaRepository·파생쿼리·@Query(3-Tier 신뢰)' },
+      kotlin: {
+        tier: 'full',
+        note: '@Entity(주생성자/본문 프로퍼티·use-site target)·JpaRepository·파생쿼리·@Query',
+      },
     },
   },
   {
@@ -128,7 +148,11 @@ export const COVERAGE_MATRIX: CapabilityCoverage[] = [
     key: 'complexity',
     label: '복잡도(위험 리포트)',
     byLang: {
-      java: { tier: 'full', note: 'AST 결정 포인트 근사(McCabe) — 비 java 는 미측정 null + [미확인] 노트' },
+      java: { tier: 'full', note: 'AST 결정 포인트 근사(McCabe) — 미지원 확장자는 미측정 null + [미확인] 노트' },
+      kotlin: { tier: 'full', note: 'AST 결정 포인트 근사(when/elvis 포함, 콤마 다중 라벨은 1로 계상)' },
+      typescript: { tier: 'full', note: 'AST 결정 포인트 근사(삼항·switch_case·&&/||/?? 포함)' },
+      tsx: { tier: 'full', note: 'AST 결정 포인트 근사(삼항·switch_case·&&/||/?? 포함)' },
+      javascript: { tier: 'full', note: 'tsx 그래머 상위집합 파싱으로 동일 근사' },
     },
   },
 ]

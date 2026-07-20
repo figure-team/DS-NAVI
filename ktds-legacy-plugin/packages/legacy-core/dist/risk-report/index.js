@@ -28,8 +28,27 @@ import { computeFanIn } from '../impact/reach.js';
 import { STRONG_EDGE_KINDS } from '../impact/types.js';
 import { cmp } from '../utils/cmp.js';
 import { measureJavaComplexity } from './complexity.js';
+import { measureKotlinComplexity } from './complexity-kotlin.js';
+import { measureTsComplexity } from './complexity-ts.js';
+/** 확장자별 복잡도 측정기 — 미지원 확장자는 null(호출자가 [미확인] 노트). */
+function complexityMeasurer(filePath) {
+    if (filePath.endsWith('.java'))
+        return measureJavaComplexity;
+    if (filePath.endsWith('.kt'))
+        return measureKotlinComplexity;
+    if (filePath.endsWith('.tsx'))
+        return (src) => measureTsComplexity(src, 'tsx');
+    if (filePath.endsWith('.ts'))
+        return (src) => measureTsComplexity(src, 'typescript');
+    if (filePath.endsWith('.js') || filePath.endsWith('.jsx')) {
+        // JS/JSX 는 tsx 그래머가 상위집합으로 파싱한다(별도 그래머 미동봉).
+        return (src) => measureTsComplexity(src, 'tsx');
+    }
+    return null;
+}
 /** W8 캐시 섹션 salt — countJavaComplexity 의 계상 규칙이 바뀌면 bump. */
-const COMPLEXITY_SALT = 'v1';
+// v1→v2: kotlin/ts/tsx 측정 편입 — 종전 "java 외 = 미측정" 캐시 노트와 의미가 달라진다.
+const COMPLEXITY_SALT = 'v2';
 export { countJavaComplexity, measureJavaComplexity } from './complexity.js';
 export { collectGitChurn } from './churn.js';
 /** `.spec/map/` 위험 리포트 파일명. */
@@ -219,7 +238,8 @@ export async function buildRiskReport(projectRoot, inputs, cache) {
     const rows = await Promise.all(ranked.map(async (p) => {
         const notes = [];
         let complexity = null;
-        if (p.filePath.endsWith('.java')) {
+        const measure = complexityMeasurer(p.filePath);
+        if (measure) {
             const hit = cxSec?.get(p.filePath);
             if (hit !== undefined) {
                 complexity = hit.c;
@@ -228,7 +248,7 @@ export async function buildRiskReport(projectRoot, inputs, cache) {
             }
             else {
                 try {
-                    complexity = await measureJavaComplexity(readFileSync(join(projectRoot, p.filePath), 'utf8'));
+                    complexity = await measure(readFileSync(join(projectRoot, p.filePath), 'utf8'));
                     cxSec?.put(p.filePath, { c: complexity });
                 }
                 catch {
@@ -239,7 +259,7 @@ export async function buildRiskReport(projectRoot, inputs, cache) {
         }
         else {
             const ext = p.filePath.includes('.') ? p.filePath.slice(p.filePath.lastIndexOf('.') + 1) : '?';
-            notes.push(`[미확인] 복잡도 미측정(${ext} — java 전용 근사)`);
+            notes.push(`[미확인] 복잡도 미측정(${ext} — java/kotlin/ts 전용 근사)`);
         }
         let churnCommits = null;
         let churnLines = null;

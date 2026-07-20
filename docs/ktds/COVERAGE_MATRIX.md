@@ -20,26 +20,27 @@
 
 ## 기능 × 언어
 
-| 기능 | bat | cmd | gradle | java | javascript | jsp | kts | properties | sh | sql | tsx | typescript | xml | yaml |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 진입점(라우트) | — | — | — | ● | ◐ | ◐ | — | — | — | — | ◐ | ◐ | ◐ | — |
-| 배치 진입점 | ◐ | ◐ | — | ● | — | — | — | — | ◐ | — | — | — | ◐ | — |
-| 구조 의존(엣지) | — | — | — | ● | — | — | — | — | — | — | — | — | ◐ | — |
-| 메서드 호출 그래프 | — | — | — | ● | — | — | — | — | — | — | — | — | — | — |
-| 대외 인터페이스 | — | — | — | ● | — | — | — | — | — | ◐ | — | — | ◐ | — |
-| JPA/Spring Data | — | — | — | ● | — | — | — | — | — | — | — | — | — | — |
-| DB 스키마 | — | — | ◐ | — | — | — | ◐ | ◐ | — | ● | — | — | ◐ | ◐ |
-| 복잡도(위험 리포트) | — | — | — | ● | — | — | — | — | — | — | — | — | — | — |
+| 기능 | bat | cmd | gradle | java | javascript | jsp | kotlin | kts | properties | sh | sql | tsx | typescript | xml | yaml |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 진입점(라우트) | — | — | — | ● | ◐ | ◐ | ● | — | — | — | — | ◐ | ◐ | ◐ | — |
+| 배치 진입점 | ◐ | ◐ | — | ● | — | — | ◐ | — | — | ◐ | — | — | — | ◐ | — |
+| 구조 의존(엣지) | — | — | — | ● | ◐ | — | ● | — | — | — | — | ◐ | ◐ | ◐ | — |
+| 메서드 호출 그래프 | — | — | — | ● | — | — | ● | — | — | — | — | — | — | — | — |
+| 대외 인터페이스 | — | — | — | ● | — | — | — | — | — | — | ◐ | — | — | ◐ | — |
+| JPA/Spring Data | — | — | — | ● | — | — | ● | — | — | — | — | — | — | — | — |
+| DB 스키마 | — | — | ◐ | — | — | — | — | ◐ | ◐ | — | ● | — | — | ◐ | ◐ |
+| 복잡도(위험 리포트) | — | — | — | ● | ● | — | ● | — | — | — | — | ● | ● | — | — |
 
 ## 비고(범위·한계 근거)
 
 ### 진입점(라우트) (`routes`)
 
 - java: ● full — Spring(@RequestMapping 계열·composed·상수 해석)·Stripes
-- javascript: ◐ partial — Next.js 파일 라우팅(app/pages)
+- javascript: ◐ partial — Next.js 파일 라우팅(app/pages)·react-router 설정/JSX
 - jsp: ◐ partial — 페이지 파일 = 진입점(URL 관례)
-- tsx: ◐ partial — Next.js 파일 라우팅(app/pages)
-- typescript: ◐ partial — Next.js 파일 라우팅(app/pages)
+- kotlin: ● full — Spring 어노테이션·companion const 상수 해석(composed 정의는 Java 쪽만 — 그래머 한계)
+- tsx: ◐ partial — Next.js 파일 라우팅(app/pages)·react-router 설정/JSX
+- typescript: ◐ partial — Next.js 파일 라우팅(app/pages)·react-router 설정/JSX
 - xml: ◐ partial — web.xml 서블릿 매핑만
 
 ### 배치 진입점 (`batch`)
@@ -47,6 +48,7 @@
 - bat: ◐ partial — java 실행 라인 탐지
 - cmd: ◐ partial — java 실행 라인 탐지
 - java: ● full — @Scheduled·main()·Quartz Java API·Executor·Timer
+- kotlin: ◐ partial — @Scheduled·top-level fun main(Quartz/Executor 미탐지)
 - sh: ◐ partial — java 실행 라인 탐지
 - xml: ◐ partial — Quartz CronTrigger·task:scheduled·spring-batch 잡
 - (예외) crontab 은 확장자 무관 경로 관례(crontab*/cron.d/)로 탐지 — 언어 행 없음
@@ -54,11 +56,16 @@
 ### 구조 의존(엣지) (`edges`)
 
 - java: ● full — import·injection·field-type·ctor-param·extends/implements·impl
+- javascript: ◐ partial — import 그래프(상대 임포트 해소)·api-call(fetch/axios 리터럴·BFF 래퍼→라우트)
+- kotlin: ● full — import·field-type(val/var 프로퍼티)·ctor-param(주생성자)·extends/implements·impl(MyBatis 제외)
+- tsx: ◐ partial — import 그래프(상대 임포트 해소)·api-call(fetch/axios 리터럴·BFF 래퍼→라우트)
+- typescript: ◐ partial — import 그래프(상대 임포트 해소)·api-call(fetch/axios 리터럴·BFF 래퍼→라우트)
 - xml: ◐ partial — *Mapper.xml namespace ↔ 매퍼 인터페이스(MyBatis)
 
 ### 메서드 호출 그래프 (`method-calls`)
 
 - java: ● full — 8-receiver 해소(field/param/local/self/super/static/return-type/external)
+- kotlin: ● full — JavaFileFacts 동형 팩트로 동일 해소기 재사용(top-level 함수·확장 수신자는 미해소 정직 표기)
 
 ### 대외 인터페이스 (`interfaces`)
 
@@ -70,6 +77,7 @@
 ### JPA/Spring Data (`jpa`)
 
 - java: ● full — @Entity 계열·JpaRepository·파생쿼리·@Query(3-Tier 신뢰)
+- kotlin: ● full — @Entity(주생성자/본문 프로퍼티·use-site target)·JpaRepository·파생쿼리·@Query
 
 ### DB 스키마 (`db-schema`)
 
@@ -82,4 +90,8 @@
 
 ### 복잡도(위험 리포트) (`complexity`)
 
-- java: ● full — AST 결정 포인트 근사(McCabe) — 비 java 는 미측정 null + [미확인] 노트
+- java: ● full — AST 결정 포인트 근사(McCabe) — 미지원 확장자는 미측정 null + [미확인] 노트
+- javascript: ● full — tsx 그래머 상위집합 파싱으로 동일 근사
+- kotlin: ● full — AST 결정 포인트 근사(when/elvis 포함, 콤마 다중 라벨은 1로 계상)
+- tsx: ● full — AST 결정 포인트 근사(삼항·switch_case·&&/||/?? 포함)
+- typescript: ● full — AST 결정 포인트 근사(삼항·switch_case·&&/||/?? 포함)

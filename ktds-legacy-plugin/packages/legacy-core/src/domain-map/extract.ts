@@ -66,6 +66,58 @@ import { extractStripesRoutes } from './routes/stripes.js'
 import { extractJspRoutes } from './routes/jsp.js'
 import { extractWebXmlRoutesFromCensus } from './routes/web-xml.js'
 import { extractJavaBatchEntries, extractXmlBatchEntries } from './routes/batch.js'
+import { extractKotlinBatchEntries } from './routes/batch-kotlin.js'
+import { collectKotlinConstants, extractSpringKotlinRoutes } from './routes/spring-kotlin.js'
+import { extractReactRouterRoutes } from './routes/react-router.js'
+import { extractTsApiCalls, joinApiCallsToRoutes } from './ts-api-calls.js'
+import { extractWrapperApiCalls } from './ts-api-wrappers.js'
+import { dedupSortEdges } from './edges.js'
+
+/** ts/tsx/js census 파일(relPath 정렬) — react-router/api-call 스캔 공용. */
+function sortedTsLikePaths(census: CensusReport): string[] {
+  return census.files
+    .filter((f) => f.lang === 'typescript' || f.lang === 'tsx' || f.lang === 'javascript')
+    .map((f) => f.relPath)
+    .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
+}
+
+/** 확장자 기반 그래머 선택 — LangId 에 'javascript' 가 없어 nextjs.ts 관례를 따른다. */
+function tsGrammarFor(relPath: string): 'tsx' | 'typescript' {
+  return relPath.endsWith('.tsx') || relPath.endsWith('.jsx') ? 'tsx' : 'typescript'
+}
+
+/**
+ * 프런트 fetch/axios 리터럴 → 백엔드 api 라우트 파일 엣지(kind='api-call').
+ * 라우트별 1:1 조인으로 filePath 를 보존한다(joinApiCallsToRoutes 는 path 만 반환).
+ */
+async function buildTsApiCallEdges(
+  projectRoot: string,
+  census: CensusReport,
+  routes: RouteEntry[],
+): Promise<EdgeRecord[]> {
+  const apiRoutes = routes.filter((r) => r.kind === 'api')
+  if (apiRoutes.length === 0) return []
+  const out: EdgeRecord[] = []
+  for (const relPath of sortedTsLikePaths(census)) {
+    let root: Node
+    try {
+      root = await parseSource(tsGrammarFor(relPath), readFileSync(join(projectRoot, relPath), 'utf8'))
+    } catch {
+      continue
+    }
+    // 직접 리터럴 호출 + 래퍼 경유 호출(BFF request/post 관용구) 양쪽을 결합한다.
+    const calls = [...extractTsApiCalls(root, relPath), ...extractWrapperApiCalls(root, relPath)]
+    if (calls.length === 0) continue
+    for (const route of apiRoutes) {
+      const links = joinApiCallsToRoutes(calls, [{ path: route.path, method: route.method }])
+      for (const link of links) {
+        if (link.from === route.filePath) continue
+        out.push({ source: link.from, target: route.filePath, kind: 'api-call', line: link.line })
+      }
+    }
+  }
+  return out
+}
 import {
   collectComposedAnnotations,
   collectConstants,
@@ -77,6 +129,7 @@ import type {
   CandidatesReport,
   CensusReport,
   ConfirmedPlan,
+  EdgeRecord,
   EdgesReport,
   MethodCallGraph,
   RouteEntry,
@@ -91,6 +144,8 @@ import type {
  * (이력: v1→v2 — consumed 에 constantsHas 추가 + 기록 래퍼 위반-즉시-실패화, 리뷰 C2.)
  */
 const SPRING_ROUTES_SALT = 'v2'
+/** Kotlin 라우트/배치 캐시 salt — spring-kotlin.ts/batch-kotlin.ts 의미 변경 시 bump(Java 와 독립). */
+const KOTLIN_SPRING_ROUTES_SALT = 'v1'
 
 interface ConsumedSpringCtx {
   /** 조회된 상수 키 → 값(부재는 null). */
@@ -258,7 +313,12 @@ export async function extractRoutes(
   batchEntries: BatchEntry[]
 }> {
   const javaFiles = census.files.filter((f) => f.lang === 'java')
+  const kotlinFiles = census.files.filter((f) => f.lang === 'kotlin')
   const routeSec = cache?.section<SpringRouteFileFacts | null>('spring-routes', SPRING_ROUTES_SALT)
+  const routeKtSec = cache?.section<SpringRouteFileFacts | null>(
+    'spring-routes-kotlin',
+    KOTLIN_SPRING_ROUTES_SALT,
+  )
 
   // 1) 파일별 준비 — 캐시 히트(내용 해시 일치)는 파싱 생략, 미스만 1회 파싱.
   //    null 캐시 = 판독 실패 파일(기존 동작대로 제외, 매회 재시도 안 함).
@@ -278,6 +338,22 @@ export async function extractRoutes(
       // null 캐시는 fingerprint 도 판독 실패('absent')에 동의할 때만 — 일시 오류가
       // 실제 내용 해시에 "팩트 없음"으로 박제되는 것을 막는다(리뷰 R2).
       if (cache?.isAbsent(f.relPath)) routeSec?.put(f.relPath, null)
+    }
+  }
+  // 1b) Kotlin 파일 준비 — 동일 규약, 전용 캐시 섹션.
+  const parsedKt = new Map<string, Node>()
+  const cachedKtByPath = new Map<string, SpringRouteFileFacts>()
+  for (const f of kotlinFiles) {
+    const hit = routeKtSec?.get(f.relPath)
+    if (hit !== undefined) {
+      if (hit !== null) cachedKtByPath.set(f.relPath, hit)
+      continue
+    }
+    try {
+      const src = readFileSync(join(projectRoot, f.relPath), 'utf8')
+      parsedKt.set(f.relPath, await parseSource('kotlin', src))
+    } catch {
+      if (cache?.isAbsent(f.relPath)) routeKtSec?.put(f.relPath, null)
     }
   }
 
@@ -315,6 +391,21 @@ export async function extractRoutes(
     for (const [k, v] of cMap) ctx.constants.set(k, v)
     for (const [k, v] of vMap) ctx.composedVerb.set(k, v)
     for (const k of sSet) ctx.composedStereotype.add(k)
+  }
+  // 2b) Kotlin 상수 기여분 — Java 뒤 census 순서로 같은 ctx 에 누적(교차언어 상수 해소).
+  //     composed 어노테이션 "정의"는 Kotlin 그래머 오파싱으로 스킵(소비는 공유 ctx 로 지원).
+  for (const f of kotlinFiles) {
+    const hit = cachedKtByPath.get(f.relPath)
+    if (hit) {
+      for (const [k, v] of hit.constants) ctx.constants.set(k, v)
+      continue
+    }
+    const root = parsedKt.get(f.relPath)
+    if (!root) continue
+    const cMap = new Map<string, string>()
+    collectKotlinConstants(root, cMap)
+    freshContrib.set(f.relPath, { constants: [...cMap], composedVerb: [], composedStereotype: [] })
+    for (const [k, v] of cMap) ctx.constants.set(k, v)
   }
 
   // 3) Java 기반 추출(Spring 라우트 + Stripes 라우트 + Java 배치 진입점).
@@ -362,8 +453,56 @@ export async function extractRoutes(
     }
   }
 
+  // 3b) Kotlin 기반 추출(Spring 라우트 + Kotlin 배치 진입점) — 3) 과 동일 규약.
+  const sortedKotlin = [...new Set([...parsedKt.keys(), ...cachedKtByPath.keys()])].sort((a, b) =>
+    a < b ? -1 : a > b ? 1 : 0,
+  )
+  for (const relPath of sortedKotlin) {
+    const hit = cachedKtByPath.get(relPath)
+    if (hit && consumedSpringCtxValid(hit.consumed, ctx)) {
+      routes.push(...hit.routes)
+      batchEntries.push(...hit.batch)
+      continue
+    }
+    let root = parsedKt.get(relPath)
+    if (!root) {
+      try {
+        root = await parseSource('kotlin', readFileSync(join(projectRoot, relPath), 'utf8'))
+      } catch {
+        if (cache?.isAbsent(relPath)) routeKtSec?.put(relPath, null)
+        continue
+      }
+      parsedKt.set(relPath, root)
+    }
+    const consumed = emptyConsumed()
+    const recCtx = cache ? recordingSpringContext(ctx, consumed) : ctx
+    const fileRoutes = extractSpringKotlinRoutes(root, relPath, recCtx)
+    const fileBatch = extractKotlinBatchEntries(root, relPath)
+    routes.push(...fileRoutes)
+    batchEntries.push(...fileBatch)
+    if (routeKtSec) {
+      const contrib = freshContrib.get(relPath) ?? {
+        constants: hit!.constants,
+        composedVerb: hit!.composedVerb,
+        composedStereotype: hit!.composedStereotype,
+      }
+      routeKtSec.put(relPath, { ...contrib, routes: fileRoutes, batch: fileBatch, consumed })
+    }
+  }
+
   // 4) Next.js 라우트 추출(census 기반).
   routes.push(...(await extractNextjsRoutes(projectRoot, census)))
+
+  // 4b) react-router 라우트(설정/JSX 기반 SPA 페이지) — ts/tsx/js census 파일 스캔.
+  for (const relPath of sortedTsLikePaths(census)) {
+    let root: Node
+    try {
+      root = await parseSource(tsGrammarFor(relPath), readFileSync(join(projectRoot, relPath), 'utf8'))
+    } catch {
+      continue
+    }
+    routes.push(...extractReactRouterRoutes(root, relPath))
+  }
 
   // 5) JSP 페이지 + web.xml 서블릿 라우트(census 기반).
   routes.push(...extractJspRoutes(census))
@@ -467,6 +606,12 @@ export async function scanDomainMap(
   const scanCache = new ScanCacheSession(projectRoot, census, { read: opts.readCache !== false })
   const routes = await extractRoutes(projectRoot, census, scanCache)
   const edges = await extractEdges(projectRoot, census, scanCache)
+  // 화면↔API 결선(api-call) — 라우트 산출 후에만 조인 가능해 여기서 병합한다.
+  // buildSlices 이전 병합이라 프런트 파일이 도달성/슬라이스에 함께 잡힌다.
+  const apiCallEdges = await buildTsApiCallEdges(projectRoot, census, routes.routes)
+  if (apiCallEdges.length > 0) {
+    edges.edges = dedupSortEdges([...edges.edges, ...apiCallEdges])
+  }
   const slices = buildSlices(census, routes, edges)
   const candidates = buildCandidates(census, routes, slices)
   writeCensus(projectRoot, census)

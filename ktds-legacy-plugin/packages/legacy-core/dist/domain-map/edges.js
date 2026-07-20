@@ -10,12 +10,16 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { extractJavaFacts } from './java-facts.js';
+import { extractKotlinFacts } from './kotlin-facts.js';
+import { extractTsImportEdges } from './ts-imports.js';
 import { parseSource } from './tree-sitter.js';
 /**
  * W8 캐시 섹션 salt — JavaFileFacts 형태(java-facts.ts)나 mybatis namespace 수집 의미가
  * 바뀌면 bump. `java-facts` 섹션은 method-calls.ts 와 공유(동일 extractJavaFacts 출력).
+ * `kotlin-facts` 섹션은 kotlin-facts.ts 출력 전용 — Java 와 독립적으로 salt 를 올린다.
  */
 export const JAVA_FACTS_SALT = 'v1';
+export const KOTLIN_FACTS_SALT = 'v1';
 const MYBATIS_NS_SALT = 'v1';
 /** 주입 어노테이션(필드/생성자). */
 const INJECT_ANNOTATIONS = new Set(['Autowired', 'Resource', 'Inject']);
@@ -131,10 +135,12 @@ function collectMyBatisNamespaces(root) {
 /** edges 산출 — census 기반, 파일 기록 없음. */
 export async function extractEdges(projectRoot, census, cache) {
     const javaFiles = census.files.filter((f) => f.lang === 'java');
+    const kotlinFiles = census.files.filter((f) => f.lang === 'kotlin');
     const xmlFiles = census.files.filter((f) => f.lang === 'xml' && f.relPath.endsWith('Mapper.xml'));
     // W8: 파일단위 팩트 캐시 — null 값 = 판독 실패 파일(기존 동작대로 제외).
     // mybatis ns 는 소비부가 정렬 순회라 배열(집합 원소)로 저장해도 동일 결과.
     const factsSec = cache?.section('java-facts', JAVA_FACTS_SALT);
+    const factsKtSec = cache?.section('kotlin-facts', KOTLIN_FACTS_SALT);
     const nsSec = cache?.section('mybatis-ns', MYBATIS_NS_SALT);
     // 1) Java 팩트 + (mybatis 탐지용) 파싱 루트를 relPath 정렬 순으로 수집.
     const factsByPath = new Map();
@@ -174,6 +180,33 @@ export async function extractEdges(projectRoot, census, cache) {
         }
         catch {
             // 증거 없는 엣지 금지 — facts 없이 둔다.
+        }
+    }
+    // 1b) Kotlin 팩트 — JavaFileFacts 동형(kotlin-facts.ts). MyBatis ns 스캔은 Java 전용이라 없음.
+    const sortedKotlin = [...kotlinFiles].sort((a, b) => cmp(a.relPath, b.relPath));
+    for (const f of sortedKotlin) {
+        const hit = factsKtSec?.get(f.relPath);
+        if (hit !== undefined) {
+            if (hit !== null)
+                factsByPath.set(f.relPath, hit);
+            continue;
+        }
+        let src;
+        try {
+            src = readFileSync(join(projectRoot, f.relPath), 'utf8');
+        }
+        catch {
+            if (cache?.isAbsent(f.relPath))
+                factsKtSec?.put(f.relPath, null);
+            continue;
+        }
+        try {
+            const facts = await extractKotlinFacts(f.relPath, src);
+            factsByPath.set(f.relPath, facts);
+            factsKtSec?.put(f.relPath, facts);
+        }
+        catch {
+            // 증거 없는 엣지 금지 — Java 루프와 동일 규약(그 파일만 제외, 추출 실패는 미캐시).
         }
     }
     const allFacts = [...factsByPath.values()];
@@ -285,6 +318,8 @@ export async function extractEdges(projectRoot, census, cache) {
             }
         }
     }
+    // TS/TSX/JS import 그래프 — 상대 임포트를 census 파일로 결정론 해소(kind='import').
+    edges.push(...(await extractTsImportEdges(projectRoot, census)));
     return {
         schemaVersion: 1,
         gitCommit: census.gitCommit,
@@ -292,8 +327,8 @@ export async function extractEdges(projectRoot, census, cache) {
         unresolved: dedupSortUnresolved(unresolved),
     };
 }
-/** 엣지 중복제거 + (source,target,kind,line) 정렬. */
-function dedupSortEdges(edges) {
+/** 엣지 중복제거 + (source,target,kind,line) 정렬 — api-call 후병합(extract.ts)도 재사용. */
+export function dedupSortEdges(edges) {
     const seen = new Set();
     const out = [];
     for (const e of edges) {

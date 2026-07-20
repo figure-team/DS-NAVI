@@ -1,5 +1,5 @@
 /**
- * tree-sitter 그래머 로더 — Java / TypeScript(+TSX).
+ * tree-sitter 그래머 로더 — Java / Kotlin / TypeScript(+TSX).
  *
  * web-tree-sitter(WASM)로 그래머를 1회 로드/캐시하고 소스를 파싱한다.
  * 그래머 .wasm 은 npm 패키지에 동봉되어 별도 빌드가 필요 없다
@@ -9,6 +9,7 @@ import { createRequire } from 'node:module';
 const req = createRequire(import.meta.url);
 const WASM_FILE = {
     java: 'tree-sitter-java/tree-sitter-java.wasm',
+    kotlin: '@tree-sitter-grammars/tree-sitter-kotlin/tree-sitter-kotlin.wasm',
     typescript: 'tree-sitter-typescript/tree-sitter-typescript.wasm',
     tsx: 'tree-sitter-typescript/tree-sitter-tsx.wasm',
 };

@@ -16,23 +16,58 @@
       "priority": "HIGH",
       "status": "ACTIVE",
       "derivedFrom": null,
-      "definition": "",
-      "scope": "",
-      "origin": "",
-      "spec": { "details": [], "inputs": "", "outputs": "", "flow": "", "preceding": [], "exceptions": [], "acceptance": [], "verify": "" },
+      "definition": "기존 아이디/비밀번호 로그인과 병행하여, 로그인 폼 내부에서 네이버 계정으로 인증·로그인할 수 있게 하는 기능(사용자 결정: 로그인폼 내부 배치 — Q-2).",
+      "scope": "포함: 로그인 폼 내 네이버 로그인 버튼 노출, 네이버 OAuth 인증 플로우 진입/콜백, 인증 성공 시 기존과 동일한 방식의 세션 구성, 인증 실패 시 기존과 동일한 오류 처리, 이메일 일치 시 기존 계정과 자동 연동(사용자 결정: 기존 계정과 연동 — Q-3). 제외: 네이버 계정 자체의 회원가입·프로필 관리, 네이버 외 타 소셜 로그인(카카오 등) 확장.",
+      "origin": "고객 요청 REQ-001(\"네이버 로그인 기능 추가\") / 관련 파생: SIR-010(OAuth2 연동), DAR-010(계정 연계 데이터), SER-010(세션 보안)",
+      "spec": {
+        "details": [
+          "① 로그인 폼(Account.action?signon) 내부에 네이버 로그인 버튼을 노출한다.",
+          "② 버튼 클릭 시 네이버 OAuth2 인가요청(SIR-010)으로 진입하고, 콜백에서 인가코드를 수신한다.",
+          "③ SIR-010 결과로 확보한 네이버 프로필(이메일)로 기존 ACCOUNT 를 조회해 일치 계정이 있으면 DAR-010 연계 테이블에 매핑을 저장하고 자동 연동한다.",
+          "④ 인증 성공 시 기존 로그인 성공 처리(AccountActionBean.java:169 계정 세션 등록)와 동일한 방식으로 세션을 구성한다.",
+          "⑤ 인증 실패(거부·오류) 시 기존 로그인 실패 처리(AccountActionBean.java:164,167 오류 메시지 후 SIGNON 복귀)와 동일하게 처리한다."
+        ],
+        "inputs": "사용자의 네이버 로그인 버튼 클릭 이벤트, 네이버 OAuth 콜백(인가코드), SIR-010 이 반환하는 프로필(이메일·닉네임)",
+        "outputs": "로그인 성공 시 계정 세션(기존 signon 성공과 동일 구조), 실패 시 오류 메시지 + 로그인 화면(SIGNON) 재표시",
+        "flow": "로그인 화면 표시(AccountActionBean.java:151) → 네이버 로그인 버튼 클릭 → SIR-010 인가요청/콜백 → 인가코드→액세스토큰 교환·프로필 조회(SIR-010) → 이메일로 ACCOUNT 조회 → 일치 시 DAR-010 연계 테이블 매핑 후 기존 세션 등록 로직 재사용(AccountActionBean.java:161,169) → 불일치 시 [확인필요 해소 범위 밖: 신규 계정 생성 절차는 별도 정의 필요] → 실패 시 오류 메시지 표시 후 SIGNON 복귀(AccountActionBean.java:164,167)",
+        "preceding": [],
+        "exceptions": [
+          "네이버 인증 거부·오류 응답",
+          "네이버 프로필에 이메일이 없거나 비공개 동의된 경우",
+          "이메일이 기존 ACCOUNT 복수 건과 일치하는 경우(현재 스키마상 email 유니크 여부 미확인 — [확인필요])"
+        ],
+        "acceptance": [
+          "로그인 폼 내부에 네이버 로그인 버튼이 노출되고 클릭 시 네이버 인증 플로우로 진입한다(AC-1).",
+          "네이버 인증 성공 시 기존과 동일한 세션 구성으로 로그인 처리가 완료된다(AC-2).",
+          "네이버 인증 실패 시 기존과 동일한 오류 메시지와 함께 로그인 화면으로 복귀한다(AC-3).",
+          "이메일이 일치하는 기존 계정이 있으면 신규 계정 생성 없이 자동 연동된다(AC-4)."
+        ],
+        "verify": "시험(신규 테스트케이스 정의 필요, [추정]) — 버튼 노출/클릭, OAuth 콜백 성공/실패, 기존 계정 자동 연동 3개 시나리오"
+      },
       "acceptanceCriteria": [
         {
           "id": "AC-1",
           "text": "로그인 폼(Account.action?signon 화면) 내부에 네이버 로그인 버튼을 노출하고, 클릭 시 네이버 OAuth 인증 플로우로 진입한다(사용자 결정: 로그인폼 내부 배치 — Q-2).",
           "kind": "rule",
-          "fnIds": ["flow:ANY /actions/Account.action?signon", "to-be:auth/naver-callback"],
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signon",
+            "to-be:auth/naver-callback"
+          ],
           "confidence": "INFERRED",
           "tests": [],
           "evidence": [
-            { "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 149, "snippet": "@DefaultHandler" }
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 149,
+              "snippet": "@DefaultHandler"
+            }
           ],
           "screenRefs": [
-            { "screenId": "screen:actions/Cart.action__removeItemFromCart_workingItemId", "annotationNo": 2, "note": "로그인 폼 진입 링크(Sign In) — 번들에 로그인 폼 자체 캡처는 없어 정확한 폼 레이아웃은 [추정]. 삽입 지점 근거는 signonForm 핸들러(AccountActionBean.java:149)." }
+            {
+              "screenId": "screen:actions/Cart.action__removeItemFromCart_workingItemId",
+              "annotationNo": 2,
+              "note": "로그인 폼 진입 링크(Sign In) — 번들에 로그인 폼 자체 캡처는 없어 정확한 폼 레이아웃은 [추정]. 삽입 지점 근거는 signonForm 핸들러(AccountActionBean.java:149)."
+            }
           ],
           "policyRefs": []
         },
@@ -40,62 +75,115 @@
           "id": "AC-2",
           "text": "네이버 인증이 성공하면 기존 로그인 성공 처리(계정 세션 등록)와 동일한 방식으로 세션을 구성한다.",
           "kind": "rule",
-          "fnIds": ["flow:ANY /actions/Account.action?signon"],
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signon"
+          ],
           "confidence": "INFERRED",
           "tests": [],
           "evidence": [
-            { "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 161, "snippet": "account = accountService.getAccount(getUsername(), getPassword());" },
-            { "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 163, "snippet": "if (account == null) {" }
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 161,
+              "snippet": "account = accountService.getAccount(getUsername(), getPassword());"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 163,
+              "snippet": "if (account == null) {"
+            }
           ],
           "screenRefs": [],
           "policyRefs": [
-            { "doc": "policy-domain-account.md", "section": "4", "ruleId": "PL-001", "note": "기존 로그인 실패 처리 규칙 — 네이버 로그인 실패 시 동일 정책 적용 검토" }
+            {
+              "doc": "policy-domain-account.md",
+              "section": "4",
+              "ruleId": "PL-001",
+              "note": "기존 로그인 실패 처리 규칙 — 네이버 로그인 실패 시 동일 정책 적용 검토"
+            }
           ]
         },
         {
           "id": "AC-3",
           "text": "네이버 로그인 실패(인증 거부·오류) 시 기존 아이디/비밀번호 로그인 실패와 동일하게 오류 메시지를 표시하고 로그인 화면으로 되돌린다.",
           "kind": "rule",
-          "fnIds": ["flow:ANY /actions/Account.action?signon"],
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signon"
+          ],
           "confidence": "INFERRED",
           "tests": [],
           "evidence": [
-            { "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 164, "snippet": "String value = \"Invalid username or password.  Signon failed.\";" },
-            { "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 167, "snippet": "return new ForwardResolution(SIGNON);" }
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 164,
+              "snippet": "String value = \"Invalid username or password.  Signon failed.\";"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 167,
+              "snippet": "return new ForwardResolution(SIGNON);"
+            }
           ],
           "screenRefs": [],
           "policyRefs": [
-            { "doc": "policy-domain-account.md", "section": "4", "ruleId": "PL-001", "note": "" }
+            {
+              "doc": "policy-domain-account.md",
+              "section": "4",
+              "ruleId": "PL-001",
+              "note": ""
+            }
           ]
         },
         {
           "id": "AC-4",
           "text": "네이버 인증으로 반환된 이메일이 기존 ACCOUNT.EMAIL 과 일치하는 계정이 있으면 신규 계정을 생성하지 않고 기존 계정과 자동 연동한다(사용자 결정: 기존 계정과 연동 — Q-3).",
           "kind": "rule",
-          "fnIds": ["flow:ANY /actions/Account.action?signon", "to-be:auth/naver-account-link"],
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signon",
+            "to-be:auth/naver-account-link"
+          ],
           "confidence": "INFERRED",
           "tests": [],
           "evidence": [
-            { "file": "src/main/resources/database/jpetstore-hsqldb-data.sql", "line": 38 }
+            {
+              "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+              "line": 38
+            }
           ],
           "screenRefs": [],
           "policyRefs": []
         }
       ],
       "changeset": {
-        "added": ["to-be:auth/naver-callback", "to-be:auth/naver-account-link"],
-        "modified": ["flow:ANY /actions/Account.action?signon"],
+        "added": [
+          "to-be:auth/naver-callback",
+          "to-be:auth/naver-account-link"
+        ],
+        "modified": [
+          "flow:ANY /actions/Account.action?signon"
+        ],
         "removed": [],
         "revived": [],
         "evidence": [
-          { "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 159 }
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 159
+          }
         ]
       },
       "screenRefs": [
-        { "screenId": "screen:actions/Cart.action__removeItemFromCart_workingItemId", "annotationNo": 2, "note": "로그인 화면 진입 링크(Sign In)" }
+        {
+          "screenId": "screen:actions/Cart.action__removeItemFromCart_workingItemId",
+          "annotationNo": 2,
+          "note": "로그인 화면 진입 링크(Sign In)"
+        }
       ],
       "policyRefs": [
-        { "doc": "policy-domain-account.md", "section": "4", "ruleId": "PL-001", "note": "" }
+        {
+          "doc": "policy-domain-account.md",
+          "section": "4",
+          "ruleId": "PL-001",
+          "note": ""
+        }
       ]
     },
     {
@@ -107,16 +195,39 @@
       "priority": "HIGH",
       "status": "ACTIVE",
       "derivedFrom": "SFR-010",
-      "definition": "",
-      "scope": "",
-      "origin": "",
-      "spec": { "details": [], "inputs": "", "outputs": "", "flow": "", "preceding": [], "exceptions": [], "acceptance": [], "verify": "" },
+      "definition": "네이버 OAuth2 인증서버와 연계하여 인가요청·인가코드-액세스토큰 교환·프로필 조회를 수행하는 인터페이스 요구사항.",
+      "scope": "포함: OAuth2 인가요청/콜백 처리, 인가코드→액세스 토큰 교환, 네이버 프로필 API(닉네임·이메일 등) 조회. 제외: 네이버 오픈API 쿼터·정책 운영, 다른 소셜 제공자 연동.",
+      "origin": "SFR-010(네이버 소셜 로그인)에서 파생 — 로그인 구현에 필요한 외부 인터페이스 요구사항.",
+      "spec": {
+        "details": [
+          "① 네이버 OAuth2 인증서버로 인가요청(authorize)을 전송한다.",
+          "② 콜백에서 인가코드(code)를 수신한다.",
+          "③ 인가코드를 액세스 토큰으로 교환한다.",
+          "④ 액세스 토큰으로 네이버 프로필 API(닉네임·이메일)를 조회해 SFR-010 에 반환한다."
+        ],
+        "inputs": "네이버 애플리케이션 인증정보(client_id/secret/redirect_uri, 설정값), 콜백 인가코드",
+        "outputs": "액세스 토큰(내부 처리용, 세션 비저장 — SER-010), 프로필 데이터(이메일·닉네임)",
+        "flow": "인가요청 전송 → 사용자 네이버 인증·동의 → 콜백(code) 수신 → 토큰 교환 API 호출 → 프로필 조회 API 호출 → 결과(이메일·닉네임)를 SFR-010 계정 연동 단계로 전달",
+        "preceding": [],
+        "exceptions": [
+          "네이버 인증서버 응답 지연·오류",
+          "액세스 토큰 만료",
+          "이메일 제공 동의 거부(스코프 미동의)"
+        ],
+        "acceptance": [
+          "인가코드→액세스토큰 교환이 정상 응답 시 성공률 100%로 완료된다.",
+          "프로필 조회 응답에서 이메일·닉네임을 정상 추출한다."
+        ],
+        "verify": "시험 — 네이버 개발자센터 테스트 앱으로 인가요청/콜백/토큰교환/프로필조회 전 구간 연동 시험"
+      },
       "acceptanceCriteria": [
         {
           "id": "AC-1",
           "text": "네이버 OAuth2 인증서버로 인가요청(authorize)을 보내고, 콜백에서 인가코드를 액세스 토큰으로 교환한다.",
           "kind": "rule",
-          "fnIds": ["to-be:auth/naver-oauth-client"],
+          "fnIds": [
+            "to-be:auth/naver-oauth-client"
+          ],
           "confidence": "INFERRED",
           "tests": [],
           "evidence": [],
@@ -127,7 +238,9 @@
           "id": "AC-2",
           "text": "발급받은 액세스 토큰으로 네이버 프로필 API(닉네임·이메일 등)를 조회해 계정 연계에 사용한다.",
           "kind": "rule",
-          "fnIds": ["to-be:auth/naver-oauth-client"],
+          "fnIds": [
+            "to-be:auth/naver-oauth-client"
+          ],
           "confidence": "INFERRED",
           "tests": [],
           "evidence": [],
@@ -136,7 +249,9 @@
         }
       ],
       "changeset": {
-        "added": ["to-be:auth/naver-oauth-client"],
+        "added": [
+          "to-be:auth/naver-oauth-client"
+        ],
         "modified": [],
         "removed": [],
         "revived": [],
@@ -154,21 +269,50 @@
       "priority": "HIGH",
       "status": "ACTIVE",
       "derivedFrom": "SFR-010",
-      "definition": "",
-      "scope": "",
-      "origin": "",
-      "spec": { "details": [], "inputs": "", "outputs": "", "flow": "", "preceding": [], "exceptions": [], "acceptance": [], "verify": "" },
+      "definition": "네이버 로그인 사용자와 기존 로컬 계정(ACCOUNT)을 연계하기 위해 별도 연계 테이블(예: NAVER_ACCOUNT_LINK)을 신설하는 데이터 요구사항(사용자 결정: 별도 연계 테이블 신설 — Q-1).",
+      "scope": "포함: 연계 테이블 신설(ACCOUNT.userid 외래키 + 네이버 고유 식별자), 기존 SIGNON.PASSWORD(NOT NULL) 제약 미변경. 제외: ACCOUNT/SIGNON 기존 테이블 구조 변경.",
+      "origin": "SFR-010(네이버 소셜 로그인)에서 파생 — Q-1 답변(\"별도 연계 테이블 신설\") 반영.",
+      "spec": {
+        "details": [
+          "① NAVER_ACCOUNT_LINK 테이블을 신설한다(PK: naver_id, FK: userid → ACCOUNT.userid).",
+          "② 네이버 인증 성공 및 기존 계정 연동 확정 시 매핑 레코드를 저장한다.",
+          "③ 기존 SIGNON.PASSWORD(NOT NULL) 제약은 변경하지 않는다."
+        ],
+        "inputs": "네이버 고유 식별자(naver_id, SIR-010 프로필 조회 결과), 매핑 대상 ACCOUNT.userid",
+        "outputs": "NAVER_ACCOUNT_LINK 레코드(naver_id, userid)",
+        "flow": "SIR-010 프로필 조회로 naver_id·이메일 확보 → 이메일로 ACCOUNT 조회해 일치 계정 확인 → NAVER_ACCOUNT_LINK 에 (naver_id, userid) 신규 행 삽입 → 이후 재로그인 시 naver_id 로 연계 조회",
+        "preceding": [
+          "SIR-010"
+        ],
+        "exceptions": [
+          "동일 naver_id 로 중복 매핑을 시도하는 경우(PK 제약으로 차단)",
+          "매핑된 ACCOUNT.userid 가 삭제될 경우의 FK 무결성 처리 방안 미정([확인필요])"
+        ],
+        "acceptance": [
+          "NAVER_ACCOUNT_LINK 테이블이 정의된 PK/FK 제약대로 생성된다.",
+          "네이버 최초 로그인 시 매핑 저장 성공률 100%, FK 무결성 위반 0건."
+        ],
+        "verify": "검토(스키마 리뷰) + 시험(매핑 저장/조회 시나리오)"
+      },
       "acceptanceCriteria": [
         {
           "id": "AC-1",
           "text": "네이버 로그인 사용자와 기존 로컬 계정을 연계하기 위해 별도 연계 테이블(예: NAVER_ACCOUNT_LINK)을 신설하여 ACCOUNT.userid 와 네이버 고유 식별자를 매핑해 저장한다. SIGNON.PASSWORD(NOT NULL) 제약은 건드리지 않는다(사용자 결정: 별도 연계 테이블 신설 — Q-1).",
           "kind": "rule",
-          "fnIds": ["to-be:auth/naver-account-link"],
+          "fnIds": [
+            "to-be:auth/naver-account-link"
+          ],
           "confidence": "INFERRED",
           "tests": [],
           "evidence": [
-            { "file": "src/main/resources/database/jpetstore-hsqldb-data.sql", "line": 37 },
-            { "file": "src/main/resources/database/jpetstore-hsqldb-data.sql", "line": 32 }
+            {
+              "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+              "line": 37
+            },
+            {
+              "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+              "line": 32
+            }
           ],
           "screenRefs": [],
           "policyRefs": []
@@ -177,18 +321,25 @@
           "id": "AC-2",
           "text": "연계 테이블은 ACCOUNT.userid 를 외래키로 참조해 계정과 네이버 식별자 사이의 연동 관계를 맺는다.",
           "kind": "rule",
-          "fnIds": ["to-be:auth/naver-account-link"],
+          "fnIds": [
+            "to-be:auth/naver-account-link"
+          ],
           "confidence": "INFERRED",
           "tests": [],
           "evidence": [
-            { "file": "src/main/resources/database/jpetstore-hsqldb-data.sql", "line": 37 }
+            {
+              "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+              "line": 37
+            }
           ],
           "screenRefs": [],
           "policyRefs": []
         }
       ],
       "changeset": {
-        "added": ["to-be:auth/naver-account-link"],
+        "added": [
+          "to-be:auth/naver-account-link"
+        ],
         "modified": [],
         "removed": [],
         "revived": [],
@@ -206,16 +357,38 @@
       "priority": "MEDIUM",
       "status": "ACTIVE",
       "derivedFrom": "SFR-010",
-      "definition": "",
-      "scope": "",
-      "origin": "",
-      "spec": { "details": [], "inputs": "", "outputs": "", "flow": "", "preceding": [], "exceptions": [], "acceptance": [], "verify": "" },
+      "definition": "네이버 로그인 도입에 따라 기존 인증 상태 판정·세션 관리 원칙을 동일하게 적용하고, 네이버 액세스 토큰을 세션에 원문 노출하지 않도록 보호하는 보안 요구사항.",
+      "scope": "포함: 기존 인증 상태 판정 규칙(인증 표시·계정 정보·아이디 보유) 재사용, 액세스 토큰 세션 원문 미저장 원칙 적용. 제외: MFA 등 신규 인증 체계 도입.",
+      "origin": "SFR-010(네이버 소셜 로그인)에서 파생 — 소셜 로그인 도입에 따른 보안 위험 대응.",
+      "spec": {
+        "details": [
+          "① 네이버 로그인 성공 후에도 기존 인증 상태 판정 규칙(인증 표시·계정 정보·아이디 보유)을 동일하게 적용한다.",
+          "② 네이버 액세스 토큰은 프로필 조회 후 세션에 원문으로 저장하지 않는다."
+        ],
+        "inputs": "SIR-010 이 발급받은 네이버 액세스 토큰(임시), 로그인 성공 후 세션 객체",
+        "outputs": "기존과 동일한 보안 원칙이 적용된 세션 상태(토큰 미포함)",
+        "flow": "SIR-010 에서 액세스 토큰으로 프로필 조회 → 조회 완료 즉시 토큰 폐기(세션 미저장) → SFR-010 의 기존 세션 등록 로직 재사용(AccountActionBean.java:169, 비밀번호 미저장과 동일 원칙)",
+        "preceding": [
+          "SFR-010"
+        ],
+        "exceptions": [
+          "토큰이 로깅·예외 스택 등 부수 경로로 노출될 위험",
+          "세션 고정(session fixation) 공격 가능성"
+        ],
+        "acceptance": [
+          "로그인 성공 후 세션 덤프에서 네이버 액세스 토큰 평문이 발견되는 건수 0건.",
+          "네이버 로그인 사용자의 인증 상태 판정이 기존 로그인 사용자와 동일하게 동작."
+        ],
+        "verify": "검토(코드 리뷰) — 세션 저장 객체 필드에 토큰 미포함 확인"
+      },
       "acceptanceCriteria": [
         {
           "id": "AC-1",
           "text": "네이버 로그인 성공 후에도 기존 인증 상태 판정 규칙(인증 표시·계정 정보·아이디 보유)을 동일하게 적용해 세션 위조를 방지한다.",
           "kind": "rule",
-          "fnIds": ["flow:ANY /actions/Account.action?signon"],
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signon"
+          ],
           "confidence": "INFERRED",
           "tests": [],
           "evidence": [],
@@ -226,7 +399,9 @@
           "id": "AC-2",
           "text": "네이버로부터 받은 액세스 토큰은 세션에 원문으로 저장하지 않는다(로그인 성공 시 비밀번호를 세션에 남기지 않는 기존 처리와 동일 원칙).",
           "kind": "rule",
-          "fnIds": ["flow:ANY /actions/Account.action?signon"],
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signon"
+          ],
           "confidence": "INFERRED",
           "tests": [],
           "evidence": [],
@@ -236,7 +411,9 @@
       ],
       "changeset": {
         "added": [],
-        "modified": ["flow:ANY /actions/Account.action?signon"],
+        "modified": [
+          "flow:ANY /actions/Account.action?signon"
+        ],
         "removed": [],
         "revived": [],
         "evidence": []

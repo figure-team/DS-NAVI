@@ -21,6 +21,11 @@
       "id": "domain:order",
       "name": "주문",
       "functionCount": 4
+    },
+    {
+      "id": "to-be:auth",
+      "name": "auth",
+      "functionCount": 3
     }
   ],
   "functions": [
@@ -448,10 +453,58 @@
         "evidence": []
       },
       "origin": "AS_IS",
-      "state": "IMPLEMENTED",
-      "requirementHistory": [],
-      "nfrTags": [],
-      "rules": [],
+      "state": "CHANGED",
+      "requirementHistory": [
+        "SER-010",
+        "SFR-010"
+      ],
+      "nfrTags": [
+        "SER-010"
+      ],
+      "rules": [
+        {
+          "reqId": "SER-010",
+          "acId": "AC-1",
+          "text": "네이버 로그인 성공 후에도 기존 인증 상태 판정 규칙(인증 표시·계정 정보·아이디 보유)을 동일하게 적용해 세션 위조를 방지한다.",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "SER-010",
+          "acId": "AC-2",
+          "text": "네이버로부터 받은 액세스 토큰은 세션에 원문으로 저장하지 않는다(로그인 성공 시 비밀번호를 세션에 남기지 않는 기존 처리와 동일 원칙).",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "SFR-010",
+          "acId": "AC-1",
+          "text": "로그인 폼(Account.action?signon 화면) 내부에 네이버 로그인 버튼을 노출하고, 클릭 시 네이버 OAuth 인증 플로우로 진입한다(사용자 결정: 로그인폼 내부 배치 — Q-2).",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "SFR-010",
+          "acId": "AC-2",
+          "text": "네이버 인증이 성공하면 기존 로그인 성공 처리(계정 세션 등록)와 동일한 방식으로 세션을 구성한다.",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "SFR-010",
+          "acId": "AC-3",
+          "text": "네이버 로그인 실패(인증 거부·오류) 시 기존 아이디/비밀번호 로그인 실패와 동일하게 오류 메시지를 표시하고 로그인 화면으로 되돌린다.",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "SFR-010",
+          "acId": "AC-4",
+          "text": "네이버 인증으로 반환된 이메일이 기존 ACCOUNT.EMAIL 과 일치하는 계정이 있으면 신규 계정을 생성하지 않고 기존 계정과 자동 연동한다(사용자 결정: 기존 계정과 연동 — Q-3).",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        }
+      ],
       "deliverableRefs": [],
       "custom": {}
     },
@@ -1330,9 +1383,405 @@
       "rules": [],
       "deliverableRefs": [],
       "custom": {}
+    },
+    {
+      "id": "to-be:auth/naver-account-link",
+      "featureId": "FN-023",
+      "name": "naver account link",
+      "domainId": "to-be:auth",
+      "domainName": "auth",
+      "entryPoint": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "data": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "DAR-010",
+        "SFR-010"
+      ],
+      "nfrTags": [
+        "DAR-010"
+      ],
+      "rules": [
+        {
+          "reqId": "DAR-010",
+          "acId": "AC-1",
+          "text": "네이버 로그인 사용자와 기존 로컬 계정을 연계하기 위해 별도 연계 테이블(예: NAVER_ACCOUNT_LINK)을 신설하여 ACCOUNT.userid 와 네이버 고유 식별자를 매핑해 저장한다. SIGNON.PASSWORD(NOT NULL) 제약은 건드리지 않는다(사용자 결정: 별도 연계 테이블 신설 — Q-1).",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "DAR-010",
+          "acId": "AC-2",
+          "text": "연계 테이블은 ACCOUNT.userid 를 외래키로 참조해 계정과 네이버 식별자 사이의 연동 관계를 맺는다.",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "SFR-010",
+          "acId": "AC-4",
+          "text": "네이버 인증으로 반환된 이메일이 기존 ACCOUNT.EMAIL 과 일치하는 계정이 있으면 신규 계정을 생성하지 않고 기존 계정과 자동 연동한다(사용자 결정: 기존 계정과 연동 — Q-3).",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        }
+      ],
+      "deliverableRefs": [],
+      "custom": {}
+    },
+    {
+      "id": "to-be:auth/naver-callback",
+      "featureId": "FN-022",
+      "name": "naver callback",
+      "domainId": "to-be:auth",
+      "domainName": "auth",
+      "entryPoint": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "data": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "SFR-010"
+      ],
+      "nfrTags": [],
+      "rules": [
+        {
+          "reqId": "SFR-010",
+          "acId": "AC-1",
+          "text": "로그인 폼(Account.action?signon 화면) 내부에 네이버 로그인 버튼을 노출하고, 클릭 시 네이버 OAuth 인증 플로우로 진입한다(사용자 결정: 로그인폼 내부 배치 — Q-2).",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        }
+      ],
+      "deliverableRefs": [],
+      "custom": {}
+    },
+    {
+      "id": "to-be:auth/naver-oauth-client",
+      "featureId": "FN-024",
+      "name": "naver oauth client",
+      "domainId": "to-be:auth",
+      "domainName": "auth",
+      "entryPoint": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "data": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "SIR-010"
+      ],
+      "nfrTags": [
+        "SIR-010"
+      ],
+      "rules": [
+        {
+          "reqId": "SIR-010",
+          "acId": "AC-1",
+          "text": "네이버 OAuth2 인증서버로 인가요청(authorize)을 보내고, 콜백에서 인가코드를 액세스 토큰으로 교환한다.",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "SIR-010",
+          "acId": "AC-2",
+          "text": "발급받은 액세스 토큰으로 네이버 프로필 API(닉네임·이메일 등)를 조회해 계정 연계에 사용한다.",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        }
+      ],
+      "deliverableRefs": [],
+      "custom": {}
     }
   ],
-  "requirements": [],
+  "requirements": [
+    {
+      "id": "DAR-010",
+      "text": "네이버 계정 연계 데이터",
+      "type": "nonfunctional",
+      "nfrCategory": "other",
+      "nfrScope": [
+        "to-be:auth/naver-account-link"
+      ],
+      "priority": "HIGH",
+      "lifecycle": "RECEIVED",
+      "status": "ACTIVE",
+      "supersedes": null,
+      "supersededBy": null,
+      "dependsOn": [
+        "SFR-010"
+      ],
+      "source": {
+        "kind": "customer",
+        "raw": "네이버 로그인 기능 추가.",
+        "section": "REQ-001"
+      },
+      "changeReq": null,
+      "signoff": null,
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "네이버 로그인 사용자와 기존 로컬 계정을 연계하기 위해 별도 연계 테이블(예: NAVER_ACCOUNT_LINK)을 신설하여 ACCOUNT.userid 와 네이버 고유 식별자를 매핑해 저장한다. SIGNON.PASSWORD(NOT NULL) 제약은 건드리지 않는다(사용자 결정: 별도 연계 테이블 신설 — Q-1).",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:auth/naver-account-link"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-2",
+          "text": "연계 테이블은 ACCOUNT.userid 를 외래키로 참조해 계정과 네이버 식별자 사이의 연동 관계를 맺는다.",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:auth/naver-account-link"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:auth/naver-account-link"
+        ],
+        "modified": [],
+        "removed": [],
+        "revived": []
+      }
+    },
+    {
+      "id": "SER-010",
+      "text": "소셜 로그인 세션 보안",
+      "type": "nonfunctional",
+      "nfrCategory": "security",
+      "nfrScope": [
+        "flow:ANY /actions/Account.action?signon"
+      ],
+      "priority": "MEDIUM",
+      "lifecycle": "RECEIVED",
+      "status": "ACTIVE",
+      "supersedes": null,
+      "supersededBy": null,
+      "dependsOn": [
+        "SFR-010"
+      ],
+      "source": {
+        "kind": "customer",
+        "raw": "네이버 로그인 기능 추가.",
+        "section": "REQ-001"
+      },
+      "changeReq": null,
+      "signoff": null,
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "네이버 로그인 성공 후에도 기존 인증 상태 판정 규칙(인증 표시·계정 정보·아이디 보유)을 동일하게 적용해 세션 위조를 방지한다.",
+          "kind": "rule",
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signon"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-2",
+          "text": "네이버로부터 받은 액세스 토큰은 세션에 원문으로 저장하지 않는다(로그인 성공 시 비밀번호를 세션에 남기지 않는 기존 처리와 동일 원칙).",
+          "kind": "rule",
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signon"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        }
+      ],
+      "changeset": {
+        "added": [],
+        "modified": [
+          "flow:ANY /actions/Account.action?signon"
+        ],
+        "removed": [],
+        "revived": []
+      }
+    },
+    {
+      "id": "SFR-010",
+      "text": "네이버 소셜 로그인",
+      "type": "functional",
+      "nfrCategory": null,
+      "nfrScope": [],
+      "priority": "HIGH",
+      "lifecycle": "RECEIVED",
+      "status": "ACTIVE",
+      "supersedes": null,
+      "supersededBy": null,
+      "dependsOn": [],
+      "source": {
+        "kind": "customer",
+        "raw": "네이버 로그인 기능 추가.",
+        "section": "REQ-001"
+      },
+      "changeReq": null,
+      "signoff": null,
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "로그인 폼(Account.action?signon 화면) 내부에 네이버 로그인 버튼을 노출하고, 클릭 시 네이버 OAuth 인증 플로우로 진입한다(사용자 결정: 로그인폼 내부 배치 — Q-2).",
+          "kind": "rule",
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signon",
+            "to-be:auth/naver-callback"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-2",
+          "text": "네이버 인증이 성공하면 기존 로그인 성공 처리(계정 세션 등록)와 동일한 방식으로 세션을 구성한다.",
+          "kind": "rule",
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signon"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-3",
+          "text": "네이버 로그인 실패(인증 거부·오류) 시 기존 아이디/비밀번호 로그인 실패와 동일하게 오류 메시지를 표시하고 로그인 화면으로 되돌린다.",
+          "kind": "rule",
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signon"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-4",
+          "text": "네이버 인증으로 반환된 이메일이 기존 ACCOUNT.EMAIL 과 일치하는 계정이 있으면 신규 계정을 생성하지 않고 기존 계정과 자동 연동한다(사용자 결정: 기존 계정과 연동 — Q-3).",
+          "kind": "rule",
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signon",
+            "to-be:auth/naver-account-link"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:auth/naver-callback",
+          "to-be:auth/naver-account-link"
+        ],
+        "modified": [
+          "flow:ANY /actions/Account.action?signon"
+        ],
+        "removed": [],
+        "revived": []
+      }
+    },
+    {
+      "id": "SIR-010",
+      "text": "네이버 OAuth2 연동",
+      "type": "nonfunctional",
+      "nfrCategory": "other",
+      "nfrScope": [
+        "to-be:auth/naver-oauth-client"
+      ],
+      "priority": "HIGH",
+      "lifecycle": "RECEIVED",
+      "status": "ACTIVE",
+      "supersedes": null,
+      "supersededBy": null,
+      "dependsOn": [
+        "SFR-010"
+      ],
+      "source": {
+        "kind": "customer",
+        "raw": "네이버 로그인 기능 추가.",
+        "section": "REQ-001"
+      },
+      "changeReq": null,
+      "signoff": null,
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "네이버 OAuth2 인증서버로 인가요청(authorize)을 보내고, 콜백에서 인가코드를 액세스 토큰으로 교환한다.",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:auth/naver-oauth-client"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-2",
+          "text": "발급받은 액세스 토큰으로 네이버 프로필 API(닉네임·이메일 등)를 조회해 계정 연계에 사용한다.",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:auth/naver-oauth-client"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:auth/naver-oauth-client"
+        ],
+        "modified": [],
+        "removed": [],
+        "revived": []
+      }
+    }
+  ],
   "testScenarios": [
     {
       "id": "TS-3653f930-N",
@@ -2592,21 +3041,173 @@
         }
       ],
       "notes": []
+    },
+    {
+      "id": "TS-2f6f5652-N",
+      "fnId": "to-be:auth/naver-account-link",
+      "reqId": null,
+      "acId": null,
+      "kind": "normal",
+      "title": "naver account link 정상 처리",
+      "given": "유효한 입력과 선행 상태가 준비됨",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "정상 완료(오류 없음) + 응답/결과 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강"
+      ]
+    },
+    {
+      "id": "TS-2f6f5652-E",
+      "fnId": "to-be:auth/naver-account-link",
+      "reqId": null,
+      "acId": null,
+      "kind": "exception",
+      "title": "naver account link 예외 처리",
+      "given": "필수 입력 누락 또는 부적합한 입력",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "오류를 안전하게 처리(비정상 종료·데이터 오염 없음) + 명확한 오류 응답 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 예외 AC 없음 — 일반형 초안(사람 보강)"
+      ]
+    },
+    {
+      "id": "TS-2f6f5652-B",
+      "fnId": "to-be:auth/naver-account-link",
+      "reqId": null,
+      "acId": null,
+      "kind": "boundary",
+      "title": "naver account link 경계 조건",
+      "given": "경계 입력(빈 값·최대 길이·한계치)",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "경계에서도 일관 동작(오류 없이 처리 또는 명확한 거부)",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 데이터 근거 없음 — 경계값은 사람 특정"
+      ]
+    },
+    {
+      "id": "TS-ca4ff450-N",
+      "fnId": "to-be:auth/naver-callback",
+      "reqId": null,
+      "acId": null,
+      "kind": "normal",
+      "title": "naver callback 정상 처리",
+      "given": "유효한 입력과 선행 상태가 준비됨",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "정상 완료(오류 없음) + 응답/결과 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강"
+      ]
+    },
+    {
+      "id": "TS-ca4ff450-E",
+      "fnId": "to-be:auth/naver-callback",
+      "reqId": null,
+      "acId": null,
+      "kind": "exception",
+      "title": "naver callback 예외 처리",
+      "given": "필수 입력 누락 또는 부적합한 입력",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "오류를 안전하게 처리(비정상 종료·데이터 오염 없음) + 명확한 오류 응답 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 예외 AC 없음 — 일반형 초안(사람 보강)"
+      ]
+    },
+    {
+      "id": "TS-ca4ff450-B",
+      "fnId": "to-be:auth/naver-callback",
+      "reqId": null,
+      "acId": null,
+      "kind": "boundary",
+      "title": "naver callback 경계 조건",
+      "given": "경계 입력(빈 값·최대 길이·한계치)",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "경계에서도 일관 동작(오류 없이 처리 또는 명확한 거부)",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 데이터 근거 없음 — 경계값은 사람 특정"
+      ]
+    },
+    {
+      "id": "TS-df351fa2-N",
+      "fnId": "to-be:auth/naver-oauth-client",
+      "reqId": null,
+      "acId": null,
+      "kind": "normal",
+      "title": "naver oauth client 정상 처리",
+      "given": "유효한 입력과 선행 상태가 준비됨",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "정상 완료(오류 없음) + 응답/결과 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강"
+      ]
+    },
+    {
+      "id": "TS-df351fa2-E",
+      "fnId": "to-be:auth/naver-oauth-client",
+      "reqId": null,
+      "acId": null,
+      "kind": "exception",
+      "title": "naver oauth client 예외 처리",
+      "given": "필수 입력 누락 또는 부적합한 입력",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "오류를 안전하게 처리(비정상 종료·데이터 오염 없음) + 명확한 오류 응답 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 예외 AC 없음 — 일반형 초안(사람 보강)"
+      ]
+    },
+    {
+      "id": "TS-df351fa2-B",
+      "fnId": "to-be:auth/naver-oauth-client",
+      "reqId": null,
+      "acId": null,
+      "kind": "boundary",
+      "title": "naver oauth client 경계 조건",
+      "given": "경계 입력(빈 값·최대 길이·한계치)",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "경계에서도 일관 동작(오류 없이 처리 또는 명확한 거부)",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 데이터 근거 없음 — 경계값은 사람 특정"
+      ]
     }
   ],
   "customFields": [],
   "coverage": {
     "requirements": {
-      "total": 0,
-      "implemented": 0,
+      "total": 4,
+      "implemented": 1,
       "verified": 0,
       "signedOff": 0,
-      "byLifecycle": {}
+      "byLifecycle": {
+        "RECEIVED": 4
+      }
     },
     "functions": {
-      "total": 21,
-      "implemented": 21,
-      "planned": 0,
+      "total": 24,
+      "implemented": 20,
+      "planned": 3,
       "orphaned": 0,
       "confirmed": 0
     },
@@ -2617,16 +3218,20 @@
       "untested": 0
     },
     "scenarios": {
-      "total": 63,
+      "total": 72,
       "confirmed": 0,
       "byKind": {
-        "normal": 21,
-        "exception": 21,
-        "boundary": 21
+        "normal": 24,
+        "exception": 24,
+        "boundary": 24
       }
     },
     "gaps": {
-      "unimplemented": [],
+      "unimplemented": [
+        "DAR-010",
+        "SFR-010",
+        "SIR-010"
+      ],
       "orphanCode": [],
       "unverified": [
         "flow:ANY /actions/Account.action",
@@ -2652,7 +3257,32 @@
         "flow:ANY /actions/Order.action?viewOrder"
       ]
     },
-    "byRequirement": {}
+    "byRequirement": {
+      "DAR-010": {
+        "targetsTotal": 1,
+        "targetsBuilt": 0,
+        "acsTotal": 2,
+        "acsPassed": 0
+      },
+      "SER-010": {
+        "targetsTotal": 1,
+        "targetsBuilt": 1,
+        "acsTotal": 2,
+        "acsPassed": 0
+      },
+      "SFR-010": {
+        "targetsTotal": 3,
+        "targetsBuilt": 1,
+        "acsTotal": 4,
+        "acsPassed": 0
+      },
+      "SIR-010": {
+        "targetsTotal": 1,
+        "targetsBuilt": 0,
+        "acsTotal": 2,
+        "acsPassed": 0
+      }
+    }
   },
   "diagnostics": []
 }

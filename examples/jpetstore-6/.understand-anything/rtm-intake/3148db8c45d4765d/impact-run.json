@@ -1,0 +1,31 @@
+{
+  "jobId": "a734a4e96b18e695",
+  "requestId": "REQ-002",
+  "query": "구글 로그인 추가",
+  "gitCommit": "fa8982d327ea2f93d694c4d7d44deb0fe9c5d1dd",
+  "seedScope": "entryPoint",
+  "seeds": [
+    {
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "origin": "route",
+      "confidence": "CONFIRMED"
+    }
+  ],
+  "bySource": [
+    {
+      "fnId": "flow:ANY /actions/Account.action",
+      "relPaths": [
+        "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+      ]
+    },
+    {
+      "fnId": "flow:ANY /actions/Account.action?signon",
+      "relPaths": [
+        "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+      ]
+    }
+  ],
+  "skippedToBe": [],
+  "unknownFnIds": [],
+  "ungroundedFnIds": []
+}

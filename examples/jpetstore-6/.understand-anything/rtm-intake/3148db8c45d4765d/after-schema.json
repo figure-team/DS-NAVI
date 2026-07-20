@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "tables": [
+    {
+      "name": "GOOGLESIGNON",
+      "change": "added",
+      "columns": [
+        {
+          "name": "googlesub",
+          "type": "varchar(255)",
+          "note": "구글 계정 식별자(sub)"
+        },
+        {
+          "name": "userid",
+          "type": "varchar(80)",
+          "note": "내부 계정 키(ACCOUNT.userid 와 동일 규격)"
+        }
+      ],
+      "pk": ["googlesub"],
+      "fks": [
+        {
+          "columns": ["userid"],
+          "refTable": "ACCOUNT",
+          "refColumns": ["userid"]
+        }
+      ],
+      "note": "[추정] DAR-020 AC-1(구글 sub↔내부 userid 연계 보관) 근거의 별도 연계 테이블. SIGNON 변경(비밀번호 null 허용·더미 값 등)은 Q-1 답변 전이라 제안하지 않음(DAR-020 AC-2)."
+    }
+  ]
+}

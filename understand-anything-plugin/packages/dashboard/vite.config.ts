@@ -22,6 +22,7 @@ import {
 import {
   appendQaRevision as appendQaRevisionIn,
   checkAnswerGate,
+  auditRtmStepArtifacts,
   isValidSid,
   latestRtmSession as latestRtmSessionIn,
   listRtmSessions as listRtmSessionsIn,
@@ -32,6 +33,7 @@ import {
   writeRtmSession as writeRtmSessionIn,
   type QaEntry,
   type RtmSession,
+  type RtmStepAudit,
   type RtmStepStatus,
 } from "./server/rtm-sessions";
 
@@ -1818,6 +1820,17 @@ function setRtmStepStatus(sid: string, k: number, status: RtmStepStatus): void {
  * 매 ① spawn 마다 새로 발급하는 게 **의미상으로도 맞다**: ①을 다시 돌리면 이전 대화는 낡은 것이고,
  * 개정(`--resume`)이 이어야 할 맥락은 **가장 최근 ①** 이다. spawn 전에 써야 개정이 그 값을 본다.
  */
+/**
+ * 단계 산출물 감사 래퍼 — base 해석(rtmIntakeBaseDir)과 프로젝트 데이터 디렉터리를 붙인다.
+ * base 를 못 찾으면(그래프 미발견) 감사를 통과시킨다: 그 상황은 spawn 자체가 성립 안 하는
+ * 별개 문제고, 여기서 실패로 뒤집으면 원인이 산출물 문제로 오인된다.
+ */
+function auditRtmStep(sid: string, step: number): RtmStepAudit {
+  const base = rtmIntakeBaseDir();
+  if (!base) return { ok: true, missing: [] };
+  return auditRtmStepArtifacts(base, sid, step, path.dirname(base));
+}
+
 function issueIdentifyClaudeSession(sid: string): string | undefined {
   const s = readRtmSession(sid);
   if (!s) return undefined;
@@ -1861,6 +1874,18 @@ function runRtmSteps(
       onClose: (code) => {
         if (code !== 0) {
           rtmTracker.finish(jobId, code);
+          setStepStatus(k, "failed");
+          return;
+        }
+        // exit 0 은 "돌긴 돌았다"일 뿐이다 — **완결의 진실은 디스크**(auditRtmStepArtifacts 주석).
+        // 산출물이 없으면 produced 로 올리지 않고 체인을 세운다: 없는 ③ 위에 ④를 쌓으면
+        // 뒤 단계가 조용히 빈 입력으로 돌아 실패가 더 깊은 곳에서 드러난다.
+        const audit = auditRtmStep(sid, k);
+        if (!audit.ok) {
+          rtmTracker.appendTail(
+            `\n[step-audit] ${k}단계 exit 0 이지만 산출물 미생성: ${audit.missing.join(", ")}\n`,
+          );
+          rtmTracker.finish(jobId, 1);
           setStepStatus(k, "failed");
           return;
         }
@@ -2021,6 +2046,17 @@ function runRtmRevise(
       if (!rtmTracker.isCurrent(jobId)) return;
       if (code !== 0) {
         rtmTracker.finish(jobId, code);
+        setRtmStepStatus(sid, RTM_STEP_MIN, "failed");
+        return;
+      }
+      // 개정도 단계 실행과 같은 게이트 — 개정이 산출을 날려먹었는데 produced 로 남으면
+      // 사용자는 "답이 반영됐다"고 믿는다(runRtmSteps.onClose 와 동형).
+      const audit = auditRtmStep(sid, RTM_STEP_MIN);
+      if (!audit.ok) {
+        rtmTracker.appendTail(
+          `\n[step-audit] ①개정 exit 0 이지만 산출물 미생성: ${audit.missing.join(", ")}\n`,
+        );
+        rtmTracker.finish(jobId, 1);
         setRtmStepStatus(sid, RTM_STEP_MIN, "failed");
         return;
       }

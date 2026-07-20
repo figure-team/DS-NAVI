@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { RECONCILE_GRACE_MS } from "./job-ledger";
 import {
   appendQaRevision,
+  auditRtmStepArtifacts,
   checkAnswerGate,
   isValidSid,
   latestRtmSession,
@@ -472,5 +473,71 @@ describe("identifyClaudeSession", () => {
     const s = readRtmSession(base, sid(1));
     expect(s?.schemaVersion).toBe(RTM_SESSION_SCHEMA_VERSION); // 재사상됨
     expect(s?.identifyClaudeSession).toBe(uuid); // 그래도 보존
+  });
+});
+
+// ── 단계 산출물 감사(2026-07-20) — exit 0 을 완결로 승격하기 전의 디스크 게이트 ──────
+describe("auditRtmStepArtifacts", () => {
+  const SID = "a1b2c3d4e5f60718";
+  let dataDir: string; // .understand-anything 상당(= base 의 부모)
+  let dir: string; // 세션 디렉터리
+
+  beforeEach(() => {
+    dataDir = base; // base 를 프로젝트 데이터 디렉터리로 쓰고, 세션 원장은 그 아래 rtm-intake
+    dir = path.join(dataDir, "rtm-intake", SID);
+    fs.mkdirSync(dir, { recursive: true });
+  });
+  const intakeBase = (): string => path.join(dataDir, "rtm-intake");
+  const audit = (step: number): ReturnType<typeof auditRtmStepArtifacts> =>
+    auditRtmStepArtifacts(intakeBase(), SID, step, dataDir);
+  const writeIdentified = (ids: string[]): void =>
+    fs.writeFileSync(
+      path.join(dir, "identified.json"),
+      JSON.stringify({ requirements: ids.map((id) => ({ id })) }),
+    );
+
+  it("①: identified.json 부재=실패, 존재=통과", () => {
+    expect(audit(1)).toEqual({ ok: false, missing: ["identified.json"] });
+    writeIdentified(["SFR-010"]);
+    expect(audit(1).ok).toBe(true);
+  });
+
+  it("★②: 필수 산출물 없음 — 시드 없음(전부 신규)이 정당한 종료라 항상 통과", () => {
+    expect(audit(2)).toEqual({ ok: true, missing: [] });
+  });
+
+  it("③④: 목록표·정의서 .md 존재 여부로 갈린다", () => {
+    expect(audit(3).missing).toEqual(["요구사항목록표.md"]);
+    expect(audit(4).missing).toEqual(["요구사항정의서.md"]);
+    fs.writeFileSync(path.join(dir, "요구사항목록표.md"), "# 목록표");
+    fs.writeFileSync(path.join(dir, "요구사항정의서.md"), "# 정의서");
+    expect(audit(3).ok).toBe(true);
+    expect(audit(4).ok).toBe(true);
+  });
+
+  it("⑤: 요구사항 1건당 1파일 — 일부만 있으면 빠진 id 를 지목한다", () => {
+    writeIdentified(["SFR-010", "SFR-020"]);
+    expect(audit(5).missing).toEqual(["요구사항명세서_{요구사항ID}.md"]); // 하나도 없음
+    fs.writeFileSync(path.join(dir, "요구사항명세서_SFR-010.md"), "# 명세서");
+    expect(audit(5)).toEqual({ ok: false, missing: ["요구사항명세서_SFR-020.md"] });
+    fs.writeFileSync(path.join(dir, "요구사항명세서_SFR-020.md"), "# 명세서");
+    expect(audit(5).ok).toBe(true);
+  });
+
+  it("⑥: 파일 존재로는 부족 — 이 세션의 id 가 rtm-requirements.json 에 투영돼야 한다", () => {
+    writeIdentified(["SFR-020"]);
+    const proj = path.join(dataDir, "rtm-requirements.json");
+    expect(audit(6).missing).toEqual(["rtm-requirements.json"]); // 파일 자체 부재
+
+    // ★ 세션 이전부터 있던 원장(다른 요구사항만) — 존재만 보면 통과해버리는 함정
+    fs.writeFileSync(proj, JSON.stringify([{ id: "SFR-001" }]));
+    expect(audit(6)).toEqual({ ok: false, missing: ["rtm-requirements.json 의 SFR-020 투영"] });
+
+    fs.writeFileSync(proj, JSON.stringify([{ id: "SFR-001" }, { id: "SFR-020" }]));
+    expect(audit(6).ok).toBe(true);
+  });
+
+  it("무효 sid 는 경로 조작 차단과 함께 실패로 떨어진다", () => {
+    expect(auditRtmStepArtifacts(intakeBase(), "../etc", 1, dataDir).ok).toBe(false);
   });
 });

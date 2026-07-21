@@ -538,6 +538,8 @@ describe('screen fill-fanout — jpetstore 데모 라운드트립', () => {
     expect(result.screensFilled).toBe(demo.screens.length)
     expect(result.droppedItems).toBe(0)
     const merged = JSON.parse(await readFile(join(root, '.understand-anything/screens.json'), 'utf8'))
-    expect(computeMechanicalHash(merged.screens)).toBe(demo.mechanicalHash)
+    // 트리아지 있는 산출물은 missing 도 봉인 대상(computeMechanicalHash 2번째 인자) —
+    // 전무하면 screens 단독 해시와 바이트 동일이라 구산출물에도 안전.
+    expect(computeMechanicalHash(merged.screens, merged.missing ?? [])).toBe(demo.mechanicalHash)
   })
 })

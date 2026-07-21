@@ -232,6 +232,21 @@ describe('deriveFolderGroups', () => {
     expect(out[0]).toBeNull()
     expect(out[1]).toBeNull()
   })
+
+  it('얕은 이탈 경로(웹루트 정적 파일)가 과반 접두를 무너뜨리지 않는다', () => {
+    // jpetstore 실측 회귀: help.html(webapp 루트) 하나가 LCP 를 3으로 무너뜨려
+    // 나머지 전 화면이 "WEB-INF" 그룹으로 뭉치던 결함 — 과반(jsp 뷰)만으로 접두 재계산.
+    const out = deriveFolderGroups(
+      [
+        'src/main/webapp/WEB-INF/jsp/cart/Cart.jsp',
+        'src/main/webapp/WEB-INF/jsp/order/ListOrders.jsp',
+        'src/main/webapp/WEB-INF/jsp/common/Error.jsp',
+        'src/main/webapp/help.html',
+      ],
+      24,
+    )
+    expect(out).toEqual(['cart', 'order', 'common', null])
+  })
 })
 
 describe('assignScreenDomains — 파생 폴백', () => {

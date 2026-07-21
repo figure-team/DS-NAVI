@@ -180,12 +180,25 @@ export function deriveFolderGroups(paths: Array<string | null>, cap: number): Ar
   const nonNull = dirs.filter((d): d is string[] => d !== null)
   if (nonNull.length === 0) return paths.map(() => null)
 
-  // 공통 디렉터리 접두 길이.
-  let lcp = nonNull[0].length
-  for (const d of nonNull) {
-    let i = 0
-    while (i < lcp && i < d.length && d[i] === nonNull[0][i]) i++
-    lcp = Math.min(lcp, i)
+  // 공통 디렉터리 접두 길이 — 얕은 이탈 경로(웹루트 정적 파일 등) 하나가 전체 접두를
+  // 무너뜨려 의미 없는 세그먼트("WEB-INF" 등)가 그룹이 되는 것을 막는다: 과반이 접두
+  // 너머로 이어지는데 일부가 접두에서 끝나면, 그 과반만으로 접두를 다시 계산한다.
+  // 접두에서 끝난 이탈 경로는 후보 없음(null)으로 남아 다음 축(④ URL 파생)에 맡긴다.
+  let pool = nonNull
+  let lcp = 0
+  for (;;) {
+    lcp = pool[0].length
+    for (const d of pool) {
+      let i = 0
+      while (i < lcp && i < d.length && d[i] === pool[0][i]) i++
+      lcp = Math.min(lcp, i)
+    }
+    const deeper = pool.filter((d) => d.length > lcp)
+    if (deeper.length < pool.length && deeper.length * 2 >= nonNull.length) {
+      pool = deeper
+      continue
+    }
+    break
   }
 
   for (let p = lcp; p >= 0; p--) {

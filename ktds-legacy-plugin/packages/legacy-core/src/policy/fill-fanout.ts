@@ -28,6 +28,7 @@ import { join } from 'node:path'
 import { z } from 'zod'
 import { cmp } from '../utils/cmp.js'
 import { specMapDir, stableJson } from '../domain-map/persist.js'
+import { applyLexiconDeep, type LexiconEntry } from '../style/lexicon.js'
 import { normalizeCitationText, isTrivialSnippet, verifyCitation, type FileCache } from '../domain-map/verify.js'
 import { CitationSchema, type Citation } from '../domain-map/fill.js'
 import { BundleFileSchema, sliceFile, DEFAULT_SLICE_LINES, type BundleFile } from '../domain-map/bundle.js'
@@ -593,6 +594,8 @@ export interface MergePolicyFillResult {
   missingDocs: string[]
   /** 커버리지를 전부 잃어 낡은 채움 섹션을 제거한 문서 수(빈 섹션 미부착). */
   staleSectionsCleared: number
+  /** 렉시콘(표기 통일) 치환 횟수 — statement 만, 인용 서브트리 불변. */
+  lexiconHits: number
 }
 
 /** md 셀 안전화 — 파이프/개행 이스케이프(GFM 표 깨짐 방지). */
@@ -674,7 +677,12 @@ async function verifyFragmentRow(
  * (부분 병합). 조각의 청크 선언 밖 rowKey 는 버리고 집계 보고한다. 병합 전 인용을 실파일과
  * 대조해 불일치는 제거하고, 근거 0 이 된 [확정]은 [추정]으로 강등한다(fail-closed).
  */
-export async function mergePolicyFillFragments(projectRoot: string): Promise<MergePolicyFillResult> {
+export async function mergePolicyFillFragments(
+  projectRoot: string,
+  opts?: { lexicon?: LexiconEntry[] },
+): Promise<MergePolicyFillResult> {
+  const lexicon = opts?.lexicon ?? []
+  let lexiconHits = 0
   const index = await readPolicyFillChunkIndex(projectRoot)
   const audit = await auditPolicyFillFragments(projectRoot)
   const completeSet = new Set(audit.complete)
@@ -704,9 +712,13 @@ export async function mergePolicyFillFragments(projectRoot: string): Promise<Mer
   // 완결 조각의 채움을 검증·수집(선언 밖 rowKey 드랍).
   for (const entry of index.chunks) {
     if (!completeSet.has(entry.chunkId)) continue
-    const frag = PolicyFillFragmentSchema.parse(
+    const fragRaw = PolicyFillFragmentSchema.parse(
       JSON.parse(await readFile(fragPath(projectRoot, entry.chunkId), 'utf8')),
     )
+    // 렉시콘: statement 만 치환(인용 서브트리 불변) — 병합 전 조각 단위 적용.
+    const lexed = applyLexiconDeep(fragRaw, lexicon)
+    lexiconHits += lexed.hits
+    const frag = lexed.value
     const declared = new Set(entry.rowKeys)
     for (const fr of frag.rows) {
       if (!declared.has(fr.rowKey)) {
@@ -767,5 +779,5 @@ export async function mergePolicyFillFragments(projectRoot: string): Promise<Mer
 
   missingRows.sort(cmp)
   missingDocs.sort(cmp)
-  return { docPaths, rowsFilled, missingRows, droppedItems, citationsRemoved, tagsDemoted, missingDocs, staleSectionsCleared }
+  return { docPaths, rowsFilled, missingRows, droppedItems, citationsRemoved, tagsDemoted, missingDocs, staleSectionsCleared, lexiconHits }
 }

@@ -104,6 +104,7 @@ Produce a JSON object with this exact structure:
 6. **Be specific, not generic** — use the actual business terminology from the code
 7. **Don't invent flows that aren't in the code** — only document what exists
 8. **Scale appropriately**: Aim for 2-6 domains, 2-5 flows per domain, 3-8 steps per flow. Fewer is fine for small projects.
+9. **Output language**: if your dispatch context includes a **Language directive**, write every name, summary, and description in that language with natural, native-level phrasing (keep untranslatable technical terms in English). Without a directive, write in English.
 
 ## Critical Constraints
 

@@ -7,6 +7,7 @@ argument-hint: ["[projectRoot]", "[scaffold|capture|fill-prep|fill-audit|fill-me
 # /understand-screens
 
 > 🌐 **언어:** 사용자에게 보여주는 모든 설명·요약·진행 안내는 **한국어**로 한다(config `outputLanguage`, 기본값 `ko`).
+> 🖋 **문체:** Stage B 채움이 쓰는 모든 title·summary·description·note 는 **문체 규약**을 로드해 따른다 — 프로젝트 override `.understand-anything/templates/style/ko-prose.md` → 없으면 `${CLAUDE_PLUGIN_ROOT}/templates/style/ko-prose.md`(팬아웃 경로는 에이전트가 직접 로드). **용어 기준:** `.understand-anything/templates/style/ko-terms.md`(사용자 확정, 최우선) → `doc-output/policy-glossary.md`(코드 유래) 순 — 표기 기준일 뿐 인용 근거가 아니다.
 
 분석 대상 웹앱의 **화면설계서**(캡처 + ①②③/ⓐⓑⓒ 번호 배지 + 항목별 설명 범례)를 생성한다.
 2단 파이프라인: **Stage A**(결정론 캡처 — 앱 기동/크롤/시나리오/routes 조인)는 스크립트가,
@@ -138,9 +139,13 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> status  
    담지 않는다(병합이 본체 유지).
 3. `fill-audit` — 조각 완결성 감사(존재 ∧ 스키마 ∧ 화면·주석 커버리지 ∧ CONFIRMED⇒
    evidence≥1). Workflow 가 초기 감사 + 최대 2회 재디스패치 후 잔여 미완결을 `failed[]` 로
-   표면화한다(조용한 누락 없음). 요약을 사용자에게 보고한다.
+   표면화한다(조용한 누락 없음). 감사 뒤 **문체 검수 라운드**가 자동 수행된다 — 문체 규약
+   위반 산문(title/summary/description/note)만 재작성(봉인 필드·핸들러·근거 불변), 재작성 수는
+   반환값 `styleRevised` 로 보고(끄려면 args `stylePass: false`). 요약을 사용자에게 보고한다.
 4. `fill-merge` — 조각의 **채움 필드만** screens.json 본체에 병합한다(봉인 필드는 본체 값
-   유지, 선언 밖 화면/주석 id 는 버리고 보고). 병합 후 `unmatchedJsps` 재계산 +
+   유지, 선언 밖 화면/주석 id 는 버리고 보고). 병합 시 **표기 통일 렉시콘**(`templates/style/
+   ko-lexicon.md`, 프로젝트 override 우선)이 산문 필드에 결정론 치환으로 자동 적용된다
+   (evidence 불변 — 치환 수는 🔤 로 보고). 병합 후 `unmatchedJsps` 재계산 +
    mechanicalHash 재검증 + `validateScreensFile` 게이트를 자동 실행한다.
 5. `validate` — 최종 게이트 재확인 후 결과를 한국어로 보고한다.
 

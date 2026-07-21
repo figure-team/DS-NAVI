@@ -16,6 +16,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { appendRunLedger, runStartedAt } from './lib/run-ledger.mjs'
+import { loadLexicon } from './lib/load-lexicon.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const distEntry = join(here, '..', 'packages', 'legacy-core', 'dist', 'index.js')
@@ -160,15 +161,18 @@ if (command === 'fill-audit') {
 if (command === 'fill-merge') {
   const runBeganMerge = runStartedAt()
   const { mergeScreenFillFragments } = engine
+  const lex = loadLexicon(engine, projectRoot, join(here, '..'))
   let result
   try {
-    result = await mergeScreenFillFragments(projectRoot)
+    result = await mergeScreenFillFragments(projectRoot, lex.lexicon ? { lexicon: lex.lexicon } : undefined)
   } catch (err) {
     console.error(`fill-merge 실패: ${err.message}`)
     process.exit(2)
   }
   const pct = (x) => (x === null ? '-' : `${Math.round(x * 100)}%`)
   console.log(`화면 채움 조각 병합 완료 — ${projectRoot}`)
+  if (lex.error) console.log(`  ⚠️ 렉시콘 파싱 실패(${lex.path}): ${lex.error} — 표기 통일 생략`)
+  if (result.lexiconHits > 0) console.log(`  🔤 표기 통일(렉시콘) ${result.lexiconHits}건 — ${lex.path}`)
   console.log(`  채움 반영 화면 ${result.screensFilled}개`)
   if (result.missingScreens.length > 0) {
     console.log(

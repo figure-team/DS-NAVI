@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { type LexiconEntry } from '../style/lexicon.js';
 /** `.spec/map/policy-fill-prep/` — 청크(팬아웃 입력) 디렉터리 이름. */
 export declare const POLICY_FILL_PREP_DIR = "policy-fill-prep";
 /** `.spec/map/policy-fill-frag/` — 조각(팬아웃 출력) 디렉터리 이름. */
@@ -207,6 +208,8 @@ export interface MergePolicyFillResult {
     missingDocs: string[];
     /** 커버리지를 전부 잃어 낡은 채움 섹션을 제거한 문서 수(빈 섹션 미부착). */
     staleSectionsCleared: number;
+    /** 렉시콘(표기 통일) 치환 횟수 — statement 만, 인용 서브트리 불변. */
+    lexiconHits: number;
 }
 /**
  * 조각을 policy-*.md 에 **덧붙임 산문 섹션**으로 병합한다. 기존 결정론 앵커 표(본체)는
@@ -215,5 +218,7 @@ export interface MergePolicyFillResult {
  * (부분 병합). 조각의 청크 선언 밖 rowKey 는 버리고 집계 보고한다. 병합 전 인용을 실파일과
  * 대조해 불일치는 제거하고, 근거 0 이 된 [확정]은 [추정]으로 강등한다(fail-closed).
  */
-export declare function mergePolicyFillFragments(projectRoot: string): Promise<MergePolicyFillResult>;
+export declare function mergePolicyFillFragments(projectRoot: string, opts?: {
+    lexicon?: LexiconEntry[];
+}): Promise<MergePolicyFillResult>;
 //# sourceMappingURL=fill-fanout.d.ts.map

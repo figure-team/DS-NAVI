@@ -7,6 +7,7 @@ argument-hint: ["[자연어 요청]", "[--intake --session <sid> --step <k>]", "
 # /understand-rtm
 
 > 🌐 **언어:** 사용자에게 보여주는 모든 설명은 **한국어**로 한다.
+> 🖋 **문체:** 요구사항 문서(목록표·정의서·명세서·변경관리)와 질문 문안 등 네가 쓰는 모든 한국어 산문은 **문체 규약**을 로드해 따른다 — 프로젝트 override `.understand-anything/templates/style/ko-prose.md` → 없으면 `${CLAUDE_PLUGIN_ROOT}/templates/style/ko-prose.md`. **용어 기준:** `.understand-anything/templates/style/ko-terms.md`(사용자 확정, 최우선) → `doc-output/policy-glossary.md`(코드 유래) 순 — 표기 기준일 뿐 인용 근거가 아니다.
 
 요구사항 추적표(RTM)의 단일 명령. **세 모드**가 인자로 갈린다:
 

@@ -30,6 +30,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { existsSync, readFileSync } from 'node:fs'
 import { appendRunLedger, runStartedAt } from './lib/run-ledger.mjs'
+import { loadLexicon } from './lib/load-lexicon.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const distEntry = join(here, '..', 'packages', 'legacy-core', 'dist', 'index.js')
@@ -633,14 +634,17 @@ async function runFillAudit() {
 /** 조각 → 도메인별 fill/<key>.json 결정론 병합. */
 async function runFillMerge() {
   const { mergeFillFragments } = engine
+  const lex = loadLexicon(engine, projectRoot, join(here, '..'))
   let result
   try {
-    result = await mergeFillFragments(projectRoot)
+    result = await mergeFillFragments(projectRoot, lex.lexicon ? { lexicon: lex.lexicon } : undefined)
   } catch (err) {
     console.error(`fill-merge 실패: ${err.message}`)
     process.exit(2)
   }
   console.log(`fill 조각 병합 완료 — ${projectRoot}`)
+  if (lex.error) console.log(`  ⚠️ 렉시콘 파싱 실패(${lex.path}): ${lex.error} — 표기 통일 생략`)
+  if (result.lexiconHits > 0) console.log(`  🔤 표기 통일(렉시콘) ${result.lexiconHits}건 — ${lex.path}`)
   console.log(`  병합 도메인 ${result.written.length}개(.spec/map/fill/):`)
   for (const w of result.written) {
     const missing = w.missingChunks.length > 0 ? ` — ⚠️ 미완결 청크 ${w.missingChunks.length}개 [${w.missingChunks.join(', ')}] (부분 병합, emit 폴백)` : ''

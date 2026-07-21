@@ -34,6 +34,8 @@ export { KNOWLEDGE_GRAPH_FILENAME, ANALYZED_AT_SENTINEL, SECRET_CARRIER_EXTENSIO
 export type { MinimalKgNodeType, MinimalKgNode, MinimalKgEdge, MinimalKg, MinimalKgBuildInputs, MinimalKgWriteAction, MinimalKgWriteResult, } from './domain-map/minimal-kg.js';
 export { prepFillChunks, auditFillFragments, mergeFillFragments, readFillChunkIndex, fillPrepDir, fillFragDir, FILL_PREP_DIR, FILL_FRAG_DIR, FILL_PREP_INDEX_FILENAME, DEFAULT_CHUNK_FLOWS, DEFAULT_CHUNK_CHAR_CAP, FillChunkSchema, FillChunkIndexSchema, FillFragmentSchema, } from './domain-map/fill-fanout.js';
 export type { FillChunk, FillChunkIndex, FillFragment, FragmentAudit, MergeFillResult, PrepFillChunksOptions, } from './domain-map/fill-fanout.js';
+export { parseLexicon, applyLexiconToText, applyLexiconDeep } from './style/lexicon.js';
+export type { LexiconEntry } from './style/lexicon.js';
 export { buildCrossDomainGraph, scoreDomains, buildDomainMapSummary, buildNameSuggestionContext, W_COMPLEXITY, W_COUPLING, W_SIZE, DEFAULT_SAMPLE_ANCHOR_CAP, DEFAULT_SAMPLE_FILE_CAP, } from './domain-map/domain-map.js';
 export { extractJavaFacts } from './domain-map/java-facts.js';
 export type { JavaFileFacts, ClassFact, FieldFact, ClassKind, } from './domain-map/java-facts.js';

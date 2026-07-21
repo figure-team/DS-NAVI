@@ -123,8 +123,12 @@ The preprocessing script does NOT produce a domain graph — it produces **raw m
 ### Phase 4: Domain Analysis
 
 1. Read the domain-analyzer agent prompt from `$PLUGIN_ROOT/agents/domain-analyzer.md`
-2. Dispatch a subagent with the domain-analyzer prompt + the context from Phase 2 or 3
-3. The agent writes its output to `$PROJECT_ROOT/.understand-anything/intermediate/domain-analysis.json`
+2. **Resolve the output language** (same convention as `/understand`): if `$PROJECT_ROOT/.understand-anything/config.json` has an `outputLanguage` field, set `$OUTPUT_LANGUAGE` to it; otherwise default to `en`. If `$OUTPUT_LANGUAGE` is NOT `en`:
+   - Append this language directive to the agent prompt:
+     > **Language directive**: Generate all textual content (domain/flow/step names, summaries, edge descriptions, tags) in **{language}**. Maintain technical accuracy while using natural, native-level phrasing in the target language. Keep technical terms in English when no standard translation exists (e.g., "middleware", "hook", "barrel").
+   - If the locale guidance file `$PLUGIN_ROOT/skills/understand/locales/<language-code>.md` exists (e.g., `ko.md`, `ja.md`, `zh.md`), append its content under a `## Output Language Guidelines` header. If it does not exist, skip silently — the directive still applies.
+3. Dispatch a subagent with the domain-analyzer prompt (+ language directive/locale guidance when applicable) + the context from Phase 2 or 3
+4. The agent writes its output to `$PROJECT_ROOT/.understand-anything/intermediate/domain-analysis.json`
 
 ### Phase 5: Validate and Save
 

@@ -482,6 +482,7 @@ export interface RawElement {
     text: string | null;
     value: string | null;
     alt: string | null;
+    title: string | null;
     placeholder: string | null;
     href: string | null;
     onclick: string | null;

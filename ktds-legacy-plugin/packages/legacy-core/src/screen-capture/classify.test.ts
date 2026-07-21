@@ -11,6 +11,7 @@ function el(partial: Partial<RawElement>): RawElement {
     text: null,
     value: null,
     alt: null,
+    title: null,
     placeholder: null,
     href: null,
     onclick: null,
@@ -134,11 +135,30 @@ describe('classifyElements', () => {
 })
 
 describe('pickLabel / badgeGlyph', () => {
-  it('라벨 우선순위 text→value→alt→placeholder→name, 공백 축약·80자 절단', () => {
-    expect(pickLabel(el({ text: '  로그인  \n버튼 ' }))).toBe('로그인 버튼')
-    expect(pickLabel(el({ value: 'Sign On' }))).toBe('Sign On')
-    expect(pickLabel(el({ placeholder: 'user id', name: 'uid' }))).toBe('user id')
-    expect(pickLabel(el({ text: 'x'.repeat(120) }))).toHaveLength(80)
+  it('라벨 우선순위 text→value→alt→title→placeholder→name, 공백 축약·80자 절단', () => {
+    expect(pickLabel(el({ text: '  로그인  \n버튼 ' }), 'field')).toBe('로그인 버튼')
+    expect(pickLabel(el({ inputType: 'submit', value: 'Sign On' }), 'action')).toBe('Sign On')
+    expect(pickLabel(el({ placeholder: 'user id', name: 'uid' }), 'field')).toBe('user id')
+    expect(pickLabel(el({ text: 'x'.repeat(120) }), 'field')).toHaveLength(80)
+  })
+
+  it('field 의 value 는 라벨 후보에서 제외 — 입력 데이터("ABC")가 항목명이 되면 안 된다', () => {
+    // jpetstore Account 편집 실측: 입력 17개 중 14개가 "ABC"/"Palo Alto" 같은 기존 값이었다.
+    expect(pickLabel(el({ value: 'ABC', name: 'account.firstName' }), 'field')).toBe(
+      'account.firstName',
+    )
+    expect(pickLabel(el({ value: 'Palo Alto', placeholder: 'city' }), 'field')).toBe('city')
+    // 버튼(action)의 value 는 화면 캡션이므로 그대로 라벨.
+    expect(pickLabel(el({ inputType: 'button', value: 'Clear' }), 'action')).toBe('Clear')
+  })
+
+  it('앵커 텍스트 부재 시 title/alt 폴백 — 태그명 "a" 라벨 방지', () => {
+    expect(pickLabel(el({ tag: 'a', href: '/cart', title: '장바구니 보기' }), 'link')).toBe(
+      '장바구니 보기',
+    )
+    expect(pickLabel(el({ tag: 'a', href: '/cart', alt: 'Cart', title: 'x' }), 'link')).toBe('Cart')
+    // text/alt/title 전부 없으면 여전히 태그명 — 대시보드 href 유도 폴백이 받는다.
+    expect(pickLabel(el({ tag: 'a', href: '/cart' }), 'link')).toBe('a')
   })
 
   it('배지 글리프: field=①②③, action=ⓐⓑⓒ, link=ⒶⒷⒸ, 범위 밖 폴백', () => {

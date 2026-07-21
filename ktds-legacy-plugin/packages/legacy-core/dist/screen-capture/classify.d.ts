@@ -26,8 +26,8 @@ interface Classified {
 }
 /** 요소 1건의 kind/eventType 분류. 주석 대상이 아니면 null. */
 export declare function classifyKind(e: RawElement): Classified | null;
-/** 표시 라벨 선택: text → value → alt → placeholder → name → domId → tag. */
-export declare function pickLabel(e: RawElement): string;
+/** 표시 라벨 선택: text → value(입력 field 제외) → alt → title → placeholder → name → domId → tag. */
+export declare function pickLabel(e: RawElement, kind: AnnotationKind): string;
 /**
  * RawElement[] → Annotation[] (handler/description/note 는 null — 이후 단계가 채움).
  * 결정론: 동일 입력이면 동일 출력(정렬·번호 안정).

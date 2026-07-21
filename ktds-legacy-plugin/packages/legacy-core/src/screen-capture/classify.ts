@@ -69,9 +69,12 @@ export function classifyKind(e: RawElement): Classified | null {
   return null
 }
 
-/** 표시 라벨 선택: text → value → alt → placeholder → name → domId → tag. */
-export function pickLabel(e: RawElement): string {
-  const raw = e.text || e.value || e.alt || e.placeholder || e.name || e.domId || e.tag
+/** 표시 라벨 선택: text → value(입력 field 제외) → alt → title → placeholder → name → domId → tag. */
+export function pickLabel(e: RawElement, kind: AnnotationKind): string {
+  // field 의 value 는 캡처 시점에 화면에 남아 있던 입력 데이터("ABC", "Palo Alto")지
+  // 항목명이 아니다 — 버튼류(input type=submit 등)의 value 만 화면 캡션이라 후보 유지.
+  const value = kind === 'field' || kind === 'region' ? null : e.value
+  const raw = e.text || value || e.alt || e.title || e.placeholder || e.name || e.domId || e.tag
   const collapsed = raw.replace(/\s+/g, ' ').trim()
   return collapsed.length > LABEL_MAX ? collapsed.slice(0, LABEL_MAX - 1) + '…' : collapsed
 }
@@ -122,7 +125,7 @@ export function classifyElements(elements: RawElement[]): Annotation[] {
     kind,
     selector: e.selector,
     bbox: roundBbox(e.bbox),
-    label: pickLabel(e),
+    label: pickLabel(e, kind),
     eventType,
     mechanical: {
       tag: e.tag.toLowerCase(),

@@ -72,6 +72,7 @@ Edge format:
 3. **Deduplicate entities.** If the same person/tool appears in multiple articles, create the entity node once.
 4. **Use existing IDs.** When creating edges to existing articles, use their exact `id` from the provided node list.
 5. **Keep it small.** For a batch of 10-15 articles, expect ~5-15 entities, ~5-10 claims, and ~10-20 implicit edges. Don't over-extract.
+6. **Match the source language.** Write entity/claim names and summaries in the predominant language of the source articles (a Korean wiki gets Korean summaries, natural native-level phrasing), unless a Language directive in your dispatch context specifies otherwise. Keep untranslatable technical terms in English.
 
 ## Output Format
 

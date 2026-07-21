@@ -28,6 +28,7 @@ import { join } from 'node:path';
 import { z } from 'zod';
 import { cmp } from '../utils/cmp.js';
 import { specMapDir, stableJson } from '../domain-map/persist.js';
+import { applyLexiconDeep } from '../style/lexicon.js';
 import { normalizeCitationText, isTrivialSnippet, verifyCitation } from '../domain-map/verify.js';
 import { CitationSchema } from '../domain-map/fill.js';
 import { BundleFileSchema, sliceFile, DEFAULT_SLICE_LINES } from '../domain-map/bundle.js';
@@ -551,7 +552,9 @@ async function verifyFragmentRow(projectRoot, row, cache) {
  * (부분 병합). 조각의 청크 선언 밖 rowKey 는 버리고 집계 보고한다. 병합 전 인용을 실파일과
  * 대조해 불일치는 제거하고, 근거 0 이 된 [확정]은 [추정]으로 강등한다(fail-closed).
  */
-export async function mergePolicyFillFragments(projectRoot) {
+export async function mergePolicyFillFragments(projectRoot, opts) {
+    const lexicon = opts?.lexicon ?? [];
+    let lexiconHits = 0;
     const index = await readPolicyFillChunkIndex(projectRoot);
     const audit = await auditPolicyFillFragments(projectRoot);
     const completeSet = new Set(audit.complete);
@@ -579,7 +582,11 @@ export async function mergePolicyFillFragments(projectRoot) {
     for (const entry of index.chunks) {
         if (!completeSet.has(entry.chunkId))
             continue;
-        const frag = PolicyFillFragmentSchema.parse(JSON.parse(await readFile(fragPath(projectRoot, entry.chunkId), 'utf8')));
+        const fragRaw = PolicyFillFragmentSchema.parse(JSON.parse(await readFile(fragPath(projectRoot, entry.chunkId), 'utf8')));
+        // 렉시콘: statement 만 치환(인용 서브트리 불변) — 병합 전 조각 단위 적용.
+        const lexed = applyLexiconDeep(fragRaw, lexicon);
+        lexiconHits += lexed.hits;
+        const frag = lexed.value;
         const declared = new Set(entry.rowKeys);
         for (const fr of frag.rows) {
             if (!declared.has(fr.rowKey)) {
@@ -639,6 +646,6 @@ export async function mergePolicyFillFragments(projectRoot) {
     }
     missingRows.sort(cmp);
     missingDocs.sort(cmp);
-    return { docPaths, rowsFilled, missingRows, droppedItems, citationsRemoved, tagsDemoted, missingDocs, staleSectionsCleared };
+    return { docPaths, rowsFilled, missingRows, droppedItems, citationsRemoved, tagsDemoted, missingDocs, staleSectionsCleared, lexiconHits };
 }
 //# sourceMappingURL=fill-fanout.js.map

@@ -17,7 +17,10 @@
 //                            // 공통 규약) | 'sonnet' (egov-proven) | 'haiku' | any model id
 //     effort?: string,       // fill-writer reasoning effort (default 'low')
 //     headerEffort?: string, // effort for header chunks only (default 'medium' — see below)
-//     language?: string }    // output language for names/summaries (default '한국어')
+//     language?: string,     // output language for names/summaries (default '한국어')
+//     stylePath?: string,    // Korean prose style guide path (default: derived from cliScript
+//                            // → <plugin>/templates/style/ko-prose.md; project override wins)
+//     stylePass?: boolean }  // run the post-audit prose style review round (default true)
 
 
 export const meta = {
@@ -27,6 +30,7 @@ export const meta = {
   phases: [
     { title: 'Fill', detail: 'one fill-writer agent per chunk, disk-guarded skip' },
     { title: 'Audit', detail: 'deterministic completeness audit + bounded re-dispatch' },
+    { title: 'Style', detail: 'Korean prose style review — rewrite violating sentences only' },
   ],
 }
 
@@ -40,6 +44,8 @@ const {
   effort = 'low',
   headerEffort = 'medium',
   language = '한국어',
+  stylePath,
+  stylePass = true,
 } = A ?? {}
 if (!projectRoot || !cliScript || !Array.isArray(chunkIds) || chunkIds.length === 0) {
   throw new Error('args must provide { projectRoot, cliScript, chunkIds: [least one chunk id] }')
@@ -57,6 +63,13 @@ const effortOpts = effort === 'inherit' ? {} : { effort }
 // business-process flowcharts. egov 실측: at a flat effort=low a 484-flow domain came back
 // with ONE 8-node chart — the roster was in the payload, unread. Effort is per-chunk so the
 // bump costs only 1 agent per domain, not per chunk.
+// Korean prose style guide (문체 규약): agents load it from disk themselves (workflow
+// scripts have no fs access). Project override wins over the plugin-bundled default.
+const styleGuidePath = stylePath || cliScript.replace(/scripts\/[^/]+$/, 'templates/style/ko-prose.md')
+const styleRule = (projectRootAbs) =>
+  `   - STYLE (문체 규약): BEFORE writing any prose, read the style guide — first try ${projectRootAbs}/.understand-anything/templates/style/ko-prose.md, and if it does not exist read ${styleGuidePath}. Apply its rules (종결어미, 번역투 금지, 용어 표기 일관, few-shot 예시) to every name/summary/label/text you write. If neither file exists, skip silently and continue.
+   - TERMS (용어 기준): if ${projectRootAbs}/.understand-anything/templates/style/ko-terms.md exists, read it and use its spellings as the canonical 표기 for every business term (사용자 확정 용어 — 최우선). Otherwise, if ${projectRootAbs}/.understand-anything/doc-output/policy-glossary.md exists, prefer its 용어 표기 for domain terms. These files fix spelling/naming ONLY — never copy them into citations. If absent, skip silently.`
+
 const isHeaderChunkId = (id) => /-000$/.test(id)
 const headerEffortOpts = headerEffort === 'inherit' ? {} : { effort: headerEffort }
 const chunkOpts = (id) => (isHeaderChunkId(id) ? headerEffortOpts : effortOpts)
@@ -102,6 +115,7 @@ ${retryReason ? `\nThis is a RE-DISPATCH. Previous attempt was incomplete: ${ret
 
    RULES (violations are machine-rejected by fill-audit / emit — no partial credit):
    - Language: every name/summary/text you write is ${language}, business language (업무 언어). Names ≤120 chars, no code symbols in names ("주문 생성" ○, "createOrder()" ✕).
+${styleRule(projectRoot)}
    - flows[]: EXACTLY one entry per chunk.flows[] id — { "flowId", "name", "summary": { "text", "citations": [...] } }. No ids from outside the chunk.
    - steps[]: EXACTLY one entry per chunk.steps[] id — { "stepId", "name", "summary": { "text", "citations": [...] } }. If the step has a "layer" and chunk.nodeDetailTemplate.byLayer[<layer>] lists sections, ALSO add "detail": { "<sectionId>": { "text", "citations": [...] } } for each section, following that section's promptHint, grounded in the step file's slice.
    - CITATIONS (the load-bearing rule): copy the chunk's preCite objects VERBATIM — byte-for-byte, do not rephrase, re-indent, translate, or shorten the snippet. You may ADD citations only by copying an EXACT line from a chunk.files[].slice.text with its real 1-based line number (slice.startLine + line offset within the slice). NEVER invent or alter file paths, line numbers, or snippets — a machine verifier compares every snippet against the real file and demotes mismatches.
@@ -148,9 +162,47 @@ const okAcks = acks.filter(Boolean)
 const skippedByGuard = okAcks.filter(a => a.skipped).length
 if (failed.length) log(`WARNING: ${failed.length} chunks incomplete after bounded retries`)
 
+// Style pass (문체 검수): separate from the completeness/citation gates above — it only
+// rewrites prose that violates the style guide, never structure/ids/citations. Runs after
+// the audit loop so it reviews complete fragments; skipped chunks are re-reviewed on
+// resume, which is harmless (compliant text is left byte-identical).
+const STYLE_ACK = {
+  type: 'object',
+  properties: {
+    chunkId: { type: 'string' },
+    revised: { type: 'number' },
+    note: { type: 'string' },
+  },
+  required: ['chunkId', 'revised'],
+}
+
+const styleReviewPrompt = (id) => `You are a Korean prose STYLE REVIEWER for ONE fill fragment of /understand-map.
+1. Read the style guide — first try ${projectRoot}/.understand-anything/templates/style/ko-prose.md, else ${styleGuidePath}. If neither exists, return { "chunkId": "${id}", "revised": 0 } immediately.
+   Also load the term base if present: ${projectRoot}/.understand-anything/templates/style/ko-terms.md (사용자 확정 표기 — 최우선), else ${projectRoot}/.understand-anything/doc-output/policy-glossary.md.
+2. Read the fragment: ${projectRoot}/.spec/map/fill-frag/${id}.json. If it does not exist, return { "chunkId": "${id}", "revised": 0 }.
+3. Review ONLY these prose fields against the guide: flows[].name, flows[].summary.text, steps[].name, steps[].summary.text, steps[].detail[*].text, header.name, header.summary.text, header.entities[].text, header.businessRules[].text, header.crossDomainInteractions[].text, header.businessFlows[].title and their nodes[].label / edges[].label.
+   Rewrite a field ONLY when it violates the guide (종결어미 혼용, 존댓말, 번역투, 이중 피동, 음차, 코드 심볼 노출, 표기 흔들림). RULES:
+   - STYLE-ONLY edits: preserve the meaning and every fact exactly. Never add, remove, or weaken a claim.
+   - NEVER change: any id (flowId/stepId/domainId/node id), any citations array or its {filePath,line,snippet} contents (snippets are verbatim evidence), confidence values, structural fields, or JSON shape/keys.
+   - A compliant field stays byte-identical. When in doubt, leave it unchanged.
+4. If you changed anything, write the fragment back to the SAME path (valid JSON, same schema).
+5. SELF-VERIFY: run \`node ${cliScript} ${projectRoot} fill-audit --chunk ${id}\` — if the chunk turned "incomplete", fix your edit per the printed reason ONCE and re-verify.
+6. ACK via structured output ONLY: { "chunkId": "${id}", "revised": <number of fields you rewrote> }. No fragment content in text.`
+
+let styleRevised = 0
+if (stylePass) {
+  phase('Style')
+  const styleTargets = chunkIds.filter(id => !failed.some(f => f.chunkId === id))
+  log(`Style review over ${styleTargets.length} complete chunks (violating sentences only)`)
+  const styleAcks = await pipeline(styleTargets, id =>
+    agent(styleReviewPrompt(id), { label: `style:${id}`, phase: 'Style', schema: STYLE_ACK, ...modelOpts, ...effortOpts }))
+  styleRevised = styleAcks.filter(Boolean).reduce((n, a) => n + (a.revised || 0), 0)
+}
+
 return {
   totalChunks: chunkIds.length,
   filled: chunkIds.length - failed.length,
   skippedByGuard,
+  styleRevised,
   failed,
 }

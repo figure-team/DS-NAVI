@@ -21,6 +21,7 @@ import { join } from 'node:path'
 import { z } from 'zod'
 import { specMapDir, stableJson } from './persist.js'
 import { cmp } from '../utils/cmp.js'
+import { applyLexiconDeep, type LexiconEntry } from '../style/lexicon.js'
 import {
   bundleDir,
   safeKeyFilename,
@@ -500,6 +501,8 @@ export interface MergeFillResult {
   skippedDomains: Array<{ key: string; reason: string }>
   /** 조각이 청크 선언 밖 id 를 내 버린 항목 수(도메인 밖/유령 id — 병합서 제외). */
   droppedItems: number
+  /** 렉시콘(표기 통일) 치환 횟수 — 산문 필드만, 인용 서브트리 불변. */
+  lexiconHits: number
 }
 
 /**
@@ -508,7 +511,12 @@ export interface MergeFillResult {
  * 붙이되 id dedupe(첫 등장 우선) + 청크 선언 밖 id 는 버리고 집계 보고한다.
  * 헤더 청크가 미완결인 도메인은 기록하지 않는다(pending 유지 — 도메인 단위 멱등).
  */
-export async function mergeFillFragments(projectRoot: string): Promise<MergeFillResult> {
+export async function mergeFillFragments(
+  projectRoot: string,
+  opts?: { lexicon?: LexiconEntry[] },
+): Promise<MergeFillResult> {
+  const lexicon = opts?.lexicon ?? []
+  let lexiconHits = 0
   const index = await readFillChunkIndex(projectRoot)
   const audit = await auditFillFragments(projectRoot)
   const completeSet = new Set(audit.complete)
@@ -549,9 +557,13 @@ export async function mergeFillFragments(projectRoot: string): Promise<MergeFill
         missingChunks.push(entry.chunkId)
         continue
       }
-      const frag = FillFragmentSchema.parse(
+      const fragRaw = FillFragmentSchema.parse(
         JSON.parse(await readFile(fragPath(projectRoot, entry.chunkId), 'utf8')),
       )
+      // 렉시콘: 산문 키만 치환(인용 서브트리 불변) — 병합 전 조각 단위 적용.
+      const lexed = applyLexiconDeep(fragRaw, lexicon)
+      lexiconHits += lexed.hits
+      const frag = lexed.value
       if (entry.isHeaderChunk) header = frag.header
       const chunk = FillChunkSchema.parse(
         JSON.parse(await readFile(chunkPath(projectRoot, entry.chunkId), 'utf8')),
@@ -602,5 +614,5 @@ export async function mergeFillFragments(projectRoot: string): Promise<MergeFill
     written.push({ key, path, flows: flows.length, steps: steps.length, missingChunks })
   }
 
-  return { written, skippedDomains, droppedItems }
+  return { written, skippedDomains, droppedItems, lexiconHits }
 }

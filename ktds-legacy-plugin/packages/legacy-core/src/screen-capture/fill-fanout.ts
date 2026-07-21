@@ -25,6 +25,7 @@ import { join } from 'node:path'
 import { z } from 'zod'
 import { cmp } from '../utils/cmp.js'
 import { CONFIDENCE_VALUES } from '../types.js'
+import { applyLexiconDeep, type LexiconEntry } from '../style/lexicon.js'
 import { specMapDir, stableJson, readMapArtifact } from '../domain-map/persist.js'
 import { normalizeCitationText, isTrivialSnippet, verifyCitation, type FileCache } from '../domain-map/verify.js'
 import { CitationSchema, type Citation } from '../domain-map/fill.js'
@@ -818,6 +819,8 @@ export interface MergeScreenFillResult {
   domainAssign: DomainAssignSummary
   /** 병합 후 ViewResolver 해석 요약(view-resolve.ts — Spring 뷰 이름→JSP 실경로). */
   viewResolve: ViewResolveSummary
+  /** 렉시콘(표기 통일) 치환 횟수 — 산문 필드만, evidence 서브트리 불변. */
+  lexiconHits: number
 }
 
 /** KG 가 있으면 unmatchedJsps 를 재계산한다(understand-screens.mjs recomputeUnmatched 동형). */
@@ -881,7 +884,10 @@ async function verifyFragmentHandler(
  */
 export async function mergeScreenFillFragments(
   projectRoot: string,
+  opts?: { lexicon?: LexiconEntry[] },
 ): Promise<MergeScreenFillResult> {
+  const lexicon = opts?.lexicon ?? []
+  let lexiconHits = 0
   const file = readScreensFile(projectRoot)
   const index = await readScreenFillChunkIndex(projectRoot)
   const audit = await auditScreenFillFragments(projectRoot)
@@ -906,9 +912,13 @@ export async function mergeScreenFillFragments(
     for (const cs of chunk.screens) {
       declaredAnnByScreen.set(cs.screenId, new Set(cs.annotations.map((a) => a.key)))
     }
-    const frag = ScreenFillFragmentSchema.parse(
+    const fragRaw = ScreenFillFragmentSchema.parse(
       JSON.parse(await readFile(fragPath(projectRoot, entry.chunkId), 'utf8')),
     )
+    // 렉시콘: 산문 키(title/summary.text/description/note)만 치환 — evidence 서브트리 불변.
+    const lexed = applyLexiconDeep(fragRaw, lexicon)
+    lexiconHits += lexed.hits
+    const frag = lexed.value
     const chunkScreenIds = new Set(chunk.screens.map((s) => s.screenId))
     for (const fs of frag.screens) {
       if (!chunkScreenIds.has(fs.screenId)) {
@@ -1023,5 +1033,6 @@ export async function mergeScreenFillFragments(
     validation: validateScreensFile(merged),
     domainAssign,
     viewResolve,
+    lexiconHits,
   }
 }

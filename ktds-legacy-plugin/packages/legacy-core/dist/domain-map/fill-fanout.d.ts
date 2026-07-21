@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { type LexiconEntry } from '../style/lexicon.js';
 /** `.spec/map/fill-prep/` — 청크(팬아웃 입력) 디렉터리 이름. */
 export declare const FILL_PREP_DIR = "fill-prep";
 /** `.spec/map/fill-frag/` — 조각(팬아웃 출력) 디렉터리 이름. */
@@ -283,6 +284,8 @@ export interface MergeFillResult {
     }>;
     /** 조각이 청크 선언 밖 id 를 내 버린 항목 수(도메인 밖/유령 id — 병합서 제외). */
     droppedItems: number;
+    /** 렉시콘(표기 통일) 치환 횟수 — 산문 필드만, 인용 서브트리 불변. */
+    lexiconHits: number;
 }
 /**
  * 조각을 도메인별 DomainFill 로 병합해 `.spec/map/fill/<key>.json` 에 쓴다.
@@ -290,5 +293,7 @@ export interface MergeFillResult {
  * 붙이되 id dedupe(첫 등장 우선) + 청크 선언 밖 id 는 버리고 집계 보고한다.
  * 헤더 청크가 미완결인 도메인은 기록하지 않는다(pending 유지 — 도메인 단위 멱등).
  */
-export declare function mergeFillFragments(projectRoot: string): Promise<MergeFillResult>;
+export declare function mergeFillFragments(projectRoot: string, opts?: {
+    lexicon?: LexiconEntry[];
+}): Promise<MergeFillResult>;
 //# sourceMappingURL=fill-fanout.d.ts.map

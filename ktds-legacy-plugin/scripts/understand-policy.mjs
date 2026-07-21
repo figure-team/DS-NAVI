@@ -15,6 +15,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { appendRunLedger, runStartedAt } from './lib/run-ledger.mjs'
+import { loadLexicon } from './lib/load-lexicon.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const distEntry = join(here, '..', 'packages', 'legacy-core', 'dist', 'index.js')
@@ -131,14 +132,17 @@ if (fillCommand === 'fill-prep' || fillCommand === 'fill-audit' || fillCommand =
   }
 
   // fill-merge
+  const lex = loadLexicon(engine, projectRoot, join(here, '..'))
   let result
   try {
-    result = await mergePolicyFillFragments(projectRoot)
+    result = await mergePolicyFillFragments(projectRoot, lex.lexicon ? { lexicon: lex.lexicon } : undefined)
   } catch (err) {
     console.error(`fill-merge 실패: ${err.message}`)
     process.exit(2)
   }
   console.log(`정책서 채움 조각 병합 완료 — ${projectRoot}`)
+  if (lex.error) console.log(`  ⚠️ 렉시콘 파싱 실패(${lex.path}): ${lex.error} — 표기 통일 생략`)
+  if (result.lexiconHits > 0) console.log(`  🔤 표기 통일(렉시콘) ${result.lexiconHits}건 — ${lex.path}`)
   console.log(`  채움 반영 행 ${result.rowsFilled}건 → 문서 ${result.docPaths.length}종`)
   if (result.missingRows.length > 0) {
     console.log(`  ⚠️ 미반영 행 ${result.missingRows.length}건(완결 조각 없음 — 부분 병합).`)

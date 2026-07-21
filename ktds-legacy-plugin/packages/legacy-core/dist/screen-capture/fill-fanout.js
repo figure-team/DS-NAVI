@@ -25,6 +25,7 @@ import { join } from 'node:path';
 import { z } from 'zod';
 import { cmp } from '../utils/cmp.js';
 import { CONFIDENCE_VALUES } from '../types.js';
+import { applyLexiconDeep } from '../style/lexicon.js';
 import { specMapDir, stableJson, readMapArtifact } from '../domain-map/persist.js';
 import { normalizeCitationText, isTrivialSnippet, verifyCitation } from '../domain-map/verify.js';
 import { CitationSchema } from '../domain-map/fill.js';
@@ -732,7 +733,9 @@ async function verifyFragmentHandler(projectRoot, bodyHandler, fragHandler, cach
  * 병합 후 unmatchedJsps 재계산(KG) + mechanicalHash 재산출(불변이라 동일) +
  * validateScreensFile 게이트로 최종 검증한다.
  */
-export async function mergeScreenFillFragments(projectRoot) {
+export async function mergeScreenFillFragments(projectRoot, opts) {
+    const lexicon = opts?.lexicon ?? [];
+    let lexiconHits = 0;
     const file = readScreensFile(projectRoot);
     const index = await readScreenFillChunkIndex(projectRoot);
     const audit = await auditScreenFillFragments(projectRoot);
@@ -755,7 +758,11 @@ export async function mergeScreenFillFragments(projectRoot) {
         for (const cs of chunk.screens) {
             declaredAnnByScreen.set(cs.screenId, new Set(cs.annotations.map((a) => a.key)));
         }
-        const frag = ScreenFillFragmentSchema.parse(JSON.parse(await readFile(fragPath(projectRoot, entry.chunkId), 'utf8')));
+        const fragRaw = ScreenFillFragmentSchema.parse(JSON.parse(await readFile(fragPath(projectRoot, entry.chunkId), 'utf8')));
+        // 렉시콘: 산문 키(title/summary.text/description/note)만 치환 — evidence 서브트리 불변.
+        const lexed = applyLexiconDeep(fragRaw, lexicon);
+        lexiconHits += lexed.hits;
+        const frag = lexed.value;
         const chunkScreenIds = new Set(chunk.screens.map((s) => s.screenId));
         for (const fs of frag.screens) {
             if (!chunkScreenIds.has(fs.screenId)) {
@@ -857,6 +864,7 @@ export async function mergeScreenFillFragments(projectRoot) {
         validation: validateScreensFile(merged),
         domainAssign,
         viewResolve,
+        lexiconHits,
     };
 }
 //# sourceMappingURL=fill-fanout.js.map

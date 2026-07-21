@@ -176,6 +176,8 @@ export type {
   MergeFillResult,
   PrepFillChunksOptions,
 } from './domain-map/fill-fanout.js'
+export { parseLexicon, applyLexiconToText, applyLexiconDeep } from './style/lexicon.js'
+export type { LexiconEntry } from './style/lexicon.js'
 export {
   buildCrossDomainGraph,
   scoreDomains,

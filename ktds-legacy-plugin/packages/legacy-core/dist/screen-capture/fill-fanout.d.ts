@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { type LexiconEntry } from '../style/lexicon.js';
 import { type DomainAssignSummary } from './domain-assign.js';
 import { type ViewResolveSummary } from './view-resolve.js';
 import { validateScreensFile } from './assemble.js';
@@ -205,6 +206,8 @@ export interface MergeScreenFillResult {
     domainAssign: DomainAssignSummary;
     /** 병합 후 ViewResolver 해석 요약(view-resolve.ts — Spring 뷰 이름→JSP 실경로). */
     viewResolve: ViewResolveSummary;
+    /** 렉시콘(표기 통일) 치환 횟수 — 산문 필드만, evidence 서브트리 불변. */
+    lexiconHits: number;
 }
 /**
  * 조각의 **채움 필드만** screens.json 본체에 병합한다. 불변 봉인 필드
@@ -215,5 +218,7 @@ export interface MergeScreenFillResult {
  * 병합 후 unmatchedJsps 재계산(KG) + mechanicalHash 재산출(불변이라 동일) +
  * validateScreensFile 게이트로 최종 검증한다.
  */
-export declare function mergeScreenFillFragments(projectRoot: string): Promise<MergeScreenFillResult>;
+export declare function mergeScreenFillFragments(projectRoot: string, opts?: {
+    lexicon?: LexiconEntry[];
+}): Promise<MergeScreenFillResult>;
 //# sourceMappingURL=fill-fanout.d.ts.map

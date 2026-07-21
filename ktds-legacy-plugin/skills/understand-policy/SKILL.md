@@ -8,6 +8,7 @@ argument-hint: ["[projectRoot]", "[domain|fill-prep|fill-audit|fill-merge]"]
 
 > ⚠️ 비민감 샘플 전용.
 > 🌐 **언어:** 사용자에게 보여주는 모든 설명·요약·진행 안내는 **한국어**로 한다.
+> 🖋 **문체:** LLM 보강이 쓰는 모든 규범 진술·산문은 **문체 규약**을 로드해 따른다 — 프로젝트 override `.understand-anything/templates/style/ko-prose.md` → 없으면 `${CLAUDE_PLUGIN_ROOT}/templates/style/ko-prose.md`(팬아웃 경로는 에이전트가 직접 로드). **용어 기준:** `.understand-anything/templates/style/ko-terms.md`(사용자 확정, 최우선) → `doc-output/policy-glossary.md`(코드 유래) 순 — 표기 기준일 뿐 인용 근거가 아니다.
 
 레거시 코드와 DB(.sql)에서 **정책서**를 생성한다. 기존 9종 산출물(코드 100% 추출)과 달리
 정책서는 **규범 문서**라 코드만으로 도출되지 않는다. 2단계로 만든다:
@@ -69,8 +70,12 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-policy.mjs <projectRoot>
 
 3. `fill-audit` — 조각 완결성 감사(존재 ∧ 스키마 ∧ 커버리지 ∧ `[확정]`⇒인용≥1). Workflow 가
    초기 감사 + 최대 2회 재디스패치 후 잔여 미완결을 `failed[]` 로 보고한다(조용히 버리지 않음).
+   감사 뒤 **문체 검수 라운드**가 자동 수행된다 — 문체 규약 위반 진술만 재작성(rowKey·인용·신뢰도
+   불변), 재작성 수는 반환값 `styleRevised` 로 보고(끄려면 args `stylePass: false`).
 
-4. `fill-merge` — 완결 조각을 각 `policy-*.md` 에 **`## 규범 진술` 섹션으로 덧붙인다**. 기존
+4. `fill-merge` — 완결 조각을 각 `policy-*.md` 에 **`## 규범 진술` 섹션으로 덧붙인다**. 병합 시
+   **표기 통일 렉시콘**(`templates/style/ko-lexicon.md`, 프로젝트 override 우선)이 진술에 결정론
+   치환으로 자동 적용된다(인용 불변 — 치환 수는 🔤 로 보고). 기존
    결정론 앵커 표는 **불변**(센티넬 `<!-- policy-fill -->` 사이만 재생성 → 재실행 멱등).
    **기계 검증기가 fill-merge 에서 `[확정]` 인용을 실파일 대조 — 불일치 인용은 제거하고 근거
    0 이 된 `[확정]`은 `[추정]`으로 강등한다**(fail-closed). 미완결 문서 행은 부분 병합으로 보고.

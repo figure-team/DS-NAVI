@@ -8,6 +8,7 @@ argument-hint: ["[projectRoot]", "[seeds | precedents | analyze]"]
 
 > ⚠️ 비민감 샘플 전용 (보안 게이트는 Phase 2).
 > 🌐 **언어:** 사용자에게 보여주는 모든 설명·질문·요약·진행 안내는 **한국어**로 한다(config `outputLanguage`, 기본값 `ko`). 영어로 답하지 말 것.
+> 🖋 **문체:** 생성예측 제안·DB 보강·결과 요약 등 네가 쓰는 한국어 산문은 **문체 규약**을 로드해 따른다 — 프로젝트 override `.understand-anything/templates/style/ko-prose.md` → 없으면 `${CLAUDE_PLUGIN_ROOT}/templates/style/ko-prose.md`. **용어 기준:** `.understand-anything/templates/style/ko-terms.md`(사용자 확정, 최우선) → `doc-output/policy-glossary.md`(코드 유래) 순 — 표기 기준일 뿐 인용 근거가 아니다.
 
 "이 파일/기능을 바꾸면 어디까지 영향이 갈까?" 그리고 "이 기능을 새로 만들려면 무엇을 손대야 하나?"를 **결정론 정적분석 + 선례검색**으로 답한다. `/understand-map` 이 만든 `.spec/map/` 산출물(census·routes·edges·slices·skeleton) 위에서 **재스캔 없이** 계산한다:
 

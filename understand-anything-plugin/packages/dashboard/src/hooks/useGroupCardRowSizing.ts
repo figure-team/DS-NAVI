@@ -16,6 +16,11 @@ const PLUS_CHIP_WIDTH = 44;
 export interface GroupCardChipSizing {
   visible: number;
   hidden: number;
+  /** 마지막 보이는 칩을 "+N" 자리만큼 말줄임해 렌더 — computeVisibleChips 참조. */
+  truncateLast: boolean;
+  /** 칩 영역 예약 높이(px) — 행 목표 줄 수만큼 고정 예약해, 랩 변수(폰트·반올림)
+   * 에도 같은 행 카드들의 칩 영역 높이가 항상 일치하게 하는 안전망. */
+  minHeight?: number;
 }
 
 /**
@@ -95,8 +100,12 @@ export function useGroupCardRowSizing(keys: string[]) {
       const target = computeRowTargetLines(naturalLines, CHIP_MAX_LINES);
       for (const key of rowKeys) {
         const chips = chipMetricsByKey.get(key) ?? [];
-        const width = chipRefs.current.get(key)?.clientWidth ?? 0;
-        next.set(key, computeVisibleChips(chips, target, width, CHIP_GAP, PLUS_CHIP_WIDTH));
+        const chipEl = chipRefs.current.get(key);
+        const width = chipEl?.clientWidth ?? 0;
+        // 칩 높이는 행 내 균일(같은 폰트/패딩) — 첫 칩 실측으로 예약 높이 산출.
+        const chipH = (chipEl?.children[0] as HTMLElement | undefined)?.offsetHeight ?? 0;
+        const minHeight = target > 0 && chipH > 0 ? target * chipH + (target - 1) * CHIP_GAP : undefined;
+        next.set(key, { ...computeVisibleChips(chips, target, width, CHIP_GAP, PLUS_CHIP_WIDTH), minHeight });
       }
     }
     setSizing(next);

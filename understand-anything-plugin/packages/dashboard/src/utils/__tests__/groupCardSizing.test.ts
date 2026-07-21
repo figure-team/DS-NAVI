@@ -47,7 +47,7 @@ describe("computeVisibleChips", () => {
 
   it("shows everything when natural lines already fit within target (no +N)", () => {
     const result = computeVisibleChips(twoLineChips, 2, 300, 6, 44);
-    expect(result).toEqual({ visible: 5, hidden: 0 });
+    expect(result).toEqual({ visible: 5, hidden: 0, truncateLast: false });
   });
 
   it("truncates to the target line and the hidden count matches exactly", () => {
@@ -71,14 +71,18 @@ describe("computeVisibleChips", () => {
   });
 
   it("returns {visible:0, hidden:0} for an empty chip list", () => {
-    expect(computeVisibleChips([], 3, 300, 6, 44)).toEqual({ visible: 0, hidden: 0 });
+    expect(computeVisibleChips([], 3, 300, 6, 44)).toEqual({
+      visible: 0,
+      hidden: 0,
+      truncateLast: false,
+    });
   });
 
-  it("backoff stops at the last visible line — full-width chips must not cascade across lines", () => {
+  it("keeps a full-width chip on the last line and truncates it instead of folding the line", () => {
     // line0 has trailing room, lines 1..3 are full-width chips. target=3.
-    // 마지막 줄(line2) 칩만 접고 멈춰야 한다: +N 은 비워진 line2 를 통째로 차지한다.
-    // (구 구현은 줄 경계를 넘어 line1·line0 까지 연쇄 백오프해 visible=2 로 붕괴 —
-    //  mmobile 콘텐츠·사이트 카드가 11개 중 1개만 보이던 실측 결함.)
+    // 마지막 줄(line2)의 유일한 칩은 접지 않고 truncateLast 로 말줄임한다 —
+    // 접으면(구 구현) "+N" 이 윗줄 끝에 흡수될 수 있어 표시 줄 수가 목표보다
+    // 부족해진다(행 높이 결손). 줄 경계 너머 연쇄 백오프 금지는 그대로 유지.
     const chips: ChipMetric[] = [
       { top: 0, left: 0, width: 60 },
       { top: 0, left: 66, width: 150 },
@@ -87,6 +91,20 @@ describe("computeVisibleChips", () => {
       { top: 72, left: 0, width: 280 },
     ];
     const result = computeVisibleChips(chips, 3, 300, 6, 44);
-    expect(result).toEqual({ visible: 3, hidden: 2 });
+    expect(result).toEqual({ visible: 4, hidden: 1, truncateLast: true });
+  });
+
+  it("regression: +N absorbed into the previous line must not shrink the displayed line count", () => {
+    // m-project 저작물·등록 실측 결함 — target=2, line1 이 통폭 칩 하나뿐인 구성.
+    // 구 구현: line1 을 통째로 접고 "+N" 이 line0 끝에 들어가 표시가 1줄로 줄었다
+    // (같은 행 카드와 칩 영역 높이 불일치). 신 구현: 칩을 남기고 말줄임한다.
+    const chips: ChipMetric[] = [
+      { top: 0, left: 0, width: 60 },
+      { top: 0, left: 66, width: 60 },
+      { top: 24, left: 0, width: 280 },
+      { top: 48, left: 0, width: 60 },
+    ];
+    const result = computeVisibleChips(chips, 2, 300, 6, 44);
+    expect(result).toEqual({ visible: 3, hidden: 1, truncateLast: true });
   });
 });

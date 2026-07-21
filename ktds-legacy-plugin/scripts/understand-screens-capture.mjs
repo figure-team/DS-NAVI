@@ -223,6 +223,7 @@ function extractElements(els) {
       text: (el.innerText || '').trim() || null,
       value: tag === 'input' ? el.getAttribute('value') : null,
       alt: el.getAttribute('alt') ?? childImgAlt,
+      title: el.getAttribute('title') ?? el.querySelector?.('img[title]')?.getAttribute('title') ?? null,
       placeholder: el.getAttribute('placeholder'),
       href: el.getAttribute('href'),
       onclick: el.getAttribute('onclick'),

@@ -28,6 +28,9 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-policy.mjs <projectRoot>
 ```
 
 - domain-graph 없이 **raw 소스**에서 동작: census → db-schema(.sql 3-Tier) → policy-signals → 정책서.
+- **PA3(신호는 map 소유)**: `/understand-map scan` 이 `.spec/map/policy-signals.json` 을 이미
+  산출했으면 **그대로 로드**한다(재스캔 0 — db-schema PA2 동형). 맵 미실행 시에만 자체 생성
+  (단독성 보존). 이 스킬의 고유 몫은 **정책서 문서 생성**(md 앵커 표 + LLM 보강)이다.
 - 산출:
   - `.understand-anything/doc-output/policy-{glossary,data,validation,authz}.md` — 앵커 표(신뢰도/근거 열 포함).
   - `.spec/map/db-schema.json`, `.spec/map/policy-signals.json` — 중간 신호(재사용).

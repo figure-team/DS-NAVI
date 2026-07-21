@@ -11,6 +11,8 @@ import { gitCommitHash } from '../domain-map/persist.js'
 import type { CensusReport } from '../domain-map/types.js'
 import { extractJavaFacts } from '../domain-map/java-facts.js'
 import type { JavaFileFacts } from '../domain-map/java-facts.js'
+import { JAVA_FACTS_SALT } from '../domain-map/edges.js'
+import type { ScanCacheSession } from '../scan-cache/index.js'
 import type { DbSchemaModel } from '../db-schema/types.js'
 import { PolicySignalSetSchema } from './types.js'
 import type { PolicySignal, PolicySignalSet } from './types.js'
@@ -225,20 +227,34 @@ export async function scanPolicySignals(
   projectRoot: string,
   census: CensusReport,
   dbSchema: DbSchemaModel,
+  cache?: ScanCacheSession,
 ): Promise<PolicySignalSet> {
+  // W8/PA3: map scan 에서 호출될 때는 edges/method-calls 와 `java-facts` 섹션을 공유해
+  // 같은 실행의 팩트를 read-your-writes 로 재사용한다(이중 파싱 방지). policy 단독 실행
+  // (cache 미전달)은 기존 경로 그대로다. null 캐시 = 판독 불가 파일(제외 동작 동일).
+  const factsSec = cache?.section<JavaFileFacts | null>('java-facts', JAVA_FACTS_SALT)
   const javaFacts: JavaFileFacts[] = []
   const unresolved: Array<{ ref: string; reason: string }> = []
   for (const f of census.files) {
     if (f.lang !== 'java') continue
+    const hit = factsSec?.get(f.relPath)
+    if (hit !== undefined) {
+      if (hit !== null) javaFacts.push(hit)
+      continue
+    }
     let source: string
     try {
       source = readFileSync(join(projectRoot, f.relPath), 'utf8')
     } catch {
+      if (cache?.isAbsent(f.relPath)) factsSec?.put(f.relPath, null)
       continue
     }
     try {
-      javaFacts.push(await extractJavaFacts(f.relPath, source))
+      const facts = await extractJavaFacts(f.relPath, source)
+      javaFacts.push(facts)
+      factsSec?.put(f.relPath, facts)
     } catch (err) {
+      // 파싱 실패는 캐시하지 않는다(edges/method-calls 규약 — 다음 실행 재시도).
       unresolved.push({ ref: f.relPath, reason: `Java 파싱 실패: ${(err as Error).message}` })
     }
   }

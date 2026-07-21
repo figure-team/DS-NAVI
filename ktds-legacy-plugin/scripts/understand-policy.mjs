@@ -39,6 +39,7 @@ const {
   readDbSchema,
   scanPolicySignals,
   writePolicySignals,
+  readPolicySignals,
   scanPolicyReconcile,
   writePolicyReconcile,
   getMethodology,
@@ -245,9 +246,14 @@ if (!dbSchema) {
   writeDbSchema(projectRoot, dbSchema)
 }
 
-// 3) policy-signals — 코드(java-facts) + DB 신호 병합(앵커).
-const signals = await scanPolicySignals(projectRoot, census, dbSchema)
-writePolicySignals(projectRoot, signals)
+// 3) policy-signals — PA3: map(scan)이 .spec/map/policy-signals.json 을 산출하면 그대로
+//    로드(재스캔 0). 맵 미실행(policy 단독 실행) 시에만 자체 생성(단독성 보존, PA2 동형).
+let signals = readPolicySignals(projectRoot)
+const signalsFromMap = signals !== null
+if (!signals) {
+  signals = await scanPolicySignals(projectRoot, census, dbSchema)
+  writePolicySignals(projectRoot, signals)
+}
 
 // 3b) 기존 정책서 대조(있을 때) — .understand-anything/policy-input/*.md → 준수/미정의/문서에만.
 const reconcile = scanPolicyReconcile(projectRoot, signals.signals)
@@ -338,7 +344,9 @@ if (live.length > 0) {
     console.log('  ⚠️ 외부 라이브 DB 감지 — 권위 스키마를 .sql 로 덤프해 넣으면 반영됩니다(권장). 라이브 연결은 추후.')
   }
 }
-console.log(`  정책 신호: ${signals.signals.length}건 → .spec/map/policy-signals.json`)
+console.log(
+  `  정책 신호: ${signals.signals.length}건 → .spec/map/policy-signals.json [${signalsFromMap ? 'map 산출 재사용' : '자체 생성(맵 미실행)'}]`,
+)
 console.log(`  정책서 ${meta.length}종 → .understand-anything/doc-output/:`)
 for (const m of meta) {
   console.log(`    - ${m.docId}: ${m.title} (근거율 ${(m.evidenceRate * 100).toFixed(0)}%)`)

@@ -1,10 +1,10 @@
 /**
  * 정책 신호 추출(정책서 P1) 공개 표면 — 코드+DB 신호 → PolicySignal[].
  */
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { specMapDir, stableJson } from '../domain-map/persist.js'
-import { POLICY_SIGNALS_FILENAME, POLICY_RECONCILE_FILENAME } from './types.js'
+import { POLICY_SIGNALS_FILENAME, POLICY_RECONCILE_FILENAME, PolicySignalSetSchema } from './types.js'
 import type { PolicySignalSet, ReconcileResult } from './types.js'
 
 export {
@@ -31,6 +31,20 @@ export { buildPolicySignals, scanPolicySignals } from './signal-scanner.js'
 export type { PolicySignalInput } from './signal-scanner.js'
 export { parseExistingPolicy } from './ingest.js'
 export { reconcilePolicy, scanPolicyReconcile } from './reconcile.js'
+
+/**
+ * policy-signals.json 로드 — PA3: map scan 이 산출한 신호를 소비자(정책서 문서 생성)가
+ * 재사용한다(readDbSchema 와 동형 — 없거나 스키마 불일치면 null → 호출자가 자체 생성 폴백).
+ */
+export function readPolicySignals(projectRoot: string): PolicySignalSet | null {
+  const path = join(specMapDir(projectRoot), POLICY_SIGNALS_FILENAME)
+  if (!existsSync(path)) return null
+  try {
+    return PolicySignalSetSchema.parse(JSON.parse(readFileSync(path, 'utf8')))
+  } catch {
+    return null
+  }
+}
 
 /** policy-signals.json 기록(`.spec/map/` mkdir -p 선행). */
 export function writePolicySignals(projectRoot: string, set: PolicySignalSet): void {

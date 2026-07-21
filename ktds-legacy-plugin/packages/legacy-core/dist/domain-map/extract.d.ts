@@ -1,4 +1,5 @@
 import type { DbSchemaModel } from '../db-schema/index.js';
+import type { PolicySignalSet, ReconcileResult } from '../policy/types.js';
 import type { InterfaceReport } from '../interface-scan/index.js';
 import type { BatchJobsReport } from '../batch-scan/report.js';
 import type { ProgramInventory } from '../program-inventory/index.js';
@@ -50,6 +51,10 @@ export declare function scanDomainMap(projectRoot: string, opts?: {
     coverage: ReturnType<typeof buildCoverageReport>;
     /** 시스템 구성도 브리지(`.understand-anything/system-map.json`) — 대시보드 연동 패널 소스. */
     systemMap: SystemMap;
+    /** PA3: 정책 신호(코드+DB 앵커) — scan 이 단독 소유, 소비자(policy 문서·대시보드)는 로드만. */
+    policySignals: PolicySignalSet;
+    /** PA3: 기존 정책서 대조(policy-input 있을 때 — 없으면 빈 결과). */
+    policyReconcile: ReconcileResult;
 }>;
 /**
  * 전체 도메인 맵 빌드 — 스캔 후 확정 플랜이 있으면 skeleton/emit 까지.

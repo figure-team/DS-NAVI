@@ -35,15 +35,19 @@ export interface VisibleChipResult {
   visible: number;
   /** 잘려서 "+N" 으로 흡수되는 칩 개수 — 실제 숨긴 개수와 정확히 일치. */
   hidden: number;
+  /** true 면 마지막 보이는 칩의 폭을 "+N" 자리만큼 줄여(말줄임) 렌더해야 한다 —
+   * 줄의 첫 칩조차 "+N" 과 나란히 못 들어가는 경우, 줄을 통째로 접으면 표시 줄
+   * 수가 행 목표보다 부족해지므로(행 높이 결손) 접는 대신 칩을 자른다. */
+  truncateLast: boolean;
 }
 
 /**
  * 칩 목록을 targetLines 줄 안에 맞춘다. 자연 줄 수가 이미 targetLines 이하면
  * 전부 노출(hidden=0). 초과하면 targetLines 번째 줄의 시작 top(cutTop) 이전
  * 칩까지만 남기고, "+N" 칩이 그 줄 폭 안에 들어갈 자리가 없으면 칩을 하나씩
- * 더 접어(hidden 증가) 자리를 만든다. 전량이 "+N"이 되는 퇴행은 방지한다
- * (최소 1개는 노출 — 그 경우 +N 칩이 넘칠 수 있으나 컨테이너 자체가 "+N" 폭
- * 보다 좁은 극단적 상황에 한한 안전장치).
+ * 더 접어(hidden 증가) 자리를 만든다. 접다가 줄의 첫 칩에 도달하면 더 접지
+ * 않고 truncateLast 로 표시한다 — 렌더러가 그 칩을 말줄임해 "+N" 자리를 만들
+ * 므로 표시 줄 수가 항상 targetLines 와 일치한다(행 높이·목록 크기 동일 보장).
  */
 export function computeVisibleChips(
   chips: ChipMetric[],
@@ -53,26 +57,32 @@ export function computeVisibleChips(
   plusWidth: number,
 ): VisibleChipResult {
   const total = chips.length;
-  if (total === 0) return { visible: 0, hidden: 0 };
+  if (total === 0) return { visible: 0, hidden: 0, truncateLast: false };
 
   const tops: number[] = [];
   for (const c of chips) if (!tops.includes(c.top)) tops.push(c.top);
   tops.sort((a, b) => a - b);
 
-  if (tops.length <= targetLines) return { visible: total, hidden: 0 };
+  if (tops.length <= targetLines) return { visible: total, hidden: 0, truncateLast: false };
 
   const cutTop = tops[targetLines];
   let k = chips.filter((c) => c.top < cutTop).length;
-  // 백오프는 마지막 보이는 줄 안에서만 — 그 줄 칩을 전부 접으면 "+N" 이 빈 줄을
-  // 통째로 차지하므로 반드시 들어간다. 줄 경계를 넘어 계속 접으면(이전 구현)
-  // 줄을 가득 채우는 긴 칩이 연속될 때 visible 이 1까지 연쇄 붕괴한다.
+  // 백오프는 마지막 보이는 줄 안에서만 — 줄 경계를 넘어 계속 접으면 줄을 가득
+  // 채우는 긴 칩이 연속될 때 visible 이 1까지 연쇄 붕괴한다.
   const lastLineTop = tops[targetLines - 1];
+  let truncateLast = false;
   while (k > 0) {
     const last = chips[k - 1];
     if (last.top !== lastLineTop) break;
     if (last.left + last.width + gap + plusWidth <= containerWidth) break;
+    const firstOnLine = k - 2 < 0 || chips[k - 2].top !== lastLineTop;
+    if (firstOnLine) {
+      // 줄의 첫 칩까지 왔다 — 접으면 줄이 사라져 행 높이 결손. 칩을 잘라 자리 확보.
+      truncateLast = true;
+      break;
+    }
     k--;
   }
   k = Math.max(k, 1);
-  return { visible: k, hidden: total - k };
+  return { visible: k, hidden: total - k, truncateLast };
 }

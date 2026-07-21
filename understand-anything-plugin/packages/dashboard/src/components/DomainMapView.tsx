@@ -7,7 +7,7 @@ import { dataUrl } from "../shared/api/client";
 import { buildDomainCards } from "../utils/domainData";
 import { parseBusinessFlows, type BizProcess } from "../utils/businessFlow";
 import { buildGroupCards, resolveGroups } from "../utils/domainGroups";
-import { useGroupCardRowSizing } from "../hooks/useGroupCardRowSizing";
+import { useGroupCardRowSizing, type GroupCardChipSizing } from "../hooks/useGroupCardRowSizing";
 import DomainCardDetail from "./DomainCardDetail";
 import GroundedBar from "./GroundedBar";
 
@@ -168,6 +168,22 @@ export default function DomainMapView({ worksExpanded = false }: { worksExpanded
     return () => document.removeEventListener("keydown", onKey);
   }, [detailId]);
 
+  // 마트료시카 모달 — 그룹 카드 ⤢: 하위 도메인 카드 목록, 그 안의 ⤢ 는 같은 모달의
+  // 근거 상세로 내부 전환(모달 중첩 금지, ← 뒤로가기). Escape 는 전체 닫기.
+  const [groupDetailKey, setGroupDetailKey] = useState<string | null>(null);
+  const [groupDetailCardId, setGroupDetailCardId] = useState<string | null>(null);
+  useEffect(() => {
+    if (!groupDetailKey) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setGroupDetailKey(null);
+        setGroupDetailCardId(null);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [groupDetailKey]);
+
   const data = useMemo(
     () => (domainGraph ? buildDomainCards(domainGraph) : null),
     [domainGraph],
@@ -224,6 +240,18 @@ export default function DomainMapView({ worksExpanded = false }: { worksExpanded
   }, [groupCards, worksExpanded, flatBusinessCardIds]);
   const groupSizing = useGroupCardRowSizing(rowSizingKeys);
 
+  // 마트료시카 모달 그리드 — 랜딩 카드와 동일한 행별 크기 정렬(별도 인스턴스).
+  // 키는 업무 칩이 있는 멤버만(칩 없는 카드는 측정 대상이 없다 — 랜딩 flat 규약과 동일).
+  const modalRowSizingKeys = useMemo(() => {
+    if (!groupDetailKey || !data) return [];
+    const rg = resolvedGroups.find((g) => g.key === groupDetailKey);
+    return (rg?.memberDomainIds ?? []).filter(
+      (id) =>
+        data.cards.some((c) => c.id === id) && (processesByDomain.get(id)?.length ?? 0) > 0,
+    );
+  }, [groupDetailKey, data, resolvedGroups, processesByDomain]);
+  const modalSizing = useGroupCardRowSizing(modalRowSizingKeys);
+
   if (!domainGraph || !data) {
     return (
       <div className="h-full flex items-center justify-center text-text-muted text-sm px-6 text-center">
@@ -235,6 +263,27 @@ export default function DomainMapView({ worksExpanded = false }: { worksExpanded
   const { cards } = data;
   const detailCard = cards.find((c) => c.id === detailId) ?? null;
   const hasGroups = resolvedGroups.length > 0;
+
+  // 마트료시카 모달 파생 — 그룹 ⤢ 대상 그룹과 그 소속 일반 도메인 카드(랜딩 카드와
+  // 동일 데이터·순서), 내부 상세로 전환된 카드. 렌더마다 계산해도 규모가 작다.
+  const detailGroup = groupDetailKey
+    ? (groupCards.find((g) => g.key === groupDetailKey) ?? null)
+    : null;
+  const detailGroupMembers = detailGroup
+    ? (resolvedGroups.find((rg) => rg.key === detailGroup.key)?.memberDomainIds ?? []).flatMap(
+        (id) => {
+          const c = cards.find((card) => card.id === id);
+          return c ? [c] : [];
+        },
+      )
+    : [];
+  const groupDetailCard = groupDetailCardId
+    ? (detailGroupMembers.find((c) => c.id === groupDetailCardId) ?? null)
+    : null;
+  const closeGroupDetail = () => {
+    setGroupDetailKey(null);
+    setGroupDetailCardId(null);
+  };
 
   // 업무/부속 분리 — 업무(프로세스) 0개 도메인(web.xml 등 기술 도메인)은 하단
   // 스트립으로 강등한다(PM 관점 위계). 업무가 전혀 없는 프로젝트(fill 전)는 분리
@@ -303,21 +352,37 @@ export default function DomainMapView({ worksExpanded = false }: { worksExpanded
                         animation: `fadeSlideIn 0.35s ease-out ${i * 0.05}s both`,
                       }}
                     >
-                      <div className="flex items-center gap-2 min-w-0" style={{ fontSize: 14, fontWeight: 650, marginBottom: 4 }}>
+                      {/* .h — 이름이 한 줄 전체를 쓰도록 카운트는 아래 메타 줄로 분리.
+                          ⤢ = 마트료시카 모달(하위 도메인 카드 목록) 열기. */}
+                      <div className="flex items-center gap-2 min-w-0" style={{ fontSize: 14, fontWeight: 650, marginBottom: 2 }}>
                         <span aria-hidden className="select-none shrink-0" style={{ fontSize: 14, lineHeight: 1 }}>
                           {g.icon}
                         </span>
                         <span className="text-text-primary truncate" title={g.name}>
                           {g.name}
                         </span>
-                        <span
-                          className="ml-auto text-text-muted whitespace-nowrap shrink-0"
-                          style={{ fontSize: 11.5, fontWeight: 500 }}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setGroupDetailKey(g.key);
+                          }}
+                          aria-haspopup="dialog"
+                          aria-label={t.domainMap.detail}
+                          title={t.domainMap.detail}
+                          className="ml-auto shrink-0 flex items-center justify-center rounded text-text-muted hover:text-accent transition-colors cursor-pointer"
+                          style={{ width: 18, height: 18, fontSize: 10, lineHeight: 1 }}
                         >
-                          {t.domainMap.subDomainCount.replace("{count}", String(g.subDomainCount))} ·{" "}
-                          {t.domainMap.workCount.replace("{count}", String(g.workCount))} ·{" "}
-                          {t.domainMap.flowCount.replace("{count}", String(g.flowCount))}
-                        </span>
+                          ⤢
+                        </button>
+                      </div>
+                      <div
+                        className="text-text-muted truncate"
+                        style={{ fontSize: 11.5, fontWeight: 500, marginBottom: 4 }}
+                      >
+                        {t.domainMap.subDomainCount.replace("{count}", String(g.subDomainCount))} ·{" "}
+                        {t.domainMap.workCount.replace("{count}", String(g.workCount))} ·{" "}
+                        {t.domainMap.flowCount.replace("{count}", String(g.flowCount))}
                       </div>
                       {g.filled && g.groundedPct !== null && (
                         <div style={{ margin: "7px 0 9px" }}>
@@ -330,10 +395,16 @@ export default function DomainMapView({ worksExpanded = false }: { worksExpanded
                         style={{
                           gap: 6,
                           marginTop: g.filled ? 0 : 8,
-                          ...(measuring ? { maxHeight: 90, overflow: "hidden" } : {}),
+                          // 확정 후엔 행 목표 줄 수만큼 높이 예약 — "+N" 흡수로 표시
+                          // 줄 수가 목표보다 줄어도 같은 행 칩 영역 높이 일치.
+                          ...(measuring
+                            ? { maxHeight: 90, overflow: "hidden" }
+                            : sized?.minHeight
+                              ? { minHeight: sized.minHeight }
+                              : {}),
                         }}
                       >
-                        {shownChips.map((chip) => (
+                        {shownChips.map((chip, ci) => (
                           <button
                             key={chip.id}
                             type="button"
@@ -342,7 +413,15 @@ export default function DomainMapView({ worksExpanded = false }: { worksExpanded
                               navigate(`/domains/${g.key}/${chip.id}`);
                             }}
                             className="rounded-full bg-elevated text-text-secondary hover:text-accent transition-colors cursor-pointer truncate"
-                            style={{ padding: "3px 9px", fontSize: 12, maxWidth: "100%" }}
+                            style={{
+                              padding: "3px 9px",
+                              fontSize: 12,
+                              // 마지막 칩 말줄임 — "+N" 자리 확보(행 높이 결손 방지).
+                              maxWidth:
+                                !measuring && sized?.truncateLast && ci === shownChips.length - 1
+                                  ? "calc(100% - 50px)"
+                                  : "100%",
+                            }}
                             title={chip.name}
                           >
                             {chip.name}
@@ -382,20 +461,14 @@ export default function DomainMapView({ worksExpanded = false }: { worksExpanded
                     animation: `fadeSlideIn 0.35s ease-out ${i * 0.05}s both`,
                   }}
                 >
-                  {/* .h — 아이콘 + 이름, 우측 기능·노드 수 + 상세(근거) 아이콘 */}
-                  <div className="flex items-center gap-2 min-w-0" style={{ fontSize: 14, fontWeight: 650, marginBottom: 4 }}>
+                  {/* .h — 아이콘 + 이름 + 상세(근거) 아이콘. 이름이 한 줄 전체를
+                      쓰도록 업무·기능 수는 아래 메타 줄로 분리 */}
+                  <div className="flex items-center gap-2 min-w-0" style={{ fontSize: 14, fontWeight: 650, marginBottom: 2 }}>
                     <span aria-hidden className="select-none shrink-0" style={{ fontSize: 14, lineHeight: 1 }}>
                       {card.icon}
                     </span>
                     <span className="text-text-primary truncate" title={card.name}>
                       {card.name}
-                    </span>
-                    <span
-                      className="ml-auto text-text-muted whitespace-nowrap shrink-0"
-                      style={{ fontSize: 11.5, fontWeight: 500 }}
-                    >
-                      {t.domainMap.workCount.replace("{count}", String(processes.length))} ·{" "}
-                      {t.domainMap.flowCount.replace("{count}", String(card.flowCount))}
                     </span>
                     <button
                       type="button"
@@ -406,11 +479,18 @@ export default function DomainMapView({ worksExpanded = false }: { worksExpanded
                       aria-haspopup="dialog"
                       aria-label={t.domainMap.detail}
                       title={t.domainMap.detail}
-                      className="shrink-0 flex items-center justify-center rounded text-text-muted hover:text-accent transition-colors cursor-pointer"
+                      className="ml-auto shrink-0 flex items-center justify-center rounded text-text-muted hover:text-accent transition-colors cursor-pointer"
                       style={{ width: 18, height: 18, fontSize: 10, lineHeight: 1 }}
                     >
                       ⤢
                     </button>
+                  </div>
+                  <div
+                    className="text-text-muted truncate"
+                    style={{ fontSize: 11.5, fontWeight: 500, marginBottom: 4 }}
+                  >
+                    {t.domainMap.workCount.replace("{count}", String(processes.length))} ·{" "}
+                    {t.domainMap.flowCount.replace("{count}", String(card.flowCount))}
                   </div>
                   {/* .gr — 근거율 바(프로토: label + 녹색 바 + %) */}
                   {card.filled && card.groundedPct !== null && (
@@ -465,11 +545,14 @@ export default function DomainMapView({ worksExpanded = false }: { worksExpanded
                   <span aria-hidden className="select-none shrink-0" style={{ fontSize: 13, lineHeight: 1 }}>
                     {card.icon}
                   </span>
-                  <span className="text-text-primary whitespace-nowrap" style={{ fontSize: 12.5, fontWeight: 600 }}>
-                    {card.name}
-                  </span>
-                  <span className="text-text-muted whitespace-nowrap" style={{ fontSize: 11 }}>
-                    {t.domainMap.flowCount.replace("{count}", String(card.flowCount))}
+                  {/* 본 카드와 동일 규칙 — 이름 줄 아래 카운트 메타 줄 */}
+                  <span className="flex flex-col min-w-0">
+                    <span className="text-text-primary whitespace-nowrap" style={{ fontSize: 12.5, fontWeight: 600 }}>
+                      {card.name}
+                    </span>
+                    <span className="text-text-muted whitespace-nowrap" style={{ fontSize: 11 }}>
+                      {t.domainMap.flowCount.replace("{count}", String(card.flowCount))}
+                    </span>
                   </span>
                   {card.filled && card.groundedPct !== null && (
                     <div className="shrink-0" style={{ width: 120 }}>
@@ -624,6 +707,163 @@ export default function DomainMapView({ worksExpanded = false }: { worksExpanded
           </div>
         </div>
       )}
+      {/* 마트료시카 모달(그룹 ⤢) — 목록 뷰: 하위 도메인 카드 그리드(랜딩 일반 카드와
+          동형: 이름/메타/근거율/업무 칩). 카드 본문 클릭 = 모달 닫고 그룹 워크스페이스
+          이동, 카드 ⤢ = 같은 모달이 근거 상세로 전환(← 뒤로가기). */}
+      {detailGroup && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-root/80 backdrop-blur-sm p-4"
+          onClick={closeGroupDetail}
+          role="presentation"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={(groupDetailCard ?? detailGroup).name}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-surface border border-border-medium rounded-xl shadow-2xl flex flex-col overflow-hidden"
+            style={{
+              width: groupDetailCard ? "min(640px, 100%)" : "min(920px, 100%)",
+              maxHeight: "82vh",
+              ["--card-accent" as string]: (groupDetailCard ?? detailGroup).color,
+            }}
+          >
+            <span style={{ height: 2, background: (groupDetailCard ?? detailGroup).color }} />
+            <div className="flex items-center gap-2.5 shrink-0 border-b border-border-subtle" style={{ padding: "14px 18px" }}>
+              {groupDetailCard && (
+                <button
+                  type="button"
+                  onClick={() => setGroupDetailCardId(null)}
+                  aria-label={t.common.back}
+                  title={t.common.back}
+                  className="shrink-0 flex items-center justify-center rounded-md border border-border-subtle text-text-muted hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
+                  style={{ width: 28, height: 28, fontSize: 14, lineHeight: 1 }}
+                >
+                  ←
+                </button>
+              )}
+              <span
+                className="flex items-center justify-center rounded-lg select-none shrink-0"
+                style={{
+                  width: 30,
+                  height: 30,
+                  background: `${(groupDetailCard ?? detailGroup).color}22`,
+                  fontSize: 15,
+                  lineHeight: 1,
+                }}
+                aria-hidden="true"
+              >
+                {(groupDetailCard ?? detailGroup).icon}
+              </span>
+              <span className="font-heading text-text-primary truncate" style={{ fontSize: 17 }}>
+                {(groupDetailCard ?? detailGroup).name}
+              </span>
+              {!groupDetailCard && (
+                <span className="text-text-muted whitespace-nowrap shrink-0" style={{ fontSize: 11.5 }}>
+                  {t.domainMap.subDomainCount.replace("{count}", String(detailGroup.subDomainCount))}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={closeGroupDetail}
+                aria-label="닫기"
+                className="ml-auto flex items-center justify-center rounded-md border border-border-subtle text-text-muted hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
+                style={{ width: 28, height: 28, fontSize: 15, lineHeight: 1 }}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="overflow-y-auto min-h-0">
+              {groupDetailCard ? (
+                <DomainCardDetail
+                  card={groupDetailCard}
+                  onViewFeatures={() => {
+                    closeGroupDetail();
+                    navigate(`/domains/${detailGroup.key}/${groupDetailCard.id}`);
+                  }}
+                />
+              ) : (
+                <div
+                  ref={modalSizing.containerRef}
+                  className="grid"
+                  style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 10, padding: 16 }}
+                >
+                  {detailGroupMembers.map((card) => {
+                    const processes = processesByDomain.get(card.id) ?? [];
+                    const openWorkspace = () => {
+                      closeGroupDetail();
+                      navigate(`/domains/${detailGroup.key}/${card.id}`);
+                    };
+                    return (
+                      <div
+                        key={card.id}
+                        ref={modalSizing.registerCard(card.id)}
+                        role="button"
+                        tabIndex={0}
+                        onClick={openWorkspace}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            openWorkspace();
+                          }
+                        }}
+                        className="domain-card rounded-[10px] bg-panel border border-border-subtle hover:border-accent cursor-pointer transition-colors"
+                        style={{ padding: "13px 14px" }}
+                      >
+                        <div className="flex items-center gap-2 min-w-0" style={{ fontSize: 14, fontWeight: 650, marginBottom: 2 }}>
+                          <span aria-hidden className="select-none shrink-0" style={{ fontSize: 14, lineHeight: 1 }}>
+                            {card.icon}
+                          </span>
+                          <span className="text-text-primary truncate" title={card.name}>
+                            {card.name}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setGroupDetailCardId(card.id);
+                            }}
+                            aria-haspopup="dialog"
+                            aria-label={t.domainMap.detail}
+                            title={t.domainMap.detail}
+                            className="ml-auto shrink-0 flex items-center justify-center rounded text-text-muted hover:text-accent transition-colors cursor-pointer"
+                            style={{ width: 18, height: 18, fontSize: 10, lineHeight: 1 }}
+                          >
+                            ⤢
+                          </button>
+                        </div>
+                        <div className="text-text-muted truncate" style={{ fontSize: 11.5, fontWeight: 500, marginBottom: 4 }}>
+                          {t.domainMap.workCount.replace("{count}", String(processes.length))} ·{" "}
+                          {t.domainMap.flowCount.replace("{count}", String(card.flowCount))}
+                        </div>
+                        {card.filled && card.groundedPct !== null && (
+                          <div style={{ margin: "7px 0 9px" }}>
+                            <GroundedBar pct={card.groundedPct} grounded={card.groundedCount} review={card.reviewCount} />
+                          </div>
+                        )}
+                        <div style={{ marginTop: card.filled ? 0 : 8 }}>
+                          <ProcessChips
+                            processes={processes}
+                            expanded={false}
+                            defaultTitle={t.flowList.bizProcessDefault}
+                            onOpen={(p) => {
+                              closeGroupDetail();
+                              navigate(`/domains/${detailGroup.key}/${card.id}?view=business&bf=${p.index}`);
+                            }}
+                            chipsRef={modalSizing.registerChips(card.id)}
+                            rowSized={modalSizing.sizing.get(card.id)}
+                            externallySized
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -748,7 +988,7 @@ function ProcessChips({
   /** 행별 크기 정렬(useGroupCardRowSizing) 측정용 칩 컨테이너 ref — 외부 사이징 시. */
   chipsRef?: (el: HTMLDivElement | null) => void;
   /** 외부(행 단위) 클램프 결과 — undefined 면 측정 패스(전량 렌더). */
-  rowSized?: { visible: number; hidden: number };
+  rowSized?: GroupCardChipSizing;
   /** true 면 내부 2줄 클램프 측정을 끄고 rowSized 를 따른다(행별 크기 정렬 공용화). */
   externallySized?: boolean;
 }) {
@@ -821,11 +1061,23 @@ function ProcessChips({
       }}
       className="flex flex-wrap"
       // 측정 패스 동안만 클립(내부 2줄=58, 외부 행별=3줄 상한 90) — 카드 높이
-      // 출렁임 방지(측정엔 무영향).
-      style={{ gap: 6, ...(measuring ? { maxHeight: externallySized ? 90 : 58, overflow: "hidden" } : {}) }}
+      // 출렁임 방지(측정엔 무영향). 외부 사이징 확정 후엔 행 목표 줄 수만큼
+      // 높이 예약(minHeight) — 행 내 칩 영역 높이 일치.
+      style={{
+        gap: 6,
+        ...(measuring
+          ? { maxHeight: externallySized ? 90 : 58, overflow: "hidden" }
+          : externallySized && rowSized?.minHeight
+            ? { minHeight: rowSized.minHeight }
+            : {}),
+      }}
     >
-      {shown.map((p) => {
+      {shown.map((p, i) => {
         const label = p.title ?? defaultTitle.replace("{n}", String(p.index + 1));
+        // 행 목표 줄 유지용 말줄임 — 마지막 칩이 "+N" 자리(50px)를 내주지 않으면
+        // 줄이 통째로 접혀 행 높이 결손이 난다(computeVisibleChips.truncateLast).
+        const clamp =
+          externallySized && !measuring && rowSized?.truncateLast && i === shown.length - 1;
         return (
           <button
             key={p.index}
@@ -835,7 +1087,7 @@ function ProcessChips({
               onOpen(p);
             }}
             className="rounded-full bg-elevated text-text-secondary hover:text-accent transition-colors cursor-pointer truncate"
-            style={{ padding: "3px 9px", fontSize: 12, maxWidth: "100%" }}
+            style={{ padding: "3px 9px", fontSize: 12, maxWidth: clamp ? "calc(100% - 50px)" : "100%" }}
             title={label}
           >
             {label}

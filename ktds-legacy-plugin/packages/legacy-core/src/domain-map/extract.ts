@@ -31,6 +31,10 @@ import { extractJpaModel } from '../jpa/extract.js'
 import { JPA_MODEL_FILENAME } from '../jpa/types.js'
 import { extractDbSchema, writeDbSchema } from '../db-schema/index.js'
 import type { DbSchemaModel } from '../db-schema/index.js'
+import { scanPolicySignals } from '../policy/signal-scanner.js'
+import { scanPolicyReconcile } from '../policy/reconcile.js'
+import { writePolicySignals, writePolicyReconcile } from '../policy/index.js'
+import type { PolicySignalSet, ReconcileResult } from '../policy/types.js'
 import { extractInterfaces, INTERFACES_FILENAME } from '../interface-scan/index.js'
 import type { InterfaceReport } from '../interface-scan/index.js'
 import { buildSpringBeanIndex } from '../batch-scan/bean-index.js'
@@ -600,6 +604,10 @@ export async function scanDomainMap(
   coverage: ReturnType<typeof buildCoverageReport>
   /** 시스템 구성도 브리지(`.understand-anything/system-map.json`) — 대시보드 연동 패널 소스. */
   systemMap: SystemMap
+  /** PA3: 정책 신호(코드+DB 앵커) — scan 이 단독 소유, 소비자(policy 문서·대시보드)는 로드만. */
+  policySignals: PolicySignalSet
+  /** PA3: 기존 정책서 대조(policy-input 있을 때 — 없으면 빈 결과). */
+  policyReconcile: ReconcileResult
 }> {
   const census = buildCensus(projectRoot)
   // W8: 파일단위 팩트 캐시 세션 — fingerprint 1회 계산(캐시 검증 + fingerprints.json 공용).
@@ -628,6 +636,14 @@ export async function scanDomainMap(
   // jpaModel 은 .sql 부재 시 code-inferred 폴백(JPA/MyBatis 역추론)의 JPA 소스.
   const dbSchema = extractDbSchema(projectRoot, census, scanCache, jpaModel)
   writeDbSchema(projectRoot, dbSchema)
+  // PA3(policy-signals map 편입): 정책 신호(코드+DB 앵커)도 scan 이 단독 소유 — db-schema(PA1)와
+  // 동형(census 파생·scan 시점·.spec/map/ 기록). 정책서 **문서 생성**은 /understand-policy 에
+  // 온디맨드로 남는다(재실행 주기 분리 — LLM 보강분 보호). java-facts 캐시 섹션을 공유해
+  // edges/method-calls 와 같은 실행에서 이중 파싱하지 않는다.
+  const policySignals = await scanPolicySignals(projectRoot, census, dbSchema, scanCache)
+  writePolicySignals(projectRoot, policySignals)
+  const policyReconcile = scanPolicyReconcile(projectRoot, policySignals.signals)
+  writePolicyReconcile(projectRoot, policyReconcile)
   // W1: 대외 인터페이스(송신/라우트 외 수신) 스캔 — interfaces.json. 소비자(docs)는 로드만.
   const interfaces = await extractInterfaces(projectRoot, census, scanCache)
   writeMapArtifact(projectRoot, INTERFACES_FILENAME, interfaces)
@@ -684,7 +700,7 @@ export async function scanDomainMap(
   // 세션이 스캔 선두에 계산한 동일 함수·동일 census 의 fingerprint 를 그대로 기록.
   writeMapArtifact(projectRoot, FINGERPRINTS_FILENAME, scanCache.fingerprints)
   scanCache.finalize()
-  return { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory, riskReport, scanCache, coverage, systemMap }
+  return { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory, riskReport, scanCache, coverage, systemMap, policySignals, policyReconcile }
 }
 
 /**

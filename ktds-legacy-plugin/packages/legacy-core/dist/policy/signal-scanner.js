@@ -9,6 +9,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { gitCommitHash } from '../domain-map/persist.js';
 import { extractJavaFacts } from '../domain-map/java-facts.js';
+import { JAVA_FACTS_SALT } from '../domain-map/edges.js';
 import { PolicySignalSetSchema } from './types.js';
 /** Spring Security / JSR-250 권한 어노테이션(이름만, '@' 제외). */
 const AUTHZ_ANNOTATIONS = new Set([
@@ -195,23 +196,38 @@ export function buildPolicySignals(input, seedUnresolved = []) {
     });
 }
 /** census 의 Java 파일을 파싱해 정책 신호를 추출(IO 래퍼). */
-export async function scanPolicySignals(projectRoot, census, dbSchema) {
+export async function scanPolicySignals(projectRoot, census, dbSchema, cache) {
+    // W8/PA3: map scan 에서 호출될 때는 edges/method-calls 와 `java-facts` 섹션을 공유해
+    // 같은 실행의 팩트를 read-your-writes 로 재사용한다(이중 파싱 방지). policy 단독 실행
+    // (cache 미전달)은 기존 경로 그대로다. null 캐시 = 판독 불가 파일(제외 동작 동일).
+    const factsSec = cache?.section('java-facts', JAVA_FACTS_SALT);
     const javaFacts = [];
     const unresolved = [];
     for (const f of census.files) {
         if (f.lang !== 'java')
             continue;
+        const hit = factsSec?.get(f.relPath);
+        if (hit !== undefined) {
+            if (hit !== null)
+                javaFacts.push(hit);
+            continue;
+        }
         let source;
         try {
             source = readFileSync(join(projectRoot, f.relPath), 'utf8');
         }
         catch {
+            if (cache?.isAbsent(f.relPath))
+                factsSec?.put(f.relPath, null);
             continue;
         }
         try {
-            javaFacts.push(await extractJavaFacts(f.relPath, source));
+            const facts = await extractJavaFacts(f.relPath, source);
+            javaFacts.push(facts);
+            factsSec?.put(f.relPath, facts);
         }
         catch (err) {
+            // 파싱 실패는 캐시하지 않는다(edges/method-calls 규약 — 다음 실행 재시도).
             unresolved.push({ ref: f.relPath, reason: `Java 파싱 실패: ${err.message}` });
         }
     }

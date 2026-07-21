@@ -129,7 +129,7 @@ if (LEDGERED_SUBS.has(sub)) {
 async function runScan() {
   const { scanDomainMap } = engine
   const noCache = hasFlag('--no-cache')
-  const { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory, riskReport, scanCache, coverage } = await scanDomainMap(projectRoot, { readCache: !noCache })
+  const { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory, riskReport, scanCache, coverage, policySignals, policyReconcile } = await scanDomainMap(projectRoot, { readCache: !noCache })
   console.log(`understand-map scan 완료 — ${projectRoot}`)
   console.log(`  census: 파일 ${census.fileCount}개`)
   reportLangSupport(coverage)
@@ -147,7 +147,13 @@ async function runScan() {
     console.log(`  잠정 FP(간이법 미조정, [추정]): ${programInventory.fp.summary.unadjustedFp} — EI ${programInventory.fp.summary.ei}·EQ ${programInventory.fp.summary.eq}·ILF ${programInventory.fp.summary.ilf}·EIF ${programInventory.fp.summary.eif}`)
   }
   reportRisk(riskReport)
-  console.log('산출물: .spec/map/{census,routes,edges,slices,candidates,db-schema,interfaces,batch-jobs,program-inventory,risk-report}.json (동일 commit 재실행 byte-diff=0)')
+  // PA3: 정책 신호도 scan 소유 — map만 돌려도 대시보드 /policy(신호·대조)가 찬다.
+  console.log(`  정책 신호: ${policySignals.signals.length}건 → .spec/map/policy-signals.json (정책서 문서 생성은 /understand-policy 온디맨드)`)
+  const rs = policyReconcile.summary
+  if (rs.준수 + rs.문서에만 > 0) {
+    console.log(`  기존 정책서 대조: 준수 ${rs.준수} · 문서에만(미구현 후보) ${rs.문서에만} · 미정의(코드에만) ${rs.미정의} → .spec/map/policy-reconcile.json`)
+  }
+  console.log('산출물: .spec/map/{census,routes,edges,slices,candidates,db-schema,policy-signals,policy-reconcile,interfaces,batch-jobs,program-inventory,risk-report}.json (동일 commit 재실행 byte-diff=0)')
   console.log('       + .understand-anything/system-map.json (시스템 구성도 연동 패널 — 인터페이스/DB/배치 조인)')
   console.log('다음 단계: plan(경계 확인) → confirm(확정) → map(요약).')
 }

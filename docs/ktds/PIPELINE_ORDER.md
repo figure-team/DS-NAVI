@@ -13,6 +13,7 @@
 ```
 [1] /understand-map scan                                  ★ 모든 것의 뿌리
      └→ .spec/map/{census, routes, edges, slices, candidates, method-calls}.json
+        + .spec/map/{db-schema, policy-signals, policy-reconcile}.json (PA1·PA3 — 소비자는 로드만)
 
 [2] /understand-map plan → group-input → group-classify(LLM) → confirm   ★ 사람 게이트
      └→ .spec/map/domain-plan.confirmed.json (+groups)    ← 재실행 결정론의 "닻"
@@ -43,8 +44,12 @@
 
 [6] /understand-policy  1단계(결정론 앵커) → 2단계 LLM 보강(행≤60 인라인, 초과 팬아웃)
      └→ .understand-anything/doc-output/policy-{glossary,data,validation,authz}.md
-        + .spec/map/{db-schema, policy-signals}.json
-        db-schema 는 map 산출 있으면 재사용. domain 모드(policy-domain-*.md)는 confirm+domain-graph 이후.
+        + .spec/map/{db-schema, policy-signals, policy-reconcile}.json
+        PA3(2026-07-21): policy-signals/policy-reconcile 은 [3] map scan 이 산출(db-schema PA2 동형)
+        — map만 돌려도 대시보드 정책서 화면(신호·대조)이 찬다. policy 는 map 산출 있으면 재사용,
+        맵 미실행 시에만 자체 생성. 이 커맨드의 고유 몫 = 정책서 **문서 생성**(md + LLM 보강)
+        온디맨드 — map 재실행이 LLM 보강분을 휩쓸지 않게 주기를 분리한다(107행 사고 재발 방지).
+        domain 모드(policy-domain-*.md)는 confirm+domain-graph 이후.
 
 [7] /understand-rtm
      생성 모드 └→ .understand-anything/rtm.json (AS-IS 추적표)

@@ -25,6 +25,10 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> scan
 - **edges**: 파일 의존 엣지(import·injection·field-type·ctor-param·extends·implements·impl·mybatis·mapper-xml). 미해소 참조는 조용히 버리지 않고 보고한다.
 - **slices**: 진입점 기준 도달성(역/정) + 파일 소유권(sole/shared/unreached, depthCap 12).
 - **계층(layer)**: ground-truth 신호로 동적 추론(하드코딩 4계층 아님; api/service/dao/db/unknown).
+- **policy-signals / policy-reconcile**(PA3): 정책 신호(코드+DB 앵커) + 기존 정책서 대조도 scan 이
+  단독 소유한다(db-schema 동형) — map만 돌려도 대시보드 정책서 화면(신호·대조)이 찬다.
+  **정책서 문서 생성(md·LLM 보강)은 `/understand-policy` 온디맨드로 남는다**(재실행 주기 분리 —
+  map 재실행이 LLM 보강분·사람 입력을 휩쓸지 않는다).
 
 ## 2) 계획 (도메인 경계 확인)
 

@@ -314,8 +314,8 @@ export declare const IntakeQuestionAxisSchema: z.ZodEnum<{
     domain: "domain";
     policy: "policy";
     code: "code";
-    screen: "screen";
     data: "data";
+    screen: "screen";
     rtm: "rtm";
     general: "general";
 }>;
@@ -338,8 +338,8 @@ export declare const IntakeQuestionSchema: z.ZodObject<{
         domain: "domain";
         policy: "policy";
         code: "code";
-        screen: "screen";
         data: "data";
+        screen: "screen";
         rtm: "rtm";
         general: "general";
     }>>>;
@@ -482,8 +482,8 @@ export declare const IdentifiedIntakeSchema: z.ZodObject<{
             domain: "domain";
             policy: "policy";
             code: "code";
-            screen: "screen";
             data: "data";
+            screen: "screen";
             rtm: "rtm";
             general: "general";
         }>>>;

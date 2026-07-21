@@ -5,6 +5,11 @@ export { buildPolicySignals, scanPolicySignals } from './signal-scanner.js';
 export type { PolicySignalInput } from './signal-scanner.js';
 export { parseExistingPolicy } from './ingest.js';
 export { reconcilePolicy, scanPolicyReconcile } from './reconcile.js';
+/**
+ * policy-signals.json 로드 — PA3: map scan 이 산출한 신호를 소비자(정책서 문서 생성)가
+ * 재사용한다(readDbSchema 와 동형 — 없거나 스키마 불일치면 null → 호출자가 자체 생성 폴백).
+ */
+export declare function readPolicySignals(projectRoot: string): PolicySignalSet | null;
 /** policy-signals.json 기록(`.spec/map/` mkdir -p 선행). */
 export declare function writePolicySignals(projectRoot: string, set: PolicySignalSet): void;
 /** policy-reconcile.json 기록(`.spec/map/` mkdir -p 선행). */

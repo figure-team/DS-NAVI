@@ -113,6 +113,7 @@ export const ko = {
     breadcrumbRoot: "도메인",
     breadcrumbLabel: "구성 브레드크럼",
     viewFeatures: "업무 보기",
+    viewInPolicy: "정책서에서 보기",
     detail: "상세보기",
     systemSuffix: "시스템",
     extTitle: "타 시스템 연동",

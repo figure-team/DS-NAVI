@@ -113,6 +113,7 @@ export const ru = {
     breadcrumbRoot: "Бизнес-карта",
     breadcrumbLabel: "Хлебные крошки бизнес-карты",
     viewFeatures: "Показать функции",
+    viewInPolicy: "Смотреть в документе политик",
     detail: "Подробнее",
     systemSuffix: "система",
     extTitle: "Внешние интеграции",

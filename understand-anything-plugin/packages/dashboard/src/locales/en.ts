@@ -113,6 +113,7 @@ export const en = {
     breadcrumbRoot: "Domains",
     breadcrumbLabel: "Composition breadcrumb",
     viewFeatures: "View features",
+    viewInPolicy: "View in policy",
     detail: "Details",
     systemSuffix: "System",
     extTitle: "External integrations",

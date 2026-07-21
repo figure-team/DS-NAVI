@@ -1,4 +1,6 @@
+import type { ReactNode } from "react";
 import { useState } from "react";
+import { Link } from "react-router";
 import { useI18n } from "../contexts/I18nContext";
 import type { DomainCard, DomainClaim } from "../utils/domainData";
 import GroundedBar from "./GroundedBar";
@@ -32,8 +34,8 @@ function ClaimRow({ claim }: { claim: DomainClaim }) {
   );
 }
 
-/** 항목군 — NEEDS_REVIEW 우선 정렬, top-5 + "+N" 더보기. */
-function ClaimGroup({ label, claims }: { label: string; claims: DomainClaim[] }) {
+/** 항목군 — NEEDS_REVIEW 우선 정렬, top-5 + "+N" 더보기. action = 헤더 우측 부가 링크(선택). */
+function ClaimGroup({ label, claims, action }: { label: string; claims: DomainClaim[]; action?: ReactNode }) {
   const [expanded, setExpanded] = useState(false);
   if (claims.length === 0) return null;
   // ⚠(NEEDS_REVIEW)를 상단 고정(신뢰도 우선) — 안정 정렬.
@@ -44,8 +46,11 @@ function ClaimGroup({ label, claims }: { label: string; claims: DomainClaim[] })
   const hidden = sorted.length - visible.length;
   return (
     <div className="space-y-1.5">
-      <h4 className="text-[10px] uppercase tracking-wider text-text-muted">
-        {label} <span className="text-text-muted/70">({claims.length})</span>
+      <h4 className="flex items-baseline gap-2 text-[10px] uppercase tracking-wider text-text-muted">
+        <span>
+          {label} <span className="text-text-muted/70">({claims.length})</span>
+        </span>
+        {action}
       </h4>
       {visible.map((c, i) => (
         <ClaimRow key={i} claim={c} />
@@ -69,6 +74,9 @@ export default function DomainCardDetail({ card, onViewFeatures }: DomainCardDet
   const entities = card.claims.filter((c) => c.kind === "entity");
   const rules = card.claims.filter((c) => c.kind === "businessRule");
   const cross = card.claims.filter((c) => c.kind === "crossDomain");
+  // 업무 규칙(LLM 하이라이트) → 정책서 도메인 탭(§4 전수 의사결정 테이블) 딥링크.
+  // 도메인 key = 노드 id 의 "domain:" 접두 제거 — policy 문서 id(policy-domain-<key>) 규약과 대응.
+  const domainKey = card.id.startsWith("domain:") ? card.id.slice("domain:".length) : card.id;
 
   return (
     <div className="border-t border-border-subtle px-6 py-4 space-y-4">
@@ -79,7 +87,18 @@ export default function DomainCardDetail({ card, onViewFeatures }: DomainCardDet
           )}
           {summary && <ClaimRow claim={summary} />}
           <ClaimGroup label={t.nodeInfo.entities} claims={entities} />
-          <ClaimGroup label={t.nodeInfo.businessRules} claims={rules} />
+          <ClaimGroup
+            label={t.nodeInfo.businessRules}
+            claims={rules}
+            action={
+              <Link
+                to={`/policy?tab=dom&dom=${encodeURIComponent(domainKey)}`}
+                className="normal-case tracking-normal text-[11px] font-medium text-accent hover:underline"
+              >
+                {t.domainMap.viewInPolicy} →
+              </Link>
+            }
+          />
           <ClaimGroup label={t.nodeInfo.crossDomain} claims={cross} />
         </>
       ) : (

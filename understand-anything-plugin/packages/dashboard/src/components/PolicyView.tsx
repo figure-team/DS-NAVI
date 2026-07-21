@@ -762,11 +762,23 @@ function DomainTab({ docs, accessToken }: { docs: DocListItem[]; accessToken: st
 
   const [searchParams, setSearchParams] = useSearchParams();
   const viewParam = searchParams.get("view");
-  const view: DomainView = DOMAIN_VIEWS.includes(viewParam as DomainView) ? (viewParam as DomainView) : "issues";
+  // 도메인 카드 딥링크 필터(?dom=<key>) — 카드 업무 규칙 → 이 도메인의 §4 정책 규칙.
+  // 필터가 있으면 기본 뷰를 "정책 규칙 목록"으로 바꿔 해당 도메인 PL 행에 바로 착지시킨다.
+  const domFilter = searchParams.get("dom");
+  const view: DomainView = DOMAIN_VIEWS.includes(viewParam as DomainView)
+    ? (viewParam as DomainView)
+    : domFilter
+      ? "policies"
+      : "issues";
   const setView = (v: DomainView) =>
     setSearchParams((prev) => {
       if (v === "issues") prev.delete("view");
       else prev.set("view", v);
+      return prev;
+    });
+  const clearDom = () =>
+    setSearchParams((prev) => {
+      prev.delete("dom");
       return prev;
     });
 
@@ -831,9 +843,37 @@ function DomainTab({ docs, accessToken }: { docs: DocListItem[]; accessToken: st
     );
   }
 
-  const totalPl = stats.reduce((a, s) => a + s.policies.length, 0);
-  const totalNamed = stats.reduce((a, s) => a + s.namedCount, 0);
-  const confirmedCount = stats.filter((s) => s.confirmed).length;
+  // ?dom= 필터 — docId 규약(policy-domain-<key>)으로 대조. 아래 집계·뷰 전부 필터 반영.
+  const shown = domFilter ? stats.filter((s) => s.docId === `policy-domain-${domFilter}`) : stats;
+  const domChip = domFilter ? (
+    <div className="flex items-center" style={{ gap: 8, marginBottom: 12 }}>
+      <Pill active>도메인 필터: {domFilter}</Pill>
+      <button
+        type="button"
+        onClick={clearDom}
+        className="text-text-muted hover:text-text-primary bg-transparent cursor-pointer"
+        style={{ fontSize: 12, border: "none", padding: 0 }}
+      >
+        해제 ✕
+      </button>
+    </div>
+  ) : null;
+
+  if (domFilter && shown.length === 0) {
+    return (
+      <>
+        {domChip}
+        <EmptyCard title={`'${domFilter}' 도메인 정책서가 아직 없습니다`}>
+          CLI에서 <code>/understand-policy &lt;root&gt; domain</code>(도메인 모드)을 실행하면 이 도메인의 §4
+          의사결정 테이블 시드가 생성됩니다. 필터를 해제하면 생성된 다른 도메인 정책서를 볼 수 있습니다.
+        </EmptyCard>
+      </>
+    );
+  }
+
+  const totalPl = shown.reduce((a, s) => a + s.policies.length, 0);
+  const totalNamed = shown.reduce((a, s) => a + s.namedCount, 0);
+  const confirmedCount = shown.filter((s) => s.confirmed).length;
 
   // 미결 모아보기 — 동일 문구(자동 시드 등)는 도메인 칩으로 묶어 중복 나열을 피한다.
   // 출처를 잃지 않는다: 도메인 칩 = 원문 문서(§8) 링크, 근거 칩 = §8 근거 열의 file:line.
@@ -841,7 +881,7 @@ function DomainTab({ docs, accessToken }: { docs: DocListItem[]; accessToken: st
     string,
     { needsCheck: boolean; sources: Array<{ docId: string; domain: string }>; evidence: Anchor[] }
   >();
-  for (const s of stats) {
+  for (const s of shown) {
     for (const it of s.issues) {
       const e = issueMap.get(it.text) ?? { needsCheck: false, sources: [], evidence: [] };
       e.needsCheck = e.needsCheck || it.needsCheck;
@@ -857,10 +897,11 @@ function DomainTab({ docs, accessToken }: { docs: DocListItem[]; accessToken: st
 
   return (
     <>
+      {domChip}
       <div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: 12, marginBottom: 14 }}>
         <ViewTile
           label="도메인 정책서"
-          value={stats.length}
+          value={shown.length}
           active={view === "domains"}
           onClick={() => setView("domains")}
         />
@@ -938,10 +979,10 @@ function DomainTab({ docs, accessToken }: { docs: DocListItem[]; accessToken: st
       {view === "domains" && (
         <div>
           <GroupLabel>
-            도메인별 현황 · 확정 {confirmedCount}/{stats.length}
+            도메인별 현황 · 확정 {confirmedCount}/{shown.length}
           </GroupLabel>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3" style={{ gap: 12 }}>
-            {stats.map((s) => (
+            {shown.map((s) => (
               <div key={s.docId} className={CARD} style={{ padding: "12px 14px" }}>
                 <div className="flex items-center flex-wrap" style={{ gap: 8, marginBottom: 6 }}>
                   <b className="text-text-primary truncate" style={{ fontSize: 13, minWidth: 0 }}>
@@ -996,7 +1037,7 @@ function DomainTab({ docs, accessToken }: { docs: DocListItem[]; accessToken: st
                 </tr>
               </thead>
               <tbody>
-                {stats.flatMap((s) =>
+                {shown.flatMap((s) =>
                   s.policies.map((p) => (
                     <tr key={`${s.docId}-${p.id}`}>
                       <td style={{ fontFamily: "var(--font-mono)", fontSize: 12, whiteSpace: "nowrap" }}>{p.id}</td>
@@ -1040,7 +1081,7 @@ function DomainTab({ docs, accessToken }: { docs: DocListItem[]; accessToken: st
             결정론 추출은 IF/THEN/근거만 확정합니다 — 정책명은 LLM 보강과 사람 검토가 채웁니다.
           </p>
           <div className="flex flex-wrap" style={{ gap: 8, marginBottom: 12 }}>
-            {stats
+            {shown
               .filter((s) => s.policies.length > 0)
               .map((s) => (
                 <Pill key={s.docId} active={s.namedCount < s.policies.length}>
@@ -1054,7 +1095,7 @@ function DomainTab({ docs, accessToken }: { docs: DocListItem[]; accessToken: st
               흐름에서 진행합니다.
             </p>
           ) : (
-            stats.flatMap((s) =>
+            shown.flatMap((s) =>
               s.policies
                 .filter((p) => p.name === null)
                 .map((p) => (

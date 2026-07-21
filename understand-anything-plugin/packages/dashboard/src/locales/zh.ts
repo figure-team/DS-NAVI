@@ -113,6 +113,7 @@ export const zh = {
     breadcrumbRoot: "业务地图",
     breadcrumbLabel: "业务地图面包屑导航",
     viewFeatures: "查看功能",
+    viewInPolicy: "在政策文档中查看",
     detail: "详情",
     systemSuffix: "系统",
     extTitle: "外部系统集成",

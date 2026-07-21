@@ -113,6 +113,7 @@ export const ja = {
     breadcrumbRoot: "業務マップ",
     breadcrumbLabel: "業務マップ パンくずリスト",
     viewFeatures: "機能を見る",
+    viewInPolicy: "ポリシー文書で見る",
     detail: "詳細",
     systemSuffix: "システム",
     extTitle: "他システム連携",

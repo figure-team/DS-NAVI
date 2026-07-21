@@ -113,6 +113,7 @@ export const zhTW = {
     breadcrumbRoot: "業務地圖",
     breadcrumbLabel: "業務地圖麵包屑導覽",
     viewFeatures: "查看功能",
+    viewInPolicy: "在政策文件中查看",
     detail: "詳情",
     systemSuffix: "系統",
     extTitle: "外部系統整合",

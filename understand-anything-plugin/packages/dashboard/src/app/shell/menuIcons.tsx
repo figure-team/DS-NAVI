@@ -32,6 +32,14 @@ export const iconRtm = (
     <circle cx="19" cy="19" r="2.4" />
   </svg>
 );
+// 작업 요청(/requests) — 요청 유입 트레이(추적표 "요청 세션" 탭에서 메뉴로 승격, 2026-07-22).
+export const iconRequest = (
+  <svg {...svgProps}>
+    <path d="M3.5 13.5v4a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-4" />
+    <path d="M3.5 13.5h4.5l1.5 2.2h5l1.5-2.2h4.5" />
+    <path d="M12 3.8v6.7m0 0 2.8-2.8M12 10.5 9.2 7.7" />
+  </svg>
+);
 export const iconDocs = (
   <svg {...svgProps}>
     <path d="M6 2.5h9L20 8v13.5H6zM14.5 3v5.5H20" />
@@ -80,12 +88,22 @@ export const iconPolicy = (
     <path d="M9.5 9.5h5M9.5 13h3.5" />
   </svg>
 );
+// 장애 분석(/incident) — DS-APM 장애 RCA 리포트 분석·해결방안(INCIDENT_ANALYSIS_DESIGN).
+export const iconIncident = (
+  <svg {...svgProps}>
+    <path d="M12 3.5 21.5 20h-19z" />
+    <path d="M12 10v4.5" />
+    <circle cx="12" cy="17.2" r="0.4" fill="currentColor" stroke="none" />
+  </svg>
+);
 /**
  * 현재 섹션(useViewMode 값)에 맞는 아이콘 — TopBar 좌측 섹션 아이콘용.
  * 구조 탭(structural)은 업무 지도 소속이라 도메인 아이콘을 승계. 미매핑/홈은 iconHome.
  */
 export function iconForMode(mode: string | null | undefined): ReactNode {
   switch (mode) {
+    case "incident":
+      return iconIncident;
     case "domain":
       return iconDomain;
     case "data":
@@ -94,6 +112,8 @@ export function iconForMode(mode: string | null | undefined): ReactNode {
       return iconScreens;
     case "rtm":
       return iconRtm;
+    case "request":
+      return iconRequest;
     case "change":
       return iconChange;
     case "programs":

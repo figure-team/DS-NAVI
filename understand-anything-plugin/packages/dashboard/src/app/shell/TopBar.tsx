@@ -23,9 +23,11 @@ export default function TopBar({ accessToken, onShowHelp }: Props) {
     mode === "domain" ? t.drawer.domain
     : mode === "docs" ? "산출물"
     : mode === "rtm" ? "추적표"
+    : mode === "request" ? "작업 요청"
     : mode === "screenspec" ? "화면설계서"
     : mode === "data" ? "데이터"
     : mode === "change" ? "변경·영향"
+    : mode === "incident" ? "장애 분석"
     : mode === "programs" ? "프로그램"
     : mode === "quality" ? "품질·위험"
     : mode === "report" ? "보고서"

@@ -194,3 +194,40 @@ P5/P6 을 선행 요구**한다 — 영향분석이 인테이크에 들어와야
   사유 명기. 6단계 승격분(②영향분석) 반영.
 - **`FRONT_REDESIGN_DESIGN.md:57`** — `/rtm/intake/:sid` 라우트 규정은 `:290` 에서 이미 뒤집혔고
   본 설계가 그 결정을 재확인한다는 주석 추가.
+
+---
+
+## 7. 메뉴 승격 — "작업 요청" (2026-07-22, 사용자 확정)
+
+**요청 세션 탭을 독립 메뉴 `/requests`("작업 요청")로 승격**했다. §1 의 "신규 메뉴 반려" 결정을
+뒤집는 것이 아니라 전제가 바뀐 것이다:
+
+- **반려 근거 ①(고유 산출물 없는 중간물)** — 탭 확정 시점(2026-07-16)의 인테이크는 모달+드로어였다.
+  지금은 세션 원장(`rtm-intake/<sid>/`) + 세션별 문서 3종 + after-flow/after-schema 가 있어
+  **메뉴=산출물 1:1 관례를 충족**한다(장애 분석 메뉴의 승인 논거와 동형).
+- **반려 근거 ②(라우트 분리 시 RtmView 리마운트)** — 하위 라우트(`/rtm/intake/:sid`) 논거였다.
+  독립 메뉴는 자기 페이지·자기 상태를 가지므로 해당 없음(장애 분석이 실증).
+- **반려 근거 ③(종착지가 추적표)** — 유일하게 살아 있는 반론. **왕복 딥링크로 해소**:
+  ⑥ 완료 카드 → `/rtm?req=<REQ>`(요청 기준 탭 강제, 기존 계약), 구 딥링크
+  `/rtm?view=session[&sid=]`·`/rtm?sid=` → `/requests` 리다이렉트.
+
+**구현(최소 침습)**: `RtmView` 에 `variant` prop — `"requests"` 는 SessionView(세션 워크스페이스)만
+렌더, `"rtm"`(기본)은 4탭(세션 탭 제거). 컨텍스트를 쪼개지 않은 이유 = ⑤·⑥이 rtm.json 과
+상호작용(loadModel 재조회·조인 프리뷰)하고 IntakePanel 서브트리 전체가 RtmContext 를 소비한다.
+등록: routes/viewModePaths/types(ViewMode "request")/NavRail(추적표 다음)/menuIcons(iconRequest)/
+TopBar + `RequestsPage`. MobileTabBar 는 신메뉴 의도적 제외 관례 유지.
+
+**부수 정합**: impact-history 원장에 `kind`("intake"|"incident") additive 필드 도입 —
+장애 항목이 rootSlot:false 하나로 "RTM 요청" 오라벨되던 재점검(2026-07-22) P2 를 함께 해소.
+seedOriginBadge 는 kind 우선, 구 항목은 query 접두("[장애]") 폴백. 배지 라벨 "RTM 요청"→"작업 요청".
+
+**보류(별도 라운드)**: useIntake 의 store slice 화·폴링 구조 수렴(재점검 P2), 장애→요청 승격(P6)은
+본 승격 이후가 순서(재점검 D 권고: kind→공통화→W5→P6).
+
+### §7 추기 — 영향 이력 연합 (2026-07-22)
+
+§2.3 의 "포인터(세션) + 스냅샷(원장)" 이단 보관은 `IMPACT_LEDGER_FEDERATION_DESIGN.md` 로
+개정됐다: code-impact 스냅샷 정본은 **세션 디렉터리**(`rtm-intake/<sid>/impact/`)이고
+impact-history 원장 append 는 제거됐다. `/change` 목록은 서버가 세션 포인터를 읽기 시점에
+병합해 노출하며, 스냅샷 서빙은 jobId 단일 키 리졸버라 `?run=` 딥링크·useIntake 2단 로드
+("두 표면 동일 스냅샷" 불변식 포함)는 무변경이다.

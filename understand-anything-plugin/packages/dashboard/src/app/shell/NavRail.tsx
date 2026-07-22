@@ -9,7 +9,9 @@ import {
   iconData,
   iconScreens,
   iconRtm,
+  iconRequest,
   iconChange,
+  iconIncident,
   iconPrograms,
   iconQuality,
   iconReport,
@@ -45,7 +47,10 @@ export default function NavRail() {
     items.push({ to: "/data", label: "데이터", icon: iconData, group: domainGraph ? undefined : "이해" });
     items.push({ to: "/screens", label: "화면설계서", icon: iconScreens });
     items.push({ to: "/rtm", label: "추적표", icon: iconRtm, group: "요구 · 변경" });
+    // 작업 요청 — 추적표 "요청 세션" 탭에서 승격(2026-07-22). 종착지(rtm.json)와 인접 배치.
+    items.push({ to: "/requests", label: "작업 요청", icon: iconRequest });
     items.push({ to: "/change", label: "변경·영향", icon: iconChange });
+    items.push({ to: "/incident", label: "장애 분석", icon: iconIncident });
     items.push({ to: "/programs", label: "프로그램", icon: iconPrograms, group: "정량 · 보고" });
     items.push({ to: "/quality", label: "품질·위험", icon: iconQuality });
     items.push({ to: "/report", label: "보고서", icon: iconReport });

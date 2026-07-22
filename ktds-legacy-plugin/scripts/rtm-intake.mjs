@@ -56,35 +56,9 @@ function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'))
 }
 
-/**
- * impact 원장 append — 대시보드 `server/job-ledger.ts` 의 `appendLedgerEntry(dir, entry, MAX)` 와
- * **동일 형식**(최신이 앞, 동일 jobId dedup, 상한 초과분 절삭). 두 패키지가 갈라져 있어
- * (ktds-legacy-plugin ↔ understand-anything-plugin) 런타임 import 가 불가하므로 형식만 맞춘다.
- * 상한 50 = 대시보드 `IMPACT_HISTORY_MAX`(vite.config.ts:1203) 와 동기.
- *
- * 절삭된 항목의 스냅샷 디렉터리도 함께 지운다(서버의 append 후처리와 동일 — 고아 디렉터리 방지).
- */
-const IMPACT_HISTORY_MAX = 50
-function appendImpactLedger(dir, entry) {
-  const ledgerPath = join(dir, 'ledger.json')
-  let entries = []
-  try {
-    const raw = JSON.parse(readFileSync(ledgerPath, 'utf8'))
-    if (Array.isArray(raw.entries)) entries = raw.entries
-  } catch {
-    // 부재/파손 = 기록 없음(정직한 empty) — 서버 readLedger 와 동일 관용.
-  }
-  const next = [entry, ...entries.filter((e) => e.jobId !== entry.jobId)]
-  mkdirSync(dir, { recursive: true })
-  writeFileSync(ledgerPath, JSON.stringify({ entries: next.slice(0, IMPACT_HISTORY_MAX) }, null, 2) + '\n', 'utf8')
-  for (const drop of next.slice(IMPACT_HISTORY_MAX)) {
-    try {
-      rmSync(join(dir, drop.jobId), { recursive: true, force: true })
-    } catch {
-      // 스냅샷 정리 실패는 무시(원장에서만 제거)
-    }
-  }
-}
+// impact 원장 append 는 연합(IMPACT_LEDGER_FEDERATION_DESIGN §2.1)으로 제거됐다 —
+// impact-history 는 /change 서버 잡 단독 기록이고, code-impact 산출은 세션 디렉터리
+// (rtm-intake/<sid>/impact/)가 정본이다. /change 목록 노출은 서버의 읽기 병합 몫.
 
 // ── 실재 대조 인벤토리 로드(P1) — IO 경계. 순수 게이트는 legacy-core 가 갖고 여기선 읽어 주입만.
 // 설계: docs/ktds/RTM_IMPACT_GATE_DESIGN.md §6.1-4.
@@ -695,33 +669,20 @@ if (cmd === 'code-impact') {
   // 원장 기록(§2.3) — jobId 는 세션 결정론 해시. 같은 세션 재실행은 같은 jobId 라 원장에서
   // dedup 되고(항목이 쌓이지 않는다) 스냅샷도 제자리 갱신된다.
   const jobId = createHash('sha256').update(`rtm-intake:${sid}`, 'utf8').digest('hex').slice(0, 16)
-  const historyDir = join(uaDir, 'impact-history')
-  const snapDir = join(historyDir, jobId)
+  // ★ 연합(IMPACT_LEDGER_FEDERATION_DESIGN §2.1) — 스냅샷 정본은 **세션 디렉터리**다.
+  // impact-history 원장은 /change 서버 잡 단독 기록으로 좁혀졌고, /change 목록·스냅샷 서빙은
+  // 서버가 세션 포인터를 읽기 시점에 병합/해석한다(무잠금 3프로세스 RMW 경합 제거).
+  const snapDir = join(sessionDir, 'impact')
   mkdirSync(snapDir, { recursive: true })
-  const files = []
   for (const [stagePath, name] of [
     [analyzed.impactPath, 'impact.json'],
     [analyzed.verifyPath, 'impact-verify-report.json'],
   ]) {
     copyFileSync(stagePath, join(snapDir, name))
     rmSync(stagePath, { force: true }) // 스테이징 해제 — .spec/map 에 요청별 파일을 남기지 않는다
-    files.push(name)
   }
   // impact-overlay.json 은 스냅샷하지 않는다 — 구조 탭 오버레이는 고정 루트 슬롯이라
   // 인테이크가 발행하면 /structure 의 현재 오버레이를 덮어쓴다(무오염 원칙).
-
-  appendImpactLedger(historyDir, {
-    jobId,
-    query: intake.request.raw, // ★ 원장 query = 요청 원문(§2.3)
-    model: null, // 결정론 조인 — LLM 미사용
-    startedAt,
-    finishedAt: new Date().toISOString(),
-    exitCode: 0,
-    status: 'done',
-    gitCommit: result.gitCommit,
-    files,
-    rootSlot: false, // ★ 루트 슬롯을 갱신하지 않은 실행 — /change 의 고아 판정에서 제외된다
-  })
 
   // 세션 포인터 — 워크스페이스 ①이 자기 분석을 찾는 키(RTM_INTAKE_WORKSPACE_DESIGN.md §2.3 인라인).
   writeFileSync(
@@ -732,6 +693,8 @@ if (cmd === 'code-impact') {
         requestId: intake.request.id,
         query: intake.request.raw,
         gitCommit: result.gitCommit,
+        startedAt, // 연합 파생 행의 시각 축 — 구 포인터(필드 부재)는 서버가 mtime 으로 근사
+        finishedAt: new Date().toISOString(),
         seedScope: 'entryPoint',
         seeds: res.seeds,
         bySource: res.bySource,
@@ -753,7 +716,7 @@ if (cmd === 'code-impact') {
   console.log('')
   console.log(`  요청별 보관: ${snapDir}/impact.json (+verify)`)
   console.log(`  세션 포인터: ${join(sessionDir, 'impact-run.json')} (jobId ${jobId})`)
-  console.log(`  원장 기록: ${join(historyDir, 'ledger.json')} — /change 메뉴에서 "${intake.request.raw}" 로 열람`)
+  console.log(`  /change 열람: 서버가 세션 포인터를 병합해 목록에 노출(연합 — 원장 직접 기록 없음)`)
   console.log('  루트 슬롯(.spec/map/impact.json)·문서 09·구조 오버레이: 무변경')
   console.log('')
   console.log('다음(SKILL ①): 위 영향 범위를 근거 보고에 포함하고 **멈춘다** — 사용자 컨펌이 게이트다.')

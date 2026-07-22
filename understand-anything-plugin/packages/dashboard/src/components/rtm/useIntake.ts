@@ -23,6 +23,11 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
   const [intakeModel, setIntakeModel] = useState<ModelChoice>(""); // "" = 세션 모델(기본)
   const [intakeStatus, setIntakeStatus] = useState<"idle" | "running" | "done" | "failed">("idle");
   const [intakeError, setIntakeError] = useState<string | null>(null);
+  // 승격 유래(EXPLORE_PROMOTION) — /change 탐색에서 "작업 요청으로 승격"으로 넘어온 경우의
+  // 유래 jobId·질의. 새 요청 모달 칩으로 보이고, startIntake 가 서버에 넘겨 세션에 박는다.
+  const [intakeOrigin, setIntakeOrigin] = useState<{ jobId: string; query: string | null } | null>(null);
+  // 유래 탐색 스냅샷 — ② 델타 뷰("유래 탐색 대비")의 비교 대상. 세션 origin 이 있을 때만 로드.
+  const [originImpact, setOriginImpact] = useState<ImpactSnapshot | null>(null);
   /**
    * 지금 도는 job 이 **몇 번 단계**인가(서버 `rtmTracker.job.step`). null=모름.
    * 이게 있어야 "최전선 재실행(①개정)"과 "다음 단계 생성"을 화면이 가른다 — 없으면 개정 중에도
@@ -71,14 +76,17 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     if (!accessToken) { setIntakeError("읽기전용(라이브 서버 없음) — 인테이크는 dev 서버가 필요합니다."); return; }
     setIntakeError(null);
     try {
-      const res = await fetch(`/rtm-intake?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(intakeModel ? { request: q, targetStep, model: intakeModel } : { request: q, targetStep }) });
+      const body: Record<string, unknown> = { request: q, targetStep };
+      if (intakeModel) body.model = intakeModel;
+      if (intakeOrigin) body.originJobId = intakeOrigin.jobId; // 승격 유래 — 서버가 원장 대조 후 세션에 박는다
+      const res = await fetch(`/rtm-intake?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const d = (await res.json().catch(() => null)) as { job?: { sid?: string }; session?: RtmSession; error?: string } | null;
       if (res.status === 202 && d?.session) {
         setSid(d.session.sid); setSession(d.session); setIntakeStatus("running");
-        setIntakeOpen(false); setIntakeQuery(""); setPreviewName(null); setIdentified(null); resetSessionArtifacts();
+        setIntakeOpen(false); setIntakeQuery(""); setIntakeOrigin(null); setPreviewName(null); setIdentified(null); resetSessionArtifacts();
       } else { setIntakeError(d?.error ?? `HTTP ${res.status}`); }
     } catch (e) { setIntakeError(String(e)); }
-  }, [intakeQuery, targetStep, intakeModel, accessToken, resetSessionArtifacts]);
+  }, [intakeQuery, targetStep, intakeModel, intakeOrigin, accessToken, resetSessionArtifacts]);
 
   // start..target 진행(다음 단계 / ⑤까지). 컨펌 게이트 미통과면 409 토스트.
   // 모델은 보내지 않는다 — 서버가 세션에 박힌 첫 실행 모델을 이어받는다(session.model, 2026-07-16).
@@ -347,9 +355,23 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
   // 새 단계가 산출되면 표시를 최전선으로 되돌린다.
   useEffect(() => { setViewStep(null); }, [session?.producedStep]);
 
+  // 유래 탐색 스냅샷 로드(EXPLORE_PROMOTION) — 세션에 origin 이 있으면 그 jobId 스냅샷을
+  // 리졸버(/impact-history-item)로 읽는다. 실패/부재는 null — ② 델타 카드가 부재를 정직하게
+  // 말한다(빈 델타로 위장 금지).
+  const originJobId = session?.origin?.jobId ?? null;
+  useEffect(() => {
+    if (!originJobId) { setOriginImpact(null); return; }
+    let alive = true;
+    fetch(`/impact-history-item${tokenQ}&id=${encodeURIComponent(originJobId)}&name=impact.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: ImpactSnapshot | null) => { if (alive) setOriginImpact(d); })
+      .catch(() => { if (alive) setOriginImpact(null); });
+    return () => { alive = false; };
+  }, [originJobId, tokenQ]);
+
   return {
     intakeOpen, setIntakeOpen, intakeQuery, setIntakeQuery, targetStep, setTargetStep,
-    intakeModel, setIntakeModel,
+    intakeModel, setIntakeModel, intakeOrigin, setIntakeOrigin, originImpact,
     intakeStatus, intakeError, setIntakeError, sid, session, sessionDocs, stepBusy, viewStep, setViewStep,
     previewName, previewMd, identified, editingDoc, setEditingDoc, draftDoc, setDraftDoc,
     impactRun, impactData, impactLoaded, afterFlows, afterSchema, qaHistory, jobStep,

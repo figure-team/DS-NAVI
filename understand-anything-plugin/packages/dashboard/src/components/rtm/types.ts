@@ -137,6 +137,8 @@ export interface RtmSession {
   steps: Record<string, { status: string; stale?: boolean }>;
   /** 첫 실행 모델(null/부재=세션 기본) — 진행·개정은 서버가 이 값으로 이어간다(2026-07-16). */
   model?: string | null;
+  /** 승격 유래(EXPLORE_PROMOTION) — 변경·영향 탐색에서 승격된 세션의 탐색 jobId·질의. */
+  origin?: { jobId: string; query: string | null } | null;
 }
 export interface SessionDoc { name: string; kind: string }
 
@@ -288,6 +290,29 @@ export interface ImpactSnapshot {
     persistence?: { mappers?: { namespace: string; relPath: string; citation?: ImpactCitation | null }[] };
   };
   downstream?: { files?: ImpactFileRef[] };
+}
+
+/**
+ * 유래 탐색 대비 도달 파일 델타(EXPLORE_PROMOTION §델타 뷰) — 결정론 집합 비교.
+ * 상·하류 도달 파일(relPath) 합집합끼리만 잰다(시드는 관점이 달라 제외 — 탐색=사용자 파일,
+ * ②=changeset 조인). **원인은 단정하지 않는다** — 차이의 서술은 화면 안내 문구 몫.
+ */
+export function computeImpactFileDelta(
+  origin: ImpactSnapshot | null | undefined,
+  current: ImpactSnapshot | null | undefined,
+): { added: string[]; removed: string[] } {
+  const files = (s: ImpactSnapshot | null | undefined): Set<string> =>
+    new Set(
+      [...(s?.upstream?.files ?? []), ...(s?.downstream?.files ?? [])]
+        .map((f) => f.relPath)
+        .filter((p): p is string => typeof p === "string" && p.length > 0),
+    );
+  const o = files(origin);
+  const c = files(current);
+  return {
+    added: [...c].filter((p) => !o.has(p)).sort(),
+    removed: [...o].filter((p) => !c.has(p)).sort(),
+  };
 }
 
 /** 신규(TO-BE) 기능 id 접두 — 아직 파일이 없어 시드가 못 된다(legacy-core rtm-seeds.ts:47). */

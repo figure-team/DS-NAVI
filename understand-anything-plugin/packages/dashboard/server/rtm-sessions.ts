@@ -54,6 +54,12 @@ export interface RtmSession {
    */
   steps: Record<string, { status: RtmStepStatus; stale?: boolean }>;
   /**
+   * 승격 유래(EXPLORE_PROMOTION — 2026-07-22). 변경·영향 탐색에서 "작업 요청으로 승격"으로
+   * 만들어진 세션이면 그 탐색의 jobId·질의를 박는다 — ① 디렉티브의 유래 요약 주입과 ② 델타
+   * 뷰("유래 탐색 대비")의 조인 키다. optional: 일반 새 요청·구세션은 부재(=유래 없음).
+   */
+  origin?: { jobId: string; query: string | null } | null;
+  /**
    * 첫 실행에서 고른 모델(null=세션 기본) — **이후 모든 단계 진행·①개정이 이 값을 이어받는다**
    * (2026-07-16 사용자 결정). 세션에 박지 않으면 브라우저 상태에 의존해 새로고침·세션 전환 뒤
    * "다음 단계"가 다른 모델로 튄다. optional 인 이유: 이 필드를 모르는 구세션이 디스크에 실재한다

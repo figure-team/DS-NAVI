@@ -104,6 +104,11 @@ export interface RtmCtx {
   setTargetStep: (v: number) => void;
   intakeModel: ModelChoice;
   setIntakeModel: (v: ModelChoice) => void;
+  /** 승격 유래(EXPLORE_PROMOTION) — /change 탐색에서 승격으로 넘어온 새 요청의 유래. 모달 칩. */
+  intakeOrigin: { jobId: string; query: string | null } | null;
+  setIntakeOrigin: (v: { jobId: string; query: string | null } | null) => void;
+  /** 유래 탐색 스냅샷 — ② 델타 뷰 비교 대상(session.origin 있을 때만 로드, 부재=null). */
+  originImpact: ImpactSnapshot | null;
   intakeStatus: "idle" | "running" | "done" | "failed";
   intakeError: string | null;
   startIntake: () => Promise<void>;

@@ -19,7 +19,7 @@ import EvidenceLink from "../ui/EvidenceLink";
  */
 export function IntakeStepper() {
   const {
-    session, intakeStatus, viewStep, setViewStep, setView,
+    session, intakeStatus, viewStep, setViewStep,
     previewName, previewMd, editingDoc, setEditingDoc, setDraftDoc, stepBusy, confirmStep, advance, saveDoc,
   } = useRtm();
   if (!session || session.discarded) return null;
@@ -52,7 +52,8 @@ export function IntakeStepper() {
           <span key={s.n} className="flex items-center">
             {i > 0 && <span style={{ width: 14, height: 1, background: "var(--color-border-subtle)", margin: "0 2px" }} />}
             {/* W3: 산출물이 요청 세션 탭 본문으로 옮겨왔으므로 단계 선택은 그 탭으로 데려간다. */}
-            <button type="button" disabled={!clickable} onClick={() => { setViewStep(s.n); setView("session"); }} className="flex items-center gap-1.5 rounded-md transition-colors" title={clickable ? `${s.label} 보기` : undefined}
+            {/* setView("session") 은 탭 시절 유물 — 스테퍼는 이제 작업 요청 메뉴에만 산다(2026-07-22). */}
+            <button type="button" disabled={!clickable} onClick={() => setViewStep(s.n)} className="flex items-center gap-1.5 rounded-md transition-colors" title={clickable ? `${s.label} 보기` : undefined}
               style={{ padding: "3px 8px", border: `1px solid ${active ? color : `${color}40`}`, background: active ? `${color}26` : `${color}14`, opacity: clickable || isRunningStep ? 1 : 0.5, cursor: clickable ? "pointer" : "default", whiteSpace: "nowrap" }}>
               <span style={{ color, fontSize: 12 }}>{CIRCLED[i]}</span>
               <span style={{ fontSize: 11, color: st === "pending" ? FAINT : "var(--color-text-secondary)" }}>{s.label}</span>
@@ -407,7 +408,7 @@ function IdentifiedView() {
  * 확정이어야 한다(auto 면 기본 2행으로 접힌다). 드로어 시절의 내부 비율을 그대로 보존한다.
  */
 export function IntakeStepContent() {
-  const { session, viewStep, previewMd, editingDoc, draftDoc, setDraftDoc } = useRtm();
+  const { session, viewStep, previewMd, editingDoc, draftDoc, setDraftDoc, identified } = useRtm();
   if (!session) return null;
   const frontier = session.producedStep;
   if (frontier < 1) return null;
@@ -433,7 +434,7 @@ export function IntakeStepContent() {
         )}
         {ps === 1 ? <IdentifiedView />
           : ps === 2 ? <ImpactStepView />
-          : ps === 6 ? <div className="text-text-secondary" style={{ fontSize: 13, lineHeight: 1.7 }}>⑥ RTM 반영 완료 — <b style={{ color: "var(--color-text-primary)" }}>요청 기준</b> 탭에서 분해된 요청·요구사항과 추적 결과를 확인하세요. <span className="text-text-muted">생성된 문서는 세션 폴더(rtm-intake)에 보존됩니다.</span></div>
+          : ps === 6 ? <div className="text-text-secondary" style={{ fontSize: 13, lineHeight: 1.7 }}>⑥ RTM 반영 완료 — 분해된 요청·요구사항과 추적 결과는 추적표에 반영되어 있습니다. <Link to={identified?.request?.id ? `/rtm?req=${encodeURIComponent(identified.request.id)}` : "/rtm?view=requirement"} className="text-accent hover:underline" style={{ fontWeight: 650 }}>추적표에서 보기 →</Link> <span className="text-text-muted">생성된 문서는 세션 폴더(rtm-intake)에 보존됩니다.</span></div>
           : editingDoc ? <textarea value={draftDoc} onChange={(e) => setDraftDoc(e.target.value)} spellCheck={false} className="w-full h-full resize-none rounded-lg bg-elevated border border-border-medium text-text-primary focus:outline-none focus:border-accent" style={{ fontFamily: "var(--font-mono)", fontSize: 12, lineHeight: 1.55, padding: "10px 12px" }} />
           : ps === 5 ? <SpecTabs />
           : <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD}>{stripFrontmatter(previewMd)}</ReactMarkdown>}
@@ -444,7 +445,7 @@ export function IntakeStepContent() {
 
 /** 인테이크 모달 — 자연어 요청 입력 + 목표 단계 선택. */
 export function IntakeModal() {
-  const { setIntakeOpen, intakeQuery, setIntakeQuery, targetStep, setTargetStep, intakeModel, setIntakeModel, intakeError, startIntake } = useRtm();
+  const { setIntakeOpen, intakeQuery, setIntakeQuery, targetStep, setTargetStep, intakeModel, setIntakeModel, intakeOrigin, setIntakeOrigin, intakeError, startIntake } = useRtm();
   useEscClose(() => setIntakeOpen(false));
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-root/80 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setIntakeOpen(false); }}>
@@ -460,6 +461,16 @@ export function IntakeModal() {
               ②영향분석이 독립 단계가 되며 낡았다 — 이제 여기서도 돌린다. 남은 차이는 **시드 도출**:
               여기는 ①의 changeset 에서 결정론 조인, 변경·영향은 임의 파일집합. */}
           <p className="text-text-muted" style={{ fontSize: 11.5, lineHeight: 1.6, marginBottom: 10 }}>이미 분석된 산출물(화면·정책·도메인·데이터·추적표)을 근거로 분해하고, <b className="text-text-secondary">②영향분석</b>에서 코드 도달성(바뀐 기능에서 무엇이 연쇄로 영향받는지)까지 확인합니다. 임의 파일집합으로 영향만 보려면 <b className="text-text-secondary">변경·영향</b> 메뉴를 쓰세요.</p>
+          {/* 승격 유래 칩(EXPLORE_PROMOTION) — 이 요청이 어느 탐색에서 왔는지 + ①에 무엇이 주입되는지.
+              × 로 떼면 유래 없는 일반 요청으로 접수된다(주입·델타 뷰 없음). */}
+          {intakeOrigin && (
+            <div className="flex items-center rounded-lg border border-border-medium bg-elevated" style={{ gap: 8, padding: "6px 10px", marginBottom: 10, fontSize: 11.5 }}>
+              <span className="text-text-secondary" style={{ whiteSpace: "nowrap" }}>유래: 변경·영향 탐색</span>
+              <code className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 10.5 }}>{intakeOrigin.jobId.slice(0, 8)}</code>
+              <span className="text-text-muted truncate" style={{ minWidth: 0 }}>탐색의 도달성 요약이 ①식별의 참고 근거로 주입되고, ②에서 탐색 대비 델타를 보여줍니다.</span>
+              <button type="button" onClick={() => setIntakeOrigin(null)} aria-label="유래 제거" title="유래를 떼고 일반 요청으로 접수" className="text-text-muted hover:text-text-primary" style={{ fontSize: 14, lineHeight: 1, marginLeft: "auto" }}>×</button>
+            </div>
+          )}
           <textarea value={intakeQuery} onChange={(e) => setIntakeQuery(e.target.value)} onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") void startIntake(); }} placeholder="예) 네이버 로그인 추가해주세요." rows={3} autoFocus className="w-full resize-y rounded-lg bg-elevated border border-border-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent" style={{ fontSize: 13, padding: "8px 11px" }} />
           <div style={{ marginTop: 14 }}>
             <div className="text-text-muted" style={{ fontSize: 11, marginBottom: 7 }}>어디까지 진행할까요? <span style={{ color: "var(--color-text-secondary)" }}>(선택 단계까지 한 번에 생성 후 멈춤)</span></div>

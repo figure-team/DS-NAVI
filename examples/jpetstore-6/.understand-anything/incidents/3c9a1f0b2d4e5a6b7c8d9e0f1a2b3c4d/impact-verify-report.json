@@ -1,0 +1,273 @@
+{
+  "gitCommit": "fa8982d327ea2f93d694c4d7d44deb0fe9c5d1dd",
+  "items": [
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+          "line": 68,
+          "snippet": "  public Resolution addItemToCart() {",
+          "status": "ok"
+        }
+      ],
+      "kind": "api",
+      "ref": "route:ANY /actions/Cart.action?addItemToCart",
+      "text": "진입점 영향: route:ANY /actions/Cart.action?addItemToCart",
+      "verdict": "GROUNDED"
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+          "line": 141,
+          "snippet": "  public ForwardResolution checkOut() {",
+          "status": "ok"
+        }
+      ],
+      "kind": "api",
+      "ref": "route:ANY /actions/Cart.action?checkOut",
+      "text": "진입점 영향: route:ANY /actions/Cart.action?checkOut",
+      "verdict": "GROUNDED"
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+          "line": 94,
+          "snippet": "  public Resolution removeItemFromCart() {",
+          "status": "ok"
+        }
+      ],
+      "kind": "api",
+      "ref": "route:ANY /actions/Cart.action?removeItemFromCart",
+      "text": "진입점 영향: route:ANY /actions/Cart.action?removeItemFromCart",
+      "verdict": "GROUNDED"
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+          "line": 116,
+          "snippet": "  public Resolution updateCartQuantities() {",
+          "status": "ok"
+        }
+      ],
+      "kind": "api",
+      "ref": "route:ANY /actions/Cart.action?updateCartQuantities",
+      "text": "진입점 영향: route:ANY /actions/Cart.action?updateCartQuantities",
+      "verdict": "GROUNDED"
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+          "line": 137,
+          "snippet": "  public ForwardResolution viewCart() {",
+          "status": "ok"
+        }
+      ],
+      "kind": "api",
+      "ref": "route:ANY /actions/Cart.action?viewCart",
+      "text": "진입점 영향: route:ANY /actions/Cart.action?viewCart",
+      "verdict": "GROUNDED"
+    },
+    {
+      "citations": [],
+      "kind": "domain",
+      "ref": "domain:cart",
+      "text": "도메인 영향: cart",
+      "verdict": "NEEDS_REVIEW"
+    },
+    {
+      "citations": [],
+      "kind": "domain",
+      "ref": "domain:order",
+      "text": "도메인 영향: order",
+      "verdict": "NEEDS_REVIEW"
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+          "line": 34,
+          "snippet": "@Service",
+          "status": "ok"
+        }
+      ],
+      "kind": "downstream",
+      "ref": "src/main/java/org/mybatis/jpetstore/mapper/CategoryMapper.java",
+      "text": "하류 의존 파일: src/main/java/org/mybatis/jpetstore/mapper/CategoryMapper.java",
+      "verdict": "GROUNDED"
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+          "line": 34,
+          "snippet": "@Service",
+          "status": "ok"
+        }
+      ],
+      "kind": "downstream",
+      "ref": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+      "text": "하류 의존 파일: src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+      "verdict": "GROUNDED"
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+          "line": 34,
+          "snippet": "@Service",
+          "status": "ok"
+        }
+      ],
+      "kind": "downstream",
+      "ref": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+      "text": "하류 의존 파일: src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+      "verdict": "GROUNDED"
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+          "line": 45,
+          "snippet": "  @SpringBean",
+          "status": "ok"
+        }
+      ],
+      "kind": "downstream",
+      "ref": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "text": "하류 의존 파일: src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "verdict": "GROUNDED"
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+          "line": 37,
+          "snippet": "@SessionScope",
+          "status": "ok"
+        }
+      ],
+      "kind": "downstream",
+      "ref": "src/main/java/org/mybatis/jpetstore/web/actions/AbstractActionBean.java",
+      "text": "하류 의존 파일: src/main/java/org/mybatis/jpetstore/web/actions/AbstractActionBean.java",
+      "verdict": "GROUNDED"
+    },
+    {
+      "citations": [],
+      "kind": "downstream",
+      "ref": "src/main/resources/org/mybatis/jpetstore/mapper/CategoryMapper.xml",
+      "text": "하류 의존 파일: src/main/resources/org/mybatis/jpetstore/mapper/CategoryMapper.xml",
+      "verdict": "NEEDS_REVIEW"
+    },
+    {
+      "citations": [],
+      "kind": "downstream",
+      "ref": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+      "text": "하류 의존 파일: src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+      "verdict": "NEEDS_REVIEW"
+    },
+    {
+      "citations": [],
+      "kind": "downstream",
+      "ref": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+      "text": "하류 의존 파일: src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+      "verdict": "NEEDS_REVIEW"
+    },
+    {
+      "citations": [],
+      "kind": "flow",
+      "ref": "flow:ANY /actions/Cart.action?addItemToCart",
+      "text": "흐름 영향: flow:ANY /actions/Cart.action?addItemToCart",
+      "verdict": "NEEDS_REVIEW"
+    },
+    {
+      "citations": [],
+      "kind": "flow",
+      "ref": "flow:ANY /actions/Cart.action?checkOut",
+      "text": "흐름 영향: flow:ANY /actions/Cart.action?checkOut",
+      "verdict": "NEEDS_REVIEW"
+    },
+    {
+      "citations": [],
+      "kind": "flow",
+      "ref": "flow:ANY /actions/Cart.action?removeItemFromCart",
+      "text": "흐름 영향: flow:ANY /actions/Cart.action?removeItemFromCart",
+      "verdict": "NEEDS_REVIEW"
+    },
+    {
+      "citations": [],
+      "kind": "flow",
+      "ref": "flow:ANY /actions/Cart.action?updateCartQuantities",
+      "text": "흐름 영향: flow:ANY /actions/Cart.action?updateCartQuantities",
+      "verdict": "NEEDS_REVIEW"
+    },
+    {
+      "citations": [],
+      "kind": "flow",
+      "ref": "flow:ANY /actions/Cart.action?viewCart",
+      "text": "흐름 영향: flow:ANY /actions/Cart.action?viewCart",
+      "verdict": "NEEDS_REVIEW"
+    },
+    {
+      "citations": [],
+      "kind": "flow",
+      "ref": "flow:ANY /actions/Order.action?newOrder",
+      "text": "흐름 영향: flow:ANY /actions/Order.action?newOrder",
+      "verdict": "NEEDS_REVIEW"
+    },
+    {
+      "citations": [],
+      "kind": "flow",
+      "ref": "flow:ANY /actions/Order.action?newOrderForm",
+      "text": "흐름 영향: flow:ANY /actions/Order.action?newOrderForm",
+      "verdict": "NEEDS_REVIEW"
+    },
+    {
+      "citations": [],
+      "kind": "mapper",
+      "ref": "src/main/resources/org/mybatis/jpetstore/mapper/CategoryMapper.xml",
+      "text": "영속성 영향: src/main/resources/org/mybatis/jpetstore/mapper/CategoryMapper.xml",
+      "verdict": "NEEDS_REVIEW"
+    },
+    {
+      "citations": [],
+      "kind": "mapper",
+      "ref": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+      "text": "영속성 영향: src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+      "verdict": "NEEDS_REVIEW"
+    },
+    {
+      "citations": [],
+      "kind": "mapper",
+      "ref": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+      "text": "영속성 영향: src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+      "verdict": "NEEDS_REVIEW"
+    },
+    {
+      "citations": [
+        {
+          "filePath": "src/test/java/org/mybatis/jpetstore/web/actions/CartActionBeanTest.java",
+          "line": 34,
+          "snippet": "  private CartActionBean cartActionBean;",
+          "status": "ok"
+        }
+      ],
+      "kind": "upstream",
+      "ref": "src/test/java/org/mybatis/jpetstore/web/actions/CartActionBeanTest.java",
+      "text": "상류 영향 파일: src/test/java/org/mybatis/jpetstore/web/actions/CartActionBeanTest.java",
+      "verdict": "GROUNDED"
+    }
+  ],
+  "overall": {
+    "citationOk": 11,
+    "citationTotal": 11,
+    "groundedPct": 100,
+    "itemGrounded": 11,
+    "itemTotal": 26,
+    "uncitedClaims": 15
+  },
+  "schemaVersion": 1
+}

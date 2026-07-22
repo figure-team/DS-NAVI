@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "tables": [
+    {
+      "name": "SOCIALSIGNON",
+      "change": "added",
+      "columns": [
+        { "name": "provider", "type": "varchar(20)", "note": "소셜 제공자 구분(KAKAO). 추후 제공자 확장 대비 식별자와 복합키." },
+        { "name": "provideruserid", "type": "varchar(80)", "note": "카카오 회원 식별자. 로그인 시 계정 매칭 키." },
+        { "name": "userid", "type": "varchar(80)", "note": "연결된 ACCOUNT.userid. 카카오 식별자 기반 자동 채번(Q-6 답변)." }
+      ],
+      "pk": ["provider", "provideruserid"],
+      "fks": [
+        { "columns": ["userid"], "refTable": "ACCOUNT", "refColumns": ["userid"] }
+      ],
+      "note": "[추정] DAR-020 AC-1 — 소셜 사용자는 비밀번호가 없어 SIGNON 행 대신 별도 연동 테이블 신설(Q-3 답변: 위임). SIGNON 은 무변경. 명명은 현행 SIGNON·BANNERDATA 처럼 대문자 단일어·소문자 컬럼 관례를 따름."
+    },
+    {
+      "name": "ACCOUNT",
+      "change": "modified",
+      "columns": [],
+      "note": "[추정] DAR-020 AC-2(Q-2 답변: 허용) — 추가 컬럼 없음. 카카오 프로필로 못 채우는 필수 컬럼(email·firstname·lastname·addr1·city·state·zip·country·phone)의 NOT NULL 제약을 null 허용으로 완화하는 제약 변경만 필요."
+    }
+  ]
+}

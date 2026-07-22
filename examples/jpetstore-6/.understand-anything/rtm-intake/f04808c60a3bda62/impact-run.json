@@ -1,0 +1,45 @@
+{
+  "jobId": "56a1efa984f12974",
+  "requestId": "REQ-002",
+  "query": "카카오 소셜 로그인을 추가하려고 해",
+  "gitCommit": "fa8982d327ea2f93d694c4d7d44deb0fe9c5d1dd",
+  "startedAt": "2026-07-22T07:26:52.587Z",
+  "finishedAt": "2026-07-22T07:26:52.625Z",
+  "seedScope": "entryPoint",
+  "seeds": [
+    {
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "origin": "route",
+      "confidence": "CONFIRMED"
+    }
+  ],
+  "bySource": [
+    {
+      "fnId": "flow:ANY /actions/Account.action",
+      "relPaths": [
+        "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+      ]
+    },
+    {
+      "fnId": "flow:ANY /actions/Account.action?newAccount",
+      "relPaths": [
+        "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+      ]
+    },
+    {
+      "fnId": "flow:ANY /actions/Account.action?signoff",
+      "relPaths": [
+        "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+      ]
+    },
+    {
+      "fnId": "flow:ANY /actions/Account.action?signon",
+      "relPaths": [
+        "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+      ]
+    }
+  ],
+  "skippedToBe": [],
+  "unknownFnIds": [],
+  "ungroundedFnIds": []
+}

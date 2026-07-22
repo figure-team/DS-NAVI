@@ -1,0 +1,1578 @@
+{
+  "schemaVersion": 2,
+  "request": {
+    "raw": "카카오 소셜 로그인을 추가하려고 해",
+    "tokens": [
+      "로그인을",
+      "소셜",
+      "추가하려고",
+      "카카오"
+    ]
+  },
+  "filter": {
+    "mode": "mixed",
+    "fallbacks": [
+      "요청 토큰(로그인을, 소셜, 추가하려고, 카카오)이 어느 도메인과도 안 맞았습니다 — 상위 5개로 폴백(전체 4개).",
+      "요청 토큰·CRUD 조인 어느 쪽으로도 테이블을 못 좁혔습니다 — 상위 10개로 폴백(전체 13개).",
+      "요청 토큰이 어느 CRUD 기능행과도 안 맞았습니다 — 상위 10행으로 폴백(전체 21행).",
+      "요청 토큰·도메인 어느 쪽으로도 기능을 못 좁혔습니다 — 상위 10개로 폴백(전체 24건)."
+    ]
+  },
+  "minimalSet": {
+    "ok": true,
+    "missing": []
+  },
+  "reducedMode": {
+    "active": false,
+    "omittedAxes": [],
+    "note": null
+  },
+  "commits": {
+    "domainGraph": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+    "dbSchema": "fa8982d327ea2f93d694c4d7d44deb0fe9c5d1dd",
+    "crudMatrix": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+    "rtm": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+    "screens": "d5fe6895ae60cb51b4d4ccbbf684d9624dfc6795",
+    "policy": "af7b83995e3bca72a2f211c9cb23ce8780baff5d",
+    "head": "03a83e099eb6de7af5ae77a8e2f3f880f4f63a7a",
+    "consistent": false,
+    "staleAxes": [
+      "도메인",
+      "스키마",
+      "CRUD",
+      "추적표",
+      "화면",
+      "정책"
+    ],
+    "note": "산출물 6/6축이 현재 소스(HEAD=03a83e09)보다 뒤에 있습니다 — 차단하지 않습니다. 낡은 축: 도메인=a73a85b4 · 스키마=fa8982d3 · CRUD=a73a85b4 · 추적표=a73a85b4 · 화면=d5fe6895 · 정책=af7b8399. 그 사이 커밋이 이 축의 입력을 바꿨을 수 있습니다(반드시 낡았다는 뜻은 아닙니다 — 재분석 없이는 모릅니다). 낡은 축에 의존하는 결론은 [추정]으로 다루십시오."
+  },
+  "axes": {
+    "domain": {
+      "present": true,
+      "source": ".understand-anything/domain-graph.json",
+      "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+      "total": 4,
+      "selected": 4,
+      "omittedCount": 0,
+      "items": [
+        {
+          "id": "domain:account",
+          "name": "계정",
+          "summary": "계정 도메인은 애완동물 쇼핑몰 이용자의 로그인·로그아웃·회원가입·계정 정보 수정을 담당한다. 단일 화면 진입점인 Account.action 이 세션 범위로 동작하며, 계정 조회·등록·수정 업무는 계정 서비스가 조율하고 실제 저장은 ACCOUNT·PROFILE·SIGNON 세 테이블에 나뉘어 이루어진다. 로그인과 회원가입, 계정 수정이 끝나면 이용자가 선호 분류로 지정한 상품 목록을 함께 조회해 개인화 목록으로 보관한다.",
+          "fileCount": 6,
+          "sampleFiles": [
+            "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+            "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+            "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+            "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+            "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+          ],
+          "counts": {
+            "flows": 7,
+            "steps": 22,
+            "entities": 5,
+            "businessRules": 11,
+            "businessFlows": 4,
+            "claims": 65
+          },
+          "groundedPct": 100,
+          "entities": [
+            "계정(Account)은 이용자 한 명을 표현하는 핵심 자료로, 아이디·비밀번호·이메일·이름·상태·주소·도시·주·우편번호·국가·전화번호를 담는다. 세션에 실려 다니도록 직렬화 가능한 형태로 정의되어 있다.",
+            "계정에는 개인화 설정 항목이 함께 들어 있다. 선호 분류·언어 설정·내 목록 노출 여부·배너 노출 여부·배너 이름이 그것이며, 이 값들은 프로필 성격의 정보로 취급된다.",
+            "하나의 계정 자료는 저장 시점에 세 테이블로 갈라진다. 기본 인적사항은 ACCOUNT, 개인화 설정은 PROFILE, 로그인 비밀번호는 SIGNON 에 각각 보관된다.",
+            "계정 조회 결과에는 배너 정보가 붙는다. 계정의 선호 분류를 배너 자료(BANNERDATA)의 분류와 맞물려 조회하므로, 이용자의 선호 분류에 대응하는 배너 이름이 함께 실려 나온다.",
+            "이용자가 고를 수 있는 언어는 영어와 일본어 두 가지, 선호 분류는 물고기·개·파충류·고양이·새 다섯 가지로 화면 진입점에 고정 목록으로 정의되어 있다."
+          ],
+          "businessRules": [
+            "로그인·회원가입·계정 수정에서 아이디와 비밀번호는 반드시 입력해야 한다. 세 업무 모두에 대해 필수 입력 검증이 걸려 있다.",
+            "회원가입과 계정 수정에서는 이름과 성이 필수 입력이다. 로그인에는 이 제약이 걸리지 않는다.",
+            "로그인은 아이디와 비밀번호가 함께 일치하는 계정이 조회될 때만 성공한다. 조회 결과가 없으면 아이디 또는 비밀번호가 잘못되었다는 안내를 남기고 입력값을 비운 뒤 로그인 화면으로 되돌린다.",
+            "로그인이 성공하면 세션에 보관하기 전에 비밀번호를 지운다. 인증 상태를 참으로 세우고 계정 정보를 세션에 등록한다.",
+            "인증 상태로 인정받으려면 인증 표시가 서 있고 계정 정보가 있으며 아이디도 채워져 있어야 한다. 세 조건을 모두 만족해야 로그인한 이용자로 취급된다.",
+            "계정 수정 시 비밀번호는 입력값이 있고 길이가 0보다 클 때만 변경한다. 비워 두면 기존 비밀번호가 유지되고, 인적사항과 개인화 설정만 갱신된다.",
+            "회원가입과 계정 수정은 각각 하나의 트랜잭션으로 묶인다. 계정·프로필·로그인 정보 저장이 모두 성공하거나 모두 취소된다.",
+            "회원가입이 끝나면 별도 로그인 절차 없이 곧바로 인증된 상태가 된다.",
+            "회원가입·계정 수정 직후에는 방금 저장한 값을 그대로 쓰지 않고 아이디로 계정을 다시 조회해 세션 정보를 새로 채운다.",
+            "로그아웃은 세션 자체를 무효화하고 계정·개인화 목록·인증 표시를 초기 상태로 되돌린다.",
+            "계정 화면에 아무 업무도 지정하지 않고 들어오면 기본으로 로그인 화면이 표시된다."
+          ],
+          "businessFlows": [],
+          "claims": [
+            {
+              "kind": "summary",
+              "ref": "domain:account",
+              "text": "계정 도메인은 애완동물 쇼핑몰 이용자의 로그인·로그아웃·회원가입·계정 정보 수정을 담당한다. 단일 화면 진입점인 Account.action 이 세션 범위로 동작하며, 계정 조회·등록·수정 업무는 계정 서비스가 조율하고 실제 저장은 ACCOUNT·PROFILE·SIGNON 세 테이블에 나뉘어 이루어진다. 로그인과 회원가입, 계정 수정이 끝나면 이용자가 선호 분류로 지정한 상품 목록을 함께 조회해 개인화 목록으로 보관한다.",
+              "verdict": "GROUNDED",
+              "citations": [
+                {
+                  "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                  "line": 43,
+                  "snippet": "public class AccountActionBean extends AbstractActionBean {"
+                },
+                {
+                  "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+                  "line": 55,
+                  "snippet": "    accountMapper.insertAccount(account);"
+                },
+                {
+                  "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+                  "line": 56,
+                  "snippet": "    accountMapper.insertProfile(account);"
+                },
+                {
+                  "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+                  "line": 57,
+                  "snippet": "    accountMapper.insertSignon(account);"
+                },
+                {
+                  "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                  "line": 118,
+                  "snippet": "    myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());"
+                }
+              ],
+              "matchedTokens": []
+            }
+          ],
+          "matchedTokens": []
+        },
+        {
+          "id": "domain:cart",
+          "name": "장바구니",
+          "summary": "고객이 고른 상품 항목을 세션 단위 장바구니에 담고, 조회·수량 변경·제거를 거쳐 주문 시작(체크아웃) 화면으로 넘기는 업무 영역이다. 장바구니는 세션 범위 객체로 보관되며, 담기·제거·수량변경·조회·체크아웃 다섯 개의 요청 처리로 구성된다.",
+          "fileCount": 6,
+          "sampleFiles": [
+            "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+            "src/main/java/org/mybatis/jpetstore/domain/CartItem.java",
+            "src/main/java/org/mybatis/jpetstore/domain/Item.java",
+            "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+            "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java"
+          ],
+          "counts": {
+            "flows": 5,
+            "steps": 15,
+            "entities": 3,
+            "businessRules": 10,
+            "businessFlows": 5,
+            "claims": 48
+          },
+          "groundedPct": 100,
+          "entities": [
+            "장바구니(Cart)는 항목 식별자별 조회를 위한 맵과 표시 순서를 유지하는 목록 두 가지로 담긴 항목을 이중 보관하며, 직렬화 가능한 세션 보관 객체다.",
+            "장바구니 항목(CartItem)은 대상 상품 항목, 수량, 재고 보유 여부, 합계 금액 네 가지 속성을 가진다.",
+            "상품 항목(Item)은 항목 식별자와 판매가를 보유하며, 장바구니 금액 계산의 단가 원천이 된다."
+          ],
+          "businessRules": [
+            "장바구니에 이미 있는 항목을 다시 담으면 새 항목을 만들지 않고 기존 항목의 수량만 1 증가시킨다.",
+            "재고 보유 여부는 캐시하지 않고 항목을 새로 담는 시점에 카탈로그에서 실시간으로 조회해 항목에 기록한다.",
+            "재고 보유 여부는 해당 항목의 재고 수량이 0보다 클 때 참으로 판정한다.",
+            "항목 식별자가 비어 있으면 담기·제거 요청을 처리하지 않고 안내 메시지와 함께 오류 화면으로 보낸다.",
+            "장바구니에 없는 항목의 제거를 시도하면 오류 화면으로 보낸다.",
+            "수량 일괄 변경 시 입력 수량이 1 미만이면 해당 항목을 장바구니에서 제거한다.",
+            "수량 입력이 숫자가 아니면 해당 항목의 수량 변경을 의도적으로 무시하고 다음 항목으로 넘어간다.",
+            "항목 합계 금액은 판매가에 수량을 곱해 산출하며, 상품 정보나 판매가가 없으면 합계를 비운다. 수량 설정·증가·상품 지정 시마다 자동 재계산된다.",
+            "장바구니 소계는 담긴 모든 항목의 판매가×수량을 합산해 산출한다.",
+            "새로 담는 항목은 수량 0으로 만든 뒤 증가시키므로 최초 담기 수량은 1이 된다."
+          ],
+          "businessFlows": [],
+          "claims": [
+            {
+              "kind": "summary",
+              "ref": "domain:cart",
+              "text": "고객이 고른 상품 항목을 세션 단위 장바구니에 담고, 조회·수량 변경·제거를 거쳐 주문 시작(체크아웃) 화면으로 넘기는 업무 영역이다. 장바구니는 세션 범위 객체로 보관되며, 담기·제거·수량변경·조회·체크아웃 다섯 개의 요청 처리로 구성된다.",
+              "verdict": "GROUNDED",
+              "citations": [
+                {
+                  "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                  "line": 37,
+                  "snippet": "@SessionScope"
+                },
+                {
+                  "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                  "line": 48,
+                  "snippet": "  private Cart cart = new Cart();"
+                },
+                {
+                  "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                  "line": 68,
+                  "snippet": "  public Resolution addItemToCart() {"
+                }
+              ],
+              "matchedTokens": []
+            }
+          ],
+          "matchedTokens": []
+        },
+        {
+          "id": "domain:catalog",
+          "name": "상품카탈로그",
+          "summary": "애완동물 상품을 카테고리·상품·품목의 3단계로 열람하고 검색하는 도메인이다. 웹 진입점 CatalogActionBean 이 메인·카테고리·상품·품목·검색 5개 화면 요청을 받아 CatalogService 에 위임하고, CatalogService 는 카테고리·상품·품목 3개 매퍼를 주입받아 CATEGORY·PRODUCT·ITEM·INVENTORY 테이블을 조회한다. 조회 전용 도메인으로 카탈로그 자체를 변경하는 기능은 없다.",
+          "fileCount": 6,
+          "sampleFiles": [
+            "src/main/java/org/mybatis/jpetstore/domain/Item.java",
+            "src/main/java/org/mybatis/jpetstore/mapper/CategoryMapper.java",
+            "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+            "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+            "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java"
+          ],
+          "counts": {
+            "flows": 5,
+            "steps": 16,
+            "entities": 4,
+            "businessRules": 7,
+            "businessFlows": 5,
+            "claims": 47
+          },
+          "groundedPct": 100,
+          "entities": [
+            "카테고리(Category)는 카테고리 ID·이름·설명 3개 속성을 가지는 카탈로그 최상위 분류 단위이며, CATEGORY 테이블의 CATID·NAME·DESCN 컬럼에 대응한다.",
+            "상품(Product)은 상품 ID·소속 카테고리 ID·이름·설명을 가지며 카테고리에 속하는 중간 분류 단위다. PRODUCT 테이블의 CATEGORY 컬럼이 소속 카테고리를 가리킨다.",
+            "품목(Item)은 실제 판매·구매 단위로 정가·원가·상태·공급자 ID·5개 부가속성을 가지며, 소속 상품 객체와 재고 수량을 함께 보유한다.",
+            "재고는 별도 INVENTORY 테이블의 QTY 컬럼으로 관리되며, 품목 조회 시 ITEM 과 조인되어 품목의 수량 속성으로 매핑된다."
+          ],
+          "businessRules": [
+            "검색어가 없거나 빈 문자열이면 상품 검색을 수행하지 않고 검색어 입력을 요청하는 안내 메시지와 함께 오류 화면으로 보낸다.",
+            "검색어는 공백 단위로 분해되어 각 키워드마다 개별 조회를 수행하고 결과를 하나의 목록으로 누적한다. 따라서 여러 키워드는 OR 조건으로 동작하며 중복 상품이 그대로 누적될 수 있다.",
+            "상품 검색은 키워드를 소문자로 바꾸고 앞뒤에 와일드카드를 붙여 상품명 소문자 값과 부분일치 비교한다. 즉 대소문자를 구분하지 않는 상품명 부분일치 검색이며, 설명 필드는 검색 대상이 아니다.",
+            "품목의 재고 보유 여부는 INVENTORY 의 수량이 0보다 큰지로 판정한다.",
+            "카테고리 조회는 카테고리 ID가 전달된 경우에만 조회를 수행하며, ID가 없으면 조회 없이 카테고리 화면으로 그대로 이동한다. 상품 조회도 동일하게 상품 ID가 있을 때만 조회한다.",
+            "카탈로그 식별자는 설정 시점에 앞뒤 공백이 제거된다. 품목 ID·상품 ID·카테고리 ID 모두 세터에서 공백을 잘라내므로 저장된 식별자에는 공백이 남지 않는다.",
+            "카탈로그 조회 상태는 세션 범위로 유지되며, 검색어·카테고리·상품·품목 관련 보관값을 한 번에 비우는 초기화 처리를 제공한다."
+          ],
+          "businessFlows": [],
+          "claims": [
+            {
+              "kind": "summary",
+              "ref": "domain:catalog",
+              "text": "애완동물 상품을 카테고리·상품·품목의 3단계로 열람하고 검색하는 도메인이다. 웹 진입점 CatalogActionBean 이 메인·카테고리·상품·품목·검색 5개 화면 요청을 받아 CatalogService 에 위임하고, CatalogService 는 카테고리·상품·품목 3개 매퍼를 주입받아 CATEGORY·PRODUCT·ITEM·INVENTORY 테이블을 조회한다. 조회 전용 도메인으로 카탈로그 자체를 변경하는 기능은 없다.",
+              "verdict": "GROUNDED",
+              "citations": [
+                {
+                  "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                  "line": 36,
+                  "snippet": "public class CatalogActionBean extends AbstractActionBean {"
+                },
+                {
+                  "file": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+                  "line": 41,
+                  "snippet": "  public CatalogService(CategoryMapper categoryMapper, ItemMapper itemMapper, ProductMapper productMapper) {"
+                }
+              ],
+              "matchedTokens": []
+            }
+          ],
+          "matchedTokens": []
+        },
+        {
+          "id": "domain:order",
+          "name": "주문",
+          "summary": "주문 도메인은 장바구니에 담긴 상품을 주문서로 전환하고, 배송지·결제 정보를 확인받아 주문을 확정하며, 확정된 주문의 이력과 상세를 조회하는 업무를 담당한다. 주문 확정 시 재고 차감·주문 저장·주문 상태 기록·품목 저장을 하나의 트랜잭션으로 처리한다.",
+          "fileCount": 11,
+          "sampleFiles": [
+            "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+            "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+            "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+            "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+            "src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+            "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+            "src/main/java/org/mybatis/jpetstore/mapper/SequenceMapper.java",
+            "src/main/java/org/mybatis/jpetstore/service/OrderService.java"
+          ],
+          "counts": {
+            "flows": 4,
+            "steps": 27,
+            "entities": 4,
+            "businessRules": 10,
+            "businessFlows": 5,
+            "claims": 73
+          },
+          "groundedPct": 100,
+          "entities": [
+            "주문(Order)은 주문번호·주문자·주문일시·배송지 정보·청구지 정보·배송사·총액·신용카드 정보·상태를 보유하며, 여러 개의 주문품목(LineItem)을 목록으로 가진다.",
+            "계정(Account)은 주문자 식별과 배송지·청구지 기본값의 공급원으로, 아이디·이름·성·주소·도시·주(state)·우편번호·국가를 보유한다.",
+            "장바구니(Cart)는 주문 전 담긴 상품 목록을 보관하며 주문서 작성 시 주문품목과 주문 총액의 원천이 된다.",
+            "채번(Sequence)은 주문번호를 발번하는 데 쓰이며, 주문 저장 직전 'ordernum' 이름으로 다음 번호를 조회하고 증가시킨다."
+          ],
+          "businessRules": [
+            "주문서 작성은 로그인한 사용자만 가능하다. 미인증 상태이면 안내 문구와 함께 로그인 화면으로 되돌린다.",
+            "장바구니가 없으면 주문을 생성할 수 없으며 오류 화면으로 보낸다.",
+            "배송지 별도 입력이 요청된 경우 배송지 입력 화면을 먼저 거치며, 이때 배송지 요청 표시는 해제된다.",
+            "확인 절차를 거치지 않은 주문은 저장되지 않고 주문 확인 화면으로 보내진다. 즉 주문 확정 전 사용자 확인이 필수다.",
+            "주문 확정이 완료되면 장바구니를 비우고 접수 완료 안내를 표시한다.",
+            "주문 상세는 본인 주문만 조회할 수 있다. 로그인 계정의 아이디와 주문의 주문자 아이디가 다르면 주문을 비우고 오류 화면으로 보낸다.",
+            "주문 확정은 재고 차감·주문 저장·주문 상태 저장·주문품목 저장을 하나의 트랜잭션으로 묶어 처리한다.",
+            "주문번호 채번 시 채번 정보가 조회되지 않으면 예외를 발생시켜 주문 처리를 중단한다.",
+            "주문서 초기값은 계정 정보에서 배송지와 청구지를 동일하게 채우고, 총액은 장바구니 소계로 설정하며, 주문 상태는 'P'로 시작한다.",
+            "취급 가능한 신용카드 종류는 Visa, MasterCard, American Express 세 가지로 고정되어 있다."
+          ],
+          "businessFlows": [],
+          "claims": [
+            {
+              "kind": "summary",
+              "ref": "domain:order",
+              "text": "주문 도메인은 장바구니에 담긴 상품을 주문서로 전환하고, 배송지·결제 정보를 확인받아 주문을 확정하며, 확정된 주문의 이력과 상세를 조회하는 업무를 담당한다. 주문 확정 시 재고 차감·주문 저장·주문 상태 기록·품목 저장을 하나의 트랜잭션으로 처리한다.",
+              "verdict": "GROUNDED",
+              "citations": [
+                {
+                  "file": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+                  "line": 60,
+                  "snippet": "  public void insertOrder(Order order) {"
+                },
+                {
+                  "file": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+                  "line": 59,
+                  "snippet": "  @Transactional"
+                },
+                {
+                  "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                  "line": 129,
+                  "snippet": "      order.initOrder(accountBean.getAccount(), cartBean.getCart());"
+                }
+              ],
+              "matchedTokens": []
+            }
+          ],
+          "matchedTokens": []
+        }
+      ],
+      "reason": "요청 토큰(로그인을, 소셜, 추가하려고, 카카오)이 어느 도메인과도 안 맞았습니다 — 상위 5개로 폴백(전체 4개).",
+      "evidence": {
+        "cited": 233,
+        "total": 233,
+        "rate": 1
+      }
+    },
+    "data": {
+      "schema": {
+        "present": true,
+        "source": ".spec/map/db-schema.json",
+        "gitCommit": "fa8982d327ea2f93d694c4d7d44deb0fe9c5d1dd",
+        "total": 13,
+        "selected": 3,
+        "omittedCount": 7,
+        "items": [
+          {
+            "name": "ACCOUNT",
+            "relPath": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+            "line": 36,
+            "primaryKey": [
+              "userid"
+            ],
+            "columns": [
+              {
+                "name": "userid",
+                "type": "varchar(80)",
+                "nullable": false,
+                "primaryKey": false,
+                "line": 37
+              },
+              {
+                "name": "email",
+                "type": "varchar(80)",
+                "nullable": false,
+                "primaryKey": false,
+                "line": 38
+              },
+              {
+                "name": "firstname",
+                "type": "varchar(80)",
+                "nullable": false,
+                "primaryKey": false,
+                "line": 39
+              },
+              {
+                "name": "lastname",
+                "type": "varchar(80)",
+                "nullable": false,
+                "primaryKey": false,
+                "line": 40
+              },
+              {
+                "name": "status",
+                "type": "varchar(2)",
+                "nullable": true,
+                "primaryKey": false,
+                "line": 41
+              },
+              {
+                "name": "addr1",
+                "type": "varchar(80)",
+                "nullable": false,
+                "primaryKey": false,
+                "line": 42
+              },
+              {
+                "name": "addr2",
+                "type": "varchar(40)",
+                "nullable": true,
+                "primaryKey": false,
+                "line": 43
+              },
+              {
+                "name": "city",
+                "type": "varchar(80)",
+                "nullable": false,
+                "primaryKey": false,
+                "line": 44
+              },
+              {
+                "name": "state",
+                "type": "varchar(80)",
+                "nullable": false,
+                "primaryKey": false,
+                "line": 45
+              },
+              {
+                "name": "zip",
+                "type": "varchar(20)",
+                "nullable": false,
+                "primaryKey": false,
+                "line": 46
+              },
+              {
+                "name": "country",
+                "type": "varchar(20)",
+                "nullable": false,
+                "primaryKey": false,
+                "line": 47
+              },
+              {
+                "name": "phone",
+                "type": "varchar(80)",
+                "nullable": false,
+                "primaryKey": false,
+                "line": 48
+              }
+            ],
+            "foreignKeys": [],
+            "rowCount": 4,
+            "selectedBy": []
+          },
+          {
+            "name": "CATEGORY",
+            "relPath": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+            "line": 113,
+            "primaryKey": [
+              "catid"
+            ],
+            "columns": [
+              {
+                "name": "catid",
+                "type": "varchar(10)",
+                "nullable": false,
+                "primaryKey": false,
+                "line": 114
+              },
+              {
+                "name": "name",
+                "type": "varchar(80)",
+                "nullable": true,
+                "primaryKey": false,
+                "line": 115
+              },
+              {
+                "name": "descn",
+                "type": "varchar(255)",
+                "nullable": true,
+                "primaryKey": false,
+                "line": 116
+              }
+            ],
+            "foreignKeys": [],
+            "rowCount": 10,
+            "selectedBy": []
+          },
+          {
+            "name": "PRODUCT",
+            "relPath": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+            "line": 120,
+            "primaryKey": [
+              "productid"
+            ],
+            "columns": [
+              {
+                "name": "productid",
+                "type": "varchar(10)",
+                "nullable": false,
+                "primaryKey": false,
+                "line": 121
+              },
+              {
+                "name": "category",
+                "type": "varchar(10)",
+                "nullable": false,
+                "primaryKey": false,
+                "line": 122
+              },
+              {
+                "name": "name",
+                "type": "varchar(80)",
+                "nullable": true,
+                "primaryKey": false,
+                "line": 123
+              },
+              {
+                "name": "descn",
+                "type": "varchar(255)",
+                "nullable": true,
+                "primaryKey": false,
+                "line": 124
+              }
+            ],
+            "foreignKeys": [
+              {
+                "columns": [
+                  "category"
+                ],
+                "line": 126,
+                "refColumns": [
+                  "catid"
+                ],
+                "refTable": "CATEGORY"
+              }
+            ],
+            "rowCount": 32,
+            "selectedBy": []
+          }
+        ],
+        "reason": "요청 토큰·CRUD 조인 어느 쪽으로도 테이블을 못 좁혔습니다 — 상위 10개로 폴백(전체 13개).",
+        "evidence": {
+          "cited": 73,
+          "total": 73,
+          "rate": 1
+        }
+      },
+      "crud": {
+        "present": true,
+        "source": ".spec/map/crud-matrix.json",
+        "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+        "total": 21,
+        "selected": 3,
+        "omittedCount": 7,
+        "items": [
+          {
+            "feature": "계정 수정 화면 표시",
+            "cells": [],
+            "confidence": "INFERRED",
+            "evidence": [],
+            "matchedTokens": []
+          },
+          {
+            "feature": "계정 정보 수정",
+            "cells": [
+              {
+                "table": "ACCOUNT",
+                "ops": "RU"
+              },
+              {
+                "table": "BANNERDATA",
+                "ops": "R"
+              },
+              {
+                "table": "PRODUCT",
+                "ops": "R"
+              },
+              {
+                "table": "PROFILE",
+                "ops": "RU"
+              },
+              {
+                "table": "SIGNON",
+                "ops": "RU"
+              }
+            ],
+            "confidence": "CONFIRMED",
+            "evidence": [
+              {
+                "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+                "line": 26
+              },
+              {
+                "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+                "line": 52
+              },
+              {
+                "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+                "line": 79
+              },
+              {
+                "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+                "line": 102
+              },
+              {
+                "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+                "line": 122
+              },
+              {
+                "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+                "line": 36
+              }
+            ],
+            "matchedTokens": []
+          },
+          {
+            "feature": "로그아웃",
+            "cells": [],
+            "confidence": "INFERRED",
+            "evidence": [],
+            "matchedTokens": []
+          }
+        ],
+        "reason": "요청 토큰이 어느 CRUD 기능행과도 안 맞았습니다 — 상위 10행으로 폴백(전체 21행).",
+        "evidence": {
+          "cited": 5,
+          "total": 10,
+          "rate": 0.5
+        }
+      }
+    },
+    "rtm": {
+      "present": true,
+      "source": ".understand-anything/rtm.json",
+      "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+      "total": 24,
+      "selected": 6,
+      "omittedCount": 4,
+      "items": [
+        {
+          "id": "flow:ANY /actions/Account.action",
+          "name": "로그인 화면 표시(기본)",
+          "domainId": "domain:account",
+          "domainName": "계정",
+          "entryPoint": {
+            "value": "ANY /actions/Account.action",
+            "confidence": "CONFIRMED",
+            "evidence": [
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                "line": 149
+              }
+            ]
+          },
+          "implementation": {
+            "value": "AccountActionBean",
+            "confidence": "CONFIRMED",
+            "evidence": [
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                "line": 149
+              }
+            ]
+          },
+          "origin": "AS_IS",
+          "state": "IMPLEMENTED",
+          "selectedBy": "domain"
+        },
+        {
+          "id": "flow:ANY /actions/Account.action?editAccount",
+          "name": "계정 정보 수정",
+          "domainId": "domain:account",
+          "domainName": "계정",
+          "entryPoint": {
+            "value": "ANY /actions/Account.action?editAccount",
+            "confidence": "CONFIRMED",
+            "evidence": [
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                "line": 137
+              }
+            ]
+          },
+          "implementation": {
+            "value": "Account, AccountActionBean, AccountMapper, AccountService, CatalogService, ProductMapper",
+            "confidence": "CONFIRMED",
+            "evidence": [
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+                "line": 27
+              },
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+                "line": 25
+              },
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+                "line": 27
+              },
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+                "line": 30
+              },
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+                "line": 34
+              },
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                "line": 137
+              }
+            ]
+          },
+          "origin": "AS_IS",
+          "state": "IMPLEMENTED",
+          "selectedBy": "domain"
+        },
+        {
+          "id": "flow:ANY /actions/Account.action?editAccountForm",
+          "name": "계정 수정 화면 표시",
+          "domainId": "domain:account",
+          "domainName": "계정",
+          "entryPoint": {
+            "value": "ANY /actions/Account.action?editAccountForm",
+            "confidence": "CONFIRMED",
+            "evidence": [
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                "line": 128
+              }
+            ]
+          },
+          "implementation": {
+            "value": "AccountActionBean",
+            "confidence": "CONFIRMED",
+            "evidence": [
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                "line": 128
+              }
+            ]
+          },
+          "origin": "AS_IS",
+          "state": "IMPLEMENTED",
+          "selectedBy": "domain"
+        },
+        {
+          "id": "flow:ANY /actions/Account.action?newAccount",
+          "name": "회원가입",
+          "domainId": "domain:account",
+          "domainName": "계정",
+          "entryPoint": {
+            "value": "ANY /actions/Account.action?newAccount",
+            "confidence": "CONFIRMED",
+            "evidence": [
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                "line": 115
+              }
+            ]
+          },
+          "implementation": {
+            "value": "Account, AccountActionBean, AccountMapper, AccountService, CatalogService, ProductMapper",
+            "confidence": "CONFIRMED",
+            "evidence": [
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+                "line": 27
+              },
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+                "line": 25
+              },
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+                "line": 27
+              },
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+                "line": 30
+              },
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+                "line": 34
+              },
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                "line": 115
+              }
+            ]
+          },
+          "origin": "AS_IS",
+          "state": "IMPLEMENTED",
+          "selectedBy": "domain"
+        },
+        {
+          "id": "flow:ANY /actions/Account.action?newAccountForm",
+          "name": "회원가입 화면 표시",
+          "domainId": "domain:account",
+          "domainName": "계정",
+          "entryPoint": {
+            "value": "ANY /actions/Account.action?newAccountForm",
+            "confidence": "CONFIRMED",
+            "evidence": [
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                "line": 106
+              }
+            ]
+          },
+          "implementation": {
+            "value": "AccountActionBean",
+            "confidence": "CONFIRMED",
+            "evidence": [
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                "line": 106
+              }
+            ]
+          },
+          "origin": "AS_IS",
+          "state": "IMPLEMENTED",
+          "selectedBy": "domain"
+        },
+        {
+          "id": "flow:ANY /actions/Account.action?signoff",
+          "name": "로그아웃",
+          "domainId": "domain:account",
+          "domainName": "계정",
+          "entryPoint": {
+            "value": "ANY /actions/Account.action?signoff",
+            "confidence": "CONFIRMED",
+            "evidence": [
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                "line": 184
+              }
+            ]
+          },
+          "implementation": {
+            "value": "AccountActionBean",
+            "confidence": "CONFIRMED",
+            "evidence": [
+              {
+                "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                "line": 184
+              }
+            ]
+          },
+          "origin": "AS_IS",
+          "state": "IMPLEMENTED",
+          "selectedBy": "domain"
+        }
+      ],
+      "reason": "요청 토큰·도메인 어느 쪽으로도 기능을 못 좁혔습니다 — 상위 10개로 폴백(전체 24건).",
+      "evidence": {
+        "cited": 20,
+        "total": 20,
+        "rate": 1
+      }
+    },
+    "screens": {
+      "present": true,
+      "source": ".understand-anything/screens.json",
+      "gitCommit": "d5fe6895ae60cb51b4d4ccbbf684d9624dfc6795",
+      "total": 22,
+      "selected": 1,
+      "omittedCount": 0,
+      "items": [
+        {
+          "id": "screen:actions/Account.action__signonForm",
+          "jspFile": "src/main/webapp/WEB-INF/jsp/account/SignonForm.jsp",
+          "title": "로그인 화면",
+          "domain": "account",
+          "url": "actions/Account.action?signonForm=",
+          "summary": {
+            "text": "signonForm 핸들러의 반환문이 chunk 슬라이스 범위(63~142행) 밖에 위치해 ForwardResolution 반환 근거를 확인하지 못했다. 근거: AccountActionBean.java:49, :151",
+            "confidence": "UNVERIFIED"
+          },
+          "annotationCount": 16,
+          "annotations": [
+            {
+              "no": 2,
+              "label": "Login",
+              "eventType": "submit",
+              "selector": "#Catalog > form > input",
+              "bbox": {
+                "x": 612,
+                "y": 272,
+                "width": 46,
+                "height": 23
+              },
+              "description": "입력한 계정으로 로그인을 시도한다.",
+              "mechanical": {
+                "formAction": "/jpetstore/actions/Account.action",
+                "formMethod": "POST",
+                "inputType": "submit",
+                "name": "signon",
+                "tag": "input"
+              },
+              "handler": {
+                "target": "AccountActionBean#signon",
+                "confidence": "CONFIRMED",
+                "evidence": [
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 159,
+                    "snippet": "public Resolution signon() {"
+                  },
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 161,
+                    "snippet": "account = accountService.getAccount(getUsername(), getPassword());"
+                  },
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 165,
+                    "snippet": "setMessage(value);"
+                  },
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 166,
+                    "snippet": "clear();"
+                  },
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 169,
+                    "snippet": "account.setPassword(null);"
+                  },
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 170,
+                    "snippet": "myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());"
+                  },
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+                    "line": 40,
+                    "snippet": "return accountMapper.getAccountByUsername(username);"
+                  },
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+                    "line": 44,
+                    "snippet": "return accountMapper.getAccountByUsernameAndPassword(username, password);"
+                  },
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 82,
+                    "snippet": "return account.getPassword();"
+                  },
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 73,
+                    "snippet": "return account.getUsername();"
+                  },
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+                    "line": 60,
+                    "snippet": "return productMapper.getProductListByCategory(categoryId);"
+                  }
+                ]
+              }
+            },
+            {
+              "no": 2,
+              "label": "Sign In",
+              "eventType": "link",
+              "selector": "#MenuContent > a:nth-of-type(2)",
+              "bbox": {
+                "x": 607,
+                "y": 34,
+                "width": 62,
+                "height": 21
+              },
+              "description": "로그인 화면으로 이동한다.",
+              "mechanical": {
+                "href": "/jpetstore/actions/Account.action?signonForm=",
+                "tag": "a"
+              },
+              "handler": {
+                "target": "AccountActionBean#signonForm",
+                "confidence": "CONFIRMED",
+                "evidence": [
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 149,
+                    "snippet": "@DefaultHandler"
+                  }
+                ]
+              }
+            },
+            {
+              "no": 2,
+              "label": "username",
+              "eventType": "change",
+              "selector": "#stripes-69144980",
+              "bbox": {
+                "x": 594,
+                "y": 208,
+                "width": 179,
+                "height": 21
+              },
+              "description": "사용자명 입력란이다.",
+              "mechanical": {
+                "formAction": "/jpetstore/actions/Account.action",
+                "formMethod": "POST",
+                "inputType": "text",
+                "name": "username",
+                "tag": "input"
+              },
+              "handler": null
+            },
+            {
+              "no": 3,
+              "label": "password",
+              "eventType": "change",
+              "selector": "#Catalog > form > p:nth-of-type(2) > input:nth-of-type(2)",
+              "bbox": {
+                "x": 590,
+                "y": 231,
+                "width": 179,
+                "height": 21
+              },
+              "description": "비밀번호 입력란이다.",
+              "mechanical": {
+                "formAction": "/jpetstore/actions/Account.action",
+                "formMethod": "POST",
+                "inputType": "password",
+                "name": "password",
+                "tag": "input"
+              },
+              "handler": null
+            },
+            {
+              "no": 10,
+              "label": "Register Now!",
+              "eventType": "link",
+              "selector": "#Catalog > a",
+              "bbox": {
+                "x": 727,
+                "y": 295,
+                "width": 126,
+                "height": 21
+              },
+              "description": "신규 계정 등록 화면으로 이동한다.",
+              "mechanical": {
+                "href": "/jpetstore/actions/Account.action?newAccountForm=",
+                "tag": "a"
+              },
+              "handler": {
+                "target": "AccountActionBean#newAccountForm",
+                "confidence": "CONFIRMED",
+                "evidence": [
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 106,
+                    "snippet": "public Resolution newAccountForm() {"
+                  }
+                ]
+              }
+            },
+            {
+              "no": 1,
+              "label": "keyword",
+              "eventType": "change",
+              "selector": "#SearchContent > form > input:nth-of-type(1)",
+              "bbox": {
+                "x": 892,
+                "y": 37,
+                "width": 135,
+                "height": 19
+              },
+              "description": "상품 검색 키워드 입력란이다.",
+              "mechanical": {
+                "formAction": "/jpetstore/actions/Catalog.action",
+                "formMethod": "POST",
+                "inputType": "text",
+                "name": "keyword",
+                "tag": "input"
+              },
+              "handler": null
+            },
+            {
+              "no": 1,
+              "label": "Search",
+              "eventType": "submit",
+              "selector": "#SearchContent > form > input:nth-of-type(2)",
+              "bbox": {
+                "x": 1032,
+                "y": 37,
+                "width": 58,
+                "height": 19
+              },
+              "description": "입력한 키워드로 상품을 검색하여 결과 화면을 표시한다.",
+              "mechanical": {
+                "formAction": "/jpetstore/actions/Catalog.action",
+                "formMethod": "POST",
+                "inputType": "submit",
+                "name": "searchProducts",
+                "tag": "input"
+              },
+              "handler": {
+                "target": "CatalogActionBean#searchProducts",
+                "confidence": "CONFIRMED",
+                "evidence": [
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 190,
+                    "snippet": "public ForwardResolution searchProducts() {"
+                  },
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 192,
+                    "snippet": "setMessage(\"Please enter a keyword to search for, then press the search button.\");"
+                  },
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 195,
+                    "snippet": "productList = catalogService.searchProductList(keyword.toLowerCase());"
+                  },
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+                    "line": 74,
+                    "snippet": "products.addAll(productMapper.searchProductList(\"%\" + keyword.toLowerCase() + \"%\"));"
+                  }
+                ]
+              }
+            },
+            {
+              "no": 1,
+              "label": "a",
+              "eventType": "link",
+              "selector": "#MenuContent > a:nth-of-type(1)",
+              "bbox": {
+                "x": 578,
+                "y": 34,
+                "width": 16,
+                "height": 21
+              },
+              "description": "장바구니 화면으로 이동한다.",
+              "mechanical": {
+                "href": "/jpetstore/actions/Cart.action?viewCart=",
+                "tag": "a"
+              },
+              "handler": {
+                "target": "CartActionBean#viewCart",
+                "confidence": "CONFIRMED",
+                "evidence": [
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 137,
+                    "snippet": "public ForwardResolution viewCart() {"
+                  }
+                ]
+              }
+            },
+            {
+              "no": 3,
+              "label": "?",
+              "eventType": "link",
+              "selector": "#MenuContent > a:nth-of-type(3)",
+              "bbox": {
+                "x": 681,
+                "y": 34,
+                "width": 10,
+                "height": 21
+              },
+              "description": "도움말 페이지로 연결되는 링크로 추정되나, 대상 핸들러 근거는 확인되지 않았다.",
+              "mechanical": {
+                "href": "../help.html",
+                "tag": "a"
+              },
+              "handler": null
+            },
+            {
+              "no": 4,
+              "label": "a",
+              "eventType": "link",
+              "selector": "#LogoContent > a",
+              "bbox": {
+                "x": 100,
+                "y": 43,
+                "width": 287,
+                "height": 21
+              },
+              "description": "메인 카탈로그 화면으로 이동한다.",
+              "mechanical": {
+                "href": "/jpetstore/actions/Catalog.action",
+                "tag": "a"
+              },
+              "handler": {
+                "target": "CatalogActionBean#viewMain",
+                "confidence": "CONFIRMED",
+                "evidence": [
+                  {
+                    "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 143,
+                    "snippet": "@DefaultHandler"
+                  }
+                ]
+              }
+            }
+          ],
+          "selectedBy": [
+            "token"
+          ],
+          "matchedTokens": [
+            "로그인을"
+          ]
+        }
+      ],
+      "reason": null,
+      "evidence": {
+        "cited": 11,
+        "total": 16,
+        "rate": 0.6875
+      }
+    },
+    "policy": {
+      "present": true,
+      "source": ".understand-anything/doc-output/policy-*.md",
+      "gitCommit": "af7b83995e3bca72a2f211c9cb23ce8780baff5d",
+      "total": 10,
+      "selected": 4,
+      "omittedCount": 0,
+      "items": [
+        {
+          "docId": "policy-authz",
+          "title": "권한 정책",
+          "relPath": ".understand-anything/doc-output/policy-authz.md",
+          "sourceCommit": "af7b83995e3bca72a2f211c9cb23ce8780baff5d",
+          "declaredEvidenceRate": 0,
+          "rowCount": 0,
+          "sections": [
+            {
+              "heading": "권한 통제 지점",
+              "rank": 8,
+              "columns": [
+                "대상",
+                "권한 어노테이션",
+                "범위",
+                "신뢰도",
+                "근거"
+              ],
+              "rowCount": 0,
+              "rows": [],
+              "matchedTokens": []
+            }
+          ],
+          "selectedBy": [
+            "shared"
+          ],
+          "matchedTokens": [],
+          "emptyArtifact": true,
+          "evidence": {
+            "cited": 0,
+            "total": 0,
+            "rate": null
+          }
+        },
+        {
+          "docId": "policy-data",
+          "title": "데이터 정책",
+          "relPath": ".understand-anything/doc-output/policy-data.md",
+          "sourceCommit": "af7b83995e3bca72a2f211c9cb23ce8780baff5d",
+          "declaredEvidenceRate": 1,
+          "rowCount": 148,
+          "sections": [],
+          "selectedBy": [
+            "shared"
+          ],
+          "matchedTokens": [],
+          "emptyArtifact": false,
+          "evidence": {
+            "cited": 148,
+            "total": 148,
+            "rate": 1
+          }
+        },
+        {
+          "docId": "policy-glossary",
+          "title": "용어/도메인 사전",
+          "relPath": ".understand-anything/doc-output/policy-glossary.md",
+          "sourceCommit": "af7b83995e3bca72a2f211c9cb23ce8780baff5d",
+          "declaredEvidenceRate": 0,
+          "rowCount": 26,
+          "sections": [],
+          "selectedBy": [
+            "shared"
+          ],
+          "matchedTokens": [],
+          "emptyArtifact": false,
+          "evidence": {
+            "cited": 26,
+            "total": 26,
+            "rate": 1
+          }
+        },
+        {
+          "docId": "policy-validation",
+          "title": "업무 규칙(Validation) 정책",
+          "relPath": ".understand-anything/doc-output/policy-validation.md",
+          "sourceCommit": "af7b83995e3bca72a2f211c9cb23ce8780baff5d",
+          "declaredEvidenceRate": 0,
+          "rowCount": 0,
+          "sections": [],
+          "selectedBy": [
+            "shared"
+          ],
+          "matchedTokens": [],
+          "emptyArtifact": true,
+          "evidence": {
+            "cited": 0,
+            "total": 0,
+            "rate": null
+          }
+        }
+      ],
+      "reason": null,
+      "evidence": {
+        "cited": 174,
+        "total": 174,
+        "rate": 1
+      }
+    }
+  },
+  "omitted": [
+    "domain:order businessFlows[4]",
+    "domain:order businessFlows[3]",
+    "domain:order businessFlows[2]",
+    "domain:order businessFlows[1]",
+    "domain:order businessFlows[0]",
+    "domain:catalog businessFlows[4]",
+    "domain:catalog businessFlows[3]",
+    "domain:catalog businessFlows[2]",
+    "domain:catalog businessFlows[1]",
+    "domain:catalog businessFlows[0]",
+    "domain:cart businessFlows[4]",
+    "domain:cart businessFlows[3]",
+    "domain:cart businessFlows[2]",
+    "domain:cart businessFlows[1]",
+    "domain:cart businessFlows[0]",
+    "domain:account businessFlows[3]",
+    "domain:account businessFlows[2]",
+    "domain:account businessFlows[1]",
+    "domain:account businessFlows[0]",
+    "domain:order claims[39]",
+    "domain:order claims[38]",
+    "domain:order claims[37]",
+    "domain:order claims[36]",
+    "domain:order claims[35]",
+    "domain:order claims[34]",
+    "domain:order claims[33]",
+    "domain:order claims[32]",
+    "domain:order claims[31]",
+    "domain:order claims[30]",
+    "domain:order claims[29]",
+    "domain:order claims[28]",
+    "domain:order claims[27]",
+    "domain:order claims[26]",
+    "domain:order claims[25]",
+    "domain:order claims[24]",
+    "domain:order claims[23]",
+    "domain:order claims[22]",
+    "domain:order claims[21]",
+    "domain:order claims[20]",
+    "domain:order claims[19]",
+    "domain:order claims[18]",
+    "domain:order claims[17]",
+    "domain:order claims[16]",
+    "domain:order claims[15]",
+    "domain:order claims[14]",
+    "domain:order claims[13]",
+    "domain:order claims[12]",
+    "domain:order claims[11]",
+    "domain:order claims[10]",
+    "domain:order claims[9]",
+    "domain:order claims[8]",
+    "domain:order claims[7]",
+    "domain:order claims[6]",
+    "domain:order claims[5]",
+    "domain:order claims[4]",
+    "domain:order claims[3]",
+    "domain:order claims[2]",
+    "domain:order claims[1]",
+    "domain:catalog claims[39]",
+    "domain:catalog claims[38]",
+    "domain:catalog claims[37]",
+    "domain:catalog claims[36]",
+    "domain:catalog claims[35]",
+    "domain:catalog claims[34]",
+    "domain:catalog claims[33]",
+    "domain:catalog claims[32]",
+    "domain:catalog claims[31]",
+    "domain:catalog claims[30]",
+    "domain:catalog claims[29]",
+    "domain:catalog claims[28]",
+    "domain:catalog claims[27]",
+    "domain:catalog claims[26]",
+    "domain:catalog claims[25]",
+    "domain:catalog claims[24]",
+    "domain:catalog claims[23]",
+    "domain:catalog claims[22]",
+    "domain:catalog claims[21]",
+    "domain:catalog claims[20]",
+    "domain:catalog claims[19]",
+    "domain:catalog claims[18]",
+    "domain:catalog claims[17]",
+    "domain:catalog claims[16]",
+    "domain:catalog claims[15]",
+    "domain:catalog claims[14]",
+    "domain:catalog claims[13]",
+    "domain:catalog claims[12]",
+    "domain:catalog claims[11]",
+    "domain:catalog claims[10]",
+    "domain:catalog claims[9]",
+    "domain:catalog claims[8]",
+    "domain:catalog claims[7]",
+    "domain:catalog claims[6]",
+    "domain:catalog claims[5]",
+    "domain:catalog claims[4]",
+    "domain:catalog claims[3]",
+    "domain:catalog claims[2]",
+    "domain:catalog claims[1]",
+    "domain:cart claims[39]",
+    "domain:cart claims[38]",
+    "domain:cart claims[37]",
+    "domain:cart claims[36]",
+    "domain:cart claims[35]",
+    "domain:cart claims[34]",
+    "domain:cart claims[33]",
+    "domain:cart claims[32]",
+    "domain:cart claims[31]",
+    "domain:cart claims[30]",
+    "domain:cart claims[29]",
+    "domain:cart claims[28]",
+    "domain:cart claims[27]",
+    "domain:cart claims[26]",
+    "domain:cart claims[25]",
+    "domain:cart claims[24]",
+    "domain:cart claims[23]",
+    "domain:cart claims[22]",
+    "domain:cart claims[21]",
+    "domain:cart claims[20]",
+    "domain:cart claims[19]",
+    "domain:cart claims[18]",
+    "domain:cart claims[17]",
+    "domain:cart claims[16]",
+    "domain:cart claims[15]",
+    "domain:cart claims[14]",
+    "domain:cart claims[13]",
+    "domain:cart claims[12]",
+    "domain:cart claims[11]",
+    "domain:cart claims[10]",
+    "domain:cart claims[9]",
+    "domain:cart claims[8]",
+    "domain:cart claims[7]",
+    "domain:cart claims[6]",
+    "domain:cart claims[5]",
+    "domain:cart claims[4]",
+    "domain:cart claims[3]",
+    "domain:cart claims[2]",
+    "domain:cart claims[1]",
+    "domain:account claims[39]",
+    "domain:account claims[38]",
+    "domain:account claims[37]",
+    "domain:account claims[36]",
+    "domain:account claims[35]",
+    "domain:account claims[34]",
+    "domain:account claims[33]",
+    "domain:account claims[32]",
+    "domain:account claims[31]",
+    "domain:account claims[30]",
+    "domain:account claims[29]",
+    "domain:account claims[28]",
+    "domain:account claims[27]",
+    "domain:account claims[26]",
+    "domain:account claims[25]",
+    "domain:account claims[24]",
+    "domain:account claims[23]",
+    "domain:account claims[22]",
+    "domain:account claims[21]",
+    "domain:account claims[20]",
+    "domain:account claims[19]",
+    "domain:account claims[18]",
+    "domain:account claims[17]",
+    "domain:account claims[16]",
+    "domain:account claims[15]",
+    "domain:account claims[14]",
+    "domain:account claims[13]",
+    "domain:account claims[12]",
+    "domain:account claims[11]",
+    "domain:account claims[10]",
+    "domain:account claims[9]",
+    "domain:account claims[8]",
+    "domain:account claims[7]",
+    "domain:account claims[6]",
+    "domain:account claims[5]",
+    "domain:account claims[4]",
+    "domain:account claims[3]",
+    "domain:account claims[2]",
+    "domain:account claims[1]",
+    "screen screen:actions/Account.action__signonForm annotations[15]",
+    "screen screen:actions/Account.action__signonForm annotations[14]",
+    "screen screen:actions/Account.action__signonForm annotations[13]",
+    "screen screen:actions/Account.action__signonForm annotations[12]",
+    "screen screen:actions/Account.action__signonForm annotations[11]",
+    "screen screen:actions/Account.action__signonForm annotations[10]",
+    "policy policy-validation §입력 검증 규칙",
+    "policy policy-glossary §규범 진술 (LLM 보강)",
+    "policy policy-glossary §용어 정의",
+    "policy policy-data §데이터 제약",
+    "policy policy-data §규범 진술 (LLM 보강)",
+    "rtm function flow:ANY /actions/Cart.action?removeItemFromCart",
+    "rtm function flow:ANY /actions/Cart.action?checkOut",
+    "rtm function flow:ANY /actions/Cart.action?addItemToCart",
+    "rtm function flow:ANY /actions/Account.action?signon",
+    "crud row 장바구니 조회",
+    "crud row 장바구니 수량 일괄 변경",
+    "crud row 장바구니 담기",
+    "crud row 상품 상세 조회",
+    "crud row 상품 검색",
+    "crud row 로그인 화면 표시(기본)",
+    "crud row 로그인",
+    "table ORDERSTATUS",
+    "table ORDERS",
+    "table LINEITEM",
+    "table BANNERDATA",
+    "table PROFILE",
+    "table INVENTORY",
+    "table ITEM"
+  ],
+  "charCap": {
+    "limit": 60000,
+    "exceeded": false
+  },
+  "budget": {
+    "domain": {
+      "demand": 262779,
+      "allocated": 15096,
+      "used": 14487,
+      "floor": 12000
+    },
+    "schema": {
+      "demand": 19407,
+      "allocated": 5532,
+      "used": 5239,
+      "floor": 4500
+    },
+    "crud": {
+      "demand": 5550,
+      "allocated": 2532,
+      "used": 1996,
+      "floor": 1500
+    },
+    "rtm": {
+      "demand": 12884,
+      "allocated": 8064,
+      "used": 7282,
+      "floor": 6000
+    },
+    "screens": {
+      "demand": 23339,
+      "allocated": 14096,
+      "used": 12602,
+      "floor": 11000
+    },
+    "policy": {
+      "demand": 37124,
+      "allocated": 10064,
+      "used": 2591,
+      "floor": 8000
+    }
+  },
+  "warnings": [
+    "산출물 6/6축이 현재 소스(HEAD=03a83e09)보다 뒤에 있습니다 — 차단하지 않습니다. 낡은 축: 도메인=a73a85b4 · 스키마=fa8982d3 · CRUD=a73a85b4 · 추적표=a73a85b4 · 화면=d5fe6895 · 정책=af7b8399. 그 사이 커밋이 이 축의 입력을 바꿨을 수 있습니다(반드시 낡았다는 뜻은 아닙니다 — 재분석 없이는 모릅니다). 낡은 축에 의존하는 결론은 [추정]으로 다루십시오.",
+    ".understand-anything/doc-output/policy-authz.md: 데이터 행 **0건**(선언 evidenceRate=0) — \"권한 정책이(가) 없다\"가 **아닙니다**. 스캐너가 못 본 것입니다(§4.1). 이 문서를 근거로 \"통제 없음\"류 결론을 내지 마십시오.",
+    ".understand-anything/doc-output/policy-validation.md: 데이터 행 **0건**(선언 evidenceRate=0) — \"업무 규칙(Validation) 정책이(가) 없다\"가 **아닙니다**. 스캐너가 못 본 것입니다(§4.1). 이 문서를 근거로 \"통제 없음\"류 결론을 내지 마십시오."
+  ]
+}

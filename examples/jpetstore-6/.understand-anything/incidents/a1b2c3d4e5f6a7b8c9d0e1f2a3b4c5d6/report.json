@@ -1,0 +1,30 @@
+{
+  "sourceFile": "2026-07-25_rca_order.md",
+  "ingestedAt": "2026-07-22T02:58:44.282Z",
+  "parseable": true,
+  "reasons": [],
+  "frontmatter": {
+    "runId": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+    "service": "jpetstore-order",
+    "createdAt": "2026-07-25T14:20:00+09:00",
+    "confidence": "medium",
+    "baselineCommit": "fa8982d327ea2f93d694c4d7d44deb0fe9c5d1dd"
+  },
+  "sections": {
+    "근본 원인": "주문 확정 시 재고 차감과 주문 삽입이 한 트랜잭션이 아니라, 예외 발생 시 재고만 차감되고 주문이 유실될 수 있다.\n위치: src/main/java/org/mybatis/jpetstore/service/OrderService.java:60",
+    "수정 제안": "OrderService.java:60 의 두 연산을 단일 트랜잭션 경계로 묶는다."
+  },
+  "title": "주문 확정 시 재고 차감과 주문 삽입이 한 트랜잭션이 아니라, 예외 발생 시 재고만 차감되고 주문이 유실될 수 있다.",
+  "refs": [
+    {
+      "path": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+      "line": 60,
+      "section": "근본 원인"
+    },
+    {
+      "path": "OrderService.java",
+      "line": 60,
+      "section": "수정 제안"
+    }
+  ]
+}

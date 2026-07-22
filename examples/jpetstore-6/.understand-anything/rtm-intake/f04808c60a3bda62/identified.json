@@ -1,0 +1,503 @@
+{
+  "request": {
+    "id": "REQ-002",
+    "name": "카카오 소셜 로그인 추가",
+    "raw": "카카오 소셜 로그인을 추가하려고 해",
+    "source": "고객 요청",
+    "requestedAt": null
+  },
+  "requirements": [
+    {
+      "id": "SFR-020",
+      "category": "SFR",
+      "name": "카카오 소셜 로그인",
+      "type": "functional",
+      "nfrCategory": null,
+      "priority": "HIGH",
+      "status": "ACTIVE",
+      "derivedFrom": null,
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": {
+        "details": [],
+        "inputs": "",
+        "outputs": "",
+        "flow": "",
+        "preceding": [],
+        "exceptions": [],
+        "acceptance": [],
+        "verify": ""
+      },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "로그인 화면에 카카오 로그인 진입 버튼이 노출된다. 기존 아이디/비밀번호 로그인은 병행 유지한다(Q-1 답변: 유지).",
+          "kind": "rule",
+          "fnIds": [
+            "flow:ANY /actions/Account.action"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 149,
+              "snippet": "@DefaultHandler"
+            }
+          ],
+          "screenRefs": [
+            {
+              "screenId": "screen:actions/Account.action__signonForm",
+              "annotationNo": 2,
+              "note": "기존 로그인 폼·Login 버튼 영역에 카카오 진입 버튼 추가(기존 폼 유지)"
+            }
+          ],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-2",
+          "text": "카카오 인증이 성공하면 기존 로그인과 동일한 세션 인증 상태가 수립된다. 민감정보를 세션에 남기지 않는 기존 규칙을 따른다.",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:account/kakao-signon",
+            "flow:ANY /actions/Account.action?signon"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 159,
+              "snippet": "public Resolution signon() {"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 169,
+              "snippet": "account.setPassword(null);"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 170,
+              "snippet": "myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());"
+            }
+          ],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-3",
+          "text": "카카오 인증이 실패하면 안내 메시지를 남기고 로그인 화면으로 되돌린다. 기존 로그인 실패 처리와 동일한 방식이다.",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:account/kakao-signon",
+            "flow:ANY /actions/Account.action?signon"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 161,
+              "snippet": "account = accountService.getAccount(getUsername(), getPassword());"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 165,
+              "snippet": "setMessage(value);"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 166,
+              "snippet": "clear();"
+            }
+          ],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-4",
+          "text": "카카오 최초 로그인 사용자는 별도 가입 절차 없이 자동 회원가입된다(Q-4 답변). 가입 완료 즉시 인증 상태가 되는 현행 규칙을 따른다.",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:account/kakao-signon",
+            "flow:ANY /actions/Account.action?newAccount"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+              "line": 55,
+              "snippet": "    accountMapper.insertAccount(account);"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+              "line": 56,
+              "snippet": "    accountMapper.insertProfile(account);"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+              "line": 57,
+              "snippet": "    accountMapper.insertSignon(account);"
+            }
+          ],
+          "screenRefs": [],
+          "policyRefs": []
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:account/kakao-signon"
+        ],
+        "modified": [
+          "flow:ANY /actions/Account.action",
+          "flow:ANY /actions/Account.action?signon",
+          "flow:ANY /actions/Account.action?newAccount"
+        ],
+        "removed": [],
+        "revived": [],
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 149
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 159,
+            "snippet": "public Resolution signon() {"
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+            "line": 44,
+            "snippet": "return accountMapper.getAccountByUsernameAndPassword(username, password);"
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 115
+          }
+        ]
+      },
+      "screenRefs": [
+        {
+          "screenId": "screen:actions/Account.action__signonForm",
+          "annotationNo": 2,
+          "note": "로그인 화면이 카카오 진입점을 겸한다"
+        }
+      ],
+      "policyRefs": []
+    },
+    {
+      "id": "SIR-020",
+      "category": "SIR",
+      "name": "카카오 인증 API 연계",
+      "type": "nonfunctional",
+      "nfrCategory": "other",
+      "priority": "HIGH",
+      "status": "ACTIVE",
+      "derivedFrom": "SFR-020",
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": {
+        "details": [],
+        "inputs": "",
+        "outputs": "",
+        "flow": "",
+        "preceding": [],
+        "exceptions": [],
+        "acceptance": [],
+        "verify": ""
+      },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "카카오 인증서버와 인가코드 수신·토큰 교환을 수행하는 콜백 진입점을 신설한다. 외부 연계 진입점은 현행 코드에 없어 전부 신규다.",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:account/kakao-oauth-callback"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-2",
+          "text": "토큰으로 카카오 프로필을 조회해 계정 식별 정보를 획득한다. 카카오가 제공하지 않는 항목은 받지 않으며, 못 채우는 컬럼은 null 허용 완화로 흡수한다(Q-2 답변: 허용).",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:account/kakao-oauth-callback"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:account/kakao-oauth-callback"
+        ],
+        "modified": [],
+        "removed": [],
+        "revived": [],
+        "evidence": []
+      },
+      "screenRefs": [],
+      "policyRefs": []
+    },
+    {
+      "id": "DAR-020",
+      "category": "DAR",
+      "name": "소셜 계정 연동 데이터",
+      "type": "nonfunctional",
+      "nfrCategory": "other",
+      "priority": "MEDIUM",
+      "status": "ACTIVE",
+      "derivedFrom": "SFR-020",
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": {
+        "details": [],
+        "inputs": "",
+        "outputs": "",
+        "flow": "",
+        "preceding": [],
+        "exceptions": [],
+        "acceptance": [],
+        "verify": ""
+      },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "카카오 사용자 식별자를 계정과 연결해 저장한다. 저장 위치는 사용자 위임(Q-3 답변)에 따라 SIGNON 행 생성 대신 별도 소셜 연동 테이블 신설안을 제안한다(테이블 정의는 ② 에프터 스키마 초안에서 제시). 기존 회원의 사후 연동은 범위에서 제외한다(Q-5 답변: 아니).",
+          "kind": "rule",
+          "fnIds": [
+            "flow:ANY /actions/Account.action?newAccount"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+              "line": 55,
+              "snippet": "    accountMapper.insertAccount(account);"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+              "line": 56,
+              "snippet": "    accountMapper.insertProfile(account);"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+              "line": 57,
+              "snippet": "    accountMapper.insertSignon(account);"
+            }
+          ],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-2",
+          "text": "카카오 자동 회원가입 시 카카오 프로필로 못 채우는 ACCOUNT 필수 컬럼은 null 허용으로 완화한다(Q-2 답변: 허용). 계정 생성은 ACCOUNT(CR) 로 귀속된다.",
+          "kind": "rule",
+          "fnIds": [
+            "flow:ANY /actions/Account.action?newAccount"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 115
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+              "line": 30
+            }
+          ],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-3",
+          "text": "자동 회원가입 시 ACCOUNT 의 기본키인 userid 는 카카오 식별자 기반으로 자동 채번한다(Q-6 답변). 기존 아이디/비밀번호 가입 계정의 userid 와 충돌하지 않아야 한다.",
+          "kind": "rule",
+          "fnIds": [
+            "flow:ANY /actions/Account.action?newAccount"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+              "line": 55,
+              "snippet": "    accountMapper.insertAccount(account);"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 115
+            }
+          ],
+          "screenRefs": [],
+          "policyRefs": []
+        }
+      ],
+      "changeset": {
+        "added": [],
+        "modified": [
+          "flow:ANY /actions/Account.action?newAccount"
+        ],
+        "removed": [],
+        "revived": [],
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 115
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+            "line": 55,
+            "snippet": "    accountMapper.insertAccount(account);"
+          }
+        ]
+      },
+      "screenRefs": [],
+      "policyRefs": []
+    },
+    {
+      "id": "SER-020",
+      "category": "SER",
+      "name": "소셜 인증 보안",
+      "type": "nonfunctional",
+      "nfrCategory": "security",
+      "priority": "MEDIUM",
+      "status": "ACTIVE",
+      "derivedFrom": "SFR-020",
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": {
+        "details": [],
+        "inputs": "",
+        "outputs": "",
+        "flow": "",
+        "preceding": [],
+        "exceptions": [],
+        "acceptance": [],
+        "verify": ""
+      },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "카카오 액세스 토큰·인가코드는 세션에 영속 보관하지 않는다. 로그인 성공 시 비밀번호를 세션 보관 전에 지우는 현행 규칙과 같은 수준을 적용한다.",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:account/kakao-oauth-callback"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 169,
+              "snippet": "account.setPassword(null);"
+            }
+          ],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-2",
+          "text": "로그아웃 시 카카오 인증 상태도 함께 정리한다. 현행 로그아웃은 세션 무효화와 인증 표시 초기화를 수행한다.",
+          "kind": "rule",
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signoff"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 184
+            }
+          ],
+          "screenRefs": [],
+          "policyRefs": []
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:account/kakao-oauth-callback"
+        ],
+        "modified": [
+          "flow:ANY /actions/Account.action?signoff"
+        ],
+        "removed": [],
+        "revived": [],
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 184
+          }
+        ]
+      },
+      "screenRefs": [],
+      "policyRefs": []
+    }
+  ],
+  "questions": [
+    {
+      "id": "Q-1",
+      "text": "현행 로그인은 아이디·비밀번호가 함께 일치하는 계정이 조회될 때만 성공한다. 카카오 로그인 도입 후에도 기존 아이디/비밀번호 로그인을 병행 유지하는가?",
+      "targetReqId": "SFR-020",
+      "axis": "domain",
+      "answer": "유지",
+      "answeredAt": "2026-07-22T07:20:10.457Z"
+    },
+    {
+      "id": "Q-2",
+      "text": "ACCOUNT 는 email·firstname·lastname·addr1·city·state·zip·country·phone 이 전부 NOT NULL 이다. 카카오 프로필만으로 못 채우는 필수 항목은 최초 로그인 시 추가 입력 화면으로 받는가, 아니면 스키마를 null 허용으로 완화하는가?",
+      "targetReqId": "DAR-020",
+      "axis": "data",
+      "answer": "허용",
+      "answeredAt": "2026-07-22T07:20:10.457Z"
+    },
+    {
+      "id": "Q-3",
+      "text": "로그인 비밀번호는 SIGNON 테이블에 분리 보관되는데 소셜 사용자는 비밀번호가 없다. 소셜 사용자도 SIGNON 행을 만드는가, 아니면 별도 소셜 연동 테이블을 신설하는가(신설이면 테이블 정의 필요)?",
+      "targetReqId": "DAR-020",
+      "axis": "data",
+      "answer": "맘대로",
+      "answeredAt": "2026-07-22T07:20:10.457Z"
+    },
+    {
+      "id": "Q-4",
+      "text": "현행 회원가입은 완료 즉시 인증 상태가 된다. 카카오 최초 로그인 사용자도 별도 가입 절차 없이 자동 회원가입 처리하는가?",
+      "targetReqId": "SFR-020",
+      "axis": "domain",
+      "answer": "그래",
+      "answeredAt": "2026-07-22T07:20:10.457Z"
+    },
+    {
+      "id": "Q-5",
+      "text": "이미 아이디/비밀번호로 가입한 기존 회원이 카카오 계정을 나중에 연결하는 기능(계정 연동)도 이번 범위에 포함하는가?",
+      "targetReqId": "DAR-020",
+      "axis": "domain",
+      "answer": "아니",
+      "answeredAt": "2026-07-22T07:20:10.457Z"
+    },
+    {
+      "id": "Q-6",
+      "text": "자동 회원가입(Q-4 답변)에는 계정 아이디가 필요하다. ACCOUNT 의 기본키인 userid 는 카카오 식별자 기반으로 자동 채번하는가?",
+      "targetReqId": "DAR-020",
+      "axis": "data",
+      "answer": "그래",
+      "answeredAt": "2026-07-22T07:24:26.193Z"
+    }
+  ]
+}

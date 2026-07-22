@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router";
 import ReactMarkdown from "react-markdown";
 import { useDashboardStore } from "../store";
 import type { IncidentLedgerEntry } from "../store/slices/incident-slice";
+import NavGroup from "./ui/NavGroup";
 
 /**
  * 장애 분석(/incident) — DS-APM RCA 리포트 원장(좌 270px) + 건별 워크스페이스(우).
@@ -133,6 +134,7 @@ export default function IncidentView() {
     [pendingDrops, selectedId],
   );
 
+  const [ledgerOpen, setLedgerOpen] = useState(true);
   const [report, setReport] = useState<ParsedReport | null>(null);
   const [seed, setSeed] = useState<SeedResult | null>(null);
   const [impact, setImpact] = useState<ImpactSnapshot | null>(null);
@@ -207,26 +209,32 @@ export default function IncidentView() {
   const limitText = report?.sections?.["한계"];
 
   return (
-    <div className="h-full overflow-auto px-5 py-4">
-      <div className="grid gap-[14px] lg:grid-cols-[270px_minmax(0,1fr)]">
-        {/* ── 좌: 장애 원장 ─────────────────────────────────────────── */}
-        <aside className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <h2 className="text-[13px] font-bold text-text-primary">장애 원장</h2>
-            <button
-              type="button"
-              onClick={() => void loadHistory()}
-              disabled={running || !token}
-              className="ml-auto rounded-lg border border-border-subtle bg-elevated px-2.5 py-1 text-[11.5px] font-semibold text-text-secondary hover:text-text-primary disabled:opacity-40"
-              title="드롭 폴더(ds-hub/장애)를 다시 스캔합니다"
-            >
-              새로고침
-            </button>
-          </div>
-          {!loaded && <div className="text-[12px] text-text-muted">불러오는 중…</div>}
+    <div className="h-full overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
+      <div className="grid items-start grid-cols-1 gap-[14px] lg:grid-cols-[270px_minmax(0,1fr)]">
+        {/* ── 좌: 장애 원장 ─ 화면설계서 좌측 내비(proto-tree 카드) 기준으로 통일(2026-07-22).
+            작업요청 세션 원장(SessionView)과 동형: .fold 헤더 + .doc 원장 행. ──────────── */}
+        <aside className="rounded-[10px] border border-border-subtle bg-panel card-shadow proto-tree">
+          <NavGroup
+            label="장애 원장"
+            count={pendingDrops.length + entries.length}
+            open={ledgerOpen}
+            onToggle={() => setLedgerOpen((v) => !v)}
+            right={
+              <button
+                type="button"
+                onClick={() => void loadHistory()}
+                disabled={running || !token}
+                className="rounded-lg border border-border-subtle bg-elevated px-2.5 py-1 text-[11px] font-semibold text-text-secondary hover:text-text-primary disabled:opacity-40"
+                title="드롭 폴더(ds-hub/장애)를 다시 스캔합니다"
+              >
+                새로고침
+              </button>
+            }
+          >
+          {!loaded && <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "4px 8px" }}>불러오는 중…</div>}
           {loaded && entries.length === 0 && pendingDrops.length === 0 && (
-            <div className="rounded-xl border border-border-subtle bg-surface p-3 text-[12px] text-text-muted">
-              장애가 없습니다. DS-APM 이 <code className="text-[11px]">ds-hub/장애/</code> 에 리포트를
+            <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "4px 8px", lineHeight: 1.5 }}>
+              장애가 없습니다. DS-APM 이 <code style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>ds-hub/장애/</code> 에 리포트를
               드롭하면 이 목록에 자동으로 나타납니다.
             </div>
           )}
@@ -238,32 +246,31 @@ export default function IncidentView() {
               <button
                 key={d.file}
                 type="button"
+                className={`doc${active ? " on" : ""}`}
                 onClick={() => setParams((p) => {
                   const n = new URLSearchParams(p);
                   n.set("id", key);
                   return n;
                 })}
-                className={`rounded-xl border px-3 py-2.5 text-left transition-colors ${
-                  active ? "border-accent/50 bg-elevated" : "border-dashed border-border-subtle bg-surface hover:bg-elevated"
-                }`}
               >
-                <div className="mb-1 flex items-center gap-1.5">
-                  <span className="truncate text-[12px] font-semibold text-text-primary">
-                    {d.service ?? "(서비스 미상)"}
+                <span style={{ minWidth: 0, flex: "1 1 auto" }}>
+                  <span className="flex items-center gap-1.5" style={{ minWidth: 0 }}>
+                    <span className="truncate font-semibold text-text-primary" style={{ fontSize: 12 }}>
+                      {d.service ?? "(서비스 미상)"}
+                    </span>
+                    {d.confidence && (
+                      <Chip tone={CONFIDENCE_TONE[d.confidence] ?? CONFIDENCE_TONE.low}>{d.confidence}</Chip>
+                    )}
                   </span>
-                  {d.confidence && (
-                    <Chip tone={CONFIDENCE_TONE[d.confidence] ?? CONFIDENCE_TONE.low}>{d.confidence}</Chip>
-                  )}
-                  <span className="ml-auto" />
-                  <Chip tone="bg-amber-500/15 text-amber-600">신규</Chip>
-                </div>
-                <div className="line-clamp-2 text-[11.5px] leading-snug text-text-secondary">
-                  {d.title ?? d.file}
-                </div>
-                <div className="mt-1 text-[10.5px] text-text-muted">
-                  {d.reportCreatedAt?.slice(0, 10) ?? ""}
-                  {!d.parseable ? " · ⚠ 형식 확인 필요" : " · 미수령"}
-                </div>
+                  <span className="line-clamp-2 text-text-secondary" style={{ display: "block", fontSize: 11.5, lineHeight: 1.35, marginTop: 2 }}>
+                    {d.title ?? d.file}
+                  </span>
+                  <span style={{ display: "block", fontSize: 10.5, color: "var(--color-text-muted)", marginTop: 2 }}>
+                    {d.reportCreatedAt?.slice(0, 10) ?? ""}
+                    {!d.parseable ? " · ⚠ 형식 확인 필요" : " · 미수령"}
+                  </span>
+                </span>
+                <span className="st"><Chip tone="bg-amber-500/15 text-amber-600">신규</Chip></span>
               </button>
             );
           })}
@@ -273,37 +280,35 @@ export default function IncidentView() {
               <button
                 key={e.runId}
                 type="button"
+                className={`doc${active ? " on" : ""}`}
                 onClick={() => setParams((p) => {
                   const n = new URLSearchParams(p);
                   n.set("id", e.runId);
                   return n;
                 })}
-                className={`rounded-xl border px-3 py-2.5 text-left transition-colors ${
-                  active
-                    ? "border-accent/50 bg-elevated"
-                    : "border-border-subtle bg-surface hover:bg-elevated"
-                }`}
               >
-                <div className="mb-1 flex items-center gap-1.5">
-                  <span className="truncate text-[12px] font-semibold text-text-primary">
-                    {e.service ?? "(서비스 미상)"}
+                <span style={{ minWidth: 0, flex: "1 1 auto" }}>
+                  <span className="flex items-center gap-1.5" style={{ minWidth: 0 }}>
+                    <span className="truncate font-semibold text-text-primary" style={{ fontSize: 12 }}>
+                      {e.service ?? "(서비스 미상)"}
+                    </span>
+                    {e.confidence && (
+                      <Chip tone={CONFIDENCE_TONE[e.confidence] ?? CONFIDENCE_TONE.low}>{e.confidence}</Chip>
+                    )}
                   </span>
-                  {e.confidence && (
-                    <Chip tone={CONFIDENCE_TONE[e.confidence] ?? CONFIDENCE_TONE.low}>{e.confidence}</Chip>
-                  )}
-                  <span className="ml-auto" />
-                  <Chip tone={STATUS_TONE[e.status]}>{STATUS_LABEL[e.status]}</Chip>
-                </div>
-                <div className="line-clamp-2 text-[11.5px] leading-snug text-text-secondary">
-                  {e.title ?? e.sourceFile ?? e.runId}
-                </div>
-                <div className="mt-1 text-[10.5px] text-text-muted">
-                  {e.reportCreatedAt?.slice(0, 10) ?? e.ingestedAt?.slice(0, 10) ?? ""}
-                  {e.allNotInProject ? " · ⚠ 타 프로젝트 의심" : ""}
-                </div>
+                  <span className="line-clamp-2 text-text-secondary" style={{ display: "block", fontSize: 11.5, lineHeight: 1.35, marginTop: 2 }}>
+                    {e.title ?? e.sourceFile ?? e.runId}
+                  </span>
+                  <span style={{ display: "block", fontSize: 10.5, color: "var(--color-text-muted)", marginTop: 2 }}>
+                    {e.reportCreatedAt?.slice(0, 10) ?? e.ingestedAt?.slice(0, 10) ?? ""}
+                    {e.allNotInProject ? " · ⚠ 타 프로젝트 의심" : ""}
+                  </span>
+                </span>
+                <span className="st"><Chip tone={STATUS_TONE[e.status]}>{STATUS_LABEL[e.status]}</Chip></span>
               </button>
             );
           })}
+          </NavGroup>
         </aside>
 
         {/* ── 우: 건별 워크스페이스 ─────────────────────────────────── */}

@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { Link, useSearchParams } from "react-router";
 
@@ -10,6 +10,7 @@ import { Chip, UnresolvedModal } from "./data-map/UnresolvedChips";
 import type { DbUnresolved } from "./data-map/types";
 import type { BadgeTone } from "./proto/Proto";
 import SearchInput from "./ui/SearchInput";
+import NavGroup from "./ui/NavGroup";
 // RTM ② 영향분석과 표면 정렬(2026-07-17) — 같은 조건 카드·같은 비포·에프터 모달을 쓴다.
 // 두 화면이 같은 스냅샷을 읽으므로(§2.3 "한 번 돌리고 두 곳에서 본다") 표현도 갈라지지 않는다.
 import DataCompareModal from "./rtm/DataCompareModal";
@@ -711,23 +712,21 @@ export default function ChangeImpactView() {
                 const activeCat = selectedEntry ? (selectedEntry.source ?? "change") : null;
                 const open = searching ? rows.length > 0 : openGroups[cat] || cat === activeCat;
                 return (
-                  <Fragment key={cat}>
-                    <button
-                      type="button"
-                      className="fold"
-                      title={hint}
-                      onClick={() => { if (!searching) setOpenGroups((p) => ({ ...p, [cat]: !p[cat] })); }}
-                      style={{ display: "block", width: "100%", textAlign: "left", background: "none", border: "none", cursor: searching ? "default" : "pointer", font: "inherit" }}
-                    >
-                      <span aria-hidden style={{ display: "inline-block", width: 12 }}>{open ? "▾" : "▸"}</span>
-                      {label} ({searching ? `${rows.length}/${all.length}` : all.length})
-                    </button>
-                    {open && cat === "change" && all.length === 0 && (
+                  <NavGroup
+                    key={cat}
+                    label={label}
+                    count={searching ? `${rows.length}/${all.length}` : all.length}
+                    open={open}
+                    disabled={searching}
+                    title={hint}
+                    onToggle={() => setOpenGroups((p) => ({ ...p, [cat]: !p[cat] }))}
+                  >
+                    {cat === "change" && all.length === 0 && (
                       <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "4px 8px", lineHeight: 1.5 }}>
                         아직 기록 없음 — 자연어 영향 탐색을 실행하면 여기 쌓입니다.
                       </div>
                     )}
-                    {open && rows.map((e) => {
+                    {rows.map((e) => {
                     const openable = e.files.includes("impact.json");
                     const isCurrent = e.jobId === currentJobId;
                     const on = activeRun ? activeRun === e.jobId : isCurrent;
@@ -777,7 +776,7 @@ export default function ChangeImpactView() {
                       </button>
                     );
                   })}
-                  </Fragment>
+                  </NavGroup>
                 );
               })}
               {/* 전 그룹 매치 0 — 헤더 (0/N) 만으론 안 읽히므로 명시(조용한 빈 결과 금지). */}

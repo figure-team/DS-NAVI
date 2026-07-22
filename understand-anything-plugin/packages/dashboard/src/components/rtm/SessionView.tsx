@@ -8,6 +8,7 @@ import {
   CIRCLED, SESSION_STATE, STEP_DEFS, WARN, fmtSessionTime, sessionStateOf,
 } from "./types";
 import { Badge } from "../proto/Proto";
+import NavGroup from "../ui/NavGroup";
 
 /**
  * W2: 요청 세션 탭 — 좌 270px 세션 원장 + 우 선택 세션 콘텐츠.
@@ -46,11 +47,12 @@ export default function SessionView() {
   // W4: 폐기 확인 다이얼로그 pending — 폐기/닫기가 스테퍼에서 카드 헤더 최우측으로 이사하며
   // (2026-07-16) 상태도 함께 왔다. 모듈 레벨 컴포넌트라 로컬 useState 로 충분하다.
   const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const [ledgerOpen, setLedgerOpen] = useState(true);
   const running = intakeStatus === "running";
 
   const ledger = (
     <div className={`${CARD} proto-tree`}>
-      <div className="fold">세션 원장 ({sessions.length})</div>
+      <NavGroup label="세션 원장" count={sessions.length} open={ledgerOpen} onToggle={() => setLedgerOpen((v) => !v)}>
       {sessionsError ? (
         <div style={{ fontSize: 12, color: "var(--color-status-error)", padding: "4px 8px", lineHeight: 1.5 }}>
           원장을 불러오지 못했습니다 — <code style={{ fontFamily: "var(--font-mono)" }}>{sessionsError}</code>
@@ -90,6 +92,7 @@ export default function SessionView() {
           );
         })
       )}
+      </NavGroup>
       {/* C1 을 화면에서 못 박는다 — 원장이 목록이라고 큐로 읽히면 안 된다(§4). */}
       <div className="fold">안내</div>
       <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "6px 8px", lineHeight: 1.5 }}>

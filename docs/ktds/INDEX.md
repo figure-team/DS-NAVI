@@ -14,10 +14,14 @@
 | `UNDERSTAND_LITE_DESIGN.md` | /understand lite 기본값 | 기각 대안 기록 포함 |
 | `UNDERSTAND_SCALE_WORKFLOW_DESIGN.md` | 대규모 Phase2 Workflow 팬아웃 | v2.1 |
 | `RTM_INTAKE_ANSWER_DESIGN.md` | ①식별 [확인필요] 답변 경로 (A1~A7) | 구현 완료(ktds.21), §9.1 시각QA 미실측 |
-| `RTM_INTAKE_WORKSPACE_DESIGN.md` | 새 요청 = 추적표 "요청 세션" 탭 워크스페이스 | W1~W5 구현 완료 + 07-17 개편으로 일부 낡음(아래 드리프트 참조) |
+| `RTM_INTAKE_WORKSPACE_DESIGN.md` | 새 요청 = 요청 세션 워크스페이스 → **"작업 요청" 메뉴로 승격**(§7, 2026-07-22) | W1~W5 구현 완료 + 07-17 개편으로 일부 낡음(아래 드리프트 참조); 탭 관련 서술은 §7 이 대체 |
 | `RTM_IMPACT_GATE_DESIGN.md` | 인테이크↔impact 근거 게이트 (2차 개정판) | **제안 상태 — 사용자 승인 전** |
 | `RTM_AFTER_FLOW_DESIGN.md` | ② 에프터 업무흐름도 초안(after-flow.json) — 비포·에프터의 구조 diff | 2026-07-17 신설 |
 | `SCREENS_MISSING_TRIAGE_DESIGN.md` | 화면설계서 missing 트리아지 — routes census 교차검증·보조 시드 | **제안 상태 — 사용자 승인 전**(2026-07-19, egov 25건 실측 기반) |
+| `INCIDENT_ANALYSIS_DESIGN.md` | 장애 분석 메뉴(/incident) — DS-APM RCA 리포트(.md+frontmatter) 드롭 → file:line 시드 추출 → impact 재사용 → 해결방안서 + 이력 원장 | v2 승인됨(2026-07-22) — P1 완료, P2~ 진행 중 |
+| `IMPACT_LEDGER_FEDERATION_DESIGN.md` | 영향 이력 연합 — impact-history 는 변경·영향 단독 기록, 작업 요청·장애는 자기 정본 + /change 읽기 병합(jobId 단일 키 리졸버) | 승인·구현 완료 v1.1(2026-07-22) — INCIDENT_ANALYSIS·RTM_INTAKE_WORKSPACE 의 이중 기록 서술을 대체 |
+| `EXPLORE_PROMOTION_DESIGN.md` | 탐색→작업 요청 승격 3종(프리필·유래 도달성 주입·② 델타 뷰) — /change 탐색 행에만, 원인 단정 금지 델타 | 구현 완료 v1(2026-07-22) — 실 ① LLM 승격 런은 다음 접수가 자연 검증 |
+| `INCIDENT_DROP_CONTRACT.md` | DS-APM→DS-NAVI 장애 리포트 드롭 계약(형식 명세·수용 게이트·협의 항목 C1~C5) | **초안 — DS-APM 측 협의 전**(2026-07-22); 픽스처=examples/jpetstore-6/ds-hub/장애/ 2건 |
 | `FEATURE_VERIFICATION_GUIDE.md` | 전 기능 점검 절차 | ⚠️ emit을 fill 없이 돌리면 그래프 클로버 주의 포함 |
 | `VERSION_TRACKING.md` | 버전 체계 | Scheme A(5파일)+Scheme B(2파일) |
 | `front-redesign/` (pmpl-proto.html 등) | 디자인 프로토 원본 | 신규 메뉴 탭/표 스타일의 수치 기준 |

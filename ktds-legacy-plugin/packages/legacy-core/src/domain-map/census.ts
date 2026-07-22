@@ -38,6 +38,8 @@ const WALK_SKIP_DIRS = new Set([
   // 가짜 배치 진입점/도메인으로 잡히는 것 방지), Maven/Gradle 산출물.
   '.mvn',
   'target',
+  // DS-APM 연동 드롭 폴더(장애 RCA 리포트 .md) — 소스 아님. 계약: docs/ktds/INCIDENT_DROP_CONTRACT.md.
+  'ds-hub',
 ])
 
 /**

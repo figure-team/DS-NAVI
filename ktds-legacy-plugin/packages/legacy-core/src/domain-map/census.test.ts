@@ -55,9 +55,15 @@ describe('isSkippedSegment — 산출물 디렉터리와 그 변형', () => {
   })
 
   it('기존 정확일치 skip 대상은 그대로 유지된다', () => {
-    for (const seg of ['node_modules', '.git', 'dist', '.mvn', 'target']) {
+    for (const seg of ['node_modules', '.git', 'dist', '.mvn', 'target', 'ds-hub']) {
       expect(isSkippedSegment(seg), seg).toBe(true)
     }
+  })
+
+  // DS-APM 드롭 폴더(INCIDENT_DROP_CONTRACT.md) — 리포트 .md 가 소스로 오염되지 않게.
+  it('ds-hub 는 정확일치만 스킵한다(ds-hubs 같은 남의 디렉터리는 보존)', () => {
+    expect(isSkippedSegment('ds-hub')).toBe(true)
+    expect(isSkippedSegment('ds-hubs')).toBe(false)
   })
 })
 

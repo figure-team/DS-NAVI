@@ -140,7 +140,13 @@ describe('framework breadth — route/batch golden equivalence', () => {
     const batch = await actualBatch('batch-testsrc')
     // 프로덕션 진입점 1건만 — src/test/** 의 main 런처는 배치 잡이 아니다.
     expect(batch.map((b) => b.handler)).toEqual(['AppMain#main'])
-    expect(batch.every((b) => !b.filePath.split('/').includes('test'))).toBe(true)
+    // 임플과 동일 규약(test·tests 세그먼트 둘 다) — 테스트 경로 잔존 0 확인.
+    expect(
+      batch.every((b) => {
+        const segs = b.filePath.split('/')
+        return !segs.includes('test') && !segs.includes('tests')
+      }),
+    ).toBe(true)
   })
 
   it('determinism: two runs over batch-app are byte-identical', async () => {

@@ -17,6 +17,7 @@ import { buildCrudMatrix } from './builders/index.js';
 import { buildMyBatisModel, isMapperXmlDocument } from '../mybatis/index.js';
 import { buildRawSqlModel, isRawSqlModelEmpty } from './raw-sql.js';
 import { DB_SCHEMA_FILENAME } from '../db-schema/types.js';
+import { JPA_MODEL_FILENAME } from '../jpa/types.js';
 export const CRUD_MATRIX_FILENAME = 'crud-matrix.json';
 /** db-schema.json 의 테이블명 집합(소문자) — 코드 SQL 노이즈 필터용. 부재/손상은 빈 집합. */
 function loadKnownTables(projectRoot) {
@@ -121,24 +122,45 @@ export function exportCrudMatrix(projectRoot) {
     const rawSqlModel = mybatisModel.mappers.length === 0
         ? buildRawSqlModelFromGraph(projectRoot, graph.nodes, knownTables)
         : { byFile: {} };
+    // JPA/Spring Data 모델(MyBatis·raw-SQL 이 비면 리포→entity→table 로 데이터축). map scan 산출.
+    let jpaModel = null;
+    const jpaPath = join(projectRoot, '.spec', 'map', JPA_MODEL_FILENAME);
+    if (existsSync(jpaPath)) {
+        try {
+            jpaModel = JSON.parse(readFileSync(jpaPath, 'utf8'));
+        }
+        catch {
+            // 손상 시 null(JPA 폴백 비활성 — MyBatis/raw-SQL/DAO 경로만).
+        }
+    }
     const doc = buildCrudMatrix({
         nodes: graph.nodes,
         edges: graph.edges,
         mybatisModel,
         rawSqlModel,
+        jpaModel,
         methodCallGraph,
     });
     const section = doc.sections.find((s) => s.table);
     if (!section?.table)
         return null;
-    // 어느 경로가 선택됐나 + 데이터축 퇴화 여부(열이 '기능' 하나뿐 = 축 없음).
-    const source = mybatisModel.mappers.length > 0 ? 'mybatis' : !isRawSqlModelEmpty(rawSqlModel) ? 'raw-sql' : 'dao';
+    // 어느 경로가 선택됐나(buildCrudMatrix 디스패치 순서 = MyBatis→raw-SQL→JPA→DAO) + 퇴화 여부.
+    const jpaHasRepos = (jpaModel?.repositories.length ?? 0) > 0;
+    const source = mybatisModel.mappers.length > 0
+        ? 'mybatis'
+        : !isRawSqlModelEmpty(rawSqlModel)
+            ? 'raw-sql'
+            : jpaHasRepos
+                ? 'jpa'
+                : 'dao';
     const degraded = section.table.columns.length <= 1;
     const degradedReason = !degraded
         ? null
-        : knownTables.size === 0 && mybatisModel.mappers.length === 0
-            ? 'no-db-schema'
-            : 'no-mybatis-no-dao-no-sql';
+        : source === 'jpa'
+            ? 'no-jpa-tables-resolved'
+            : knownTables.size === 0 && mybatisModel.mappers.length === 0
+                ? 'no-db-schema'
+                : 'no-mybatis-no-dao-no-sql';
     // domain-graph.json 은 최상위 gitCommit 을 갖지 않는다 — 스탬프는 ktdsMap.generatedFromCommit
     // (emit 이 skeleton.gitCommit 에서 투영, 없으면 빈 문자열)과 project.gitCommitHash 에 있다.
     // `||` 인 이유: emit 이 `?? ''` 로 쓰므로 빈 문자열을 유효값으로 받으면 안 된다.

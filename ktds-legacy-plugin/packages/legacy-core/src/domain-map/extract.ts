@@ -304,6 +304,14 @@ function consumedSpringCtxValid(c: ConsumedSpringCtx, ctx: SpringContext): boole
   return true
 }
 
+/**
+ * 테스트 소스 경로 판별 — `test`/`tests` 세그먼트를 포함하면 테스트로 본다.
+ * interface-scan·batch-scan/report 와 동일 규약(세그먼트 정확일치).
+ */
+function isTestPath(relPath: string): boolean {
+  return relPath.split('/').some((seg) => seg === 'test' || seg === 'tests')
+}
+
 /** 프로젝트 루트에서 라우트/배치 보고를 추출한다(파일 기록 없음). */
 export async function extractRoutes(
   projectRoot: string,
@@ -551,8 +559,13 @@ export async function extractRoutes(
   const finalRoutes = sortRoutes(sortedRoutes)
 
   // 8) W2: 배치 핸들러 해석 — 스프링 빈 인덱스로 XML 엔트리의 잡 클래스 파일을 푼다.
+  //    테스트 소스(src/test/**)의 진입점은 배치 잡이 아니다 — 테스트 런처
+  //    (JUnit/통합테스트 main, 테스트 리소스 스케줄)를 배치로 오분류하지 않도록
+  //    정의 파일이 테스트 경로면 제외한다(interface-scan·batch-scan/report 와 동일 규약).
   const beanIndex = buildSpringBeanIndex(projectRoot, census)
-  const resolvedBatch = resolveBatchHandlers(batchEntries, beanIndex, census)
+  const resolvedBatch = resolveBatchHandlers(batchEntries, beanIndex, census).filter(
+    (b) => !isTestPath(b.filePath),
+  )
 
   return {
     schemaVersion: 1,

@@ -136,6 +136,13 @@ describe('framework breadth — route/batch golden equivalence', () => {
     expect(triggers.has('task-xml')).toBe(true)
   })
 
+  it('batch-testsrc: 테스트 소스 main 은 배치 잡에서 제외(프로덕션 main 만)', async () => {
+    const batch = await actualBatch('batch-testsrc')
+    // 프로덕션 진입점 1건만 — src/test/** 의 main 런처는 배치 잡이 아니다.
+    expect(batch.map((b) => b.handler)).toEqual(['AppMain#main'])
+    expect(batch.every((b) => !b.filePath.split('/').includes('test'))).toBe(true)
+  })
+
   it('determinism: two runs over batch-app are byte-identical', async () => {
     const root = join(fixturesRoot, 'batch-app')
     const census = buildCensus(root)

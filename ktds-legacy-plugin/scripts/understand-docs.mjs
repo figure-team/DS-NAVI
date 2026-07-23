@@ -38,6 +38,7 @@ const {
   writeWikiVault,
   buildMyBatisModel,
   isMapperXmlDocument,
+  collectRtmSignals,
   readDbSchema,
   buildXlsxWorkbook,
   docToSheets,
@@ -198,6 +199,27 @@ if (existsSync(mcgPath)) {
   }
 }
 
+// JPA/Spring Data 모델(비-MyBatis·비-raw-SQL 폴백) — crud-matrix 가 리포→entity→table 로 데이터축을
+// 세운다(map scan 산출 jpa-model.json). RTM 데이터 축과 동일 소스(build-rtm dataCellFromJpa).
+let jpaModel = null
+const jpaPath = join(projectRoot, '.spec', 'map', 'jpa-model.json')
+if (existsSync(jpaPath)) {
+  try {
+    jpaModel = JSON.parse(readFileSync(jpaPath, 'utf8'))
+  } catch {
+    // 손상 시 null(JPA 폴백 비활성).
+  }
+}
+
+// 코드 raw SQL 모델(비-MyBatis·비-JPA 폴백, Kotlin/JDBC) — crud-matrix 데이터축. rtm CLI 와 동일 경로.
+let rawSqlModel = { byFile: {} }
+try {
+  const sig = collectRtmSignals(projectRoot, graph.nodes)
+  if (sig && sig.rawSqlModel) rawSqlModel = sig.rawSqlModel
+} catch {
+  // 신호 수집 실패는 무시(crud-matrix 는 DAO 폴백으로 우아하게 강등).
+}
+
 // 언어 도출 — 그래프 노드 filePath 확장자에서(emit project.languages 가 비어 있어 보강).
 const EXT_LANG = { java: "Java", kt: "Kotlin", ts: "TypeScript", tsx: "TypeScript", js: "JavaScript", jsx: "JavaScript", py: "Python", go: "Go", rb: "Ruby", cs: "C#", php: "PHP" }
 function deriveLanguages(nodes) {
@@ -257,7 +279,7 @@ const buildDeps = findBuildDeps(projectRoot)
 // PA3: db-spec 가 DDL 의 실제 컬럼/PK/FK/CHECK 를 grounding 으로 싣도록 map(scan) 산출을 로드.
 // 없으면(맵 미실행/code-only) null → db-spec 은 기존 노드 기반 목록만(우아한 degrade).
 const dbSchema = readDbSchema(projectRoot)
-const input = { nodes: graph.nodes, edges: graph.edges, routes, interfaces, batchJobs, programInventory, riskReport, rtm, workSummary, mybatisModel, methodCallGraph, project, buildDeps, fileEdges, dbSchema }
+const input = { nodes: graph.nodes, edges: graph.edges, routes, interfaces, batchJobs, programInventory, riskReport, rtm, workSummary, mybatisModel, rawSqlModel, jpaModel, methodCallGraph, project, buildDeps, fileEdges, dbSchema }
 // domain-graph.json 은 최상위 gitCommit 을 갖지 않는다 — 스탬프는 ktdsMap.generatedFromCommit
 // (emit 이 skeleton.gitCommit 에서 투영, 없으면 빈 문자열)과 project.gitCommitHash 에 있다.
 // `||` 인 이유: emit.ts 가 `?? ''` 로 쓰므로 빈 문자열을 유효값으로 받으면 안 된다.

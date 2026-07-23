@@ -14,6 +14,7 @@ import type { MyBatisModel } from '../../mybatis/types.js'
 import { isRawSqlModelEmpty, type RawSqlModel } from '../raw-sql.js'
 import { reachableMethods } from '../../domain-map/method-calls.js'
 import type { MethodCallGraph } from '../../domain-map/types.js'
+import type { JpaModel, JpaRepository } from '../../jpa/types.js'
 
 const cmp = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0)
 
@@ -25,6 +26,27 @@ export function crudOf(method: string): string | null {
   if (/^(delete|remove|drop|destroy|purge)/.test(m)) return 'D'
   if (/^(select|get|find|list|search|query|count|read|load|exist|fetch|view|retrieve)/.test(m)) return 'R'
   return null
+}
+
+/**
+ * JPA/Spring Data 리포지토리 메서드 → CRUD 글자. crud-matrix(기능×테이블 JPA 경로)와
+ * RTM 데이터 축(build-rtm)이 **동일 규약**을 쓰도록 단일 소스로 export 한다(드리프트 차단).
+ *
+ * @Query 명시 쿼리면 본문 선두 동사(JPQL/native)로 판정 — 이름 규칙보다 우선. 파생쿼리(findByX)는
+ * 조회. save/persist 는 업서트라 **C+U**(crudOf 는 save→C 로만 봐 수정 흐름을 전부 Create 로 오표기).
+ */
+export function jpaCrud(method: string, repo: JpaRepository): string | null {
+  const q = repo.queries.find((x) => x.method === method)
+  if (q && q.query) {
+    const verb = q.query.trimStart().toLowerCase()
+    if (verb.startsWith('insert')) return 'C'
+    if (verb.startsWith('update')) return 'U'
+    if (verb.startsWith('delete')) return 'D'
+    if (verb.startsWith('select')) return 'R'
+  }
+  if (repo.derivedQueries.some((d) => d.method === method)) return 'R'
+  if (/^(save|persist|store)/.test(method.toLowerCase())) return 'CU'
+  return crudOf(method)
 }
 
 /**
@@ -289,6 +311,99 @@ function buildByRawSql(input: DocInput, model: RawSqlModel): GeneratedDoc {
   return doc(columns, rows, RAW_SQL_PROSE)
 }
 
+/** JPA/Spring Data prose — 리포→entity→table 귀속, 호출부 근거. */
+const JPA_PROSE =
+  'CRUD 는 기능 핸들러가 실제 호출하는 Spring Data 리포지토리 메서드에서 판정한다 — @Query 는 SQL 선두 동사, ' +
+  '파생쿼리(findByX)는 R, save/persist 는 업서트(C+U). 테이블은 리포지토리의 entity→@Entity/@Table 로 해소한다. ' +
+  '귀속은 method-call 그래프의 실제 호출부이며 근거=호출부 file:line(리포 접근 지점).'
+
+/**
+ * 기능×테이블 (JPA/Spring Data 폴백) — MyBatis·raw-SQL 신호가 없는 Spring Data 프로젝트용.
+ * 흐름 핸들러에서 도달하는 리포지토리 메서드 호출(method-calls)을 리포→entity→table 로 귀속하고,
+ * CRUD 는 jpaCrud(호출 메서드)로 판정한다. 근거=실제 호출부 file:line(RTM 데이터 축 DEF-6 과 동일 소스).
+ * 도달 테이블이 0이면(리포는 있으나 호출/entity 미해소) 열='기능'만 남는 퇴화 표를 정직하게 낸다
+ * (crud-export 가 source='jpa'·degraded·'no-jpa-tables-resolved' 로 보고 — 조용한 퇴화 금지).
+ */
+function buildByJpa(input: DocInput, jpa: JpaModel): GeneratedDoc {
+  const stepById = new Map(input.nodes.filter((n) => n.type === 'step').map((n) => [n.id, n]))
+  const incoming = new Map<string, string[]>()
+  for (const e of input.edges) {
+    if (e.type !== 'calls') continue
+    incoming.set(e.target, [...(incoming.get(e.target) ?? []), ...calleeMethods(e.description)])
+  }
+  const repoByPath = new Map(jpa.repositories.map((r) => [r.relPath, r]))
+  const tableOf = (repo: JpaRepository): string | null => {
+    if (!repo.entityType) return null
+    const e = jpa.entities.find((x) => x.className === repo.entityType)
+    return e ? e.tableName : null
+  }
+  const flows = nodesOfType(input.nodes, 'flow')
+  const tablesSet = new Set<string>()
+  const perFlow = new Map<string, { byTable: Map<string, Set<string>>; ev: Evidence[] }>()
+  for (const flow of flows) {
+    const byTable = new Map<string, Set<string>>()
+    const ev: Evidence[] = []
+    const evSeen = new Set<string>()
+    const attribute = (repo: JpaRepository, method: string, evFile: string, evLine: number | null): void => {
+      const table = tableOf(repo)
+      if (!table) return
+      const crud = jpaCrud(method, repo)
+      if (!crud) return
+      tablesSet.add(table)
+      const set = byTable.get(table) ?? new Set<string>()
+      for (const ch of crud) set.add(ch) // 업서트(CU) 등 다글자 → 글자별 편입.
+      byTable.set(table, set)
+      if (evLine != null) {
+        const key = `${evFile}:${evLine}`
+        if (!evSeen.has(key)) {
+          evSeen.add(key)
+          ev.push({ file: evFile, line: evLine })
+        }
+      }
+    }
+    const handler = bareHandler((flow.domainMeta as Record<string, unknown> | undefined)?.entryPoint)
+    const graph = input.methodCallGraph
+    if (graph && handler && typeof flow.filePath === 'string') {
+      // 정밀: 핸들러에서 도달하는 (파일, 메서드) 중 리포지토리 호출 — 호출부 근거.
+      const reached = new Set(reachableMethods(graph, flow.filePath, handler).map((m) => `${m.file}\n${m.method}`))
+      reached.add(`${flow.filePath}\n${handler}`)
+      for (const c of graph.calls) {
+        if (c.calleeFile == null) continue
+        const repo = repoByPath.get(c.calleeFile)
+        if (!repo) continue
+        if (!reached.has(`${c.callerFile}\n${c.callerMethod}`)) continue
+        attribute(repo, c.calleeMethod, c.callerFile, c.callLine)
+      }
+    } else {
+      // 폴백: flow_step 스텝이 리포지토리 파일이면 들어오는 calls 메서드로 CRUD.
+      for (const e of input.edges) {
+        if (e.type !== 'flow_step' || e.source !== flow.id) continue
+        const step = stepById.get(e.target)
+        if (!step || typeof step.filePath !== 'string') continue
+        const repo = repoByPath.get(step.filePath)
+        if (!repo) continue
+        for (const method of incoming.get(step.id) ?? []) {
+          attribute(repo, method, step.filePath, step.lineRange ? step.lineRange[0] : null)
+        }
+      }
+    }
+    perFlow.set(flow.id, { byTable, ev })
+  }
+  const tableCols = [...tablesSet].sort(cmp)
+  const columns = ['기능', ...tableCols]
+  const rows: TableRow[] = flows.map((flow): TableRow => {
+    const { byTable, ev } = perFlow.get(flow.id)!
+    const cells = [
+      flow.name.length > 0 ? flow.name : flow.id,
+      ...tableCols.map((t) => (byTable.has(t) ? crudCell(byTable.get(t)!) : '')),
+    ]
+    return ev.length > 0
+      ? { cells, confidence: 'CONFIRMED', evidence: ev.sort((a, b) => cmp(a.file, b.file) || (a.line ?? 0) - (b.line ?? 0)) }
+      : { cells, confidence: 'INFERRED', evidence: [] }
+  })
+  return doc(columns, rows, JPA_PROSE)
+}
+
 export function buildCrudMatrix(input: DocInput): GeneratedDoc {
   const model = input.mybatisModel
   if (model && model.mappers.length > 0) {
@@ -297,7 +412,10 @@ export function buildCrudMatrix(input: DocInput): GeneratedDoc {
     // 폴백: 파일 단위 사용메서드 라벨(과다귀속 가능, caveat).
     return buildByTable(input, model)
   }
-  // 비-MyBatis: 코드 raw SQL 로 기능×테이블(db-schema 필터). 신호 없으면 기능×DAO 폴백.
+  // 비-MyBatis: 코드 raw SQL 로 기능×테이블(db-schema 필터).
   if (!isRawSqlModelEmpty(input.rawSqlModel)) return buildByRawSql(input, input.rawSqlModel!)
+  // JPA/Spring Data: 리포→entity→table, 호출부 근거(DEF-6 RTM 데이터 축과 동일 소스). 자바 지배 ORM 축 공백 해소.
+  if (input.jpaModel && input.jpaModel.repositories.length > 0) return buildByJpa(input, input.jpaModel)
+  // 신호 전무: 기능×DAO 폴백([추정]).
   return buildByDao(input)
 }

@@ -2,7 +2,7 @@ import { nodeEvidence } from '../doc-generator/builders/shared.js';
 import { namespaceBaseName } from '../mybatis/index.js';
 import { reachableMethods } from '../domain-map/method-calls.js';
 import { isRawSqlModelEmpty } from '../doc-generator/raw-sql.js';
-import { crudOf } from '../doc-generator/builders/crud-matrix.js';
+import { jpaCrud } from '../doc-generator/builders/crud-matrix.js';
 import { computeCoverage } from './coverage.js';
 import { computeDiagnostics } from './validate.js';
 const cmp = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
@@ -105,31 +105,6 @@ function dataCellFromRawSql(flow, input, stepById) {
  * 메서드명(@Query 는 SQL 동사, 파생쿼리/상속메서드는 이름 규칙)으로 CRUD 를 판정한다.
  * 근거=호출부 file:line(실제 리포 접근 지점). MyBatis·raw-SQL 이 비었을 때만 쓰이는 폴백.
  */
-function jpaCrud(method, repo) {
-    // @Query 명시 쿼리면 본문 선두 동사(JPQL/native)로 판정 — 이름 규칙보다 우선.
-    const q = repo.queries.find((x) => x.method === method);
-    if (q && q.query) {
-        const verb = q.query.trimStart().toLowerCase();
-        if (verb.startsWith('insert'))
-            return 'C';
-        if (verb.startsWith('update'))
-            return 'U';
-        if (verb.startsWith('delete'))
-            return 'D';
-        if (verb.startsWith('select'))
-            return 'R';
-    }
-    // 파생 쿼리(findByX)는 전부 조회.
-    if (repo.derivedQueries.some((d) => d.method === method))
-        return 'R';
-    // Spring Data save/saveAll = 업서트(신규면 INSERT, 존재하면 UPDATE) — 정적으로 구분 불가하니
-    // C+U 로 정직 표기한다. crudOf 는 save→C 로만 보나, JPA 에선 save 가 유일 변경 메서드라
-    // 그대로 쓰면 수정 흐름이 전부 Create 로 오표기된다(관례 붕괴).
-    if (/^(save|persist|store)/.test(method.toLowerCase()))
-        return 'CU';
-    // 이름 규칙(JpaRepository 상속 delete/findById… 포함).
-    return crudOf(method);
-}
 function dataCellFromJpa(flow, input, stepById, incoming) {
     const jpa = input.jpaModel;
     if (!jpa || jpa.repositories.length === 0)

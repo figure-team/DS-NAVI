@@ -2,6 +2,7 @@ import { nodeEvidence } from '../doc-generator/builders/shared.js';
 import { namespaceBaseName } from '../mybatis/index.js';
 import { reachableMethods } from '../domain-map/method-calls.js';
 import { isRawSqlModelEmpty } from '../doc-generator/raw-sql.js';
+import { crudOf } from '../doc-generator/builders/crud-matrix.js';
 import { computeCoverage } from './coverage.js';
 import { computeDiagnostics } from './validate.js';
 const cmp = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
@@ -98,10 +99,113 @@ function dataCellFromRawSql(flow, input, stepById) {
         .join(' · ');
     return { value, confidence: 'CONFIRMED', evidence: ev.sort((a, b) => cmp(a.file, b.file) || (a.line ?? 0) - (b.line ?? 0)) };
 }
-function dataCell(flow, input, mapperByBase, stepById, incoming) {
-    // MyBatis 부재 시 코드 raw SQL 폴백(손수 짠 JDBC/Kotlin 영속화). 둘 다 없으면 빈 셀.
-    if (mapperByBase.size === 0)
-        return dataCellFromRawSql(flow, input, stepById);
+/**
+ * 한 flow 의 데이터 셀 — JPA/Spring Data 리포지토리 경로. 흐름 핸들러에서 도달하는
+ * 리포지토리 메서드 호출(method-calls) 을 찾아 리포지토리→entity→table 로 귀속하고, 호출된
+ * 메서드명(@Query 는 SQL 동사, 파생쿼리/상속메서드는 이름 규칙)으로 CRUD 를 판정한다.
+ * 근거=호출부 file:line(실제 리포 접근 지점). MyBatis·raw-SQL 이 비었을 때만 쓰이는 폴백.
+ */
+function jpaCrud(method, repo) {
+    // @Query 명시 쿼리면 본문 선두 동사(JPQL/native)로 판정 — 이름 규칙보다 우선.
+    const q = repo.queries.find((x) => x.method === method);
+    if (q && q.query) {
+        const verb = q.query.trimStart().toLowerCase();
+        if (verb.startsWith('insert'))
+            return 'C';
+        if (verb.startsWith('update'))
+            return 'U';
+        if (verb.startsWith('delete'))
+            return 'D';
+        if (verb.startsWith('select'))
+            return 'R';
+    }
+    // 파생 쿼리(findByX)는 전부 조회.
+    if (repo.derivedQueries.some((d) => d.method === method))
+        return 'R';
+    // Spring Data save/saveAll = 업서트(신규면 INSERT, 존재하면 UPDATE) — 정적으로 구분 불가하니
+    // C+U 로 정직 표기한다. crudOf 는 save→C 로만 보나, JPA 에선 save 가 유일 변경 메서드라
+    // 그대로 쓰면 수정 흐름이 전부 Create 로 오표기된다(관례 붕괴).
+    if (/^(save|persist|store)/.test(method.toLowerCase()))
+        return 'CU';
+    // 이름 규칙(JpaRepository 상속 delete/findById… 포함).
+    return crudOf(method);
+}
+function dataCellFromJpa(flow, input, stepById, incoming) {
+    const jpa = input.jpaModel;
+    if (!jpa || jpa.repositories.length === 0)
+        return inferredCell();
+    const repoByPath = new Map(jpa.repositories.map((r) => [r.relPath, r]));
+    const tableOf = (repo) => {
+        if (!repo.entityType)
+            return null;
+        const e = jpa.entities.find((x) => x.className === repo.entityType);
+        return e ? e.tableName : null;
+    };
+    const byTable = new Map();
+    const ev = [];
+    const evSeen = new Set();
+    const attribute = (repo, method, evFile, evLine) => {
+        const table = tableOf(repo);
+        if (!table)
+            return;
+        const crud = jpaCrud(method, repo);
+        if (!crud)
+            return;
+        const set = byTable.get(table) ?? new Set();
+        for (const ch of crud)
+            set.add(ch); // 업서트(CU) 등 다글자 → 글자별 편입.
+        byTable.set(table, set);
+        if (evLine != null) {
+            const key = `${evFile}:${evLine}`;
+            if (!evSeen.has(key)) {
+                evSeen.add(key);
+                ev.push({ file: evFile, line: evLine });
+            }
+        }
+    };
+    const handler = bareHandler(flow.domainMeta?.entryPoint);
+    const graph = input.methodCallGraph;
+    if (graph && handler && typeof flow.filePath === 'string') {
+        // 정밀: 핸들러에서 도달하는 (파일, 메서드) 중 리포지토리 메서드 호출 — 호출부 근거.
+        const reached = new Set(reachableMethods(graph, flow.filePath, handler).map((m) => `${m.file}\n${m.method}`));
+        reached.add(`${flow.filePath}\n${handler}`);
+        for (const c of graph.calls) {
+            if (c.calleeFile == null)
+                continue;
+            const repo = repoByPath.get(c.calleeFile);
+            if (!repo)
+                continue;
+            if (!reached.has(`${c.callerFile}\n${c.callerMethod}`))
+                continue;
+            attribute(repo, c.calleeMethod, c.callerFile, c.callLine);
+        }
+    }
+    else {
+        // 폴백: flow_step 스텝이 리포지토리 파일이면 들어오는 calls 메서드로 CRUD.
+        for (const e of input.edges) {
+            if (e.type !== 'flow_step' || e.source !== flow.id)
+                continue;
+            const step = stepById.get(e.target);
+            if (!step || typeof step.filePath !== 'string')
+                continue;
+            const repo = repoByPath.get(step.filePath);
+            if (!repo)
+                continue;
+            for (const method of incoming.get(step.id) ?? []) {
+                attribute(repo, method, step.filePath, step.lineRange ? step.lineRange[0] : null);
+            }
+        }
+    }
+    if (byTable.size === 0)
+        return inferredCell();
+    const value = [...byTable.keys()]
+        .sort(cmp)
+        .map((t) => `${t}(${crudOrder(byTable.get(t))})`)
+        .join(' · ');
+    return { value, confidence: 'CONFIRMED', evidence: ev.sort((a, b) => cmp(a.file, b.file) || (a.line ?? 0) - (b.line ?? 0)) };
+}
+/** 한 flow 의 데이터 셀 — MyBatis 매퍼 정밀 귀속(핸들러 도달 메서드 → 매퍼 문). */
+function dataCellFromMyBatis(flow, input, mapperByBase, stepById, incoming) {
     const byTable = new Map();
     const ev = [];
     const evSeen = new Set();
@@ -152,6 +256,20 @@ function dataCell(flow, input, mapperByBase, stepById, incoming) {
         .map((t) => `${t}(${crudOrder(byTable.get(t))})`)
         .join(' · ');
     return { value, confidence: 'CONFIRMED', evidence: ev };
+}
+/**
+ * 한 flow 의 데이터 셀 오케스트레이션. 우선순위: MyBatis 매퍼(있으면) → 코드 raw SQL → JPA
+ * 리포지토리. 상위 소스가 근거를 내면 그대로 쓰고, 비었을 때만 다음 소스로 폴백한다(ORM
+ * 영속화 앱은 매퍼·raw-SQL 이 없어 JPA 로 채워진다). 셋 다 비면 빈 셀.
+ */
+function dataCell(flow, input, mapperByBase, stepById, incoming) {
+    const primary = mapperByBase.size > 0
+        ? dataCellFromMyBatis(flow, input, mapperByBase, stepById, incoming)
+        : dataCellFromRawSql(flow, input, stepById);
+    if (primary.confidence === 'CONFIRMED')
+        return primary;
+    const jpa = dataCellFromJpa(flow, input, stepById, incoming);
+    return jpa.confidence === 'CONFIRMED' ? jpa : primary;
 }
 /** 한 flow 의 진입점 셀 — entryPoint 핸들러 ↔ routes 핸들러 매칭(매칭 시 라우트 file:line). */
 function entryPointCell(flow, routeByHandler) {

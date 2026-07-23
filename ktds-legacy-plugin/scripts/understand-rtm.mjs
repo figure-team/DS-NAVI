@@ -108,6 +108,18 @@ if (existsSync(mcgPath)) {
   }
 }
 
+// JPA/Spring Data 모델(데이터 축 ORM 폴백) — map scan 이 산출한 jpa-model.json. MyBatis·raw-SQL 이
+// 비었을 때 리포지토리→entity→table 로 데이터 축을 채운다(build-rtm dataCell 폴백 체인).
+let jpaModel = null
+const jpaPath = join(projectRoot, '.spec', 'map', 'jpa-model.json')
+if (existsSync(jpaPath)) {
+  try {
+    jpaModel = JSON.parse(readFileSync(jpaPath, 'utf8'))
+  } catch {
+    // 손상 시 null(JPA 폴백 비활성 — MyBatis/raw-SQL 경로만).
+  }
+}
+
 // 데이터·테스트 축 신호(비-MyBatis Kotlin/JDBC 대응) — 코드 SQL(rawSqlModel) + 테스트 링크.
 // MyBatis 프로젝트면 rawSqlModel 은 비어도 무방(build-rtm 이 MyBatis 경로를 우선한다).
 let rtmSignals = { rawSqlModel: { byFile: {} }, testLinks: { byProdClass: {} }, diag: { knownTables: 0, sqlLinkedFiles: 0, testFiles: 0, prodClasses: 0 } }
@@ -122,6 +134,7 @@ const input = {
   edges: graph.edges,
   routes,
   mybatisModel,
+  jpaModel,
   methodCallGraph,
   rawSqlModel: rtmSignals.rawSqlModel,
   testLinks: rtmSignals.testLinks,
@@ -223,15 +236,25 @@ console.log(
   const dataGrounded = model.functions.filter((f) => f.data.evidence.length > 0).length
   const testGrounded = model.functions.filter((f) => f.test.value.trim() !== '').length
   const d = rtmSignals.diag
-  const dataSource = mybatisModel.mappers.length > 0 ? 'MyBatis' : d.sqlLinkedFiles > 0 ? '코드 SQL' : '없음'
+  const jpaRepos = Array.isArray(jpaModel?.repositories) ? jpaModel.repositories.length : 0
+  const dataSource =
+    mybatisModel.mappers.length > 0
+      ? 'MyBatis'
+      : d.sqlLinkedFiles > 0
+        ? '코드 SQL'
+        : jpaRepos > 0
+          ? 'JPA'
+          : '없음'
   console.log(
     `  축별 근거 — 진입점·구현 100% · 데이터 ${dataGrounded}/${total}(출처: ${dataSource}) · 테스트 ${testGrounded}/${total}(테스트 파일 ${d.testFiles}개 스캔)`,
   )
   if (dataGrounded === 0 && mybatisModel.mappers.length === 0) {
     console.log(
-      d.knownTables === 0
-        ? `  ⚠️ 데이터 축 미지원 — db-schema.json 부재로 코드 SQL 을 테이블로 매핑 불가('검증 0' 아님). understand-map DB 스키마 스캔을 먼저 실행하세요.`
-        : `  ⚠️ 데이터 축 미검출 — MyBatis 매퍼·코드 SQL 신호 없음(손수 영속화). '없음'이 아니라 '축 미지원' — 수동 확인 필요.`,
+      jpaRepos > 0
+        ? `  ⚠️ 데이터 축 미검출 — JPA 리포지토리 ${jpaRepos}개는 감지됐으나 흐름→리포 호출 매핑 0(엔티티 미해소·호출그래프 공백 후보). '검증 0' 아님 — 수동 확인.`
+        : d.knownTables === 0
+          ? `  ⚠️ 데이터 축 미지원 — db-schema.json 부재로 코드 SQL 을 테이블로 매핑 불가('검증 0' 아님). understand-map DB 스키마 스캔을 먼저 실행하세요.`
+          : `  ⚠️ 데이터 축 미검출 — MyBatis·코드 SQL·JPA 신호 없음(손수 영속화 후보). '없음'이 아니라 '축 미지원' — 수동 확인 필요.`,
     )
   }
   if (testGrounded === 0) {

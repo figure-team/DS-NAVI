@@ -18,7 +18,7 @@ import type { MethodCallGraph } from '../../domain-map/types.js'
 const cmp = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0)
 
 /** 메서드명 → CRUD 글자(접두 규칙, 폴백 경로). 미상이면 null. */
-function crudOf(method: string): string | null {
+export function crudOf(method: string): string | null {
   const m = method.toLowerCase()
   if (/^(insert|save|add|create|regist|new|persist)/.test(m)) return 'C'
   if (/^(update|modify|edit|set|merge|change)/.test(m)) return 'U'

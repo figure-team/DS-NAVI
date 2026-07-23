@@ -9,5 +9,7 @@
  */
 import type { GeneratedDoc } from '../types.js';
 import { type DocInput } from './shared.js';
+/** 메서드명 → CRUD 글자(접두 규칙, 폴백 경로). 미상이면 null. */
+export declare function crudOf(method: string): string | null;
 export declare function buildCrudMatrix(input: DocInput): GeneratedDoc;
 //# sourceMappingURL=crud-matrix.d.ts.map

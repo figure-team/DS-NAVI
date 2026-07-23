@@ -12,6 +12,7 @@
  */
 import { basename, resolve } from 'node:path';
 import { writeDomainGraph } from './persist.js';
+import { resolveAnalyzedAt } from './minimal-kg.js';
 import { SKELETON_BLANK } from './types.js';
 /** NEEDS_REVIEW 강등 마커 — 검증 실패 항목 텍스트 앞에 붙인다(삭제 금지). */
 export const NEEDS_REVIEW_MARKER = '[확인 필요] ';
@@ -88,7 +89,7 @@ export function emitDomainGraph(projectRoot, skeleton, options = {}) {
             languages: [],
             frameworks: [],
             description: 'ktds /understand-map 결정론 도메인 그래프 (skeleton)',
-            analyzedAt: options.analyzedAt ?? new Date().toISOString(),
+            analyzedAt: options.analyzedAt ?? resolveAnalyzedAt(projectRoot, skeleton.gitCommit),
             gitCommitHash: skeleton.gitCommit ?? '',
         },
         nodes,
@@ -254,7 +255,7 @@ export function emitFilledDomainGraph(projectRoot, skeleton, filledNodes, option
             languages: [],
             frameworks: [],
             description: 'ktds /understand-map 결정론 도메인 그래프 (skeleton+LLM fill+기계검증)',
-            analyzedAt: options.analyzedAt ?? new Date().toISOString(),
+            analyzedAt: options.analyzedAt ?? resolveAnalyzedAt(projectRoot, skeleton.gitCommit),
             gitCommitHash: skeleton.gitCommit ?? '',
         },
         nodes,

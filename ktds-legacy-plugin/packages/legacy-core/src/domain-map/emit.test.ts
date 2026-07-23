@@ -11,6 +11,7 @@ import { buildCandidates } from './classify.js'
 import { buildAutoPlan } from './confirm.js'
 import { buildSkeleton } from './skeleton.js'
 import { emitDomainGraph, embedVerification } from './emit.js'
+import { resolveAnalyzedAt } from './minimal-kg.js'
 import { validateGraph } from '@understand-anything/core/schema'
 import { loadProjectGraph } from '../orchestrator/index.js'
 import type { SkeletonReport, UaGraphNode } from './types.js'
@@ -71,6 +72,22 @@ describe('emit — structural domain-graph.json (pre-LLM-fill)', () => {
     expect(Array.isArray(parsed.edges)).toBe(true)
     expect(parsed.nodes.length).toBe(skeleton.nodes.length)
     expect(parsed.edges.length).toBe(skeleton.edges.length)
+  })
+
+  it('analyzedAt 결정론 — now() 아닌 커밋시각/센티널, 재실행 byte-identical', async () => {
+    // 회귀: emit 이 analyzedAt 을 new Date() 로 채워 동일 commit 재실행마다 domain-graph.json
+    // 이 byte-diff 를 냈다(스캔 산출물은 결정론인데 emit envelope 만 위반 — "동일 commit
+    // 재실행 byte-diff=0" 보장 깨짐). analyzedAt 은 resolveAnalyzedAt(커밋 커미터 시각,
+    // 비-git 은 센티널)로 결정론 해석해야 한다.
+    const skeleton = await shopMiniSkeleton()
+    const expected = resolveAnalyzedAt(root, skeleton.gitCommit)
+    emitDomainGraph(root, skeleton)
+    const first = await readFile(join(root, '.understand-anything', 'domain-graph.json'), 'utf8')
+    emitDomainGraph(root, skeleton)
+    const second = await readFile(join(root, '.understand-anything', 'domain-graph.json'), 'utf8')
+    expect(first).toBe(second) // 재실행 byte-identical
+    const at = (JSON.parse(first) as { project: { analyzedAt: string } }).project.analyzedAt
+    expect(at).toBe(expected) // now() 가 아니라 결정론 소스
   })
 
   it('UA core 자동 보정을 한 건도 유발하지 않는다(정식 어휘 — 대시보드 배너 소음 0)', async () => {

@@ -12,6 +12,7 @@
  */
 import { basename, resolve } from 'node:path'
 import { writeDomainGraph } from './persist.js'
+import { resolveAnalyzedAt } from './minimal-kg.js'
 import { SKELETON_BLANK } from './types.js'
 import type { ConfirmedGroup, SkeletonReport, UaGraphEdge, UaGraphNode } from './types.js'
 import type { VerifyReport, VerifiedItem } from './verify.js'
@@ -80,7 +81,11 @@ export function applyDeterministicLabels(
 export interface EmitOptions {
   /** 프로젝트 표시명 — 기본 basename(projectRoot). */
   projectName?: string
-  /** 분석 시각(ISO) — 기본 now. 테스트는 고정값을 주입해 byte-identical 보장. */
+  /**
+   * 분석 시각(ISO) — 미지정 시 skeleton 커밋의 커미터 시각(비-git 은 센티널)으로
+   * 결정론 해석한다(resolveAnalyzedAt). now() 폴백은 동일 commit 재실행마다 byte-diff 를
+   * 내므로 금지(minimal-kg 정책과 동일). 테스트는 고정값 주입 가능.
+   */
   analyzedAt?: string
   /**
    * 상단도메인 계층(DOMAIN_HIERARCHY) — confirmed plan.groups 를 ktdsMap.groups 로
@@ -114,7 +119,7 @@ export function emitDomainGraph(
       languages: [] as string[],
       frameworks: [] as string[],
       description: 'ktds /understand-map 결정론 도메인 그래프 (skeleton)',
-      analyzedAt: options.analyzedAt ?? new Date().toISOString(),
+      analyzedAt: options.analyzedAt ?? resolveAnalyzedAt(projectRoot, skeleton.gitCommit),
       gitCommitHash: skeleton.gitCommit ?? '',
     },
     nodes,
@@ -290,7 +295,7 @@ export function emitFilledDomainGraph(
       languages: [] as string[],
       frameworks: [] as string[],
       description: 'ktds /understand-map 결정론 도메인 그래프 (skeleton+LLM fill+기계검증)',
-      analyzedAt: options.analyzedAt ?? new Date().toISOString(),
+      analyzedAt: options.analyzedAt ?? resolveAnalyzedAt(projectRoot, skeleton.gitCommit),
       gitCommitHash: skeleton.gitCommit ?? '',
     },
     nodes,

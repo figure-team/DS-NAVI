@@ -243,6 +243,46 @@ describe('fill-fanout — 조각 감사(audit)·병합(merge)', () => {
     expect(audit2.incomplete[0]?.reason).toBe('header-missing')
   })
 
+  it('흐름 있는 헤더 청크가 업무 흐름도(businessFlows) 없으면 비차단 경고(조용한 누락 방지)', async () => {
+    const chunks = await readChunks(root)
+    const header = chunks.find((c) => c.key === 'order' && c.isHeaderChunk)!
+    // businessFlows 없는 헤더 조각 — complete 로 통과하되 warnings 에 잡힌다.
+    await writeFrag(root, fragFor(header))
+    const audit = await auditFillFragments(root, [header.chunkId])
+    expect(audit.complete).toEqual([header.chunkId]) // 완결 판정엔 무영향(optional).
+    expect(audit.warnings.map((w) => w.chunkId)).toContain(header.chunkId)
+    expect(audit.warnings[0]?.reason).toMatch(/업무 흐름도/)
+
+    // businessFlows 를 채운 헤더 조각 → 경고 사라짐(반대 케이스).
+    const withBf = fragFor(header)
+    withBf.header = {
+      ...withBf.header!,
+      businessFlows: [
+        {
+          title: '주문 접수',
+          nodes: [
+            { id: 'n1', kind: 'start', label: '시작' },
+            {
+              id: 'n2',
+              kind: 'activity',
+              label: '주문 확인',
+              citations: [{ filePath: header.files[0].relPath, line: header.files[0].line, snippet: 'public class OrderController {' }],
+            },
+            { id: 'n3', kind: 'end', label: '완료' },
+          ],
+          edges: [
+            { from: 'n1', to: 'n2' },
+            { from: 'n2', to: 'n3' },
+          ],
+        },
+      ],
+    }
+    await writeFrag(root, withBf)
+    const audit2 = await auditFillFragments(root, [header.chunkId])
+    expect(audit2.complete).toEqual([header.chunkId])
+    expect(audit2.warnings).toEqual([])
+  })
+
   it('전 청크 조각 → 병합 fill 이 DomainFillSchema 유효 + 청크 선언 밖 id 버림 보고', async () => {
     const chunks = await readChunks(root)
     const orderChunks = chunks.filter((c) => c.key === 'order')

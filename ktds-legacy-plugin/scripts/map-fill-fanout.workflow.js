@@ -131,7 +131,7 @@ ${styleRule(projectRoot)}
 
 const auditPrompt = () => `Run this exact command and nothing else:
 node ${cliScript} ${projectRoot} fill-audit
-It prints a single JSON line: { "complete": [...], "incomplete": [{ "chunkId", "reason" }] }.
+It prints a single JSON line: { "complete": [...], "incomplete": [{ "chunkId", "reason" }], "warnings": [{ "chunkId", "reason" }] }.
 Return { incomplete } via structured output, copied verbatim from the command output. Do NOT attempt to fix, rewrite, or delete anything yourself.`
 
 phase('Fill')

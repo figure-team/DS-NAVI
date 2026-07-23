@@ -92,7 +92,9 @@ export default function CrudTab({ crud }: { crud: CrudMatrix }) {
   const degradedMsg =
     crud.degradedReason === "no-db-schema"
       ? "DB 스키마(db-schema.json)가 없어 코드 SQL 을 테이블로 매핑할 수 없습니다 — understand-map 의 DB 스키마 스캔을 먼저 실행하세요."
-      : "MyBatis 매퍼·DAO·코드 SQL·테이블 신호가 모두 없어 기능↔테이블 CRUD 축을 만들 수 없습니다(손수 짠 JDBC/영속화 프로젝트). 아래는 기능 목록입니다.";
+      : crud.degradedReason === "no-jpa-tables-resolved"
+        ? "JPA/Spring Data 리포지토리는 있으나 흐름→리포지토리 호출 또는 엔티티→테이블 매핑이 해소되지 않아 CRUD 축을 만들 수 없습니다(제네릭 상위타입 미해소 등). 아래는 기능 목록입니다."
+        : "MyBatis 매퍼·DAO·코드 SQL·테이블 신호가 모두 없어 기능↔테이블 CRUD 축을 만들 수 없습니다(손수 짠 JDBC/영속화 프로젝트). 아래는 기능 목록입니다.";
 
   return (
     <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "14px 16px" }}>

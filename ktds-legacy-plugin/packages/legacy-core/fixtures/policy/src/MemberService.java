@@ -19,4 +19,9 @@ public class MemberService {
 
   public void viewMember(Long id) {
   }
+
+  @Deprecated
+  @Size(max = 50)
+  @NotNull
+  private String legacyName;
 }

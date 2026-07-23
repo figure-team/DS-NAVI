@@ -412,3 +412,19 @@ export type {
   ArtifactScore,
   GoldenArtifactKind,
 } from './golden/index.js'
+export {
+  parseIncidentReport,
+  resolveIncidentSeeds,
+  extractFileLineRefs,
+  INCIDENT_SECTION_ROOT_CAUSE,
+  INCIDENT_SECTION_FIX,
+  INCIDENT_SECTION_LIMITS,
+} from './incident/incident-report.js'
+export type {
+  IncidentFrontmatter,
+  IncidentFileRef,
+  ParsedIncidentReport,
+  IncidentSeedVerdict,
+  IncidentSeedResolution,
+  IncidentSeedResult,
+} from './incident/incident-report.js'

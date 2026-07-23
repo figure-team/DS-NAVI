@@ -20,6 +20,13 @@ import {
   writePendingMarker,
 } from "./server/job-ledger";
 import {
+  deriveIncidentRows,
+  deriveIntakeRows,
+  mapPromotedSids,
+  mergeImpactHistory,
+  resolveImpactSnapshot,
+} from "./server/impact-federation";
+import {
   appendQaRevision as appendQaRevisionIn,
   checkAnswerGate,
   auditRtmStepArtifacts,
@@ -1445,6 +1452,12 @@ interface ImpactHistoryEntry {
    * 지시를 벗어나 시드를 바꿨다는 뜻(원장에 경고로 노출). 대조 불가(비확정 실행)면 null.
    */
   seedMatch: boolean | null;
+  /**
+   * 기록 주체(2026-07-22 additive) — "intake"=작업 요청 code-impact(rtm-intake.mjs),
+   * "incident"=장애 분석 analyze(incident.mjs). 부재 = 변경·영향 메뉴(서버 잡) 또는 구 항목.
+   * 대시보드 seedOriginBadge 가 이 필드를 우선 분기한다(구 항목은 query 접두 폴백).
+   */
+  kind?: "intake" | "incident" | null;
 }
 
 function impactHistoryDir(projectRoot: string): string {
@@ -1578,6 +1591,301 @@ function reconcileImpactHistory(projectRoot: string): void {
   });
 }
 
+// ── ktds: 장애 분석(/incident) — DS-APM RCA 리포트 드롭 → 시드 게이트 2단계 실행 ──
+// 설계: docs/ktds/INCIDENT_ANALYSIS_DESIGN.md §2.5 · 계약: docs/ktds/INCIDENT_DROP_CONTRACT.md.
+// 원장(.understand-anything/incident-history/ledger.json)은 incident.mjs CLI 가 **스스로**
+// runId 키로 append 한다(rtm-intake code-impact 의 자가 기록 선례) — 서버는 spawn·서빙만
+// 하고 원장을 쓰지 않으므로 impact 류의 pending WAL 마커가 필요 없다: spawn 이 중간에
+// 죽어도 원장은 "마지막으로 완료된 단계"를 정확히 가리킨다(단계별 CLI append 가 WAL 역할).
+// 실행은 impact 의 시드 게이트와 동형 2-spawn: prepare(수령+시드 판정, 결정론) → 사용자
+// 시드 확정 → resolve(analyze+해결방안서+finalize, 유일한 LLM 산문 단계).
+const INCIDENT_DROP_DIR = path.join("ds-hub", "장애"); // 계약 C2(가칭) — 경로 확정 시 여기 1곳
+/** /incident-item 이 서빙하는 건별 파일 화이트리스트. */
+const INCIDENT_ITEM_FILES = new Set([
+  "report.md",
+  "report.json",
+  "seed.json",
+  "impact.json",
+  "impact-verify-report.json",
+  "resolution-input.json",
+  "resolution.md",
+]);
+/** runId 어휘 가드 — incident.mjs guardRunId 와 동일(디렉터리명이 된다). */
+const INCIDENT_RUN_ID_RE = /^(?!\.)[A-Za-z0-9._-]{1,64}$/;
+
+interface IncidentJobExtra extends Record<string, unknown> {
+  runId: string | null;
+  phase: "prepare" | "resolve" | null;
+  model: string | null;
+}
+const incidentTracker = new ClaudeJobTracker<IncidentJobExtra>({
+  runId: null,
+  phase: null,
+  model: null,
+});
+
+function incidentsBaseDir(projectRoot: string): string {
+  return path.join(projectRoot, ".understand-anything", "incidents");
+}
+/** 원장 읽기 — CLI 가 쓴 entries 배열을 관용 파싱(부재/파손 = 빈 목록, 정직한 empty). */
+function readIncidentLedgerEntries(projectRoot: string): Array<Record<string, unknown>> {
+  try {
+    const raw = JSON.parse(
+      fs.readFileSync(
+        path.join(projectRoot, ".understand-anything", "incident-history", "ledger.json"),
+        "utf-8",
+      ),
+    ) as { entries?: unknown };
+    return Array.isArray(raw.entries)
+      ? raw.entries.filter((e): e is Record<string, unknown> => !!e && typeof e === "object")
+      : [];
+  } catch {
+    return [];
+  }
+}
+/**
+ * 미수령 드롭의 **목록 미리보기** 파싱 — service·제목·confidence 만 뽑아 목록 행에 쓴다.
+ * ★ 이것은 뷰 전용 경량 파싱이다. 정본 파싱·시드 판정은 CLI ingest(`incident.mjs`)가 하고
+ * legacy-core 가 소유한다 — 대시보드는 플러그인 스크립트를 부르거나 CLAUDE_PLUGIN_ROOT 를
+ * 해석하지 않는다는 규약(claude 만 spawn)을 지키려 여기 최소 파서를 둔다. 엣지에서 CLI 정본
+ * 파싱과 갈리더라도 목록 프리뷰만 다를 뿐, 수령 시 정본으로 덮인다.
+ */
+interface IncidentDropPreview {
+  file: string;
+  ingested: boolean;
+  runId: string | null;
+  service: string | null;
+  title: string | null;
+  confidence: "high" | "medium" | "low" | null;
+  baselineCommit: string | null;
+  reportCreatedAt: string | null;
+  /** 수용 게이트(runId+service+근본 원인) 통과 여부 — 프리뷰 수준 판정. */
+  parseable: boolean;
+}
+function parseIncidentDropPreview(raw: string): Omit<IncidentDropPreview, "file" | "ingested"> {
+  const fm: Record<string, string> = {};
+  const m = /^---\r?\n([\s\S]*?)\r?\n---/.exec(raw);
+  if (m) {
+    for (const line of m[1].split(/\r?\n/)) {
+      const idx = line.indexOf(":");
+      if (idx > 0) fm[line.slice(0, idx).trim()] = line.slice(idx + 1).trim();
+    }
+  }
+  const conf = (fm.confidence ?? "").toLowerCase();
+  // 근본 원인 섹션 첫 비어있지 않은 줄 = 제목(코드 CLI 의 title 규약과 동일 의도).
+  // 줄 스캔 — 헤딩 다음부터 다음 `## `(또는 끝)까지에서 첫 내용 줄을 집는다.
+  let title: string | null = null;
+  const lines = raw.split(/\r?\n/);
+  const h = lines.findIndex((l) => /^##\s+근본 원인\s*$/.test(l));
+  if (h >= 0) {
+    for (let i = h + 1; i < lines.length; i++) {
+      if (/^##\s/.test(lines[i])) break;
+      const t = lines[i].trim();
+      if (t.length > 0) {
+        title = t;
+        break;
+      }
+    }
+  }
+  const runId = fm.runId && /^(?!\.)[A-Za-z0-9._-]{1,64}$/.test(fm.runId) ? fm.runId : null;
+  return {
+    runId,
+    service: fm.service || null,
+    title,
+    confidence: conf === "high" || conf === "medium" || conf === "low" ? conf : conf ? "low" : null,
+    baselineCommit: fm.baselineCommit || null,
+    reportCreatedAt: fm.createdAt || null,
+    parseable: Boolean(fm.runId && fm.service && /^##\s+근본 원인\s*$/m.test(raw)),
+  };
+}
+/**
+ * 드롭 폴더 .md 목록 + 수령 여부(원장 sourceFile 대조) — 워처 없이 조회 시 스캔.
+ * 미수령 건은 프리뷰까지 파싱해 프런트가 메인 목록에 "신규" 행으로 바로 보이게 한다.
+ */
+function listIncidentDrops(
+  projectRoot: string,
+  entries: Array<Record<string, unknown>>,
+): IncidentDropPreview[] {
+  const dropDir = path.join(projectRoot, INCIDENT_DROP_DIR);
+  if (!fs.existsSync(dropDir)) return [];
+  const ingested = new Set(entries.map((e) => e.sourceFile).filter((f) => typeof f === "string"));
+  try {
+    return fs
+      .readdirSync(dropDir)
+      .filter((f) => f.endsWith(".md"))
+      .sort()
+      .map((file): IncidentDropPreview => {
+        const done = ingested.has(file);
+        // 수령된 건은 원장이 정본이라 재파싱 불필요. 미수령만 프리뷰 파싱(크기 상한 방어).
+        if (done) {
+          return {
+            file,
+            ingested: true,
+            runId: null,
+            service: null,
+            title: null,
+            confidence: null,
+            baselineCommit: null,
+            reportCreatedAt: null,
+            parseable: true,
+          };
+        }
+        try {
+          const abs = path.join(dropDir, file);
+          if (fs.statSync(abs).size > 1024 * 1024) {
+            return { file, ingested: false, runId: null, service: null, title: null, confidence: null, baselineCommit: null, reportCreatedAt: null, parseable: false };
+          }
+          return { file, ingested: false, ...parseIncidentDropPreview(fs.readFileSync(abs, "utf-8")) };
+        } catch {
+          return { file, ingested: false, runId: null, service: null, title: null, confidence: null, baselineCommit: null, reportCreatedAt: null, parseable: false };
+        }
+      });
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * prepare 디렉티브 — 결정론 단계(수령+시드 판정)만. analyze 금지를 못 박는 이유는 impact
+ * 페이즈 A 와 같다: 시드 확정은 사용자 게이트인데 LLM 이 "이왕 돌린 김에" 진행하는 이탈을 막는다.
+ */
+function incidentPrepareDirective(runId: string | null): string {
+  return headlessDirective(
+    `위 작업은 대시보드 장애 분석 메뉴에서 자동 실행된 헤드리스 수령·시드 판정이다.`,
+    ` SKILL.md 의 1)수령과 2)시드 판정만 수행하고 멈춰라: \`incident.mjs ingest\` 를 실행한 뒤` +
+      (runId ? ` runId \`${runId}\` 에 대해` : ` 수령된 각 신규(ingested) 건에 대해`) +
+      ` \`incident.mjs seed --run <runId>\` 를 실행하고 그 출력(판정 3종·경고)을 그대로 보고하라.` +
+      ` **analyze 를 실행하지 마라** — 시드 확정은 사용자 게이트다(대시보드가 확정 후 별도 실행).` +
+      ` \`★ 전량 not-in-project\` 경고와 \`⚠ 커밋 불일치\` 경고는 조용히 넘기지 말고 보고에 실어라.` +
+      ` unparseable 건은 사유만 보고한다(분석 진행 불가).`,
+  );
+}
+/**
+ * resolve 디렉티브 — 사용자 확정 시드로 3)영향 분석 → 4)해결방안서 → 5)인용 게이트까지.
+ * 시드를 --path 로 못 박는 이유는 impact 페이즈 B 와 같다(확정 경로가 정본, LLM 재량 배제).
+ */
+function incidentResolveDirective(runId: string, confirmedPaths: string[]): string {
+  const pathFlags = confirmedPaths.map((p) => ` --path ${p}`).join("");
+  return headlessDirective(
+    `위 작업은 대시보드 장애 분석 메뉴에서 자동 실행된 헤드리스 해결방안 단계다 — 사용자가 시드를 확정했다.`,
+    ` SKILL.md 의 3)~5)만 수행하고 멈춰라. ` +
+      `① \`incident.mjs analyze --run ${runId}${pathFlags}\` — **시드를 바꾸지 마라**(사용자 확정 경로가 정본이다). ` +
+      `② \`incident.mjs resolve-input --run ${runId}\` 로 입력 번들을 만들고, **그 번들만 근거로** ` +
+      `\`.understand-anything/incidents/${runId}/resolution.md\` 를 SKILL 4) 규약대로 작성하라 — ` +
+      `구성(원인 요약/즉시 조치/근본 해결/영향 업무·데이터/재발 방지 후보/한계)·confidence 머리 표기·` +
+      `"DS-APM RCA 제안" 인용 승계·리포트 \`## 한계\` 말미 승계·무근거 [추정] 태그. 전 소스를 읽지 마라. ` +
+      `③ \`incident.mjs finalize --run ${runId}\` 로 인용 실재 대조를 통과시켜라 — 차단되면 해당 인용을 고쳐 ` +
+      `재실행하고, 두 번째도 실패하면 남은 위반을 보고하고 멈춰라(무리한 통과 시도 금지).`,
+  );
+}
+
+/**
+ * POST /incident-run — { phase: "prepare"|"resolve", runId?, confirmedPaths?, model? }.
+ * prepare = 수령+시드 판정(결정론, runId 생략 시 신규 전건). resolve = runId+확정 시드 필수.
+ * 전역 뮤텍스 1개(설계 §2.5) — 진행 중이면 409. 즉시 202 + job.
+ */
+function handleIncidentRunPost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  if (incidentTracker.running) {
+    sendJson(res, 409, { error: "An incident job is already running", job: incidentTracker.snapshot() });
+    return;
+  }
+  const projectRoot = impactProjectRoot();
+  if (!projectRoot) {
+    sendJson(res, 404, { error: "No project found. Run /understand first." });
+    return;
+  }
+  collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
+    .then((body) => {
+      let parsed: {
+        phase?: unknown;
+        runId?: unknown;
+        confirmedPaths?: unknown;
+        model?: unknown;
+      } = {};
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const phase = parsed.phase === "prepare" || parsed.phase === "resolve" ? parsed.phase : null;
+      if (!phase) {
+        sendJson(res, 400, { error: "phase 는 'prepare' | 'resolve' 여야 합니다." });
+        return;
+      }
+      const runId = typeof parsed.runId === "string" && parsed.runId ? parsed.runId : null;
+      if (runId && !INCIDENT_RUN_ID_RE.test(runId)) {
+        sendJson(res, 400, { error: "Invalid runId" });
+        return;
+      }
+      let confirmedPaths: string[] = [];
+      if (phase === "resolve") {
+        if (!runId) {
+          sendJson(res, 400, { error: "resolve 에는 runId 가 필요합니다." });
+          return;
+        }
+        confirmedPaths = Array.isArray(parsed.confirmedPaths)
+          ? parsed.confirmedPaths.filter((p): p is string => typeof p === "string" && p.length > 0)
+          : [];
+        if (confirmedPaths.length === 0) {
+          sendJson(res, 400, { error: "resolve 에는 확정 시드(confirmedPaths)가 필요합니다." });
+          return;
+        }
+        // fail-closed — 확정 시드도 실존·경계 검증(경로 조작·유령 경로 차단은 서버 몫).
+        // ★ 문자셋 가드: confirmedPaths 는 resolve 디렉티브에서 ` --path ${p}` 로 프롬프트에
+        //   들어가 bypassPermissions claude 가 bash 로 조립한다 — 공백·`;`·백틱·`$()`·따옴표가
+        //   든 이름의 파일이 실존하면 그 LLM 매개로 인젝션/플래그 인젝션이 성립한다. runId 는
+        //   INCIDENT_RUN_ID_RE 로 막으면서 시드만 안 막던 비대칭을 없앤다(소스 경로 안전 문자만).
+        const rootReal = fs.realpathSync(projectRoot);
+        const bad = confirmedPaths.filter((p) => {
+          if (!/^[\w./가-힣-]+$/.test(p)) return true; // 셸 메타문자·공백 거부
+          if (path.isAbsolute(p) || p.split(/[\\/]/).includes("..")) return true;
+          const abs = path.join(projectRoot, p);
+          if (!fs.existsSync(abs)) return true;
+          // realpath 봉쇄 — 트리 안 심링크가 밖을 가리키는 탈출 차단.
+          try {
+            return !(fs.realpathSync(abs) + path.sep).startsWith(rootReal + path.sep);
+          } catch {
+            return true;
+          }
+        });
+        if (bad.length > 0) {
+          sendJson(res, 400, { error: `실존하지 않거나 허용되지 않는 시드: ${bad.join(" · ")}` });
+          return;
+        }
+      }
+      // ★ 뮤텍스 재확인(TOCTOU) — 진입부 체크(1695)는 body 수신 **전**이라, 근접한 두 POST 가
+      //   둘 다 idle 을 보고 각자 begin() → bypassPermissions claude 2개 spawn + 원장 lost-update.
+      //   begin() 은 동기라, 이 재확인부터 begin() 까지 await 이 없으면 단일 스레드에서 원자적이다
+      //   (둘째 핸들러는 자기 동기 구간에서 running=true 를 본다).
+      if (incidentTracker.running) {
+        sendJson(res, 409, { error: "An incident job is already running", job: incidentTracker.snapshot() });
+        return;
+      }
+      const model = pickModel(parsed.model);
+      const jobId = incidentTracker.begin({ runId, phase, model });
+      const prompt =
+        phase === "prepare"
+          ? `/understand-incident ${projectRoot}${incidentPrepareDirective(runId)}`
+          : `/understand-incident ${projectRoot}${incidentResolveDirective(runId as string, confirmedPaths)}`;
+      const launched = runClaudeSkill({
+        prompt,
+        cwd: projectRoot,
+        jobId,
+        tracker: incidentTracker,
+        model: model ?? undefined,
+        onSpawnError: () =>
+          sendJson(res, 500, { error: "Failed to launch claude", job: incidentTracker.snapshot() }),
+      });
+      if (!launched) return;
+      sendJson(res, 202, { job: incidentTracker.snapshot() });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
 // ── P3: RTM 단계 인테이크 — 6단계를 단계당 claude -p 1회로 ─────
 // 한 POST 가 start..target 단계를 순차 spawn(중간 컨펌 없이 자동진행), target 에서 멈춤. 단계마다
 // claude -p "/understand-rtm --intake --session <sid> --step <k>". 세션 상태는 디스크(session.json)에
@@ -1606,6 +1914,61 @@ function rtmIdentifyGroundingDirective(sid: string): string {
     `근거가 없으면 CONFIRMED 를 쓰지 마라(\`evidence: []\` + CONFIRMED 는 검증기가 막는다). ` +
     `화면·정책 축이 번들에 있으면 \`screenRefs\`/\`policyRefs\` 로 귀속하고, 축이 생략됐거나(\`reducedMode\`) ` +
     `커밋이 어긋나면(\`commits.consistent:false\`) 그 축에 의존하는 결론은 [추정]으로 강등하라.`
+  );
+}
+/**
+ * 승격 유래 요약(EXPLORE_PROMOTION_DESIGN) — 변경·영향 탐색에서 승격된 세션의 ① 에만 붙는다.
+ * 서버가 유래 스냅샷을 **결정론 요약**해 동봉한다(LLM 재탐색 금지·목록 상한으로 유계).
+ * 도달성 관점(시드·상하류)은 5축 번들에 없는 유일한 축이라 이것만 보탠다 — 번들이 정본,
+ * 이 요약은 참고 근거다. 유래 없는 일반 세션은 빈 문자열(디렉티브 무변).
+ */
+function rtmOriginDirective(sid: string): string {
+  const origin = readRtmSession(sid)?.origin;
+  if (!origin) return "";
+  let summary = "";
+  const projectRoot = impactProjectRoot();
+  if (projectRoot) {
+    const fedBase = rtmIntakeBaseDir();
+    const snapFile = resolveImpactSnapshot(
+      {
+        historyDir: impactHistoryDir(projectRoot),
+        rtmBase: fedBase,
+        intakeSessions: fedBase ? listRtmSessionsIn(fedBase, isRtmSessionRunning) : [],
+        incidentsDir: incidentsBaseDir(projectRoot),
+        incidentEntries: readIncidentLedgerEntries(projectRoot),
+      },
+      origin.jobId,
+      "impact.json",
+    );
+    if (snapFile) {
+      try {
+        const snap = JSON.parse(fs.readFileSync(snapFile, "utf-8")) as {
+          seeds?: Array<{ relPath?: string }>;
+          upstream?: { files?: Array<{ relPath?: string }>; domains?: Array<{ key?: string; name?: string }> };
+          downstream?: { files?: Array<{ relPath?: string }> };
+        };
+        const cap = (xs: Array<string | undefined> | undefined, n: number): string => {
+          const list = (xs ?? []).filter((s): s is string => typeof s === "string");
+          if (list.length === 0) return "(없음)";
+          return list.slice(0, n).join(" · ") + (list.length > n ? ` 외 ${list.length - n}` : "");
+        };
+        summary =
+          ` 탐색이 확인한 도달성 요약(엔진 결정론 산출): 시드 ${cap(snap.seeds?.map((s) => s.relPath), 6)}; ` +
+          `상류 ${cap(snap.upstream?.files?.map((f) => f.relPath), 8)}; ` +
+          `하류 ${cap(snap.downstream?.files?.map((f) => f.relPath), 8)}; ` +
+          `도메인 ${cap(snap.upstream?.domains?.map((d) => d.name ?? d.key), 6)}.`;
+      } catch {
+        // 스냅샷 파손 — 요약 생략(아래 부재 문구가 사실을 말한다).
+      }
+    }
+  }
+  return (
+    ` 이 요청은 변경·영향 탐색에서 승격됐다(유래 jobId ${origin.jobId}` +
+    (origin.query ? `, 질의 "${origin.query.replace(/"/g, "'").slice(0, 120)}"` : "") +
+    `).` +
+    (summary || " 유래 스냅샷을 읽지 못해 요약이 없다 — '탐색에서 영향 없음'으로 오독하지 마라.") +
+    ` 이 요약은 분해·[확인필요] 질문의 **참고 근거**다 — 요구사항 범위의 정본은 요청 원문과 근거 번들이며, ` +
+    `이 요약에만 있는 파일을 changeset 근거로 삼지 마라(도달성 정본은 ② 코드영향 검증이 다시 계산한다).`
   );
 }
 /**
@@ -1650,7 +2013,7 @@ function rtmStepDirective(step: number, sid: string): string {
     `위 작업은 대시보드 추적표에서 자동 실행된 헤드리스 단계 ${step} 이다.`,
     ` SKILL.md §B 의 --step ${step} 지침만 끝까지 수행한 뒤 보고하고 멈춰라. 다음 단계는 사용자 컨펌 후 별도로 ` +
       `진행된다. 신규는 전부 [추정]이며 확정은 사람이 대시보드에서 한다.` +
-      (step === RTM_STEP_MIN ? rtmIdentifyGroundingDirective(sid) : "") +
+      (step === RTM_STEP_MIN ? rtmIdentifyGroundingDirective(sid) + rtmOriginDirective(sid) : "") +
       (step === RTM_STEP_IMPACT ? rtmImpactDirective(sid) : ""),
   );
 }
@@ -1925,7 +2288,7 @@ function handleRtmIntakePost(
   }
   collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
     .then((body) => {
-      let parsed: { request?: unknown; sid?: unknown; targetStep?: unknown; model?: unknown; rerunFrom?: unknown } = {};
+      let parsed: { request?: unknown; sid?: unknown; targetStep?: unknown; model?: unknown; rerunFrom?: unknown; originJobId?: unknown } = {};
       try {
         parsed = JSON.parse(body);
       } catch {
@@ -1986,6 +2349,13 @@ function handleRtmIntakePost(
         model = pickModel(parsed.model);
         const sid = crypto.randomBytes(8).toString("hex");
         session = newRtmSession(sid, request, wantTarget, model);
+        // 승격 유래(EXPLORE_PROMOTION) — 변경·영향 탐색 기록(원장 실재 jobId)에서 온 승격이면
+        // 세션에 유래를 박는다: ① 디렉티브 유래 요약·② 델타 뷰의 조인 키. 원장에 없는 jobId 는
+        // 무시(낡은 딥링크 등 — 유래 없는 일반 세션으로 정직하게 시작).
+        if (typeof parsed.originJobId === "string" && /^[0-9a-f]{16}$/.test(parsed.originJobId)) {
+          const originRow = readImpactHistory(projectRoot).find((e) => e.jobId === parsed.originJobId);
+          if (originRow) session.origin = { jobId: originRow.jobId, query: originRow.query ?? null };
+        }
         startStep = RTM_STEP_MIN;
         // 세션이 늘어나는 유일한 지점 — 여기서 상한 정리(impact 가 원장 append 시 자르는 것과 동형).
         const base = rtmIntakeBaseDir();
@@ -2639,6 +3009,10 @@ export default defineConfig({
             pathname === "/rtm-intake-doc" ||
             pathname === "/rtm-change" ||
             pathname === "/rtm-change-status" ||
+            pathname === "/incident-run" ||
+            pathname === "/incident-status" ||
+            pathname === "/incident-history" ||
+            pathname === "/incident-item" ||
             pathname === "/screens.json" ||
             pathname === "/screen-overrides.json" ||
             pathname === "/screen-override" ||
@@ -2831,22 +3205,53 @@ export default defineConfig({
           }
           // ktds(WT-E): 영향 분석 히스토리 — 원장 목록 + 스냅샷 열람(읽기 전용).
           if (pathname === "/impact-history") {
+            // 연합(IMPACT_LEDGER_FEDERATION_DESIGN §2.2) — 원장(change+레거시) + 세션 포인터
+            // (intake) + incident-history(장애) 를 읽기 시점에 병합. 기록자는 원장별 1주체.
             const historyRoot = impactProjectRoot();
-            if (historyRoot) reconcileImpactHistory(historyRoot); // 재시작으로 잃은 job 복원
-            sendJson(res, 200, { entries: historyRoot ? readImpactHistory(historyRoot) : [] });
+            if (!historyRoot) {
+              sendJson(res, 200, { entries: [] });
+              return;
+            }
+            reconcileImpactHistory(historyRoot); // 재시작으로 잃은 job 복원(서버 잡 전용)
+            const fedBase = rtmIntakeBaseDir();
+            const fedSessions = fedBase ? listRtmSessionsIn(fedBase, isRtmSessionRunning) : [];
+            const intakeRows = fedBase ? deriveIntakeRows(fedBase, fedSessions) : [];
+            const incidentRows = deriveIncidentRows(
+              incidentsBaseDir(historyRoot),
+              readIncidentLedgerEntries(historyRoot),
+            );
+            // 승격 역인덱스 — 탐색 행에 promotedSid 를 얹어 /change 버튼이 시작/열기를 가른다.
+            const promoted = fedBase ? mapPromotedSids(fedBase, fedSessions) : {};
+            const merged = mergeImpactHistory(readImpactHistory(historyRoot), intakeRows, incidentRows, IMPACT_HISTORY_MAX)
+              .map((e) => (e.source === "change" && promoted[e.jobId] ? { ...e, promotedSid: promoted[e.jobId] } : e));
+            sendJson(res, 200, { entries: merged });
             return;
           }
           if (pathname === "/impact-history-item") {
             const historyRoot = impactProjectRoot();
             const id = url.searchParams.get("id") ?? "";
             const name = url.searchParams.get("name") ?? "impact.json";
-            // jobId 는 crypto.randomBytes(8).hex = 16자 소문자 hex — 경로 조작 원천 차단.
+            // jobId 는 16자 소문자 hex(서버 랜덤 또는 CLI 결정론 해시) — 경로 조작 원천 차단.
             if (!historyRoot || !/^[0-9a-f]{16}$/.test(id) || !IMPACT_SNAPSHOT_FILES.has(name)) {
               sendJson(res, 400, { error: "Invalid snapshot id or name" });
               return;
             }
-            const snapFile = path.join(impactHistoryDir(historyRoot), id, name);
-            if (!fs.existsSync(snapFile)) {
+            // 리졸버(연합 §2.3 v1.1) — jobId 단일 키로 원장/세션/건 디렉터리를 순차 해석.
+            // 프런트 fetch 계약(?id=<jobId>)이 불변이라 인테이크 ② 인라인과 /change 가
+            // 같은 파일을 읽는 "두 표면 동일" 불변식이 그대로 유지된다.
+            const fedBase = rtmIntakeBaseDir();
+            const snapFile = resolveImpactSnapshot(
+              {
+                historyDir: impactHistoryDir(historyRoot),
+                rtmBase: fedBase,
+                intakeSessions: fedBase ? listRtmSessionsIn(fedBase, isRtmSessionRunning) : [],
+                incidentsDir: incidentsBaseDir(historyRoot),
+                incidentEntries: readIncidentLedgerEntries(historyRoot),
+              },
+              id,
+              name,
+            );
+            if (!snapFile) {
               sendJson(res, 404, { error: "Snapshot not found" });
               return;
             }
@@ -2854,6 +3259,50 @@ export default defineConfig({
               sendJson(res, 200, JSON.parse(fs.readFileSync(snapFile, "utf-8")));
             } catch {
               sendJson(res, 500, { error: "Failed to read snapshot" });
+            }
+            return;
+          }
+          // ktds: 장애 분석 — DS-APM RCA 드롭 수령·시드 게이트 2단계 실행/원장/건별 스냅샷.
+          if (pathname === "/incident-run") {
+            if (req.method === "POST") handleIncidentRunPost(req, res);
+            else sendJson(res, 405, { error: "Use POST to run an incident phase" });
+            return;
+          }
+          if (pathname === "/incident-status") {
+            sendJson(res, 200, { job: incidentTracker.snapshot() });
+            return;
+          }
+          if (pathname === "/incident-history") {
+            const incRoot = impactProjectRoot();
+            const entries = incRoot ? readIncidentLedgerEntries(incRoot) : [];
+            sendJson(res, 200, {
+              entries,
+              drops: incRoot ? listIncidentDrops(incRoot, entries) : [],
+              job: incidentTracker.snapshot(),
+            });
+            return;
+          }
+          if (pathname === "/incident-item") {
+            const incRoot = impactProjectRoot();
+            const run = url.searchParams.get("run") ?? "";
+            const name = url.searchParams.get("name") ?? "report.json";
+            if (!incRoot || !INCIDENT_RUN_ID_RE.test(run) || !INCIDENT_ITEM_FILES.has(name)) {
+              sendJson(res, 400, { error: "Invalid incident run or name" });
+              return;
+            }
+            const itemFile = path.join(incidentsBaseDir(incRoot), run, name);
+            if (!fs.existsSync(itemFile)) {
+              sendJson(res, 404, { error: "Incident item not found" });
+              return;
+            }
+            try {
+              if (name.endsWith(".md")) {
+                sendJson(res, 200, { content: fs.readFileSync(itemFile, "utf-8") });
+              } else {
+                sendJson(res, 200, JSON.parse(fs.readFileSync(itemFile, "utf-8")));
+              }
+            } catch {
+              sendJson(res, 500, { error: "Failed to read incident item" });
             }
             return;
           }

@@ -23,13 +23,16 @@ import { createDomainSlice } from "./slices/domain-slice";
 import type { DomainSlice } from "./slices/domain-slice";
 import { createSessionSlice } from "./slices/session-slice";
 import type { SessionSlice } from "./slices/session-slice";
+import { createIncidentSlice } from "./slices/incident-slice";
+import type { IncidentSlice } from "./slices/incident-slice";
 
 export interface DashboardStore
   extends GraphSlice,
     CodeViewerSlice,
     OverlaySlice,
     DomainSlice,
-    SessionSlice {}
+    SessionSlice,
+    IncidentSlice {}
 
 export const useDashboardStore = create<DashboardStore>()((set, get, api) => ({
   ...createGraphSlice(set, get, api),
@@ -37,6 +40,7 @@ export const useDashboardStore = create<DashboardStore>()((set, get, api) => ({
   ...createOverlaySlice(set, get, api),
   ...createDomainSlice(set, get, api),
   ...createSessionSlice(set, get, api),
+  ...createIncidentSlice(set, get, api),
 }));
 
 // 기존 `store.ts` 공개 API 유지 — 타입·상수는 types.ts에서 그대로 재수출.

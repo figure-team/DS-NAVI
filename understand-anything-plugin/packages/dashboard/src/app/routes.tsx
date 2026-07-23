@@ -4,10 +4,12 @@ import HomePage from "./pages/HomePage";
 import StructurePage from "./pages/StructurePage";
 import DomainsPage from "./pages/DomainsPage";
 import RtmPage from "./pages/RtmPage";
+import RequestsPage from "./pages/RequestsPage";
 import ScreenspecPage from "./pages/ScreenspecPage";
 import DeliverablesPage from "./pages/DeliverablesPage";
 import DataPage from "./pages/DataPage";
 import ChangePage from "./pages/ChangePage";
+import IncidentPage from "./pages/IncidentPage";
 import ProgramsPage from "./pages/ProgramsPage";
 import QualityPage from "./pages/QualityPage";
 import ReportPage from "./pages/ReportPage";
@@ -33,10 +35,13 @@ export const router = createBrowserRouter(
         { path: "domains/:groupKey/:domainId", element: <DomainsPage /> },
         { path: "deliverables/:docId?", element: <DeliverablesPage /> },
         { path: "rtm", element: <RtmPage /> },
+        // 작업 요청 — 추적표 "요청 세션" 탭에서 메뉴로 승격(2026-07-22). 셸은 RtmView variant.
+        { path: "requests", element: <RequestsPage /> },
         { path: "screens", element: <ScreenspecPage /> },
         // 신설 6메뉴(pmpl-proto 메뉴 개편 2차)
         { path: "data", element: <DataPage /> },
         { path: "change", element: <ChangePage /> },
+        { path: "incident", element: <IncidentPage /> },
         { path: "programs", element: <ProgramsPage /> },
         { path: "quality", element: <QualityPage /> },
         { path: "report", element: <ReportPage /> },

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../../store";
 import ApproverDialog from "./ApproverDialog";
@@ -37,8 +37,17 @@ import type {
  *
  * 상태·콜백은 전부 이 셸이 소유하고 RtmContext 로 내려보낸다 — 뷰/드로어는 rtm/ 의
  * 모듈 레벨 컴포넌트(감사 gap4/8: 본문 내부 정의로 인한 remount·포커스 유실 해소).
+ *
+ * variant(2026-07-22, 요청 세션 탭 → "작업 요청" 메뉴 승격):
+ * - "rtm"(기본) = 추적표 4탭(기능/요청/시나리오/현황). 세션 탭은 제거됐고 구 딥링크
+ *   (?view=session·?sid=)는 /requests 로 리다이렉트한다.
+ * - "requests" = 작업 요청 메뉴(/requests) — SessionView(세션 원장+워크스페이스)만 렌더.
+ *   컨텍스트를 쪼개지 않는 이유: ⑤·⑥이 rtm.json 과 상호작용하고(loadModel 재조회, 조인
+ *   프리뷰) IntakePanel 서브트리 전체가 RtmContext 를 소비한다 — 셸 공유가 최소 침습.
  */
-export default function RtmView() {
+export default function RtmView({ variant = "rtm" }: { variant?: "rtm" | "requests" }) {
+  const isRequests = variant === "requests";
+  const navigate = useNavigate();
   const accessToken = useDashboardStore((s) => s.accessToken);
   const approverHandle = useDashboardStore((s) => s.approverHandle);
   const setApproverHandle = useDashboardStore((s) => s.setApproverHandle);
@@ -113,7 +122,8 @@ export default function RtmView() {
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [sessionsError, setSessionsError] = useState<string | null>(null);
   const loadSessions = useCallback(() => {
-    if (!canWrite) { setSessions([]); setSessionsError(null); return; }
+    // 세션 원장은 작업 요청 메뉴 몫 — 추적표 variant 에선 소비처(세션 탭)가 사라져 안 읽는다.
+    if (!canWrite || !isRequests) { setSessions([]); setSessionsError(null); return; }
     fetch(`/rtm-intake-sessions${tokenQ}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d: { sessions?: SessionRow[] }) => { setSessions(Array.isArray(d?.sessions) ? d.sessions : []); setSessionsError(null); })
@@ -128,17 +138,42 @@ export default function RtmView() {
   // 요청 기준 탭을 강제한다(검증 딥링크).
   useEffect(() => {
     const v = searchParams.get("view");
-    if ((v === "function" || v === "requirement" || v === "scenario" || v === "session" || v === "status") && v !== view) setView(v);
+    const urlSid = searchParams.get("sid");
+    // 승격 리다이렉트 — 구 딥링크(/rtm?view=session[&sid=])는 세션의 새 집(/requests)으로.
+    // sid 단독(?sid=)도 세션 딥링크였으므로 함께 넘긴다. 추적표 전용 키만 벗기고 나머지
+    // 쿼리(onboard 등 QA/게이트 어포던스)는 보존한다.
+    if (!isRequests && (v === "session" || urlSid)) {
+      const next = new URLSearchParams(searchParams);
+      next.delete("view"); next.delete("req"); next.delete("fn"); next.delete("ts");
+      const qs = next.toString();
+      navigate(qs ? `/requests?${qs}` : "/requests", { replace: true });
+      return;
+    }
     // N2: ?sid= 를 라우팅 키로 승격 — 종전엔 마운트 복구 키라서 뒤로가기로 세션이 안 바뀌었다.
     // 이는 결함 수정이 아니라 의도된 설계 변경이며(RTM_INTAKE_WORKSPACE_DESIGN.md §3 N2),
-    // FRONT_REDESIGN_DESIGN.md:290 의 논거(별도 라우트면 RtmView 리마운트)와는 충돌하지 않는다 —
-    // 같은 페이지 쿼리 전환이라 언마운트가 없다(변경·영향의 ?run= 과 동형).
+    // 승격(2026-07-22) 후에도 같은 페이지 쿼리 전환이라 언마운트가 없다(변경·영향의 ?run= 과 동형).
     // W4: 빈 sid 로의 뒤로가기(닫기 클릭 포함)는 이제 안전하다 — "닫기"가 discardSession(폐기)과
     // 분리돼(C2) 선택 해제만 하므로, sid 가 사라지면 clearSession 으로 로컬 상태만 지운다(서버
     // 호출 없음). 종전엔 닫기=폐기가 한 몸이라 뒤로가기가 서버 세션을 지웠다.
-    const urlSid = searchParams.get("sid");
-    if (urlSid && urlSid !== sid) intake.selectSession(urlSid);
-    else if (!urlSid && sid) intake.clearSession();
+    if (isRequests) {
+      // 승격 수신(EXPLORE_PROMOTION) — /change 의 "작업 요청으로 승격 →" 딥링크. 새 요청 모달을
+      // 탐색 질의로 프리필하고 유래를 칩으로 단 뒤, 일회성 파라미터는 URL 에서 걷는다.
+      const promote = searchParams.get("promote");
+      if (promote && /^[0-9a-f]{16}$/.test(promote)) {
+        const pq = searchParams.get("pq") ?? "";
+        intake.setIntakeQuery(pq);
+        intake.setIntakeOrigin({ jobId: promote, query: pq || null });
+        intake.setIntakeError(null);
+        intake.setTargetStep(6);
+        intake.setIntakeOpen(true);
+        setSearchParams((prev) => { const p = new URLSearchParams(prev); p.delete("promote"); p.delete("pq"); return p; }, { replace: true });
+        return;
+      }
+      if (urlSid && urlSid !== sid) intake.selectSession(urlSid);
+      else if (!urlSid && sid) intake.clearSession();
+      return; // 작업 요청 메뉴엔 표 탭이 없다 — view/req/fn/ts 는 추적표 몫.
+    }
+    if ((v === "function" || v === "requirement" || v === "scenario" || v === "status") && v !== view) setView(v);
     const req = searchParams.get("req");
     if (req && req !== selReq) {
       setView("requirement");
@@ -162,6 +197,18 @@ export default function RtmView() {
     setSearchParams(
       (prev) => {
         const next = new URLSearchParams(prev);
+        // 작업 요청 메뉴는 sid 만 미러한다. 추적표는 sid 를 건드리지 않는다 — 승격 리다이렉트
+        // effect 가 처리 중일 수 있어 여기서 지우면 딥링크 sid 를 경주로 잃는다.
+        if (isRequests) {
+          if (sid) next.set("sid", sid);
+          else next.delete("sid");
+          // 승격 일회성 키는 미러에서도 걷는다 — 스트립(URL→상태 effect)과 이 미러가 같은 커밋에서
+          // 각자 스냅샷으로 setSearchParams 를 부르면 나중 호출(미러)이 낡은 스냅샷으로 덮어써
+          // promote/pq 가 되살아난다(라이브 실측). 상태 반영은 스트립 전에 끝나 있어 안전하다.
+          next.delete("promote");
+          next.delete("pq");
+          return next;
+        }
         if (view !== "function") next.set("view", view);
         else next.delete("view");
         if (selFn) next.set("fn", selFn);
@@ -170,13 +217,11 @@ export default function RtmView() {
         else next.delete("req");
         if (selTs) next.set("ts", selTs);
         else next.delete("ts");
-        if (sid) next.set("sid", sid);
-        else next.delete("sid");
         return next;
       },
       { replace: true },
     );
-  }, [view, selFn, selReq, selTs, sid, setSearchParams]);
+  }, [isRequests, view, selFn, selReq, selTs, sid, setSearchParams]);
 
   useEffect(() => { if (!toast) return; const id = setTimeout(() => setToast(null), 6000); return () => clearTimeout(id); }, [toast]);
 
@@ -364,6 +409,7 @@ export default function RtmView() {
     intakeQuery: intake.intakeQuery, setIntakeQuery: intake.setIntakeQuery,
     targetStep: intake.targetStep, setTargetStep: intake.setTargetStep,
     intakeModel: intake.intakeModel, setIntakeModel: intake.setIntakeModel,
+    intakeOrigin: intake.intakeOrigin, setIntakeOrigin: intake.setIntakeOrigin, originImpact: intake.originImpact,
     intakeStatus: intake.intakeStatus, intakeError: intake.intakeError, startIntake: intake.startIntake,
     session: intake.session, sid, sessions, sessionsError, openSession, closeSession,
     sessionDocs: intake.sessionDocs, stepBusy: intake.stepBusy,
@@ -398,7 +444,7 @@ export default function RtmView() {
 
         {/* 진단 배너 → TopBar warn 칩으로 이관(2026-07-15). 클릭 동작(커버리지 현황 탭 이동)은
             그대로 유지 — 상세는 현황 탭 무결성 진단 목록에서 본다(모달 중복 없음). */}
-        {diags.length > 0 && (
+        {!isRequests && diags.length > 0 && (
           <TopBarSlot>
             <button
               type="button"
@@ -415,24 +461,28 @@ export default function RtmView() {
         {/* pmpl-proto .tabs — 기준(기능/요청)·시험 시나리오·커버리지 현황 (count 병기).
             우측 액션(변경·영향 링크 · xlsx)은 삭제됐다(2026-07-16 사용자 결정) — 변경·영향은
             좌측 내비 메뉴가 이미 있고, xlsx 는 산출물 메뉴 몫이다. */}
-        <div className="shrink-0 flex border-b border-border-subtle" style={{ margin: "14px 24px 0", gap: 2 }}>
-          {tabBtn("function", "기능 기준", model?.functions.length)}
-          {tabBtn("requirement", "요청 기준", model?.requirements.length)}
-          {/* W2: 라벨은 작업("새 요청")이 아니라 대상 명사 — 탭=렌즈 관례(RTM_TAB_DESIGN.md:108)를
-              지키기 위한 것으로, 액션 어포던스는 요청 세션 탭의 ＋ 새 요청 버튼이 진다. */}
-          {tabBtn("session", "요청 세션", sessions.length)}
-          {tabBtn("scenario", "시험 시나리오", model?.testScenarios?.length)}
-          {tabBtn("status", "커버리지 현황")}
-        </div>
+        {/* 요청 세션 탭은 "작업 요청" 메뉴로 승격돼 빠졌다(2026-07-22) — 세션 원장·세션별 문서가
+            고유 산출물이라 메뉴=산출물 1:1 관례를 충족하고, 탭=렌즈 관례도 더 깨끗해진다(세션은
+            rtm.json 의 렌즈가 아니라 별도 데이터였다). 구 딥링크는 위 리다이렉트가 받는다. */}
+        {!isRequests && (
+          <div className="shrink-0 flex border-b border-border-subtle" style={{ margin: "14px 28px 0", gap: 2 }}>
+            {tabBtn("function", "기능 기준", model?.functions.length)}
+            {tabBtn("requirement", "요청 기준", model?.requirements.length)}
+            {tabBtn("scenario", "시험 시나리오", model?.testScenarios?.length)}
+            {tabBtn("status", "커버리지 현황")}
+          </div>
+        )}
 
         {/* 본문 */}
         {/* W3: 인테이크 드로어가 사라져 하단 여백 예약도 사라진다 — 남은 예약은 선택 종속
             드로어 3종(Function/Requirement/Scenario)의 몫이다. */}
-        <div className="flex-1 min-h-0 overflow-auto" style={{ padding: 24, paddingBottom: (selectedFn || selectedReq || selectedTs) ? "50vh" : 24, maxWidth: 1340, width: "100%", margin: "0 auto" }}>
-          {/* 세션 원장은 rtm.json 과 독립이다 — 오히려 ⑤ 가 rtm.json 을 만든다. 모델 게이트 안에
-              두면 rtm.json 이 없는 새 프로젝트에서 그걸 만들어 낼 탭이 가려진다(변경·영향이 오류
-              상태에서도 원장 트리를 공유하는 것과 같은 이유). */}
-          {view === "session" ? (
+        {/* 전폭 본문 — maxWidth 1340 중앙 정렬을 걷고 변경·영향(24px 28px 48px)과 동일 규격으로
+            (2026-07-22 사용자 지시: 세 화면이 메뉴 영역을 같은 폭으로 쓸 것). */}
+        <div className="flex-1 min-h-0 overflow-auto" style={{ padding: "24px 28px", paddingBottom: (selectedFn || selectedReq || selectedTs) ? "50vh" : 48 }}>
+          {/* 세션 원장은 rtm.json 과 독립이다 — 오히려 ⑤ 가 rtm.json 을 만든다. 모델 게이트 밖에
+              두므로 rtm.json 이 없는 새 프로젝트에서도 그걸 만들어 낼 메뉴가 살아 있다(변경·영향이
+              오류 상태에서도 원장 트리를 공유하는 것과 같은 이유). */}
+          {isRequests ? (
             <SessionView />
           ) : error ? (
             <div className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6, maxWidth: 520 }}>
@@ -460,7 +510,8 @@ export default function RtmView() {
         {selectedTs && view === "scenario" && model && <ScenarioDrawer />}
 
         {/* 인테이크 모달 — 단발 실행 파라미터 입력이라 관례상 모달이 맞다(설계 §2.2). 단계
-            산출물은 여기 있지 않다: 요청 세션 탭 우측 카드 본문이 그 자리다(W3). */}
+            산출물은 여기 있지 않다: 작업 요청 메뉴 우측 카드 본문이 그 자리다(W3). 여는 버튼
+            (＋ 새 요청)이 SessionView 에만 있으므로 사실상 requests variant 전용이다. */}
         {intake.intakeOpen && <IntakeModal />}
 
         {/* gap9: 확정자 인라인 입력(window.prompt 대체) */}

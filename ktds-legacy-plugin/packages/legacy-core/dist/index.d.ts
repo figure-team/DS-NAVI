@@ -88,4 +88,6 @@ export type { ScanCacheSection, SectionStats } from './scan-cache/index.js';
 export * from './screen-capture/index.js';
 export { GOLDEN_SCORER_VERSION, collectCitations, scoreCitations, extractDomainGraphUnits, extractDomainGraphKeyItems, extractRtmUnits, extractRtmKeyItems, scoreStructure, scoreRecall, scoreGoldenArtifact, normalizeText, } from './golden/index.js';
 export type { Citation as GoldenCitation, CitationScore, StructureUnit, StructureScore, KeyItem, RecallScore, ArtifactScore, GoldenArtifactKind, } from './golden/index.js';
+export { parseIncidentReport, resolveIncidentSeeds, extractFileLineRefs, INCIDENT_SECTION_ROOT_CAUSE, INCIDENT_SECTION_FIX, INCIDENT_SECTION_LIMITS, } from './incident/incident-report.js';
+export type { IncidentFrontmatter, IncidentFileRef, ParsedIncidentReport, IncidentSeedVerdict, IncidentSeedResolution, IncidentSeedResult, } from './incident/incident-report.js';
 //# sourceMappingURL=index.d.ts.map

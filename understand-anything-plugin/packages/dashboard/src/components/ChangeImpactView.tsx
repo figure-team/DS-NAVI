@@ -10,6 +10,7 @@ import { Chip, UnresolvedModal } from "./data-map/UnresolvedChips";
 import type { DbUnresolved } from "./data-map/types";
 import type { BadgeTone } from "./proto/Proto";
 import SearchInput from "./ui/SearchInput";
+import NavGroup from "./ui/NavGroup";
 // RTM ② 영향분석과 표면 정렬(2026-07-17) — 같은 조건 카드·같은 비포·에프터 모달을 쓴다.
 // 두 화면이 같은 스냅샷을 읽으므로(§2.3 "한 번 돌리고 두 곳에서 본다") 표현도 갈라지지 않는다.
 import DataCompareModal from "./rtm/DataCompareModal";
@@ -174,15 +175,41 @@ interface HistoryEntry {
   seedGate?: "user-confirmed" | null;
   /** 산출 시드 ↔ 확정 시드 대조 — false 는 spawn 이 지시를 벗어난 것(경고 표식). */
   seedMatch?: boolean | null;
+  /**
+   * 기록 주체 — "intake"=작업 요청 메뉴 code-impact, "incident"=장애 분석 analyze.
+   * 부재 = 변경·영향 메뉴 실행 또는 kind 도입(2026-07-22) 이전 구 항목 — 구 항목은
+   * rootSlot:false + query 접두("[장애]")로 폴백 판별한다.
+   */
+  kind?: "intake" | "incident" | null;
+  /** 연합 병합 출처(서버 부여) — 파생 행은 kind 와 일치, 레거시 행은 후행 태깅. */
+  source?: "change" | "intake" | "incident";
+  /** 파생 행의 열람 참조(intake=sid, incident=runId) — 표시용, fetch 는 jobId 리졸버. */
+  ref?: { sid?: string; runId?: string };
+  /** intake 파생 행 — 폐기 세션은 숨기지 않고 배지를 승계한다. */
+  discarded?: boolean;
+  /** 탐색 행 전용 — 이 탐색에서 시작된 작업 요청 세션(폐기 제외·최신 우선). 버튼 시작/열기 분기. */
+  promotedSid?: string;
+  /** incident 파생 행 — incident-history 정본 상태(analyzed/resolved) 병기. */
+  incidentStatus?: string;
 }
 
 /** 원장 실행 유형 배지 — 시드를 누가 정했나(근거 등급이 갈리는 축). */
 function seedOriginBadge(e: HistoryEntry): { label: string; tone: BadgeTone; title: string } {
-  if (e.rootSlot === false) {
+  // 장애 분기가 rootSlot 분기보다 먼저다 — 장애도 rootSlot:false 라, 순서를 바꾸면 "작업 요청"
+  // 오라벨이 재발한다(재점검 2026-07-22 발견). 연합 후 source(서버 부여)가 1순위, kind 부재
+  // 구 항목은 query 접두로 폴백.
+  if (e.source === "incident" || e.kind === "incident" || (e.kind == null && e.rootSlot === false && e.query.startsWith("[장애]"))) {
     return {
-      label: "RTM 요청",
+      label: "장애 분석",
+      tone: "warn",
+      title: `장애 분석 메뉴의 영향 분석 — 시드는 RCA 리포트 근거(사용자 확정 게이트)${e.incidentStatus === "resolved" ? " · 해결방안 확정됨" : ""}`,
+    };
+  }
+  if (e.source === "intake" || e.rootSlot === false) {
+    return {
+      label: "작업 요청",
       tone: "info",
-      title: "추적표 요청 세션의 코드영향 검증 — 시드는 changeset 결정론 조인",
+      title: "작업 요청 메뉴(요청 세션)의 코드영향 검증 — 시드는 changeset 결정론 조인",
     };
   }
   if (e.seedGate === "user-confirmed") {
@@ -398,6 +425,13 @@ export default function ChangeImpactView() {
   const rawRun = searchParams.get("run");
   const activeRun = historyEnabled && rawRun && /^[0-9a-f]{16}$/.test(rawRun) ? rawRun : null;
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  // 원장 검색·그룹 접기(사용자 지시 2026-07-22) — 탐색 기록만 기본 펼침, 유래 2그룹은 접힘.
+  const [historyQuery, setHistoryQuery] = useState("");
+  const [openGroups, setOpenGroups] = useState<Record<"change" | "intake" | "incident", boolean>>({
+    change: true,
+    intake: false,
+    incident: false,
+  });
 
   const [data, setData] = useState<ImpactData | null>(null);
   const [verify, setVerify] = useState<VerifyReport | null>(null);
@@ -647,52 +681,112 @@ export default function ChangeImpactView() {
     <div className={`${CARD} proto-tree`}>
       {historyEnabled ? (
         <>
-          <div className="fold">분석 기록 ({history.length})</div>
+          {/* 출처별 분리(사용자 지시 2026-07-22) — 이 메뉴의 정체는 탐색 도구라서 자기 기록
+              (탐색)이 첫 그룹이고, 작업 요청·장애 유래는 열람 전용 별도 섹션으로 가른다.
+              연합 서버가 모든 행에 source 를 태깅하므로(레거시 포함) 그룹 판정은 그 필드 하나다. */}
           {history.length === 0 ? (
-            <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "4px 8px", lineHeight: 1.5 }}>
-              아직 기록 없음 — 자연어 영향 탐색을 실행하면 여기 쌓입니다.
-            </div>
+            <>
+              <div className="fold">탐색 기록 (0)</div>
+              <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "4px 8px", lineHeight: 1.5 }}>
+                아직 기록 없음 — 자연어 영향 탐색을 실행하면 여기 쌓입니다.
+              </div>
+            </>
           ) : (
-            history.map((e) => {
-              const openable = e.files.includes("impact.json");
-              const isCurrent = e.jobId === currentJobId;
-              const on = activeRun ? activeRun === e.jobId : isCurrent;
-              const origin = seedOriginBadge(e);
-              return (
-                <button
-                  key={e.jobId}
-                  type="button"
-                  className={`doc${on ? " on" : ""}`}
-                  disabled={!openable}
-                  title={`${e.query}\n${fmtTime(e.finishedAt)}${openable ? "" : " · 결과 스냅샷 없음"}`}
-                  style={openable ? undefined : { opacity: 0.55, cursor: "default" }}
-                  // 최신 항목은 루트 슬롯(문서 09·구조 오버레이와 같은 기준)을 그대로 보여주므로
-                  // ?run= 없이 연다 — 스냅샷 열람 배너 대신 문서/오버레이 링크가 뜬다.
-                  onClick={() => setParam("run", isCurrent ? null : e.jobId)}
-                >
-                  <span style={{ minWidth: 0, flex: "1 1 auto" }}>
-                    <span className="truncate" style={{ display: "block" }}>
-                      {e.query || "(질의 미상)"}
-                    </span>
-                    <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>{fmtTime(e.finishedAt)}</span>
-                  </span>
-                  <span className="st">
-                    {isCurrent && <Badge tone="info">최신</Badge>}
-                    <span title={origin.title}>
-                      <Badge tone={origin.tone}>{origin.label}</Badge>
-                    </span>
-                    {e.seedMatch === false && (
-                      <span title="산출 시드가 확정 시드와 다릅니다 — 실행이 지시를 벗어났을 수 있음">
-                        <Badge tone="warn">시드 불일치</Badge>
-                      </span>
+            <>
+              {/* 원장 검색 — 질의문 부분일치(대소문자 무시). 검색 중엔 접힘을 무시하고 매치가
+                  있는 그룹만 자동으로 펴서 보여준다(접힌 그룹에 숨은 매치 = 조용한 누락 금지). */}
+              <SearchInput value={historyQuery} onChange={setHistoryQuery} placeholder="기록 검색" width="full" style={{ marginTop: 4, marginBottom: 2 }} />
+              {(
+                [
+                  ["change", "탐색 기록", "이 메뉴에서 실행한 자연어 영향 탐색·서버 잡 기록"],
+                  ["intake", "작업 요청 유래", "작업 요청 ② 코드영향 검증의 실행 — 열람 전용(정본은 세션)"],
+                  ["incident", "장애 유래", "장애 분석 analyze 의 실행 — 열람 전용(정본은 장애 건)"],
+                ] as const
+              ).map(([cat, label, hint]) => {
+                const all = history.filter((e) => (e.source ?? "change") === cat);
+                const hq = historyQuery.trim().toLowerCase();
+                const searching = hq.length > 0;
+                const rows = searching ? all.filter((e) => e.query.toLowerCase().includes(hq)) : all;
+                if (all.length === 0 && cat !== "change") return null; // 빈 유래 섹션은 접지 않고 생략
+                // 열람 중(?run=) 항목이 접힌 그룹에 숨지 않게 그 그룹은 강제로 편다.
+                const activeCat = selectedEntry ? (selectedEntry.source ?? "change") : null;
+                const open = searching ? rows.length > 0 : openGroups[cat] || cat === activeCat;
+                return (
+                  <NavGroup
+                    key={cat}
+                    label={label}
+                    count={searching ? `${rows.length}/${all.length}` : all.length}
+                    open={open}
+                    disabled={searching}
+                    title={hint}
+                    onToggle={() => setOpenGroups((p) => ({ ...p, [cat]: !p[cat] }))}
+                  >
+                    {cat === "change" && all.length === 0 && (
+                      <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "4px 8px", lineHeight: 1.5 }}>
+                        아직 기록 없음 — 자연어 영향 탐색을 실행하면 여기 쌓입니다.
+                      </div>
                     )}
-                    <Badge tone={e.status === "done" ? "ok" : "err"}>
-                      {e.status === "done" ? "완료" : "실패"}
-                    </Badge>
-                  </span>
-                </button>
-              );
-            })
+                    {rows.map((e) => {
+                    const openable = e.files.includes("impact.json");
+                    const isCurrent = e.jobId === currentJobId;
+                    const on = activeRun ? activeRun === e.jobId : isCurrent;
+                    const origin = seedOriginBadge(e);
+                    return (
+                      <button
+                        key={e.jobId}
+                        type="button"
+                        className={`doc${on ? " on" : ""}`}
+                        disabled={!openable}
+                        title={`${e.query}\n${fmtTime(e.finishedAt)}${openable ? "" : " · 결과 스냅샷 없음"}`}
+                        style={openable ? undefined : { opacity: 0.55, cursor: "default" }}
+                        // 최신 항목은 루트 슬롯(문서 09·구조 오버레이와 같은 기준)을 그대로 보여주므로
+                        // ?run= 없이 연다 — 스냅샷 열람 배너 대신 문서/오버레이 링크가 뜬다.
+                        onClick={() => setParam("run", isCurrent ? null : e.jobId)}
+                      >
+                        <span style={{ minWidth: 0, flex: "1 1 auto" }}>
+                          <span className="truncate" style={{ display: "block" }}>
+                            {e.query || "(질의 미상)"}
+                          </span>
+                          <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>{fmtTime(e.finishedAt)}</span>
+                        </span>
+                        <span className="st">
+                          {isCurrent && <Badge tone="info">최신</Badge>}
+                          {/* 그룹 헤더가 출처를 말하므로 행 배지는 부가 상태(폐기/불일치/완료)에 집중 —
+                              단, 시드 근거 등급 배지(시드 확정/자율)는 탐색 그룹에서 여전히 의미가 있다. */}
+                          {cat === "change" && (
+                            <span title={origin.title}>
+                              <Badge tone={origin.tone}>{origin.label}</Badge>
+                            </span>
+                          )}
+                          {/* 폐기 세션의 분석도 노출한다 — 원장은 폐기를 숨기지 않는다(연합 §5). */}
+                          {e.discarded && (
+                            <span title="폐기된 세션의 분석입니다">
+                              <Badge tone="mut">폐기</Badge>
+                            </span>
+                          )}
+                          {e.seedMatch === false && (
+                            <span title="산출 시드가 확정 시드와 다릅니다 — 실행이 지시를 벗어났을 수 있음">
+                              <Badge tone="warn">시드 불일치</Badge>
+                            </span>
+                          )}
+                          <Badge tone={e.status === "done" ? "ok" : "err"}>
+                            {e.status === "done" ? "완료" : "실패"}
+                          </Badge>
+                        </span>
+                      </button>
+                    );
+                  })}
+                  </NavGroup>
+                );
+              })}
+              {/* 전 그룹 매치 0 — 헤더 (0/N) 만으론 안 읽히므로 명시(조용한 빈 결과 금지). */}
+              {historyQuery.trim().length > 0 &&
+                history.every((e) => !e.query.toLowerCase().includes(historyQuery.trim().toLowerCase())) && (
+                  <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "4px 8px", lineHeight: 1.5 }}>
+                    검색 결과 없음 — <b className="text-text-secondary">{historyQuery.trim()}</b>
+                  </div>
+                )}
+            </>
           )}
           {orphanRoot && rootMeta && (
             <>
@@ -736,10 +830,12 @@ export default function ChangeImpactView() {
       {/* 인테이크는 impact 엔진을 호출하지 않는다(요구사항 문서 + RTM 행만 산출) — 여기서
           "RTM 인테이크로도 분석이 시작된다" 고 안내하면 오지 않을 결과를 기다리게 된다. */}
       <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "6px 8px", lineHeight: 1.5 }}>
-        새 분석은 우상단 <b className="text-text-secondary">자연어 영향 분석</b> 또는 CLI에서{" "}
-        <code>/understand-impact</code>를 실행해 시작합니다.
+        이 메뉴는 <b className="text-text-secondary">탐색 도구</b>입니다 — 새 분석은 우상단{" "}
+        <b className="text-text-secondary">자연어 영향 분석</b> 또는 CLI에서 <code>/understand-impact</code>를
+        실행해 시작합니다.
         <div style={{ marginTop: 6 }}>
-          요구사항 접수·추적은 <Link to="/rtm" style={LINK_TEXT}>추적표</Link>에서 합니다.
+          정식 요청 접수·요구사항 분해는 <Link to="/requests" style={LINK_TEXT}>작업 요청</Link>에서,
+          추적·확정은 <Link to="/rtm" style={LINK_TEXT}>추적표</Link>에서 합니다.
         </div>
       </div>
     </div>
@@ -839,6 +935,21 @@ export default function ChangeImpactView() {
               {scanState === "current" && <Badge tone="mut">현재 스캔 기준</Badge>}
               {scanState === "stale" && <Badge tone="warn">스캔 갱신됨 · 재분석 권장</Badge>}
               <div className="flex-1" />
+              {/* 작업 요청 연결(EXPLORE_PROMOTION) — 탐색 기록만 접수로 이어진다(작업 요청·장애
+                  유래 행은 이미 자기 프로세스가 있으므로 제외). 탐색 기록은 시작 후에도 **사라지지
+                  않으므로**(원장 불소멸 + ② 델타가 유래 스냅샷 참조) 라벨은 "승격"(이동 암시)이
+                  아니라 "작업 요청"이고, 이미 시작된 세션이 있으면 그 세션 열기로 바뀐다. */}
+              {headerEntry && (headerEntry.source ?? "change") === "change" && (
+                headerEntry.promotedSid ? (
+                  <LinkBtn to={`/requests?sid=${encodeURIComponent(headerEntry.promotedSid)}`}>
+                    작업 요청 열기 →
+                  </LinkBtn>
+                ) : (
+                  <LinkBtn to={`/requests?promote=${headerEntry.jobId}&pq=${encodeURIComponent(headerEntry.query)}`}>
+                    작업 요청 →
+                  </LinkBtn>
+                )
+              )}
               {activeRun ? (
                 <button
                   type="button"

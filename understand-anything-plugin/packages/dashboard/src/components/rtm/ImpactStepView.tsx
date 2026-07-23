@@ -6,7 +6,7 @@ import { useRtm } from "./context";
 import DataCompareModal from "./DataCompareModal";
 import FlowCompareModal from "./FlowCompareModal";
 import { Axis, REF_GAP, REF_ROW } from "./shared";
-import { BAD, BORDER, FAINT, VERB, WARN, impactAbsenceOf } from "./types";
+import { BAD, BORDER, FAINT, VERB, WARN, computeImpactFileDelta, impactAbsenceOf } from "./types";
 import EvidenceLink from "../ui/EvidenceLink";
 
 // ── ② 영향분석 템플릿 (2026-07-17) — 종전 IntakePanel.ImpactInline 의 후신 ────
@@ -71,7 +71,7 @@ export function CompareBtn({ label, onClick, disabled, title }: { label: string;
 }
 
 export default function ImpactStepView() {
-  const { identified, impactRun, impactData, impactLoaded, afterFlows, afterSchema, fnById } = useRtm();
+  const { identified, impactRun, impactData, impactLoaded, afterFlows, afterSchema, fnById, session, originImpact } = useRtm();
   const [flowCompare, setFlowCompare] = useState(false);
   const [dataCompare, setDataCompare] = useState(false);
   const up = impactData?.upstream;
@@ -122,6 +122,60 @@ export default function ImpactStepView() {
           </Link>
         )}
       </div>
+
+      {/* 유래 탐색 대비(EXPLORE_PROMOTION 델타 뷰) — 승격 세션에만 뜬다. 탐색(사용자 추측 범위)과
+          ②(분해된 요구의 범위)의 도달 파일 집합 차이를 결정론으로 보여주되 **원인은 단정하지 않는다**.
+          다르면 혼란이 아니라 "추측과 실제 요구 범위의 차이"라는 정보가 되도록 서사를 화면이 진다. */}
+      {session?.origin && (
+        <div style={{ marginBottom: 10 }}>
+          <SectionCard
+            tone="var(--color-status-info)"
+            icon="⇄"
+            title="유래 탐색 대비"
+            sub="승격 전 탐색과의 도달 파일 델타 · 정본은 이 ② 결과"
+            action={
+              <Link to={`/change?run=${encodeURIComponent(session.origin.jobId)}`} className="hover:underline"
+                style={{ fontSize: 10.5, color: "var(--color-status-info)", textDecoration: "none" }}
+                title={`유래 탐색 분석${session.origin.query ? `("${session.origin.query}")` : ""} 을 변경·영향 원장에서 엽니다.`}>
+                탐색 분석 열기 →
+              </Link>
+            }
+          >
+            {!originImpact ? (
+              <span style={{ fontSize: 10.5, color: WARN }}>
+                유래 스냅샷을 읽지 못했습니다(원장에서 밀렸을 수 있음) — 델타를 계산할 수 없습니다.
+              </span>
+            ) : !impactData ? (
+              <span style={{ fontSize: 10.5, color: FAINT }}>
+                ② 스냅샷이 아직 없어 델타를 계산할 수 없습니다 — 코드영향 검증 산출 후 표시됩니다.
+              </span>
+            ) : (
+              (() => {
+                const delta = computeImpactFileDelta(originImpact, impactData);
+                if (delta.added.length === 0 && delta.removed.length === 0) {
+                  return <span style={{ fontSize: 10.5, color: FAINT }}>도달 파일 집합이 탐색과 동일합니다.</span>;
+                }
+                const row = (sym: string, color: string, files: string[], label: string) => (
+                  <div className="flex flex-wrap items-baseline" style={{ gap: 5, minWidth: 0, padding: "1px 0" }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color, whiteSpace: "nowrap" }}>{sym} {label} {files.length}</span>
+                    {files.slice(0, CAP).map((p) => <EvidenceLink key={p} file={p} line={1} showLine={false} basename />)}
+                    <Over n={files.length} />
+                  </div>
+                );
+                return (
+                  <div className="flex flex-col" style={{ gap: 3 }}>
+                    {delta.added.length > 0 && row("+", "var(--color-status-info)", delta.added, "탐색에 없던 도달")}
+                    {delta.removed.length > 0 && row("−", FAINT, delta.removed, "탐색에만 있던 도달")}
+                    <div className="text-text-muted" style={{ fontSize: 10, lineHeight: 1.5, marginTop: 2 }}>
+                      차이는 요청 분해·[확인필요] 답변으로 범위가 정제된 결과일 수 있습니다 — 원인은 단정하지 않습니다.
+                    </div>
+                  </div>
+                );
+              })()
+            )}
+          </SectionCard>
+        </div>
+      )}
 
       {absence ?? (impactRun && (
         <div className="flex flex-col" style={{ gap: 10 }}>

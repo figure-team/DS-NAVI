@@ -21,6 +21,7 @@ import {
   writeConfig,
   type ScreensConfig,
 } from '../config/index.js'
+import { RouteKindSchema } from '../domain-map/types.js'
 import { selectCensusSeeds, type CensusRoute } from './triage.js'
 
 /** 빌드 시스템 관측 신호 — OnDisk 가 수집, 순수 함수는 이것만 본다. */
@@ -55,6 +56,13 @@ export interface ScaffoldSummary {
   /** 사람이 확인해야 하는 항목(한국어) — 호출부가 그대로 출력한다. */
   notes: string[]
 }
+
+/**
+ * 서버 렌더 화면을 내는 라우트 종류(크롤 가능) — 정본 `RouteKindSchema`(api|form|page|servlet)
+ * 에서 `api`(JSON REST)만 제외해 파생한다. 수기 목록은 enum 확장 시 드리프트(예 servlet
+ * 누락 = 결함 4 재발)를 부르므로 스키마에서 뽑는다. form=뷰 제출·page=렌더·servlet=레거시 서버 렌더.
+ */
+const PAGE_KINDS = new Set<string>(RouteKindSchema.options.filter((k) => k !== 'api'))
 
 /** pom.xml 플러그인 → 실행 goal 매핑(위→아래 첫 매치, 결정론). */
 const MAVEN_RUN_GOALS: Array<{ token: string; goal: string }> = [
@@ -118,14 +126,28 @@ export function scaffoldScreensConfig(input: ScaffoldInput): {
   notes.push(
     '로그인이 필요한 앱이면 scenarios 에 테스트 계정 로그인 스텝을 채우세요(계정·셀렉터는 코드에서 유추 불가 — 첫 capture 의 auth-gated 트리아지가 대상 화면을 알려줍니다).',
   )
-  // SPA 정직 경고(결함 1) — 라우트는 있는데 GET-safe 목록성 시드가 0건이면 REST-only(JSON API)
-  // 라 크롤·census 로 화면을 못 늘린다. 상태 기반 SPA(react-router 없음)는 커버리지가 손으로
-  // 짠 시나리오 수에 갇히므로, 골든패스만 짜서 조용히 축소되지 않게 미리 규율을 박는다.
-  const spaSuspected = input.routes.length > 0 && seeds.length === 0
+  // SPA 정직 경고(결함 1, 개정 결함 4) — 라우트는 있는데 GET-safe 목록성 시드가 0건이고,
+  // 서버 렌더 페이지 라우트(kind form/page/servlet)도 하나도 없으면 REST-only(JSON API)=
+  // 상태 기반 SPA(react-router 없음) 신호다. 커버리지가 손으로 짠 시나리오 수에 갇히므로,
+  // 골든패스만 짜서 조용히 축소되지 않게 미리 규율을 박는다.
+  // ★서버 렌더 페이지 라우트가 하나라도 있으면(예 Spring MVC form 컨트롤러) 루트(/)에서
+  //   a[href] 링크를 따라 크롤로 화면을 늘리므로 SPA 로 오판하지 않는다 — 시드는 eGov
+  //   목록성 접미사(list/main/index) 게이트라 리소스지향 경로(petclinic /owners·/vets.html)엔
+  //   0건이 정상이고, "시드 0" 을 "SPA" 로 오결론하면 안 된다(결함 4: petclinic 거짓 양성).
+  //   kind 부재(구 스캐너)면 hasPageRoute=false 로 구 동작 유지(안전 강등).
+  const hasPageRoute = input.routes.some(
+    (r) => typeof r.kind === 'string' && PAGE_KINDS.has(r.kind.toLowerCase()),
+  )
+  const noSeedNoRoute = input.routes.length > 0 && seeds.length === 0
+  const spaSuspected = noSeedNoRoute && !hasPageRoute
   if (spaSuspected) {
     notes.push(
       `⚠️ SPA 의심 — routes ${input.routes.length}건이 전부 REST/비목록성이라 크롤 시드가 0건입니다. ` +
         '클라이언트 라우팅 SPA 라면 화면은 시나리오로만 커버됩니다 — 골든패스만 짜지 말고 전수 화면을 시나리오로(화면=시나리오 1:1) 작성하세요.',
+    )
+  } else if (noSeedNoRoute && hasPageRoute) {
+    notes.push(
+      '크롤 시드(목록성 라우트)는 0건이지만 서버 렌더 페이지 라우트가 있어 루트(/)에서 링크를 따라 크롤합니다 — capture 를 그대로 실행하세요(SPA 아님).',
     )
   }
   const screens = ScreensConfigSchema.parse({

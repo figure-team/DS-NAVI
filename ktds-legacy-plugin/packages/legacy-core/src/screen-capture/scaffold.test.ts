@@ -12,8 +12,8 @@ import type { CensusRoute } from './triage.js'
 
 const noBuild: BuildSignals = { hasMvnw: false, hasGradlew: false, pomXml: null, buildGradle: null }
 
-function route(path: string, method = 'GET'): CensusRoute {
-  return { path, method, handler: 'X#y', filePath: 'src/X.java', line: 1 }
+function route(path: string, method = 'GET', kind?: string): CensusRoute {
+  return { path, method, handler: 'X#y', filePath: 'src/X.java', line: 1, ...(kind ? { kind } : {}) }
 }
 
 describe('detectStartCommand — 빌드 신호 결정론 감지', () => {
@@ -101,6 +101,50 @@ describe('scaffoldScreensConfig — routes census 초안', () => {
     })
     expect(summary.spaSuspected).toBe(false)
     expect(summary.notes.some((n) => n.includes('SPA 의심'))).toBe(false)
+  })
+
+  it('시드 0건이라도 서버 렌더 페이지 라우트(kind form)가 있으면 SPA 오판 안 함(결함 4: petclinic 회귀)', () => {
+    // 리소스지향 경로는 목록성 접미사(list/main/index)가 없어 census 시드가 0건이지만,
+    // kind:form = 서버 렌더 화면이므로 루트에서 크롤 가능 → SPA 아님(거짓 양성 방지).
+    const { summary } = scaffoldScreensConfig({
+      routes: [
+        route('/', 'GET', 'page'), // kind:'page'(렌더) — react-router 도 이 kind → 크롤 가능, 오판 방지
+        route('/owners/find', 'GET', 'form'),
+        route('/vets.html', 'GET', 'form'),
+        route('/vets', 'GET', 'api'),
+      ],
+      contextPath: null,
+      build: noBuild,
+    })
+    expect(summary.seedUrls).toBe(0)
+    expect(summary.spaSuspected).toBe(false)
+    expect(summary.notes.some((n) => n.includes('SPA 의심'))).toBe(false)
+    // 오도 대신 "루트에서 크롤" 안내가 나온다.
+    expect(summary.notes.some((n) => n.includes('루트(/)에서 링크를 따라 크롤'))).toBe(true)
+  })
+
+  it('시드 0건이라도 레거시 servlet 라우트(web.xml)면 SPA 오판 안 함(결함 4 자매경로: 서블릿 앱)', () => {
+    // web-xml.ts 는 kind:'servlet'(레거시 서버 렌더)을 낸다 — PAGE_KINDS 에서 빠지면
+    // 순수 서블릿/Struts 앱이 SPA 로 오판된다(결함 4 재발). RouteKindSchema 파생으로 방지.
+    const { summary } = scaffoldScreensConfig({
+      routes: [route('/', 'ANY', 'servlet'), route('/board.do', 'ANY', 'servlet')],
+      contextPath: null,
+      build: noBuild,
+    })
+    expect(summary.seedUrls).toBe(0)
+    expect(summary.spaSuspected).toBe(false)
+    expect(summary.notes.some((n) => n.includes('SPA 의심'))).toBe(false)
+  })
+
+  it('시드 0건 + 서버 렌더 페이지 라우트도 없으면(전부 kind api) SPA 의심 유지', () => {
+    const { summary } = scaffoldScreensConfig({
+      routes: [route('/api/trust', 'GET', 'api'), route('/api/royalty', 'GET', 'api')],
+      contextPath: null,
+      build: noBuild,
+    })
+    expect(summary.seedUrls).toBe(0)
+    expect(summary.spaSuspected).toBe(true)
+    expect(summary.notes.some((n) => n.includes('SPA 의심'))).toBe(true)
   })
 })
 

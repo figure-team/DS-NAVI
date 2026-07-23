@@ -260,11 +260,22 @@ export interface FragmentAudit {
         chunkId: string;
         reason: string;
     }>;
+    /**
+     * 비차단 경고(조용한 누락 방지) — 완결(complete)이지만 품질 신호가 빠진 조각.
+     * 현재: 흐름 있는 도메인의 헤더 청크가 업무 흐름도(businessFlows)를 안 씀
+     * (schema 는 optional 이라 통과하지만, 대시보드 업무 흐름도가 공백이 된다 —
+     * 헤더 에이전트가 SKILL 지시를 빠뜨린 신호). complete/incomplete 판정엔 무영향.
+     */
+    warnings: Array<{
+        chunkId: string;
+        reason: string;
+    }>;
 }
 /**
  * 조각 완결성 감사 — 존재 ∧ JSON ∧ 스키마 ∧ chunkId/domainId 정합 ∧ 헤더 존재
  * (헤더 청크) ∧ 커버리지(조각 flow/step id ⊇ 청크 선언 id). 완료의 진실은 이
  * 감사가 결정한다(에이전트 ack 아님). `only` 로 청크 부분 감사(스킵 가드용).
+ * 추가로 비차단 warnings(예: 헤더 업무 흐름도 누락)를 수집한다(조용한 누락 방지).
  */
 export declare function auditFillFragments(projectRoot: string, only?: string[]): Promise<FragmentAudit>;
 export interface MergeFillResult {

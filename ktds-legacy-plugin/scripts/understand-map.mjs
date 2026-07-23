@@ -635,6 +635,10 @@ async function runFillAudit() {
     process.exit(2)
   }
   console.log(JSON.stringify(audit))
+  // 비차단 경고는 stderr 로 사람에게도 보인다(조용한 누락 금지) — JSON 소비는 stdout 만 읽는다.
+  for (const w of audit.warnings ?? []) {
+    console.error(`  ⚠️ ${w.chunkId}: ${w.reason}`)
+  }
 }
 
 /** 조각 → 도메인별 fill/<key>.json 결정론 병합. */

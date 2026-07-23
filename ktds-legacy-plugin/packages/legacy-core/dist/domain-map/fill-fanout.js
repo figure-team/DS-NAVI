@@ -362,12 +362,14 @@ export async function prepFillChunks(projectRoot, options = {}) {
  * 조각 완결성 감사 — 존재 ∧ JSON ∧ 스키마 ∧ chunkId/domainId 정합 ∧ 헤더 존재
  * (헤더 청크) ∧ 커버리지(조각 flow/step id ⊇ 청크 선언 id). 완료의 진실은 이
  * 감사가 결정한다(에이전트 ack 아님). `only` 로 청크 부분 감사(스킵 가드용).
+ * 추가로 비차단 warnings(예: 헤더 업무 흐름도 누락)를 수집한다(조용한 누락 방지).
  */
 export async function auditFillFragments(projectRoot, only) {
     const index = await readFillChunkIndex(projectRoot);
     const onlySet = only && only.length > 0 ? new Set(only) : null;
     const complete = [];
     const incomplete = [];
+    const warnings = [];
     for (const entry of index.chunks) {
         if (onlySet && !onlySet.has(entry.chunkId))
             continue;
@@ -411,11 +413,22 @@ export async function auditFillFragments(projectRoot, only) {
             fail(`coverage: flows ${chunk.flows.length - missingFlows}/${chunk.flows.length} · steps ${chunk.steps.length - missingSteps}/${chunk.steps.length}`);
             continue;
         }
+        // 비차단 경고: 흐름 있는 도메인의 헤더 청크가 업무 흐름도(businessFlows)를 안 씀.
+        // schema 상 optional 이라 complete 로 통과하지만, 헤더 에이전트가 SKILL 지시(도메인별
+        // 업무 프로세스 순서도)를 빠뜨리면 대시보드 업무 흐름도가 통째로 공백이 된다 — 조용히
+        // 넘기지 않고 표면화한다(조용한 누락 금지). 흐름 0 도메인은 그릴 게 없으니 제외.
+        if (entry.isHeaderChunk && (frag.header?.businessFlows?.length ?? 0) === 0 && chunk.flows.length > 0) {
+            warnings.push({
+                chunkId: entry.chunkId,
+                reason: `업무 흐름도(businessFlows) 0장 — 흐름 ${chunk.flows.length}개 도메인인데 헤더가 업무 흐름도를 안 씀(대시보드 업무 흐름도 공백)`,
+            });
+        }
         complete.push(entry.chunkId);
     }
     complete.sort(cmp);
     incomplete.sort((a, b) => cmp(a.chunkId, b.chunkId));
-    return { complete, incomplete };
+    warnings.sort((a, b) => cmp(a.chunkId, b.chunkId));
+    return { complete, incomplete, warnings };
 }
 /**
  * 조각을 도메인별 DomainFill 로 병합해 `.spec/map/fill/<key>.json` 에 쓴다.

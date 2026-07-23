@@ -27,7 +27,7 @@ if (!existsSync(distEntry)) {
 const projectRoot = process.argv[2] || process.cwd()
 const runBegan = runStartedAt()
 const engine = await import(distEntry)
-const { buildRtm, applyRequirements, applyOverlay, attachTestScenarios, buildMyBatisModel, isMapperXmlDocument } = engine
+const { buildRtm, applyRequirements, applyOverlay, attachTestScenarios, buildMyBatisModel, isMapperXmlDocument, collectRtmSignals } = engine
 // P1c 근거 게이트 — 배럴(rtm/index.ts)이 동시 편집 중이라 아직 export 를 못 얹었다. 파일 경로
 // 직접 import 라 패키지 exports 맵을 타지 않고, Node 가 해석경로로 캐싱하므로 dist/index.js 가
 // 쓰는 것과 **동일한 모듈 인스턴스**다. 배럴에 `checkCellGrounding` 이 추가되면 위 구조분해로 합칠 것.
@@ -108,7 +108,24 @@ if (existsSync(mcgPath)) {
   }
 }
 
-const input = { nodes: graph.nodes, edges: graph.edges, routes, mybatisModel, methodCallGraph }
+// 데이터·테스트 축 신호(비-MyBatis Kotlin/JDBC 대응) — 코드 SQL(rawSqlModel) + 테스트 링크.
+// MyBatis 프로젝트면 rawSqlModel 은 비어도 무방(build-rtm 이 MyBatis 경로를 우선한다).
+let rtmSignals = { rawSqlModel: { byFile: {} }, testLinks: { byProdClass: {} }, diag: { knownTables: 0, sqlLinkedFiles: 0, testFiles: 0, prodClasses: 0 } }
+try {
+  rtmSignals = collectRtmSignals(projectRoot, graph.nodes)
+} catch (err) {
+  console.error(`데이터/테스트 축 신호 수집 실패(무시): ${err.message}`)
+}
+
+const input = {
+  nodes: graph.nodes,
+  edges: graph.edges,
+  routes,
+  mybatisModel,
+  methodCallGraph,
+  rawSqlModel: rtmSignals.rawSqlModel,
+  testLinks: rtmSignals.testLinks,
+}
 // domain-graph.json 은 최상위 gitCommit 을 갖지 않는다 — 스탬프는 ktdsMap.generatedFromCommit
 // (emit 이 skeleton.gitCommit 에서 투영, 없으면 빈 문자열)과 project.gitCommitHash 에 있다.
 // `||` 인 이유: emit.ts 가 `?? ''` 로 쓰므로 빈 문자열을 유효값으로 받으면 안 된다.
@@ -200,6 +217,31 @@ console.log(
     `${dropped > 0 ? `(입력 ${reqCount}, 드롭 ${dropped})` : ''} · 시나리오 ${model.testScenarios.length}건(확정 ${model.coverage?.scenarios?.confirmed ?? 0}) · 추적셀 근거율 ${rate}%` +
     `${overlayCount > 0 ? ` · 사람 오버레이 ${overlayCount} 적용` : ''}`,
 )
+// 축별 근거 + 정직 degrade(C) — 데이터·테스트 축 0% 가 "없음"으로 오독되지 않게 신호원 상태를 표기한다.
+{
+  const total = model.functions.length
+  const dataGrounded = model.functions.filter((f) => f.data.evidence.length > 0).length
+  const testGrounded = model.functions.filter((f) => f.test.value.trim() !== '').length
+  const d = rtmSignals.diag
+  const dataSource = mybatisModel.mappers.length > 0 ? 'MyBatis' : d.sqlLinkedFiles > 0 ? '코드 SQL' : '없음'
+  console.log(
+    `  축별 근거 — 진입점·구현 100% · 데이터 ${dataGrounded}/${total}(출처: ${dataSource}) · 테스트 ${testGrounded}/${total}(테스트 파일 ${d.testFiles}개 스캔)`,
+  )
+  if (dataGrounded === 0 && mybatisModel.mappers.length === 0) {
+    console.log(
+      d.knownTables === 0
+        ? `  ⚠️ 데이터 축 미지원 — db-schema.json 부재로 코드 SQL 을 테이블로 매핑 불가('검증 0' 아님). understand-map DB 스키마 스캔을 먼저 실행하세요.`
+        : `  ⚠️ 데이터 축 미검출 — MyBatis 매퍼·코드 SQL 신호 없음(손수 영속화). '없음'이 아니라 '축 미지원' — 수동 확인 필요.`,
+    )
+  }
+  if (testGrounded === 0) {
+    console.log(
+      d.testFiles === 0
+        ? `  ⚠️ 테스트 축 미검출 — 테스트 소스 파일 0개(테스트 미배치 또는 스캔 경로 밖).`
+        : `  ⚠️ 테스트 축 미링크 — 테스트 ${d.testFiles}개를 스캔했으나 기능 링크 0(프로덕션 클래스 참조 매칭 실패). '검증 0' 아님 — 수동 확인.`,
+    )
+  }
+}
 const cov = model.coverage
 if (cov) {
   console.log(

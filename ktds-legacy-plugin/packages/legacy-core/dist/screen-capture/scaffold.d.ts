@@ -25,6 +25,8 @@ export interface ScaffoldSummary {
     startCommand: string[] | null;
     /** 감지 근거 한 줄(예: "pom.xml cargo-maven3-plugin + mvnw"). */
     startCommandSource: string | null;
+    /** 클라이언트 라우팅 SPA 의심(결함 1) — 라우트 존재 + GET-safe 시드 0건. */
+    spaSuspected: boolean;
     /** 사람이 확인해야 하는 항목(한국어) — 호출부가 그대로 출력한다. */
     notes: string[];
 }

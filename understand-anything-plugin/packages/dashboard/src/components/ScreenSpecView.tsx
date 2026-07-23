@@ -9,7 +9,7 @@ import TopBarSlot from "../app/shell/TopBarSlot";
 import InfoPopover from "./InfoPopover";
 import { Chip } from "./data-map/UnresolvedChips";
 import type { DbUnresolved } from "./data-map/types";
-import { computeCommonHrefs, displayLabel } from "./screenSpecAnnotations";
+import { computeCommonChrome, isCommonChrome, displayLabel } from "./screenSpecAnnotations";
 import type { Annotation, LabelSource, Screen } from "./screenSpecAnnotations";
 // 근거 popover — RTM 기능표(FunctionView)와 같은 컴포넌트를 그대로 쓴다. 세 번째 복제본을
 // 만들지 않으려는 것(data-map CrudTab 이 이미 같은 패턴을 로컬 복제해 뒀다).
@@ -356,6 +356,8 @@ export default function ScreenSpecView() {
   const [kindFilter, setKindFilter] = useState<string | null>(null);
   // 공통 네비게이션 링크 접기 — 기본 접힘. 링크 세그먼트를 고른 경우엔 강제 전개한다.
   const [commonOpen, setCommonOpen] = useState(false);
+  // 캡처 확대 보기(라이트박스) — 원본 크기 + 배지 오버레이(결함 4). Esc/백드롭 클릭 닫기.
+  const [lightbox, setLightbox] = useState(false);
   // 근거 popover — 신뢰도 배지가 앵커. 배지 등급과 근거는 같은 handler 를 설명하므로
   // (등급은 살아남은 evidence 로 정해진다) 별도 접이를 두지 않고 배지에 합쳤다.
   const [evPop, setEvPop] = useState<EvPopoverState | null>(null);
@@ -393,7 +395,23 @@ export default function ScreenSpecView() {
     setKindFilter(null);
     setCommonOpen(false);
     setEvPop(null);
+    setLightbox(false);
   }, [selId]);
+
+  // 라이트박스 Esc 닫기 + 열려 있는 동안 배경 스크롤 잠금(결함 4).
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightbox(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [lightbox]);
 
   const load = useCallback(() => {
     setError(null);
@@ -434,9 +452,10 @@ export default function ScreenSpecView() {
     [overrides],
   );
 
-  // 공통 네비게이션 href 집합 — 전 화면을 한 번 스캔해 구한다(screens.json 전체가
-  // 이미 로드돼 있어 엔진·데이터 변경 없이 계산 가능).
-  const commonHrefs = useMemo(() => computeCommonHrefs(file?.screens ?? []), [file]);
+  // 공통 크롬(앱 셸) 판정 재료 — 전 화면을 한 번 스캔(결함 2): 구조 신호(region 태그)와
+  // 빈도(링크 href 25% · 비링크 kind|label 80%)를 함께 본다. 좌측 내비·상단바처럼 전 화면
+  // 반복되는 버튼·링크를 화면 고유 사양에서 접어 표시한다.
+  const common = useMemo(() => computeCommonChrome(file?.screens ?? []), [file]);
 
   // 좌측 섹션 축 — screens[].domain(엔진 결정론 배정, 플랜 도메인 key)을
   // 상단도메인 그룹이 있으면 그룹으로 접고(egov 136 도메인 과립화 방지),
@@ -693,14 +712,15 @@ export default function ScreenSpecView() {
   }
 
   const visibleAnns = sel.annotations.filter((a) => !merged(a).hidden);
-  // 캡처 위에 그릴 배지 — 표와 같은 세그먼트 값으로 필터한다(둘이 어긋나지 않게).
-  const overlayAnns = visibleAnns.filter((a) => !kindFilter || kindGroup(a.kind) === kindFilter);
+  /** 이 주석이 앱 셸 공통 크롬(좌측 내비·상단바)인가 — 표·배지에서 접기 대상(결함 2). */
+  const isCommonNav = (a: Annotation) => isCommonChrome(a, common);
+  // 세그먼트 필터를 고른 사용자에게 "고유"만 남기면 빈 표로 읽힐 수 있다 — 필터 시 강제 전개.
+  const chromeFoldOpen = commonOpen || !!kindFilter;
+  // 캡처 위에 그릴 배지 — 표와 같은 필터. 공통 크롬은 기본 접힘(펼치면 함께 표시).
+  const overlayAnns = visibleAnns.filter(
+    (a) => (!kindFilter || kindGroup(a.kind) === kindFilter) && (chromeFoldOpen || !isCommonNav(a)),
+  );
   const notes = visibleAnns.filter((a) => merged(a).note);
-  /** 이 행이 전 화면 반복 GNB·푸터 링크인가 — 표에서 접기 대상. */
-  const isCommonNav = (a: Annotation) =>
-    a.kind === "link" && !!a.mechanical.href && commonHrefs.has(a.mechanical.href);
-  // 링크만 보려고 세그먼트를 고른 사용자에게 "고유 1건"만 남기면 빈 표로 읽힌다 — 강제 전개.
-  const linkFoldOpen = commonOpen || kindFilter === "link";
   // 세그먼트 카운트 — 배지 전수 기준(공통 링크 접기와 무관하게 캡처엔 다 그려진다).
   const segments = KIND_ORDER.filter((k) => k !== "region")
     .map((k) => ({ kind: k, n: visibleAnns.filter((a) => kindGroup(a.kind) === k).length }))
@@ -1115,10 +1135,22 @@ export default function ScreenSpecView() {
               const cropW = trim?.width ?? sel.capture.width;
               const cropH = trim?.height ?? sel.capture.height;
               return (
-                <div
-                  className="border border-border-medium rounded-lg overflow-auto bg-white"
-                  style={{ maxWidth: Math.min(cropW, MAX_CAPTURE_WIDTH), maxHeight: "75vh" }}
-                >
+                <div className="relative" style={{ maxWidth: Math.min(cropW, MAX_CAPTURE_WIDTH) }}>
+                  {/* 확대 보기 트리거(결함 4) — 밀도 높은 백오피스 화면을 원본 크기로 크게 본다 */}
+                  <button
+                    type="button"
+                    onClick={() => setLightbox(true)}
+                    title="원본 크기로 크게 보기 (Esc 로 닫기)"
+                    aria-label="캡처 크게 보기"
+                    className="absolute z-10 inline-flex items-center gap-1 rounded-md cursor-pointer bg-panel/90 border border-border-medium text-text-secondary hover:text-text-primary"
+                    style={{ top: 8, right: 8, padding: "3px 8px", fontSize: 11.5, backdropFilter: "blur(2px)" }}
+                  >
+                    <span style={{ fontSize: 13, lineHeight: 1 }}>⤢</span> 크게 보기
+                  </button>
+                  <div
+                    className="border border-border-medium rounded-lg overflow-auto bg-white"
+                    style={{ maxHeight: "75vh" }}
+                  >
                   <div className="relative overflow-hidden" style={{ aspectRatio: `${cropW} / ${cropH}` }}>
                     <img
                       src={imgSrc(sel)}
@@ -1179,9 +1211,84 @@ export default function ScreenSpecView() {
                       );
                     })}
                   </div>
+                  </div>
                 </div>
               );
             })()
+          )}
+
+          {/* 확대 보기 라이트박스(결함 4) — 원본 크기 + 배지, Esc/백드롭 클릭 닫기 */}
+          {lightbox && !imgError && (
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label={`${title(sel)} 캡처 크게 보기`}
+              onClick={() => setLightbox(false)}
+              className="fixed inset-0 z-[9999] flex flex-col"
+              style={{ background: "rgba(15,17,21,0.82)", backdropFilter: "blur(2px)" }}
+            >
+              <div
+                className="flex items-center justify-between text-white shrink-0"
+                style={{ padding: "10px 16px", fontSize: 13 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <span className="truncate">
+                  {title(sel)} · 원본 {sel.capture.width}×{sel.capture.height}
+                </span>
+                <button
+                  type="button"
+                  autoFocus
+                  onClick={() => setLightbox(false)}
+                  className="inline-flex items-center gap-1 rounded-md cursor-pointer border border-white/30 hover:bg-white/10"
+                  style={{ padding: "4px 10px", fontSize: 12.5 }}
+                >
+                  닫기 <span style={{ opacity: 0.7 }}>(Esc)</span>
+                </button>
+              </div>
+              {/* 스크롤 컨테이너 — 원본 크기 이미지 + 문서좌표 배지(크롭 없음) */}
+              <div className="flex-1 overflow-auto" style={{ padding: "0 16px 16px" }} onClick={(e) => e.stopPropagation()}>
+                <div
+                  className="relative bg-white mx-auto"
+                  style={{ width: sel.capture.width, height: sel.capture.height, maxWidth: "none" }}
+                >
+                  <img
+                    src={imgSrc(sel)}
+                    alt={title(sel)}
+                    draggable={false}
+                    className="block select-none"
+                    style={{ width: sel.capture.width, height: sel.capture.height }}
+                  />
+                  {overlayAnns.map((a) => {
+                    const st = kindStyle(a.kind);
+                    const m = merged(a);
+                    const dl = dispLabel(a);
+                    return (
+                      <span
+                        key={annKey(a)}
+                        aria-label={`${badgeGlyph(a.kind, a.no)} ${dl.text}${m.description ? ` — ${m.description}` : ""}`}
+                        title={`${dl.text}${m.description ? ` — ${m.description}` : ""}`}
+                        className="absolute flex items-center justify-center rounded-full font-bold p-0"
+                        style={{
+                          left: `${((a.bbox.x + a.bbox.width) / sel.capture.width) * 100}%`,
+                          top: `${(a.bbox.y / sel.capture.height) * 100}%`,
+                          transform: "translate(-50%, -50%)",
+                          width: 22,
+                          height: 22,
+                          fontSize: 14,
+                          lineHeight: "22px",
+                          background: st.bg,
+                          color: st.fg,
+                          border: `1.5px solid ${st.border}`,
+                          boxShadow: "0 0 2px rgba(0,0,0,0.6)",
+                        }}
+                      >
+                        {badgeGlyph(a.kind, a.no)}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           )}
 
           {/* 범례 표 — 프로토 .tbl */}
@@ -1249,18 +1356,18 @@ export default function ScreenSpecView() {
                               <button
                                 type="button"
                                 onClick={() => setCommonOpen((v) => !v)}
-                                aria-expanded={linkFoldOpen}
+                                aria-expanded={chromeFoldOpen}
                                 className="inline-flex items-center gap-1.5 cursor-pointer bg-transparent border-0 text-text-muted"
                                 style={{ font: "inherit", fontSize: 11.5, padding: "3px 0" }}
-                                title="전 화면에 반복 등장하는 공통 네비게이션·푸터 링크 — 이 화면 고유 사양이 아니라 기본으로 접어 둡니다"
+                                title="전 화면에 반복 등장하는 공통 UI(좌측 내비·상단바·푸터) — 이 화면 고유 사양이 아니라 기본으로 접어 둡니다"
                               >
-                                <span style={{ fontSize: 9, width: 10 }}>{linkFoldOpen ? "▾" : "▸"}</span>
-                                공통 네비게이션 {commons.length}건
+                                <span style={{ fontSize: 9, width: 10 }}>{chromeFoldOpen ? "▾" : "▸"}</span>
+                                공통 UI(내비·상단바) {commons.length}건
                                 <span style={{ opacity: 0.7 }}>— 전 화면 반복</span>
                               </button>
                             </td>
                           </tr>,
-                          ...(linkFoldOpen ? commons.map(renderRow) : []),
+                          ...(chromeFoldOpen ? commons.map(renderRow) : []),
                         ]
                       : [];
                   return [...spacer, header, ...rows.map(renderRow), ...fold];

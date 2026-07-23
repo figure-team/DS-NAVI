@@ -69,6 +69,7 @@ function ctx(over: Partial<DomainAssignContext> = {}): DomainAssignContext {
     domainByRoot: over.domainByRoot ?? new Map(),
     ownersByFile: over.ownersByFile ?? new Map(),
     planDomainCount: over.planDomainCount ?? 0,
+    domainOverrides: over.domainOverrides ?? new Map(),
   }
 }
 
@@ -323,5 +324,69 @@ describe('assignScreenDomains — 불변식', () => {
     const before = computeMechanicalHash(screens)
     const r = assignScreenDomains(screens, ctx({ domainByRoot: ROOTS }))
     expect(computeMechanicalHash(r.screens)).toBe(before)
+  })
+})
+
+// ── 축 D: screen-domain-map 힌트(결함 3) ────────────────────────────────────
+
+describe('assignScreenDomains — 축 D 결정론 힌트(override)', () => {
+  it('힌트가 있으면 다른 축을 건너뛰고 최우선 배정한다', () => {
+    // 핸들러 근거가 cart 를 가리켜도 힌트가 우선한다.
+    const s = screen('screen:(root)__s_trust-register', [ann(1, ['web/CartBean.java'])])
+    const r = assignScreenDomains(
+      [s],
+      ctx({ domainByRoot: ROOTS, domainOverrides: new Map([['screen:(root)__s_trust-register', 'trust']]) }),
+    )
+    expect(r.screens[0].domain).toBe('trust')
+    expect(r.summary.byMethod.override).toBe(1)
+    expect(r.summary.byMethod.handlerJoin).toBe(0)
+  })
+
+  it('힌트는 재실행해도 보존된다(멱등)', () => {
+    const s = screen('screen:(root)__s_x', [ann(1)])
+    const c = ctx({ domainOverrides: new Map([['screen:(root)__s_x', 'royalty']]) })
+    const once = assignScreenDomains([s], c)
+    const twice = assignScreenDomains(once.screens, c)
+    expect(once.screens[0].domain).toBe('royalty')
+    expect(twice.screens).toEqual(once.screens)
+  })
+})
+
+// ── 축 C: 시나리오 접미 토큰 → 플랜 키(SPA 폴백, 결함 3) ─────────────────────
+
+describe('assignScreenDomains — 축 C 시나리오 토큰', () => {
+  const PLAN = new Map([
+    ['web/TrustBean.java', 'trust'],
+    ['web/RoyaltyBean.java', 'royalty'],
+  ])
+
+  it('화면 id 의 __s_ 접미를 토큰화해 플랜 키와 매칭한다(SPA: URL=(root))', () => {
+    const s = screen('screen:(root)__s_trust-register', [ann(1)])
+    const r = assignScreenDomains([s], ctx({ domainByRoot: PLAN }))
+    expect(r.screens[0].domain).toBe('trust')
+    expect(r.summary.byMethod.scenarioToken).toBe(1)
+  })
+
+  it('scenario 필드에서도 토큰을 뽑는다', () => {
+    const s = screen('screen:(root)__s_x', [ann(1)])
+    s.scenario = 'royalty-settlement'
+    const r = assignScreenDomains([s], ctx({ domainByRoot: PLAN }))
+    expect(r.screens[0].domain).toBe('royalty')
+  })
+
+  it('플랜 키와 안 맞는 토큰은 미배정(null) — 지어내지 않음', () => {
+    const s = screen('screen:(root)__s_unknown-thing', [ann(1)])
+    const r = assignScreenDomains([s], ctx({ domainByRoot: PLAN }))
+    expect(r.screens[0].domain).toBeNull()
+    expect(r.summary.byMethod.unassigned).toBe(1)
+  })
+
+  it('서버 신호 축(핸들러/폴더)이 시나리오 토큰보다 우선한다', () => {
+    // 핸들러 근거가 trust 를 명시 → scenario 접미(royalty)보다 앞선다.
+    const s = screen('screen:(root)__s_royalty-x', [ann(1, ['web/TrustBean.java'])])
+    const r = assignScreenDomains([s], ctx({ domainByRoot: PLAN }))
+    expect(r.screens[0].domain).toBe('trust')
+    expect(r.summary.byMethod.handlerJoin).toBe(1)
+    expect(r.summary.byMethod.scenarioToken).toBe(0)
   })
 })

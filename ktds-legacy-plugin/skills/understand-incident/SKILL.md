@@ -10,7 +10,7 @@ argument-hint: ["[projectRoot]"]
 > 🌐 **언어:** 사용자에게 보여주는 모든 설명·질문·요약·진행 안내는 **한국어**로 한다(config `outputLanguage`, 기본값 `ko`).
 > 🖋 **문체:** 해결방안서 등 네가 쓰는 한국어 산문은 **문체 규약**을 로드해 따른다 — 프로젝트 override `.understand-anything/templates/style/ko-prose.md` → 없으면 `${CLAUDE_PLUGIN_ROOT}/templates/style/ko-prose.md`.
 
-DS-APM(장애탐지)이 `<projectRoot>/ds-hub/장애/` 에 드롭한 **장애 RCA 리포트**(.md+frontmatter, 계약: `docs/ktds/INCIDENT_DROP_CONTRACT.md`)를 분석해 **해결방안서**(`resolution.md`)를 만든다. 설계: `docs/ktds/INCIDENT_ANALYSIS_DESIGN.md`.
+DS-APM(장애탐지)이 `<projectRoot>/ds-hub/issues/` 에 드롭한 **장애 RCA 리포트**(.md+frontmatter, 계약: `docs/ktds/INCIDENT_DROP_CONTRACT.md`)를 분석해 **해결방안서**(`resolution.md`)를 만든다. 설계: `docs/ktds/INCIDENT_ANALYSIS_DESIGN.md`.
 
 원칙 3개:
 - **스키마를 발명하지 않는다** — DS-APM 실물 형식이 계약. 파싱 불가 파일도 원문 보존 + unparseable 원장 기록.

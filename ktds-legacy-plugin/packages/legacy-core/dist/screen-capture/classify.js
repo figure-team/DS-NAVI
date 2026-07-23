@@ -125,6 +125,8 @@ export function classifyElements(elements) {
         handler: null,
         description: null,
         note: null,
+        // 공통 크롬 region 태그(결함 2) — 값이 있을 때만 실어 구버전 산출물 바이트 보존.
+        ...(e.region ? { region: e.region } : {}),
     }));
 }
 //# sourceMappingURL=classify.js.map

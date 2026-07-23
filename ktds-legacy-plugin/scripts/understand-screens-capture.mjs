@@ -189,7 +189,18 @@ function stopApp() {
 
 // ── 브라우저 내부 추출 함수 ─────────────────────────────────────────────────
 const EXTRACT_SELECTOR = 'a[href], button, input, select, textarea, [onclick]'
-function extractElements(els) {
+function extractElements(els, chromeSelectors) {
+  // 공통 크롬 region 태그(결함 2) — el.closest 최초 일치 셀렉터명(잘못된 셀렉터는 건너뜀).
+  function regionOf(el) {
+    for (const sel of chromeSelectors ?? []) {
+      try {
+        if (el.closest?.(sel)) return sel
+      } catch {
+        /* 잘못된 셀렉터 무시 — 조용한 전체 차단 방지 */
+      }
+    }
+    return null
+  }
   function cssPath(el) {
     const parts = []
     let n = el
@@ -240,6 +251,7 @@ function extractElements(els) {
         height: r.height,
       },
       selector: cssPath(el),
+      region: regionOf(el),
     }
   })
 }
@@ -257,6 +269,10 @@ const screens = []
 const missing = []
 const usedIds = new Set()
 const visitedKeys = new Set()
+// SPA 커버리지 신호(결함 1) — 크롤이 발견한 앱 내부 내비 링크의 distinct screenKey.
+// 상태 기반 SPA(react-router 없음)는 이 집합이 사실상 비어(링크 대신 button+상태),
+// 커버리지가 손으로 짠 시나리오 수에 갇힌다는 것을 정직 경고하는 근거.
+const crawlNavKeys = new Set()
 const sha256 = (data) => createHash('sha256').update(data).digest('hex')
 const relUrl = (u) => `${relativePath(u, ctxPath)}${u.search}`
 const resolveUrl = (rel) => new URL(rel.replace(/^\//, ''), baseURL).href
@@ -273,7 +289,7 @@ async function captureScreen(
     if (usedIds.has(id)) return null
   }
   usedIds.add(id)
-  const raw = await page.$$eval(EXTRACT_SELECTOR, extractElements)
+  const raw = await page.$$eval(EXTRACT_SELECTOR, extractElements, sc.chromeSelectors ?? [])
   const annotations = joinRoutes(classifyElements(raw), {
     routes: routesReport.routes ?? [],
     contextPath: ctxPath,
@@ -367,8 +383,9 @@ async function crawl(browser) {
     const hrefs = await page.$$eval('a[href]', (as) => as.map((a) => a.getAttribute('href')))
     for (const h of hrefs) {
       const nu = normalizeUrl(h, finalU)
-      if (nu && shouldVisit(nu, sc.exclude) && !visitedKeys.has(screenKey(nu, ctxPath))) {
-        queue.push(nu.href)
+      if (nu && shouldVisit(nu, sc.exclude)) {
+        crawlNavKeys.add(screenKey(nu, ctxPath))
+        if (!visitedKeys.has(screenKey(nu, ctxPath))) queue.push(nu.href)
       }
     }
   }
@@ -557,6 +574,54 @@ try {
   const seeded = file.screens.filter((s) => s.seededFrom === 'routes-census').length
   if (seeded > 0) {
     console.log(`census 보조 시드 회수 화면 ${seeded}건(seededFrom: routes-census — 메뉴 링크 없음).`)
+  }
+
+  // ── 공통 크롬 태깅 요약(결함 2) — region 태그가 붙은 주석 비율 ──────────────
+  const regionCounts = new Map()
+  let taggedAnns = 0
+  for (const s of file.screens) {
+    for (const a of s.annotations) {
+      if (a.region) {
+        taggedAnns++
+        regionCounts.set(a.region, (regionCounts.get(a.region) ?? 0) + 1)
+      }
+    }
+  }
+  if (st.annotationCount > 0) {
+    if (taggedAnns > 0) {
+      const parts = [...regionCounts.entries()].sort((a, b) => b[1] - a[1]).map(([r, n]) => `${r} ${n}`)
+      console.log(
+        `공통 크롬 태그: 주석 ${taggedAnns}/${st.annotationCount}건(${Math.round((taggedAnns / st.annotationCount) * 100)}%)이 ` +
+          `앱 셸 region — ${parts.join(' · ')}. 대시보드가 화면 고유 사양에서 접어 표시합니다.`,
+      )
+    } else if ((sc.chromeSelectors ?? []).length > 0) {
+      console.log(
+        'ⓘ 공통 크롬 태그 0건 — chromeSelectors 가 이 앱 셸과 안 맞을 수 있습니다(커스텀 마크업이면 ' +
+          '클래스/id 셀렉터를 config screens.chromeSelectors 에 추가). 대시보드 빈도 기반 접기는 계속 동작합니다.',
+      )
+    }
+  }
+
+  // ── SPA 커버리지 갭 정직 경고(결함 1) — 상태 기반 SPA 는 커버리지가 시나리오에 갇힌다 ──
+  const crawlCaptured = file.screens.filter((s) => !s.scenario && !s.seededFrom).length
+  const routesTotal = (routesReport.routes ?? []).length
+  // 크롤이 따라갈 앱 내부 내비 링크가 사실상 없고(≤1) 라우트 census 는 존재 = 클라이언트 라우팅 SPA 의심.
+  const spaSuspected = crawlNavKeys.size <= 1 && routesTotal > 0
+  if (spaSuspected) {
+    const scenarioScreens = file.screens.filter((s) => s.scenario).length
+    console.log('\n⚠️  SPA 커버리지 갭 경고(결함 1)')
+    console.log(
+      `  크롤이 발견한 앱 내부 내비 링크 ${crawlNavKeys.size}건 — 클라이언트 라우팅 SPA(상태 기반 내비)로 보입니다.`,
+    )
+    console.log(
+      `  routes.json ${routesTotal}건은 대부분 REST 엔드포인트(화면 아님)라 크롤·census 시드로 화면을 늘리지 못합니다.`,
+    )
+    console.log(
+      `  → 화면 커버리지 = 시나리오 수에 갇힙니다(현재 크롤 ${crawlCaptured} · 시나리오 ${scenarioScreens} · 시나리오 정의 ${sc.scenarios.length}개).`,
+    )
+    console.log(
+      '  실화면이 시나리오보다 많으면 조용한 갭이 생깁니다 — 골든패스만 짜지 말고 전수 화면을 시나리오로(화면=시나리오 1:1) 채우세요.',
+    )
   }
   const sigGroups = new Map()
   for (const s of file.screens) {

@@ -8,6 +8,8 @@ import type { UaGraphEdge, UaGraphNode } from '../../domain-map/types.js';
 import type { RoutesReport, EdgeRecord } from '../../domain-map/types.js';
 import type { JpaModel } from '../../jpa/types.js';
 import type { MyBatisModel } from '../../mybatis/types.js';
+import type { RawSqlModel } from '../raw-sql.js';
+import type { TestLinkModel } from '../../rtm/test-links.js';
 import type { MethodCallGraph } from '../../domain-map/types.js';
 import type { PolicySignalSet } from '../../policy/types.js';
 import type { DbSchemaModel } from '../../db-schema/types.js';
@@ -36,6 +38,16 @@ export interface DocInput {
     jpaModel?: JpaModel | null;
     /** MyBatis 모델(Tier B) — crud-matrix(기능×테이블) + si-테이블정의서(테이블/컬럼) grounding. */
     mybatisModel?: MyBatisModel | null;
+    /**
+     * 코드 raw SQL 모델(비-MyBatis·비-JPA 폴백) — crud-matrix/RTM 데이터 축이 손수 짠 JDBC/Kotlin
+     * 영속화 파일의 SQL 에서 기능×테이블 CRUD 를 세운다(db-schema 테이블로 필터). MyBatis 부재 시 사용.
+     */
+    rawSqlModel?: RawSqlModel | null;
+    /**
+     * 테스트 → 프로덕션 클래스 링크 모델(RTM 테스트 축) — 테스트 파일이 참조하는 프로덕션 클래스
+     * basename 으로 test↔기능을 잇는다(언어 무관). map-scan 이 test 신호를 안 만들던 갭 보완.
+     */
+    testLinks?: TestLinkModel | null;
     /** 메서드 호출그래프(P3) — crud-matrix 가 흐름별 핸들러→매퍼 메서드 정밀 귀속에 사용. */
     methodCallGraph?: MethodCallGraph | null;
     /** 빌드파일 의존성(pom.xml/gradle) — tech-stack 프레임워크/라이브러리 grounding(file:line). */

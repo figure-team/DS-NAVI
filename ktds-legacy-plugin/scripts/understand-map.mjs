@@ -705,6 +705,16 @@ async function runEmit() {
   console.log(`  ${result.verifyReportPath}  (인용 검증 리포트)`)
   if (crud) {
     console.log(`  ${crud.outPath}  (CRUD 매트릭스 — 열 ${crud.columns} · 행 ${crud.rows})`)
+    // 조용한 퇴화 금지(결함: 비-MyBatis·비-JPA 프로젝트에서 데이터축이 비면 '기능' 열만 남는다).
+    if (crud.degraded) {
+      const why =
+        crud.degradedReason === 'no-db-schema'
+          ? 'db-schema.json 부재로 코드 SQL 을 테이블로 필터할 수 없습니다 — /understand-map 의 db-schema 스캔을 먼저 실행하세요.'
+          : 'MyBatis 매퍼·DAO·코드 SQL·테이블 신호가 모두 없어 데이터축(테이블/CRUD)을 만들 수 없습니다(손수 짠 영속화 프로젝트).'
+      console.log(`  ⚠️ CRUD 매트릭스 데이터축 없음 — 열이 '기능' 하나뿐입니다(사실상 기능 목록). ${why}`)
+    } else if (crud.source === 'raw-sql') {
+      console.log('  (데이터축 출처: 코드 raw SQL — MyBatis 부재, db-schema 테이블로 필터).')
+    }
   } else {
     console.log('  ⚠️ crud-matrix.json 미산출 — 표 섹션 없음(그래프에 flow 부재?). 데이터 화면이 빕니다.')
   }

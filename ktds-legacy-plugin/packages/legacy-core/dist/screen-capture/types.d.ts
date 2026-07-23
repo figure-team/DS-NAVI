@@ -132,6 +132,7 @@ export declare const AnnotationSchema: z.ZodObject<{
     }, z.core.$strip>>;
     description: z.ZodNullable<z.ZodString>;
     note: z.ZodNullable<z.ZodString>;
+    region: z.ZodOptional<z.ZodNullable<z.ZodString>>;
 }, z.core.$strip>;
 export type Annotation = z.infer<typeof AnnotationSchema>;
 export declare const ScreenCaptureInfoSchema: z.ZodObject<{
@@ -221,6 +222,7 @@ export declare const ScreenSchema: z.ZodObject<{
         }, z.core.$strip>>;
         description: z.ZodNullable<z.ZodString>;
         note: z.ZodNullable<z.ZodString>;
+        region: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     }, z.core.$strip>>;
 }, z.core.$strip>;
 export type Screen = z.infer<typeof ScreenSchema>;
@@ -389,6 +391,7 @@ export declare const ScreensFileSchema: z.ZodObject<{
             }, z.core.$strip>>;
             description: z.ZodNullable<z.ZodString>;
             note: z.ZodNullable<z.ZodString>;
+            region: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         }, z.core.$strip>>;
     }, z.core.$strip>>;
     unmatchedJsps: z.ZodArray<z.ZodString>;
@@ -493,5 +496,7 @@ export interface RawElement {
     visible: boolean;
     bbox: BBox;
     selector: string;
+    /** 공통 크롬 region 태그(결함 2) — config chromeSelectors 중 el.closest 최초 일치. 없으면 null. */
+    region?: string | null;
 }
 //# sourceMappingURL=types.d.ts.map

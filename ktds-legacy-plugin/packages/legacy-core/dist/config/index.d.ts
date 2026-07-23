@@ -25,6 +25,7 @@ export declare const ScreensConfigSchema: z.ZodObject<{
     maxPages: z.ZodDefault<z.ZodNumber>;
     exclude: z.ZodDefault<z.ZodArray<z.ZodString>>;
     seedUrls: z.ZodDefault<z.ZodArray<z.ZodString>>;
+    chromeSelectors: z.ZodDefault<z.ZodArray<z.ZodString>>;
     censusSeed: z.ZodDefault<z.ZodObject<{
         enabled: z.ZodDefault<z.ZodBoolean>;
         maxPages: z.ZodDefault<z.ZodNumber>;
@@ -75,6 +76,7 @@ export declare const ConfigSchema: z.ZodObject<{
         maxPages: z.ZodDefault<z.ZodNumber>;
         exclude: z.ZodDefault<z.ZodArray<z.ZodString>>;
         seedUrls: z.ZodDefault<z.ZodArray<z.ZodString>>;
+        chromeSelectors: z.ZodDefault<z.ZodArray<z.ZodString>>;
         censusSeed: z.ZodDefault<z.ZodObject<{
             enabled: z.ZodDefault<z.ZodBoolean>;
             maxPages: z.ZodDefault<z.ZodNumber>;

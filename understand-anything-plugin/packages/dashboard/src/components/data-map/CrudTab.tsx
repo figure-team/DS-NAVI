@@ -87,8 +87,30 @@ export default function CrudTab({ crud }: { crud: CrudMatrix }) {
       { replace },
     );
 
+  // 데이터축 퇴화(테이블/CRUD 신호 전무) — 조용히 기능 목록으로 보이지 않게 정직 안내.
+  const degraded = crud.degraded === true || tableCols.length === 0;
+  const degradedMsg =
+    crud.degradedReason === "no-db-schema"
+      ? "DB 스키마(db-schema.json)가 없어 코드 SQL 을 테이블로 매핑할 수 없습니다 — understand-map 의 DB 스키마 스캔을 먼저 실행하세요."
+      : "MyBatis 매퍼·DAO·코드 SQL·테이블 신호가 모두 없어 기능↔테이블 CRUD 축을 만들 수 없습니다(손수 짠 JDBC/영속화 프로젝트). 아래는 기능 목록입니다.";
+
   return (
     <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "14px 16px" }}>
+      {degraded && (
+        <div
+          className="rounded-lg border"
+          style={{
+            marginBottom: 12,
+            padding: "10px 14px",
+            fontSize: 12.5,
+            lineHeight: 1.6,
+            borderColor: "var(--color-warning, #d19a00)",
+            background: "color-mix(in srgb, var(--color-warning, #d19a00) 8%, transparent)",
+          }}
+        >
+          <b>⚠️ CRUD 매트릭스 데이터축 없음</b> — {degradedMsg}
+        </div>
+      )}
       {/* 툴바 — 축 따라가는 검색(기능/테이블) · 테이블 필터 · 전치 토글 */}
       <div className="flex items-center flex-wrap" style={{ gap: 8, marginBottom: 12 }}>
         <SearchInput

@@ -1,8 +1,11 @@
 import { describe, it, expect } from "vitest";
 import {
+  commonChromeThreshold,
   commonNavThreshold,
+  computeCommonChrome,
   computeCommonHrefs,
   displayLabel,
+  isCommonChrome,
   isJunkLabel,
   labelFromHref,
 } from "../screenSpecAnnotations";
@@ -196,5 +199,48 @@ describe("computeCommonHrefs", () => {
 
   it("빈 입력에 터지지 않는다", () => {
     expect(computeCommonHrefs([]).size).toBe(0);
+  });
+});
+
+describe("commonChromeThreshold", () => {
+  it("전체 화면의 80%, 최소 3화면(링크 25%보다 높다)", () => {
+    expect(commonChromeThreshold(43)).toBe(35);
+    expect(commonChromeThreshold(10)).toBe(8);
+    expect(commonChromeThreshold(2)).toBe(3);
+  });
+});
+
+describe("computeCommonChrome / isCommonChrome (결함 2)", () => {
+  const navBtn = (label: string) =>
+    ann({ kind: "action", label, mechanical: { name: null, href: null, formAction: null, required: false } });
+
+  it("region 태그가 붙은 주석은 임계·빈도와 무관하게 공통 크롬(구조 신호 최우선)", () => {
+    const solo = ann({ kind: "action", label: "로그아웃", region: "header" });
+    const common = computeCommonChrome([screen("s0", [solo])]);
+    expect(isCommonChrome(solo, common)).toBe(true);
+  });
+
+  it("region 없는 상태 버튼도 80% 이상 반복되면 공통으로 접는다(빈도 폴백)", () => {
+    // 좌측 내비 버튼 "징수 등록" 이 10화면 중 9화면(90%)에 반복 → 공통.
+    const screens = Array.from({ length: 10 }, (_, i) =>
+      screen(`s${i}`, i < 9 ? [navBtn("징수 등록")] : [navBtn("고유 버튼")]),
+    );
+    const common = computeCommonChrome(screens);
+    expect(isCommonChrome(navBtn("징수 등록"), common)).toBe(true);
+    expect(isCommonChrome(navBtn("고유 버튼"), common)).toBe(false);
+  });
+
+  it("80% 미만 반복 버튼은 화면 고유 사양으로 남긴다(과잉 접기 방지)", () => {
+    // "저장" 이 10화면 중 6화면(60% < 80%)에만 → 접지 않는다.
+    const screens = Array.from({ length: 10 }, (_, i) => screen(`s${i}`, i < 6 ? [navBtn("저장")] : []));
+    const common = computeCommonChrome(screens);
+    expect(isCommonChrome(navBtn("저장"), common)).toBe(false);
+  });
+
+  it("공통 링크(href 25%)는 계속 접는다(기존 규약 유지)", () => {
+    const gnb = "/actions/Catalog.action?viewCategory=&categoryId=FISH";
+    const screens = Array.from({ length: 8 }, (_, i) => screen(`s${i}`, [link(gnb)]));
+    const common = computeCommonChrome(screens);
+    expect(isCommonChrome(link(gnb), common)).toBe(true);
   });
 });

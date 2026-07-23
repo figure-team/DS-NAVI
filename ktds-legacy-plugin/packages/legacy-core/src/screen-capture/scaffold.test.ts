@@ -80,6 +80,28 @@ describe('scaffoldScreensConfig — routes census 초안', () => {
     expect(summary.notes.some((n) => n.includes('scenarios'))).toBe(true)
     expect(summary.notes.some((n) => n.includes('startCommand 미감지'))).toBe(true)
   })
+
+  it('라우트는 있는데 GET-safe 시드가 0건이면 SPA 의심 경고를 낸다(결함 1)', () => {
+    // REST-only(전부 POST/비목록성) → 크롤 시드 0건 = 클라이언트 라우팅 SPA 신호.
+    const { summary } = scaffoldScreensConfig({
+      routes: [route('/api/trust/register', 'POST'), route('/api/royalty/settle', 'POST')],
+      contextPath: null,
+      build: noBuild,
+    })
+    expect(summary.seedUrls).toBe(0)
+    expect(summary.spaSuspected).toBe(true)
+    expect(summary.notes.some((n) => n.includes('SPA 의심'))).toBe(true)
+  })
+
+  it('GET-safe 목록성 시드가 있으면 SPA 의심이 아니다', () => {
+    const { summary } = scaffoldScreensConfig({
+      routes: [route('/cop/bbs/selectBoardList.do')],
+      contextPath: null,
+      build: noBuild,
+    })
+    expect(summary.spaSuspected).toBe(false)
+    expect(summary.notes.some((n) => n.includes('SPA 의심'))).toBe(false)
+  })
 })
 
 describe('scaffoldScreensConfigOnDisk — fail-closed IO', () => {

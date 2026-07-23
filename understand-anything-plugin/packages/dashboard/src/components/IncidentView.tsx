@@ -225,7 +225,7 @@ export default function IncidentView() {
                 onClick={() => void loadHistory()}
                 disabled={running || !token}
                 className="rounded-lg border border-border-subtle bg-elevated px-2.5 py-1 text-[11px] font-semibold text-text-secondary hover:text-text-primary disabled:opacity-40"
-                title="드롭 폴더(ds-hub/장애)를 다시 스캔합니다"
+                title="드롭 폴더(ds-hub/issues)를 다시 스캔합니다"
               >
                 새로고침
               </button>
@@ -234,7 +234,7 @@ export default function IncidentView() {
           {!loaded && <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "4px 8px" }}>불러오는 중…</div>}
           {loaded && entries.length === 0 && pendingDrops.length === 0 && (
             <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "4px 8px", lineHeight: 1.5 }}>
-              장애가 없습니다. DS-APM 이 <code style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>ds-hub/장애/</code> 에 리포트를
+              장애가 없습니다. DS-APM 이 <code style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>ds-hub/issues/</code> 에 리포트를
               드롭하면 이 목록에 자동으로 나타납니다.
             </div>
           )}

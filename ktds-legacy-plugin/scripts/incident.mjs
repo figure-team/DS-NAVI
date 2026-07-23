@@ -31,8 +31,8 @@ const { parseIncidentReport, resolveIncidentSeeds } = engine
 
 const [, , cmd, projectRoot, ...flags] = process.argv
 
-/** 드롭 폴더(계약 C2 — 가칭). 경로 확정 시 이 상수 1곳만 바꾼다. */
-const INCIDENT_DROP_DIR = join('ds-hub', '장애')
+/** 드롭 폴더(계약 C2). 경로 확정 시 이 상수 1곳만 바꾼다. */
+const INCIDENT_DROP_DIR = join('ds-hub', 'issues')
 const INCIDENT_HISTORY_MAX = 50
 /** 드롭 파일 크기 상한(신뢰 불가 입력 DoS 방어). RCA 리포트는 수 KB — 1MB 면 넉넉하다. */
 const MAX_DROP_BYTES = 1024 * 1024

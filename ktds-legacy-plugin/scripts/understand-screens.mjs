@@ -257,9 +257,21 @@ if (command === 'assign-domains') {
   console.log(`화면 도메인 재배정 완료 — ${projectRoot}`)
   console.log(
     `  배정 ${r.summary.assigned}/${r.summary.total}` +
-      ` (핸들러 조인 ${m.handlerJoin} · 뷰파일 조인 ${m.viewFileJoin} · 뷰폴더 파생 ${m.viewFolder}` +
-      ` · URL 파생 ${m.urlFolder} · 미배정 ${m.unassigned})`,
+      ` (힌트 ${m.override} · 핸들러 조인 ${m.handlerJoin} · 뷰파일 조인 ${m.viewFileJoin} · 뷰폴더 파생 ${m.viewFolder}` +
+      ` · URL 파생 ${m.urlFolder} · 시나리오 토큰 ${m.scenarioToken} · 미배정 ${m.unassigned})`,
   )
+  // 축 E — 조용한 실패 금지: 배정률이 낮으면 눈에 띄게 경고하고 힌트 파일 경로를 안내한다.
+  if (r.summary.total > 0 && r.summary.assigned === 0) {
+    console.warn(
+      `  ⚠️ 배정 0/${r.summary.total} — 서버 렌더 신호가 없는 SPA 로 보입니다. ` +
+        `.spec/map/screen-domain-map.json 에 화면 id → 도메인 키 힌트를 주면 최우선 축(재실행 보존)으로 배정됩니다.`,
+    )
+  } else if (r.summary.total > 0 && r.summary.assigned * 2 < r.summary.total) {
+    console.warn(
+      `  ⚠️ 배정률 낮음(${r.summary.assigned}/${r.summary.total}) — 미배정분은 화면설계서 "기타" 로 뭉칩니다. ` +
+        `시나리오 id 를 플랜 키와 맞추거나 .spec/map/screen-domain-map.json 힌트를 보강하세요.`,
+    )
+  }
   console.log(`  산출물: ${r.screensPath}`)
   console.log('다음 단계: validate → 대시보드 화면설계서 그룹 확인.')
   process.exit(0)
@@ -310,9 +322,14 @@ if (command === 'validate') {
   {
     const screens = file.screens ?? []
     const domainAssigned = screens.filter((s) => s.domain != null).length
+    const allUnassigned = screens.length > 0 && domainAssigned === 0
     console.log(
       `도메인 배정 ${domainAssigned}/${screens.length}` +
-        (domainAssigned < screens.length ? ' — assign-domains 로 재배정 가능(화면설계서 그룹 축)' : ''),
+        (allUnassigned
+          ? ' — ⚠️ 전량 미배정(화면설계서 "기타" 로 뭉침). SPA 라면 .spec/map/screen-domain-map.json 힌트 후 assign-domains'
+          : domainAssigned < screens.length
+            ? ' — assign-domains 로 재배정 가능(화면설계서 그룹 축)'
+            : ''),
     )
   }
   const recomputed = recomputeUnmatched(file)

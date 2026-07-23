@@ -43,6 +43,16 @@ export const ScreensConfigSchema = z.object({
     /** 크롤 시드 추가 URL(baseUrl 상대) — 링크로 발견 불가한 화면(검색 결과 등). */
     seedUrls: z.array(z.string()).default([]),
     /**
+     * 공통 크롬(앱 셸) region 셀렉터(결함 2) — 좌측 내비·상단바처럼 전 화면 반복되는
+     * 영역. 캡처가 각 요소에 `el.closest(sel)` 최초 일치를 region 태그로 기록하고(결정론),
+     * 대시보드가 화면 고유 사양에서 접어 둔다(SI 화면설계서가 공통 영역을 화면마다
+     * 반복 기술하지 않는 관례). 기본값은 시맨틱 랜드마크 — 커스텀 셸은 클래스/id 셀렉터
+     * (예 ".lc-nav", "#app-topbar")를 추가한다. 빈도 기반 접기(대시보드)와 병행.
+     */
+    chromeSelectors: z
+        .array(z.string())
+        .default(['nav', 'header', 'aside', '[role="navigation"]', '[role="banner"]', '[role="complementary"]']),
+    /**
      * routes census 보조 시드(SCREENS_MISSING_TRIAGE_DESIGN §3) — 크롤·시나리오가 끝난 뒤
      * .spec/map/routes.json 의 미방문 GET-safe 라우트(목록성 leaf 만, 부작용 계열 deny)를
      * 재시도해 메뉴가 낡아 놓친 실존 화면을 회수한다. scenarioId 를 주면 해당 시나리오의

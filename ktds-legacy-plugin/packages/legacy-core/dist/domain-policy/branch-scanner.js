@@ -1,9 +1,12 @@
 /**
- * 분기 스캐너(PD1) — Java 소스의 결정 지점(if/else if/switch/삼항) + 조건식 추출.
+ * 분기 스캐너(PD1) — Java/Kotlin 소스의 결정 지점(if/else if/switch·when/삼항) + 조건식 추출.
  *
- * tree-sitter Java AST 를 순회하며 소속 클래스/메서드를 추적하고, 각 분기 노드의
- * 조건식 원문(공백 정규화·바깥 괄호 제거)을 file:line 과 함께 수집한다. 합성 없음 —
- * 소스에 있는 분기만. 도메인 귀속은 상위(PD3: skeleton.stepSources → relPath 매핑)에서.
+ * tree-sitter AST 를 순회하며 소속 클래스/메서드를 추적하고, 각 분기 노드의 조건식 원문
+ * (공백 정규화·바깥 괄호 제거)을 file:line 과 함께 수집한다. 합성 없음 — 소스에 있는 분기만.
+ * 도메인 귀속은 상위(PD3: skeleton.stepSources → relPath 매핑)에서.
+ *
+ * 언어: `.kt` 는 Kotlin 문법(if_expression·when_expression — 삼항 없음), 그 외는 Java 문법.
+ * (2026-07-23: Kotlin 프로젝트에서 Java 파서 하드코딩 탓에 분기 0 으로 퇴화하던 갭 해소.)
  *
  * 결정론: AST 소스 순서 순회 후 (relPath,line,kind,condition) 정렬.
  */
@@ -12,6 +15,10 @@ import { join } from 'node:path';
 import { parseSource, startLine } from '../domain-map/tree-sitter.js';
 import { gitCommitHash } from '../domain-map/persist.js';
 import { BranchSignalSetSchema } from './types.js';
+/** 확장자 → 파서 언어. `.kt` = kotlin, 그 외(.java 등) = java. */
+function langOf(relPath) {
+    return relPath.endsWith('.kt') ? 'kotlin' : 'java';
+}
 const CLASS_TYPES = new Set([
     'class_declaration',
     'interface_declaration',
@@ -19,9 +26,23 @@ const CLASS_TYPES = new Set([
     'record_declaration',
 ]);
 const METHOD_TYPES = new Set(['method_declaration', 'constructor_declaration']);
+/** Kotlin 클래스/메서드 노드 타입(name = 'name' 필드 또는 첫 identifier). */
+const KT_CLASS_TYPES = new Set(['class_declaration', 'object_declaration']);
+const KT_METHOD_TYPES = new Set(['function_declaration', 'secondary_constructor']);
 function nameField(node) {
     const n = node.childForFieldName('name');
     return n ? n.text : null;
+}
+/** name 필드가 없으면 첫 identifier child 로 폴백(Kotlin 그래머 대응). */
+function nameOrIdent(node) {
+    return nameField(node) ?? node.namedChildren.find((c) => c != null && c.type === 'identifier')?.text ?? null;
+}
+/** 바깥 괄호 1겹 제거 + 공백 정규화(Kotlin when_subject `(x)` 등). */
+function stripParens(text) {
+    let t = text.replace(/\s+/g, ' ').trim();
+    if (t.startsWith('(') && t.endsWith(')'))
+        t = t.slice(1, -1).trim();
+    return t;
 }
 /** 조건식 텍스트 정규화 — 공백 1칸, 바깥 괄호 1겹 제거(parenthesized_expression). */
 function condText(node) {
@@ -77,7 +98,7 @@ function thenText(node) {
 /**
  * 한 Java 파일에서 분기 신호를 추출한다(순수, 파싱 포함). 소스 순서 보존.
  */
-export async function extractBranches(relPath, src) {
+async function extractBranchesJava(relPath, src) {
     const root = await parseSource('java', src);
     const out = [];
     const walk = (node, className, methodName) => {
@@ -106,11 +127,69 @@ export async function extractBranches(relPath, src) {
     walk(root, null, null);
     return out;
 }
+/**
+ * 한 Kotlin 파일에서 분기 신호를 추출한다. Kotlin 은 `if`·`when` 이 식(expression)이고
+ * 삼항이 없다(if 가 겸함). if_expression=if, when_expression=switch 로 매핑(스키마 kind 유지).
+ *  - if 조건 = childForFieldName('condition')(괄호 밖 식) · THEN = condition 다음 named child(본문).
+ *  - when 조건 = when_subject `(x)` 의 괄호 제거 · THEN = 공란(케이스별, Java switch 와 동형).
+ */
+async function extractBranchesKotlin(relPath, src) {
+    const root = await parseSource('kotlin', src);
+    const out = [];
+    const walk = (node, className, methodName) => {
+        let cls = className;
+        let mth = methodName;
+        if (KT_CLASS_TYPES.has(node.type)) {
+            cls = nameOrIdent(node) ?? className;
+        }
+        else if (KT_METHOD_TYPES.has(node.type)) {
+            mth = nameOrIdent(node) ?? (node.type === 'secondary_constructor' ? '<init>' : methodName);
+        }
+        if (node.type === 'if_expression') {
+            // Kotlin if_expression named children = [condition, consequence, alternative?] (실측 고정).
+            // web-tree-sitter 는 접근마다 다른 Node 래퍼를 줘 indexOf 가 안 맞으므로 위치로 집는다.
+            const named = node.namedChildren.filter((c) => c != null);
+            const cond = node.childForFieldName('condition') ?? named[0] ?? null;
+            const consequence = named[1] ?? null;
+            out.push({
+                relPath,
+                line: startLine(node),
+                className: cls,
+                methodName: mth,
+                kind: 'if',
+                condition: condText(cond),
+                then: summarizeBody(consequence),
+            });
+        }
+        else if (node.type === 'when_expression') {
+            const subj = node.namedChildren.find((c) => c != null && c.type === 'when_subject');
+            out.push({
+                relPath,
+                line: startLine(node),
+                className: cls,
+                methodName: mth,
+                kind: 'switch',
+                condition: subj ? stripParens(subj.text) : '',
+                then: '',
+            });
+        }
+        for (const c of node.namedChildren) {
+            if (c)
+                walk(c, cls, mth);
+        }
+    };
+    walk(root, null, null);
+    return out;
+}
+/** 한 소스 파일에서 분기 신호를 추출한다 — 확장자로 Java/Kotlin 파서를 고른다. */
+export async function extractBranches(relPath, src) {
+    return langOf(relPath) === 'kotlin' ? extractBranchesKotlin(relPath, src) : extractBranchesJava(relPath, src);
+}
 function cmp(a, b) {
     return a < b ? -1 : a > b ? 1 : 0;
 }
 /** 한 Java 파일의 enum 선언을 추출한다(이름 + 상수 목록). §3 상태값·§2 용어 시드. */
-export async function extractEnums(relPath, src) {
+async function extractEnumsJava(relPath, src) {
     const root = await parseSource('java', src);
     const out = [];
     const walk = (node) => {
@@ -136,6 +215,42 @@ export async function extractEnums(relPath, src) {
     };
     walk(root);
     return out;
+}
+/** Kotlin `enum class` — class_declaration(modifiers 에 enum) + enum_class_body/enum_entry. */
+async function extractEnumsKotlin(relPath, src) {
+    const root = await parseSource('kotlin', src);
+    const out = [];
+    const isEnumClass = (node) => {
+        const mods = node.namedChildren.find((c) => c != null && c.type === 'modifiers');
+        return mods != null && /\benum\b/.test(mods.text);
+    };
+    const walk = (node) => {
+        if (node.type === 'class_declaration' && isEnumClass(node)) {
+            const name = nameOrIdent(node) ?? '';
+            const body = node.namedChildren.find((c) => c != null && c.type === 'enum_class_body');
+            const constants = [];
+            if (body) {
+                for (const c of body.namedChildren) {
+                    if (c && c.type === 'enum_entry') {
+                        const cn = c.childForFieldName('name')?.text ?? c.namedChildren.find((x) => x != null && x.type === 'identifier')?.text;
+                        if (cn)
+                            constants.push(cn);
+                    }
+                }
+            }
+            if (name)
+                out.push({ enumName: name, constants, relPath, line: startLine(node) });
+        }
+        for (const c of node.namedChildren)
+            if (c)
+                walk(c);
+    };
+    walk(root);
+    return out;
+}
+/** 한 소스 파일의 enum 을 추출한다 — 확장자로 Java/Kotlin 파서를 고른다. */
+export async function extractEnums(relPath, src) {
+    return langOf(relPath) === 'kotlin' ? extractEnumsKotlin(relPath, src) : extractEnumsJava(relPath, src);
 }
 /**
  * 여러 Java 파일(relPaths)을 스캔해 분기 신호 집합을 만든다(IO).

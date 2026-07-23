@@ -11,6 +11,7 @@ import type { GeneratedDoc, Evidence, TableRow } from '../types.js'
 import { type DocInput, nodesOfType } from './shared.js'
 import { namespaceBaseName } from '../../mybatis/index.js'
 import type { MyBatisModel } from '../../mybatis/types.js'
+import { isRawSqlModelEmpty, type RawSqlModel } from '../raw-sql.js'
 import { reachableMethods } from '../../domain-map/method-calls.js'
 import type { MethodCallGraph } from '../../domain-map/types.js'
 
@@ -233,6 +234,61 @@ function buildByTablePrecise(input: DocInput, model: MyBatisModel, graph: Method
   return doc(columns, rows, PRECISE_PROSE)
 }
 
+/** 코드 raw SQL prose — 비-MyBatis 영속화의 SQL 문자열에서 CRUD 판정. */
+const RAW_SQL_PROSE =
+  'MyBatis 매퍼가 없어(손수 짠 JDBC/영속화) 코드 내 SQL 문자열에서 테이블·CRUD 를 판정한다 ' +
+  '(select/join=R, insert=C, update=U, delete=D). 테이블은 DB 스키마(db-schema)에 실재하는 것만 ' +
+  '축으로 세운다. 귀속은 흐름이 도달하는 영속화 파일 단위다(핸들러 단위 정밀 추적은 후속). 근거=소스 file:line.'
+
+/**
+ * 기능×테이블 (raw SQL 폴백) — MyBatis·JPA 신호가 없는 손수 짠 영속화 프로젝트용.
+ * 흐름이 도달하는 step 의 파일 SQL(rawSqlModel)에서 테이블×CRUD 를 귀속한다.
+ * layer 에 의존하지 않는다(영속화 파일이 service 로 오분류돼도 filePath 로 매칭).
+ */
+function buildByRawSql(input: DocInput, model: RawSqlModel): GeneratedDoc {
+  const stepById = new Map(input.nodes.filter((n) => n.type === 'step').map((n) => [n.id, n]))
+  const flows = nodesOfType(input.nodes, 'flow')
+  const tablesSet = new Set<string>()
+  const perFlow = new Map<string, { byTable: Map<string, Set<string>>; ev: Evidence[] }>()
+  for (const flow of flows) {
+    const byTable = new Map<string, Set<string>>()
+    const ev: Evidence[] = []
+    const evSeen = new Set<string>()
+    for (const e of input.edges) {
+      if (e.type !== 'flow_step' || e.source !== flow.id) continue
+      const step = stepById.get(e.target)
+      if (!step || typeof step.filePath !== 'string') continue
+      const accesses = model.byFile[step.filePath]
+      if (!accesses) continue
+      for (const a of accesses) {
+        tablesSet.add(a.table)
+        const set = byTable.get(a.table) ?? new Set<string>()
+        set.add(a.crud)
+        byTable.set(a.table, set)
+        const key = `${step.filePath}:${a.line}`
+        if (!evSeen.has(key)) {
+          evSeen.add(key)
+          ev.push({ file: step.filePath, line: a.line })
+        }
+      }
+    }
+    perFlow.set(flow.id, { byTable, ev })
+  }
+  const tableCols = [...tablesSet].sort(cmp)
+  const columns = ['기능', ...tableCols]
+  const rows: TableRow[] = flows.map((flow): TableRow => {
+    const { byTable, ev } = perFlow.get(flow.id)!
+    const cells = [
+      flow.name.length > 0 ? flow.name : flow.id,
+      ...tableCols.map((t) => (byTable.has(t) ? crudCell(byTable.get(t)!) : '')),
+    ]
+    return ev.length > 0
+      ? { cells, confidence: 'CONFIRMED', evidence: ev }
+      : { cells, confidence: 'INFERRED', evidence: [] }
+  })
+  return doc(columns, rows, RAW_SQL_PROSE)
+}
+
 export function buildCrudMatrix(input: DocInput): GeneratedDoc {
   const model = input.mybatisModel
   if (model && model.mappers.length > 0) {
@@ -241,5 +297,7 @@ export function buildCrudMatrix(input: DocInput): GeneratedDoc {
     // 폴백: 파일 단위 사용메서드 라벨(과다귀속 가능, caveat).
     return buildByTable(input, model)
   }
+  // 비-MyBatis: 코드 raw SQL 로 기능×테이블(db-schema 필터). 신호 없으면 기능×DAO 폴백.
+  if (!isRawSqlModelEmpty(input.rawSqlModel)) return buildByRawSql(input, input.rawSqlModel!)
   return buildByDao(input)
 }

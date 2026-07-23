@@ -255,7 +255,7 @@ export function loadMinimalKgInputs(projectRoot) {
  */
 export const ANALYZED_AT_SENTINEL = '1970-01-01T00:00:00.000Z';
 /** analyzedAt 결정론 해석 — gitCommit 있으면 커밋 시각, 없으면(또는 조회 실패) 센티널. */
-function resolveAnalyzedAt(projectRoot, gitCommit) {
+export function resolveAnalyzedAt(projectRoot, gitCommit) {
     if (gitCommit) {
         const fromCommit = gitCommitDate(projectRoot, gitCommit);
         if (fromCommit)

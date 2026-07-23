@@ -113,6 +113,8 @@ export declare function loadMinimalKgInputs(projectRoot: string): Omit<MinimalKg
  * "커밋 시각을 모른다"는 사실 자체가 결정론적이니 그 사실을 고정값으로 표현한다.
  */
 export declare const ANALYZED_AT_SENTINEL = "1970-01-01T00:00:00.000Z";
+/** analyzedAt 결정론 해석 — gitCommit 있으면 커밋 시각, 없으면(또는 조회 실패) 센티널. */
+export declare function resolveAnalyzedAt(projectRoot: string, gitCommit: string | null): string;
 export type MinimalKgWriteAction = 'written' | 'skipped-existing-llm-kg' | 'skipped-invalid-target';
 export interface MinimalKgWriteResult {
     action: MinimalKgWriteAction;

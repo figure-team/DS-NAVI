@@ -239,7 +239,14 @@ function runAnalyze() {
   console.log(`영향도 분석 완료 — ${projectRoot}`)
   console.log(`  상류(영향받는 호출자): 파일 ${result.upstream.files.length} · API ${result.upstream.api.length} · 흐름 ${result.upstream.flows.length} · 도메인 ${result.upstream.domains.length}`)
   console.log(`  하류(의존 협력자): 파일 ${result.downstream.files.length}`)
-  console.log(`  DB/영속성: 매퍼 ${result.upstream.persistence.mappers.length} (SQL ${result.upstream.persistence.sqlFiles.length})`)
+  {
+    const p = result.upstream.persistence
+    const jpaN = (p.jpaTables ?? []).length
+    console.log(
+      `  DB/영속성: 매퍼 ${p.mappers.length} (SQL ${p.sqlFiles.length})` +
+        (jpaN > 0 ? ` · JPA 테이블 ${jpaN} (${p.jpaTables.map((t) => t.tableName).join(', ')})` : ''),
+    )
+  }
   console.log(`  검토 필요: ${result.needsReview.length}건 · 근거율(인용 보유): ${verify.overall.groundedPct}%`)
   if (suggestion) {
     console.log(`  생성예측(${suggestion.strength}): [변경] ${suggestion.change.length} · [생성] ${suggestion.create.length} · [영향] ${suggestion.impact.length}`)

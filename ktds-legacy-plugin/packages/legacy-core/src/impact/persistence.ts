@@ -31,8 +31,16 @@ export interface PersistenceInputs {
 }
 
 /**
- * dataImpactSet 에 든 @Entity 파일의 entity↔table 영향(AC-16). 명시 @Table = CONFIRMED,
+ * dataImpactSet 에 걸린 @Entity/리포지토리의 entity↔table 영향(AC-16). 명시 @Table = CONFIRMED,
  * 암묵 명명전략 = INFERRED. 컬럼도 명시/암묵 신뢰도를 승계. entity 선언 라인을 앵커로.
+ *
+ * 영향 대상 엔티티는 두 경로로 잡는다:
+ *   (a) @Entity 파일이 dataSet 에 든 경우(엔티티 직접 변경).
+ *   (b) Spring Data 리포지토리 파일이 dataSet 에 들고 그 리포가 관리하는 엔티티
+ *       (리포지토리 변경/시드 → 관리 테이블 영향). 제네릭 상위타입 `JpaRepository<T>` 는
+ *       forward 엣지를 만들지 않아 리포는 하류 폐포로 엔티티에 도달하지 못한다 — jpa-model 의
+ *       repo→entityType 매핑으로 보완한다(리포/DAO 는 가장 흔한 영향 시드).
+ * 테이블 근거는 언제나 실제 @Entity 선언(file:line) — 리포 경로여도 grounding 은 엔티티다.
  */
 function computeJpaTables(
   dataImpactSet: ReadonlySet<string>,
@@ -40,8 +48,10 @@ function computeJpaTables(
 ): JpaTableImpact[] {
   if (!jpaModel) return []
   const out: JpaTableImpact[] = []
-  for (const e of jpaModel.entities) {
-    if (!dataImpactSet.has(e.relPath)) continue
+  const emittedRel = new Set<string>() // relPath 기준 중복 제거(엔티티+리포 공존 시 1건).
+  const emit = (e: (typeof jpaModel.entities)[number]): void => {
+    if (emittedRel.has(e.relPath)) return
+    emittedRel.add(e.relPath)
     out.push({
       entityClass: e.className,
       relPath: e.relPath,
@@ -53,6 +63,14 @@ function computeJpaTables(
         .map((c) => ({ column: c.columnName, confidence: c.confidence, line: c.line }))
         .sort((a, b) => cmp(a.column, b.column)),
     })
+  }
+  // (a) @Entity 파일이 dataSet 에 — relPath 기준(동일 simple 명 엔티티도 각각 emit, 붕괴 없음).
+  for (const e of jpaModel.entities) if (dataImpactSet.has(e.relPath)) emit(e)
+  // (b) 리포지토리 파일이 dataSet 에 → 관리 엔티티(entityType 해소). 미해소면 스킵(합성 금지).
+  for (const r of jpaModel.repositories) {
+    if (!r.entityType || !dataImpactSet.has(r.relPath)) continue
+    const e = jpaModel.entities.find((x) => x.className === r.entityType)
+    if (e) emit(e)
   }
   return out.sort((a, b) => cmp(a.relPath, b.relPath) || cmp(a.entityClass, b.entityClass))
 }

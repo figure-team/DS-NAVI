@@ -79,6 +79,26 @@ describe('impact jpaTables db-grounding (AC-16)', () => {
     expect(t.confidence).toBe('INFERRED')
   })
 
+  it('dataSet 의 리포지토리 → 관리 엔티티 테이블(제네릭 상위타입 forward 엣지 부재 보완)', () => {
+    const ownerRepo = relOf('OwnerRepository')
+    const owner = relOf('Owner')
+    // 리포지토리만 dataSet 에(엔티티 파일은 없음) — 리포/DAO 시드 시나리오.
+    const out = computePersistenceImpact(new Set([ownerRepo]), [], [], { jpaModel: model })
+    expect(out.jpaTables).toHaveLength(1)
+    const t = out.jpaTables[0]
+    expect(t.entityClass).toBe('Owner')
+    expect(t.tableName).toBe('owners')
+    // 테이블 근거는 리포가 아니라 실제 @Entity 선언(grounding=엔티티).
+    expect(t.citation.filePath).toBe(owner)
+  })
+
+  it('엔티티와 리포가 둘 다 dataSet 에 있어도 테이블은 1건(중복 제거)', () => {
+    const ownerRepo = relOf('OwnerRepository')
+    const owner = relOf('Owner')
+    const out = computePersistenceImpact(new Set([ownerRepo, owner]), [], [], { jpaModel: model })
+    expect(out.jpaTables.filter((t) => t.entityClass === 'Owner')).toHaveLength(1)
+  })
+
   it('jpaModel 없으면 jpaTables=[](MyBatis 전용 회귀 안전)', () => {
     const out = computePersistenceImpact(new Set(['x']), [], [], {})
     expect(out.jpaTables).toEqual([])

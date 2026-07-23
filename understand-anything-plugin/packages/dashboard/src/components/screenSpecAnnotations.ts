@@ -21,6 +21,8 @@ export interface Annotation {
   handler: Handler | null;
   description: string | null;
   note: string | null;
+  /** 앱 셸 공통 크롬 region 태그(캡처가 el.closest 로 기록) — 있으면 화면 고유 사양에서 접는다. */
+  region?: string | null;
 }
 export interface Screen {
   id: string;
@@ -129,4 +131,57 @@ export function computeCommonHrefs(screens: Screen[]): ReadonlySet<string> {
   const common = new Set<string>();
   for (const [h, ids] of byHref) if (ids.size >= threshold) common.add(h);
   return common;
+}
+
+/**
+ * 비링크(버튼·입력) 공통 판정 임계 — 전체 화면의 80%, 최소 3화면(결함 2).
+ * 링크(25%)보다 훨씬 높다: 버튼·입력은 반복돼도 대체로 그 화면의 고유 사양이라
+ * (기존 test 가 못박은 원칙) 거의 전 화면 반복(상단바 로그아웃·저장·⌘K)일 때만 접는다.
+ * 구조 신호(region 태그)가 있으면 임계와 무관하게 접으므로, 이 빈도 축은 region 이
+ * 없는(구버전 산출물·커스텀 셸) 경우의 폴백이다.
+ */
+export const commonChromeThreshold = (screenCount: number) => Math.max(3, Math.ceil(screenCount * 0.8));
+
+/** 비링크 공통 판정 키 — 같은 종류+라벨(정규화). href 없는 상태 버튼·입력의 반복 식별. */
+const chromeKeyOf = (a: Annotation): string => `${a.kind}|${(a.label ?? "").replace(/\s+/g, " ").trim()}`;
+
+export interface CommonChrome {
+  /** 공통 링크 href(25% 임계) — 기존 computeCommonHrefs 와 동일. */
+  linkHrefs: ReadonlySet<string>;
+  /** 공통 버튼·입력 키(kind|label, 80% 임계). */
+  chromeKeys: ReadonlySet<string>;
+}
+
+/**
+ * 공통 크롬(앱 셸) 판정 재료(결함 2) — 좌측 내비·상단바처럼 전 화면 반복되는 요소를
+ * 화면 고유 사양에서 접기 위한 빈도 집계. 링크는 href 25%, 비링크는 kind|label 80%.
+ * region 태그(구조 신호)는 isCommonChrome 이 별도로 최우선 반영한다.
+ */
+export function computeCommonChrome(screens: Screen[]): CommonChrome {
+  const linkHrefs = computeCommonHrefs(screens);
+  const byKey = new Map<string, Set<string>>();
+  for (const s of screens) {
+    for (const a of s.annotations) {
+      if (a.kind === "link") continue; // 링크는 href 축이 담당
+      const k = chromeKeyOf(a);
+      let ids = byKey.get(k);
+      if (!ids) byKey.set(k, (ids = new Set()));
+      ids.add(s.id);
+    }
+  }
+  const threshold = commonChromeThreshold(screens.length);
+  const chromeKeys = new Set<string>();
+  for (const [k, ids] of byKey) if (ids.size >= threshold) chromeKeys.add(k);
+  return { linkHrefs, chromeKeys };
+}
+
+/**
+ * 이 주석이 앱 셸 공통 크롬인가(결함 2) — 화면 고유 사양이 아니라 접기 대상.
+ *  1) 구조 신호 최우선: region 태그가 있으면 무조건 공통(캡처가 nav/header 안에서 관측).
+ *  2) 빈도 폴백: 링크는 공통 href, 비링크는 공통 kind|label(region 없는 산출물 대비).
+ */
+export function isCommonChrome(a: Annotation, common: CommonChrome): boolean {
+  if (a.region) return true;
+  if (a.kind === "link") return !!a.mechanical.href && common.linkHrefs.has(a.mechanical.href);
+  return common.chromeKeys.has(chromeKeyOf(a));
 }

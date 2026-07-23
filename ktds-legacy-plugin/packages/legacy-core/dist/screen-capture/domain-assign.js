@@ -27,9 +27,19 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { z } from 'zod';
 import { readMapArtifact, stableJson, CONFIRMED_PLAN_FILENAME, SLICES_FILENAME, } from '../domain-map/persist.js';
 import { ConfirmedPlanSchema, SlicesReportSchema } from '../domain-map/types.js';
 import { ScreensFileSchema, SCREENS_FILENAME } from './types.js';
+/**
+ * 화면→도메인 결정론 힌트 파일(결함 3, 축 D) — `.spec/map/` 아래. SPA 처럼 서버 렌더 신호가
+ * 없어 ⓪①②③④ 가 전부 0표인 화면을, 사람이 화면 id → 확정 플랜 도메인 키로 직접 매핑한다.
+ * assign 이 이걸 *최우선* 축으로 소비하므로 재실행해도 보존된다(과거엔 수동 screens[].domain 을
+ * assign 이 미배정으로 덮어써, 우회가 산출물에만 남고 도구엔 안 남는 결함이 있었다).
+ * 형식: { "screen:...": "domainKey", ... } — 키는 확정 플랜 도메인 key 여야 의미가 있다(강제 아님).
+ */
+export const SCREEN_DOMAIN_MAP_FILENAME = 'screen-domain-map.json';
+export const ScreenDomainMapSchema = z.record(z.string(), z.string());
 /** `.spec/map/` 의 확정 플랜·슬라이스에서 조인 컨텍스트를 만든다(부재는 빈 맵). */
 export function loadDomainAssignContext(projectRoot) {
     const plan = readMapArtifact(projectRoot, CONFIRMED_PLAN_FILENAME, ConfirmedPlanSchema);
@@ -44,7 +54,14 @@ export function loadDomainAssignContext(projectRoot) {
         if (o.owners.length > 0)
             ownersByFile.set(o.relPath, o.owners);
     }
-    return { domainByRoot, ownersByFile, planDomainCount: plan?.domains.length ?? 0 };
+    const overrideRec = readMapArtifact(projectRoot, SCREEN_DOMAIN_MAP_FILENAME, ScreenDomainMapSchema);
+    const domainOverrides = new Map(Object.entries(overrideRec ?? {}));
+    return {
+        domainByRoot,
+        ownersByFile,
+        planDomainCount: plan?.domains.length ?? 0,
+        domainOverrides,
+    };
 }
 // ──────────────────────────────────────────────────────────────────────────
 // 다수결(①②)
@@ -214,18 +231,60 @@ function planKeyFromPath(path, planKeys) {
     return null;
 }
 /**
+ * 시나리오 접미 토큰 → 플랜 키(결함 3, 축 C) — SPA 는 URL 이 항상 `(root)` 라 ④ URL 축이
+ * 무력하고, 화면 구분이 시나리오 id 접미(`screen:(root)__s_trust-register`)에만 남는다.
+ * 시나리오 id/화면 id 접미를 토큰화(`-_./` 분리)해 확정 플랜 키와 대조한다:
+ *   "trust-register" → [trust, register] → planKey "trust"
+ *   "royalty.settlement" → planKey "royalty" (또는 "royalty.settlement" 창 일치)
+ * 가장 긴 토큰 창을 가장 이른 시작에서 채택(결정론). 일치가 없으면 null.
+ */
+function planKeyFromScenario(scenario, screenId, planKeys) {
+    if (planKeys.size === 0)
+        return null;
+    // 후보 출처: scenario 필드 + 화면 id 의 `__s_`/`__` 접미(둘 다 시나리오 유래).
+    const suffix = screenId.includes('__') ? screenId.split('__').slice(1).join('__') : '';
+    const sources = [scenario ?? '', suffix.replace(/^s_/, '')];
+    for (const src of sources) {
+        const tokens = src.split(/[-_./]+/).filter(Boolean);
+        if (tokens.length === 0)
+            continue;
+        for (let start = 0; start < tokens.length; start++) {
+            for (let end = tokens.length; end > start; end--) {
+                const cand = tokens.slice(start, end).join('.');
+                if (planKeys.has(cand))
+                    return cand;
+            }
+        }
+    }
+    return null;
+}
+/**
  * 전 화면 domain 재배정(순수·멱등) — 기존 domain 값은 보지 않고 항상 새로 계산한다
  * (과거 실행·수동 편집의 낡은 값이 남지 않게. 사람 편집은 *-overrides 소관).
  */
 export function assignScreenDomains(screens, ctx) {
     const cap = Math.max(DERIVED_GROUP_CAP, ctx.planDomainCount);
-    const byMethod = { handlerJoin: 0, viewFileJoin: 0, viewFolder: 0, urlFolder: 0, unassigned: 0 };
+    const byMethod = {
+        override: 0,
+        handlerJoin: 0,
+        viewFileJoin: 0,
+        viewFolder: 0,
+        urlFolder: 0,
+        scenarioToken: 0,
+        unassigned: 0,
+    };
     const commonChrome = computeCommonChromeKeys(screens);
     const planKeys = new Set(ctx.domainByRoot.values());
     // ③ 파생 축(전 화면 jspFile)은 ⓪ 플랜 키 일치 판정에도 쓰므로 먼저 계산한다.
     const viewFolder = deriveFolderGroups(screens.map((s) => s.jspFile), cap);
-    // ⓪①② — 화면 단위 조인.
+    // 축 D + ⓪①② — 화면 단위 조인.
     const joined = screens.map((s, i) => {
+        // 축 D — screen-domain-map.json 결정론 힌트가 최우선(재실행 보존). 다른 축을 건너뛴다.
+        const override = ctx.domainOverrides.get(s.id);
+        if (override) {
+            byMethod.override++;
+            return override;
+        }
         // ⓪ 뷰 경로 → 플랜 키: 파생 폴더 단일 일치 or 경로 윈도우 "."-조인 일치.
         const folder = viewFolder[i];
         if (folder && planKeys.has(folder)) {
@@ -265,6 +324,14 @@ export function assignScreenDomains(screens, ctx) {
             else if (urlFolder[i]) {
                 domain = urlFolder[i];
                 byMethod.urlFolder++;
+            }
+        }
+        // 축 C — 시나리오 접미 토큰 → 플랜 키(SPA 폴백: URL 이 (root) 하나라 ④ 가 무력할 때).
+        if (!domain) {
+            const scn = planKeyFromScenario(s.scenario, s.id, planKeys);
+            if (scn) {
+                domain = scn;
+                byMethod.scenarioToken++;
             }
         }
         if (!domain)

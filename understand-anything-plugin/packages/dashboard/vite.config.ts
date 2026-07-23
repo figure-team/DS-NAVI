@@ -1599,7 +1599,7 @@ function reconcileImpactHistory(projectRoot: string): void {
 // 죽어도 원장은 "마지막으로 완료된 단계"를 정확히 가리킨다(단계별 CLI append 가 WAL 역할).
 // 실행은 impact 의 시드 게이트와 동형 2-spawn: prepare(수령+시드 판정, 결정론) → 사용자
 // 시드 확정 → resolve(analyze+해결방안서+finalize, 유일한 LLM 산문 단계).
-const INCIDENT_DROP_DIR = path.join("ds-hub", "장애"); // 계약 C2(가칭) — 경로 확정 시 여기 1곳
+const INCIDENT_DROP_DIR = path.join("ds-hub", "issues"); // 계약 C2 — 경로 확정 시 여기 1곳
 /** /incident-item 이 서빙하는 건별 파일 화이트리스트. */
 const INCIDENT_ITEM_FILES = new Set([
   "report.md",

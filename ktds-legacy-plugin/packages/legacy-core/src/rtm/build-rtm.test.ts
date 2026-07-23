@@ -109,3 +109,103 @@ describe('buildRtm (R1, AS-IS)', () => {
     expect(JSON.stringify(buildRtm(fixture(), 'c'))).toBe(JSON.stringify(buildRtm(fixture(), 'c')))
   })
 })
+
+/** 비-MyBatis fixture — 손수 영속화(rawSqlModel) + 테스트 링크(testLinks). */
+function kotlinFixture(): DocInput {
+  const nodes = [
+    { id: 'd1', type: 'domain', name: '정산', summary: '', tags: [], complexity: 'simple' },
+    {
+      id: 'f1',
+      type: 'flow',
+      name: '사용내역 인입',
+      summary: '',
+      tags: [],
+      complexity: 'simple',
+      filePath: 'src/main/kotlin/Ingestor.kt',
+      lineRange: [1, 20],
+      domainMeta: { entryPoint: 'Ingestor#ingest' },
+    },
+    {
+      id: 's1',
+      type: 'step',
+      name: 'UsageStore',
+      summary: '',
+      tags: [],
+      complexity: 'simple',
+      layer: 'service', // 손수 영속화는 dao 로 분류 안 됨 — 그래도 매칭돼야 한다
+      filePath: 'src/main/kotlin/UsageStore.kt',
+    },
+  ]
+  const edges = [
+    { source: 'd1', target: 'f1', type: 'contains_flow' },
+    { source: 'f1', target: 's1', type: 'flow_step' },
+  ]
+  return {
+    nodes,
+    edges,
+    routes: { schemaVersion: 1, gitCommit: null, contextPath: null, batchEntries: [], routes: [] },
+    mybatisModel: null,
+    rawSqlModel: {
+      byFile: {
+        'src/main/kotlin/UsageStore.kt': [
+          { table: 'usage_staging', crud: 'C', line: 12 },
+          { table: 'usage_staging', crud: 'R', line: 30 },
+        ],
+      },
+    },
+    testLinks: {
+      byProdClass: {
+        UsageStore: [
+          { testFile: 'src/test/kotlin/UsageStoreTest.kt', testClass: 'UsageStoreTest', prodClass: 'UsageStore', line: 8, convention: true },
+        ],
+        Ingestor: [
+          { testFile: 'src/test/kotlin/BroadIntegrationTest.kt', testClass: 'BroadIntegrationTest', prodClass: 'Ingestor', line: 40, convention: false },
+        ],
+      },
+    },
+  } as unknown as DocInput
+}
+
+describe('buildRtm — 비-MyBatis 데이터/테스트 축(Kotlin 손수영속)', () => {
+  it('데이터 축을 코드 raw SQL 에서 테이블×CRUD 로 채운다(MyBatis 부재)', () => {
+    const row = buildRtm(kotlinFixture()).functions[0]
+    expect(row.data.value).toBe('usage_staging(CR)')
+    expect(row.data.confidence).toBe('CONFIRMED')
+    expect(row.data.evidence).toEqual([
+      { file: 'src/main/kotlin/UsageStore.kt', line: 12 },
+      { file: 'src/main/kotlin/UsageStore.kt', line: 30 },
+    ])
+  })
+
+  it('테스트 축을 프로덕션 클래스 참조로 링크한다 — 관례(XxxTest) 있으면 그것만·CONFIRMED', () => {
+    const row = buildRtm(kotlinFixture()).functions[0]
+    // UsageStoreTest(관례)가 있으므로 광역 BroadIntegrationTest(참조-only)는 제외된다.
+    expect(row.test.value).toBe('UsageStoreTest')
+    expect(row.test.confidence).toBe('CONFIRMED')
+    expect(row.test.evidence).toEqual([{ file: 'src/test/kotlin/UsageStoreTest.kt', line: 8 }])
+  })
+
+  it('관례 테스트가 없으면 참조 링크 전부·INFERRED', () => {
+    const fx = kotlinFixture()
+    // 관례 링크 제거 → 참조-only 만 남긴다.
+    ;(fx.testLinks as { byProdClass: Record<string, unknown[]> }).byProdClass.UsageStore = []
+    const row = buildRtm(fx).functions[0]
+    expect(row.test.value).toBe('BroadIntegrationTest')
+    expect(row.test.confidence).toBe('INFERRED')
+  })
+
+  it('테스트 링크 부재 시 UNVERIFIED 빈 셀(합성 금지)', () => {
+    const fx = kotlinFixture()
+    fx.testLinks = { byProdClass: {} }
+    const row = buildRtm(fx).functions[0]
+    expect(row.test).toEqual({ value: '', confidence: 'UNVERIFIED', evidence: [] })
+  })
+
+  it('rawSqlModel·mybatis 둘 다 없으면 데이터 축은 빈 INFERRED', () => {
+    const fx = kotlinFixture()
+    fx.rawSqlModel = { byFile: {} }
+    const row = buildRtm(fx).functions[0]
+    expect(row.data.value).toBe('')
+    expect(row.data.confidence).toBe('INFERRED')
+  })
+})

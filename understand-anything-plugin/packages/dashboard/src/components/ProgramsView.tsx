@@ -1014,7 +1014,10 @@ export default function ProgramsView() {
   );
 }
 
-/** 도메인 셀 — 단일 도메인은 /domains/:key 로 점프, 복합(a+b)은 텍스트. via 신뢰도 배지 병기. */
+/** 도메인 셀 — 단일 도메인은 /domains/:key 로 점프, 복합(a+b)은 "공유 N개" 배지(툴팁에 전체 목록).
+ *  via 신뢰도 배지 병기. 복합 도메인 문자열은 전 도메인 나열(최장 236자)이라 통째 렌더하면 도메인
+ *  열이 표 폭의 73%를 먹어 레이아웃이 깨진다 — 짧은 배지로 압축해 열 폭을 정상화한다(행 검색은
+ *  p.domain 전체 문자열을 haystack 에 유지하므로 도메인명 검색은 그대로 동작). */
 function DomainCell({ domain, via, q }: { domain: string | null; via?: string | null; q: string }) {
   if (!domain) {
     return (
@@ -1027,6 +1030,7 @@ function DomainCell({ domain, via, q }: { domain: string | null; via?: string | 
     );
   }
   const single = !domain.includes("+");
+  const domains = single ? [domain] : domain.split("+").filter(Boolean);
   const viaInfo = via ? VIA_DISPLAY[via] : undefined;
   return (
     <span className="inline-flex items-center gap-1.5">
@@ -1039,9 +1043,9 @@ function DomainCell({ domain, via, q }: { domain: string | null; via?: string | 
           <Highlight text={domain} q={q} />
         </Link>
       ) : (
-        <span className="text-text-secondary">
-          <Highlight text={domain} q={q} />
-        </span>
+        <Badge tone="info" title={`공유 도메인 ${domains.length}개: ${domains.join(", ")}`}>
+          공유 {domains.length}개
+        </Badge>
       )}
       {viaInfo && (
         <Badge tone={viaInfo.tone} title={viaInfo.title}>

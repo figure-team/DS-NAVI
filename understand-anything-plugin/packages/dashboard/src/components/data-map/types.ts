@@ -71,6 +71,12 @@ export interface CrudMatrix {
   prose?: string;
   columns: string[];
   rows: CrudRow[];
+  /** 데이터축(테이블/CRUD)이 비어 열이 '기능' 하나뿐인가 — 조용한 퇴화 정직 표기. */
+  degraded?: boolean;
+  /** 퇴화 사유(비-MyBatis·비-JPA 신호 전무 / db-schema 부재). */
+  degradedReason?: "no-mybatis-no-dao-no-sql" | "no-db-schema" | null;
+  /** 데이터축 출처(mybatis / raw-sql / dao / none) — 진단 표기용. */
+  source?: "mybatis" | "raw-sql" | "dao" | "none";
 }
 
 /* ── 공용 헬퍼 ── */

@@ -59,7 +59,10 @@ export {
   assignScreenDomainsOnDisk,
   loadDomainAssignContext,
   deriveFolderGroups,
+  SCREEN_DOMAIN_MAP_FILENAME,
+  ScreenDomainMapSchema,
 } from './domain-assign.js'
+export type { ScreenDomainMap } from './domain-assign.js'
 export {
   loadViewResolverConfigs,
   resolveViewName,

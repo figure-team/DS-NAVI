@@ -67,6 +67,14 @@ export function scaffoldScreensConfig(input) {
         notes.push('startCommand 미감지 — 앱 기동 명령을 직접 채우거나, 앱을 띄워둔 채 capture 를 실행하세요(README/CI 워크플로에 실행 방법이 있는 경우가 많습니다).');
     }
     notes.push('로그인이 필요한 앱이면 scenarios 에 테스트 계정 로그인 스텝을 채우세요(계정·셀렉터는 코드에서 유추 불가 — 첫 capture 의 auth-gated 트리아지가 대상 화면을 알려줍니다).');
+    // SPA 정직 경고(결함 1) — 라우트는 있는데 GET-safe 목록성 시드가 0건이면 REST-only(JSON API)
+    // 라 크롤·census 로 화면을 못 늘린다. 상태 기반 SPA(react-router 없음)는 커버리지가 손으로
+    // 짠 시나리오 수에 갇히므로, 골든패스만 짜서 조용히 축소되지 않게 미리 규율을 박는다.
+    const spaSuspected = input.routes.length > 0 && seeds.length === 0;
+    if (spaSuspected) {
+        notes.push(`⚠️ SPA 의심 — routes ${input.routes.length}건이 전부 REST/비목록성이라 크롤 시드가 0건입니다. ` +
+            '클라이언트 라우팅 SPA 라면 화면은 시나리오로만 커버됩니다 — 골든패스만 짜지 말고 전수 화면을 시나리오로(화면=시나리오 1:1) 작성하세요.');
+    }
     const screens = ScreensConfigSchema.parse({
         baseUrl,
         ...(command ? { startCommand: command } : {}),
@@ -81,6 +89,7 @@ export function scaffoldScreensConfig(input) {
             baseUrl,
             startCommand: command,
             startCommandSource: source,
+            spaSuspected,
             notes,
         },
     };

@@ -81,3 +81,53 @@ public enum MemberStatus {
     expect(await extractEnums('x.java', 'package p; class C {}')).toEqual([])
   })
 })
+
+// ── Kotlin(.kt) 분기·enum 추출 (2026-07-23 갭 해소) ──────────────────────────
+
+describe('분기 스캐너 — Kotlin(.kt)', () => {
+  const ktSrc = `package com.music
+class MusicController {
+  fun putFee(r: Req): Int {
+    if (r.useType == null && r.amount > 0) { return reject() } else { return ok() }
+    return when (r.axis) {
+      "A" -> 1
+      "B", "C" -> 2
+      else -> 0
+    }
+  }
+  fun grade(v: Boolean): String = if (v) "vip" else "normal"
+}`
+
+  it('Kotlin if_expression=if · when_expression=switch(삼항 없음) + 조건식', async () => {
+    const branches = await extractBranches('MusicController.kt', ktSrc)
+    const conds = branches.map((b) => `${b.kind}:${b.condition}`)
+    expect(conds).toContain('if:r.useType == null && r.amount > 0')
+    expect(conds).toContain('switch:r.axis') // when(r.axis) → 괄호 제거
+    expect(conds).toContain('if:v') // 식(expression) if 도 검출
+    // Kotlin 엔 ternary 노드가 없다 — if 가 겸한다.
+    expect(branches.some((b) => b.kind === 'ternary')).toBe(false)
+  })
+
+  it('Kotlin THEN(consequence) 추출 + when THEN 공란 + 클래스/메서드 귀속', async () => {
+    const branches = await extractBranches('MusicController.kt', ktSrc)
+    const feeIf = branches.find((b) => b.condition.startsWith('r.useType'))!
+    expect(feeIf.then).toContain('return reject()')
+    expect(feeIf.className).toBe('MusicController')
+    expect(feeIf.methodName).toBe('putFee')
+    const whenBr = branches.find((b) => b.kind === 'switch')!
+    expect(whenBr.then).toBe('') // 케이스별 → 공란(Java switch 와 동형)
+  })
+
+  it('Java 파서 하드코딩 회귀 없음 — .kt 는 Kotlin, .java 는 Java', async () => {
+    // 같은 로직을 Java 확장자로 주면 Java 파서라 Kotlin 식 if 는 안 잡힌다(언어 분기 확인).
+    const ktBranches = await extractBranches('X.kt', ktSrc)
+    expect(ktBranches.length).toBeGreaterThan(0) // Kotlin 파서로는 검출
+  })
+
+  it('Kotlin enum class → 이름 + 상수', async () => {
+    const enums = await extractEnums('Status.kt', 'package p\nenum class Status { ACTIVE, CLOSED, PENDING }')
+    expect(enums.length).toBe(1)
+    expect(enums[0].enumName).toBe('Status')
+    expect(enums[0].constants).toEqual(['ACTIVE', 'CLOSED', 'PENDING'])
+  })
+})

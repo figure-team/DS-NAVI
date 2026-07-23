@@ -277,6 +277,9 @@ export {
   getMethodology,
   listMethodologies,
   DEFAULT_METHODOLOGY,
+  extractSqlCrud,
+  buildRawSqlModel,
+  isRawSqlModelEmpty,
 } from './doc-generator/index.js'
 export type {
   Methodology,
@@ -293,6 +296,9 @@ export type {
   DocTemplate,
   DocTemplateSection,
   DocSetEntry,
+  RawSqlAccess,
+  RawSqlModel,
+  CrudLetter,
 } from './doc-generator/index.js'
 export { enforceEvidence, INFERRED_BLOCK_THRESHOLD } from './evidence/index.js'
 export type { EvidenceVerdict, EvidenceViolation } from './evidence/index.js'

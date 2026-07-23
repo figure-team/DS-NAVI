@@ -50,6 +50,8 @@ export interface ScaffoldSummary {
   startCommand: string[] | null
   /** 감지 근거 한 줄(예: "pom.xml cargo-maven3-plugin + mvnw"). */
   startCommandSource: string | null
+  /** 클라이언트 라우팅 SPA 의심(결함 1) — 라우트 존재 + GET-safe 시드 0건. */
+  spaSuspected: boolean
   /** 사람이 확인해야 하는 항목(한국어) — 호출부가 그대로 출력한다. */
   notes: string[]
 }
@@ -116,6 +118,16 @@ export function scaffoldScreensConfig(input: ScaffoldInput): {
   notes.push(
     '로그인이 필요한 앱이면 scenarios 에 테스트 계정 로그인 스텝을 채우세요(계정·셀렉터는 코드에서 유추 불가 — 첫 capture 의 auth-gated 트리아지가 대상 화면을 알려줍니다).',
   )
+  // SPA 정직 경고(결함 1) — 라우트는 있는데 GET-safe 목록성 시드가 0건이면 REST-only(JSON API)
+  // 라 크롤·census 로 화면을 못 늘린다. 상태 기반 SPA(react-router 없음)는 커버리지가 손으로
+  // 짠 시나리오 수에 갇히므로, 골든패스만 짜서 조용히 축소되지 않게 미리 규율을 박는다.
+  const spaSuspected = input.routes.length > 0 && seeds.length === 0
+  if (spaSuspected) {
+    notes.push(
+      `⚠️ SPA 의심 — routes ${input.routes.length}건이 전부 REST/비목록성이라 크롤 시드가 0건입니다. ` +
+        '클라이언트 라우팅 SPA 라면 화면은 시나리오로만 커버됩니다 — 골든패스만 짜지 말고 전수 화면을 시나리오로(화면=시나리오 1:1) 작성하세요.',
+    )
+  }
   const screens = ScreensConfigSchema.parse({
     baseUrl,
     ...(command ? { startCommand: command } : {}),
@@ -130,6 +142,7 @@ export function scaffoldScreensConfig(input: ScaffoldInput): {
       baseUrl,
       startCommand: command,
       startCommandSource: source,
+      spaSuspected,
       notes,
     },
   }

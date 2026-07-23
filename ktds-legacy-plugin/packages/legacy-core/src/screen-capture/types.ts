@@ -85,6 +85,16 @@ export const AnnotationSchema = z.object({
   description: z.string().nullable(),
   /** "※ …" 비고. */
   note: z.string().nullable(),
+  /**
+   * 앱 셸 공통 크롬 영역 태그(결함 2) — 이 요소가 config `screens.chromeSelectors` 중
+   * 어느 region(nav/header/[role=navigation] 등) 안에 있는지. Stage A 가 `el.closest`로
+   * 결정론 기록하고, 대시보드가 화면 고유 사양에서 접어 두는 판정에 쓴다(SPA 좌측 내비·
+   * 상단바처럼 전 화면 반복되는 버튼/링크 분리). null/미설정 = 화면 본문.
+   *
+   * mechanicalProjection(assemble.ts) 밖 필드 — 태깅은 mechanicalHash 를 바꾸지 않고,
+   * 값이 있을 때만 직렬화돼 구버전 산출물의 바이트를 보존한다(seededFrom 과 동형).
+   */
+  region: z.string().nullable().optional(),
 })
 export type Annotation = z.infer<typeof AnnotationSchema>
 
@@ -258,4 +268,6 @@ export interface RawElement {
   visible: boolean
   bbox: BBox
   selector: string
+  /** 공통 크롬 region 태그(결함 2) — config chromeSelectors 중 el.closest 최초 일치. 없으면 null. */
+  region?: string | null
 }

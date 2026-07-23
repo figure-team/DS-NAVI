@@ -6,6 +6,8 @@
 export { RtmConfidenceSchema, RtmTraceCellSchema, TestResultSchema, TestRefSchema, AcKindSchema, AcceptanceCriterionSchema, RtmOriginSchema, RtmFunctionStateSchema, DeliverableRefSchema, RtmFunctionRuleSchema, RtmFunctionRowSchema, RtmDomainSchema, RtmChangesetSchema, RequirementTypeSchema, NfrCategorySchema, RequirementLifecycleSchema, PrioritySchema, RequirementSourceSchema, ChangeReqSchema, SignoffSchema, RtmRequirementSchema, RtmCoverageSchema, RtmDiagnosticSchema, RtmAuditEventSchema, RtmFunctionOverrideSchema, RtmTestOverrideSchema, RtmRequirementOverrideSchema, TestScenarioKindSchema, RtmTestScenarioSchema, RtmScenarioOverrideSchema, RtmCustomFieldSchema, RtmModelSchema, } from './types.js';
 export { buildRtm } from './build-rtm.js';
 export { buildTestScenarios, attachTestScenarios } from './test-scenarios.js';
+export { collectRtmSignals } from './rtm-signals.js';
+export { buildTestLinkModel, isTestFile, isTestLinkModelEmpty } from './test-links.js';
 export { applyRequirements } from './apply-requirements.js';
 export { applyOverlay } from './apply-overlay.js';
 export { computeCoverage } from './coverage.js';

@@ -79,12 +79,12 @@ function enumStatusCodes(enums: EnumFact[]): StatusCode[] {
   )
 }
 
-/** Java enum → §2 용어(이름=용어, 상수 목록=정의). */
+/** enum(Java/Kotlin) → §2 용어(이름=용어, 상수 목록=정의). */
 function enumTerms(enums: EnumFact[]): Term[] {
   return enums.map((e) => ({
     term: e.enumName,
     definition: `enum 상수: ${e.constants.join(', ')}`,
-    note: 'Java enum',
+    note: 'enum',
     evidence: { file: e.relPath, line: e.line },
   }))
 }
@@ -110,9 +110,9 @@ function classNameOf(relPath: string): string {
   return dot > 0 ? base.slice(0, dot) : base
 }
 
-/** 정책 대상 Java? — 운영 소스만(테스트 제외). 정책은 운영 코드 기준. */
-function isPolicyJava(relPath: string): boolean {
-  return relPath.endsWith('.java') && !relPath.includes('/test/')
+/** 정책 대상 소스? — Java/Kotlin 운영 소스만(테스트 제외). 정책은 운영 코드 기준. */
+function isPolicySource(relPath: string): boolean {
+  return (relPath.endsWith('.java') || relPath.endsWith('.kt')) && !relPath.includes('/test/')
 }
 
 /**
@@ -156,7 +156,7 @@ export function buildDomainPolicyInputs(
     key: c.key,
     name: nameByKey.get(c.key) ?? c.key,
     classes: c.files
-      .filter((f) => isPolicyJava(f.relPath))
+      .filter((f) => isPolicySource(f.relPath))
       .map((f) => ({ className: classNameOf(f.relPath), relPath: f.relPath })),
     flows: flowsByKey.get(c.key) ?? [],
     branches: branchesByKey.get(c.key) ?? [],
@@ -287,9 +287,9 @@ export async function assembleDomainPolicies(projectRoot: string): Promise<Domai
   const statusByKey = new Map<string, StatusCode[]>()
   for (const c of candidates.candidates) {
     // 후보 멤버 .java ∪ flow 진입점 .java (둘 다 운영 소스만). 도메인 경계 한정.
-    const files = new Set(c.files.filter((f) => isPolicyJava(f.relPath)).map((f) => f.relPath))
+    const files = new Set(c.files.filter((f) => isPolicySource(f.relPath)).map((f) => f.relPath))
     for (const ef of entryFilesByKey.get(c.key) ?? []) {
-      if (isPolicyJava(ef)) files.add(ef)
+      if (isPolicySource(ef)) files.add(ef)
     }
     // 파일 1회 읽어 분기 + enum 추출 + 텍스트 누적(테이블 참조 scoping 용).
     const signals: BranchSignal[] = []

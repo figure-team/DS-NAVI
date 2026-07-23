@@ -88,8 +88,12 @@ export default function WorkMapTreePanel({
                 <span
                   className="tabular-nums text-text-muted bg-elevated rounded-full"
                   style={{ marginLeft: "auto", flex: "none", fontSize: 10.5, fontWeight: 600, padding: "1px 7px" }}
+                  // 이 화면은 "업무 흐름도"이고 자식 리프가 업무이므로 알약도 업무(items) 수를 센다
+                  // (기능 flowCount 는 상세 패널에서 별도로 본다). 머리 숫자 = 펼친 자식 행 수로 일치.
+                  title={t.domainMap.workCount.replace("{count}", String(d.items.length))}
+                  aria-label={t.domainMap.workCount.replace("{count}", String(d.items.length))}
                 >
-                  {d.flowCount}
+                  {d.items.length}
                 </span>
               </button>
               {/* 자식(업무흐름 리프) — 셰브런 축 가이드 라인 + .doc 행. */}

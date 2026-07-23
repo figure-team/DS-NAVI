@@ -18,7 +18,7 @@ import { parseSource } from './tree-sitter.js';
  * 바뀌면 bump. `java-facts` 섹션은 method-calls.ts 와 공유(동일 extractJavaFacts 출력).
  * `kotlin-facts` 섹션은 kotlin-facts.ts 출력 전용 — Java 와 독립적으로 salt 를 올린다.
  */
-export const JAVA_FACTS_SALT = 'v1';
+export const JAVA_FACTS_SALT = 'v2';
 export const KOTLIN_FACTS_SALT = 'v1';
 const MYBATIS_NS_SALT = 'v1';
 /** 주입 어노테이션(필드/생성자). */

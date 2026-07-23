@@ -50,6 +50,14 @@ const VALIDATION_ANNOTATIONS = new Set([
 function cmp(a, b) {
     return a < b ? -1 : a > b ? 1 : 0;
 }
+/**
+ * i번째 어노테이션의 정확한 라인. 앵커(신 스캐너)가 있으면 그 어노테이션 라인을,
+ * 없으면(구 캐시) 멤버 선언 라인으로 폴백한다. `annotationAnchors` 는 `annotations` 와
+ * 동일 순서·길이라 인덱스로 대응한다.
+ */
+function annoLine(anchors, i, fallback) {
+    return anchors?.[i]?.line ?? fallback;
+}
 /** 코드/DB 모델에서 정책 신호를 결정론으로 추출(순수). */
 export function buildPolicySignals(input, seedUnresolved = []) {
     const signals = [];
@@ -140,45 +148,45 @@ export function buildPolicySignals(input, seedUnresolved = []) {
                     confidence: 'CONFIRMED',
                 });
             }
-            for (const anno of cls.annotations) {
+            cls.annotations.forEach((anno, i) => {
                 if (AUTHZ_ANNOTATIONS.has(anno)) {
                     signals.push({
                         category: 'authz',
                         kind: 'class-authz',
                         subject: cls.name,
                         detail: `@${anno}`,
-                        anchor: { file: facts.relPath, line: cls.line },
+                        anchor: { file: facts.relPath, line: annoLine(cls.annotationAnchors, i, cls.line) },
                         confidence: 'CONFIRMED',
                     });
                 }
-            }
+            });
             for (const fld of cls.fields) {
-                for (const anno of fld.annotations) {
+                fld.annotations.forEach((anno, i) => {
                     if (VALIDATION_ANNOTATIONS.has(anno)) {
                         signals.push({
                             category: 'validation',
                             kind: 'bean-validation',
                             subject: `${cls.name}.${fld.name}`,
                             detail: `@${anno}`,
-                            anchor: { file: facts.relPath, line: fld.line },
+                            anchor: { file: facts.relPath, line: annoLine(fld.annotationAnchors, i, fld.line) },
                             confidence: 'CONFIRMED',
                         });
                     }
-                }
+                });
             }
             for (const m of cls.methods) {
-                for (const anno of m.annotations) {
+                m.annotations.forEach((anno, i) => {
                     if (AUTHZ_ANNOTATIONS.has(anno)) {
                         signals.push({
                             category: 'authz',
                             kind: 'method-authz',
                             subject: `${cls.name}#${m.name}`,
                             detail: `@${anno}`,
-                            anchor: { file: facts.relPath, line: m.line },
+                            anchor: { file: facts.relPath, line: annoLine(m.annotationAnchors, i, m.line) },
                             confidence: 'CONFIRMED',
                         });
                     }
-                }
+                });
             }
         }
     }

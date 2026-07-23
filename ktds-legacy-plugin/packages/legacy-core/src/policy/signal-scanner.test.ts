@@ -35,8 +35,25 @@ describe('정책 신호 스캐너 (P1)', () => {
       expect(v.map((s) => `${s.subject} ${s.detail}`).sort()).toEqual([
         'MemberService.email @Email',
         'MemberService.email @NotNull',
+        'MemberService.legacyName @NotNull',
+        'MemberService.legacyName @Size',
         'MemberService.password @Size',
       ])
+    })
+
+    it('앵커는 멤버 선언 라인이 아니라 특정 어노테이션 라인(붕괴 금지)', async () => {
+      const set = await scanPolicySignals(policyDir, buildCensus(policyDir), dbSchema)
+      const line = (subject: string, detail: string) =>
+        set.signals.find((s) => s.subject === subject && s.detail === detail)!.anchor.line
+      // 다중 어노테이션 필드: @NotNull(L9)/@Email(L10) 이 서로 다른 라인 — 필드 라인(L9)으로 붕괴 금지.
+      expect(line('MemberService.email', '@NotNull')).toBe(9)
+      expect(line('MemberService.email', '@Email')).toBe(10)
+      // 선행 비검증 어노테이션(@Deprecated L23) 을 건너뛰어 @Size(L24)/@NotNull(L25) 에 정확히 앵커.
+      // (petclinic 근본원인: @Column 이 필드 선언 시작이라 검증 어노테이션이 그 라인으로 붕괴하던 결함)
+      expect(line('MemberService.legacyName', '@Size')).toBe(24)
+      expect(line('MemberService.legacyName', '@NotNull')).toBe(25)
+      // 메서드 권한: @PreAuthorize(L16) 은 메서드 선언 라인(L17) 아님.
+      expect(line('MemberService#deleteMember', '@PreAuthorize')).toBe(16)
     })
 
     it('glossary — enum + DB 테이블/컬럼주석', async () => {

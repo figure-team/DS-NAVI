@@ -68,17 +68,21 @@ function typeOuterName(node) {
             return null;
     }
 }
-/** 모디파이어 노드에서 어노테이션 이름 목록(정렬 없이 선언 순서). */
-function annotationNames(mods) {
+/** 모디파이어 노드에서 어노테이션 앵커(이름+그 어노테이션 라인, 선언 순서). */
+function annotationAnchorsOf(mods) {
     if (!mods)
         return [];
     const out = [];
     for (const a of children(mods, 'annotation', 'marker_annotation')) {
         const id = child(a, 'identifier');
         if (id)
-            out.push(id.text);
+            out.push({ name: id.text, line: startLine(a) });
     }
     return out;
+}
+/** 모디파이어 노드에서 어노테이션 이름 목록(정렬 없이 선언 순서). */
+function annotationNames(mods) {
+    return annotationAnchorsOf(mods).map((a) => a.name);
 }
 /** 모디파이어 텍스트에 abstract 키워드가 있는지. */
 function isAbstractMods(mods) {
@@ -334,13 +338,15 @@ function collectMethods(body) {
         const { calls, locals } = mbody
             ? collectBodyFacts(mbody)
             : { calls: [], locals: [] };
+        const mannotAnchors = annotationAnchorsOf(child(m, 'modifiers'));
         out.push({
             name: id.text,
             paramCount,
             paramsText: fps ? fps.text : '()',
             returnType: m.type === 'constructor_declaration' ? null : returnTypeName(m),
             line: startLine(m),
-            annotations: annotationNames(child(m, 'modifiers')),
+            annotations: mannotAnchors.map((a) => a.name),
+            annotationAnchors: mannotAnchors,
             locals,
             calls,
         });
@@ -363,7 +369,8 @@ function declToFact(decl, kind, packageName) {
         for (const field of children(body, 'field_declaration')) {
             const typeName = typeOuterName(fieldTypeNode(field));
             const fmods = child(field, 'modifiers');
-            const fannots = annotationNames(fmods);
+            const fannotAnchors = annotationAnchorsOf(fmods);
+            const fannots = fannotAnchors.map((a) => a.name);
             for (const declr of children(field, 'variable_declarator')) {
                 const nameId = child(declr, 'identifier');
                 if (!nameId || !typeName)
@@ -373,6 +380,7 @@ function declToFact(decl, kind, packageName) {
                     type: typeName,
                     line: startLine(field),
                     annotations: fannots,
+                    annotationAnchors: fannotAnchors,
                 });
             }
         }
@@ -395,6 +403,7 @@ function declToFact(decl, kind, packageName) {
         fields,
         ctorParamTypes,
         annotations: annotationNames(mods),
+        annotationAnchors: annotationAnchorsOf(mods),
         methods,
     };
 }

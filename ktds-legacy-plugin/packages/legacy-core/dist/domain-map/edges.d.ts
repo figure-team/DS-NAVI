@@ -5,7 +5,7 @@ import type { CensusReport, EdgeRecord, EdgesReport } from './types.js';
  * 바뀌면 bump. `java-facts` 섹션은 method-calls.ts 와 공유(동일 extractJavaFacts 출력).
  * `kotlin-facts` 섹션은 kotlin-facts.ts 출력 전용 — Java 와 독립적으로 salt 를 올린다.
  */
-export declare const JAVA_FACTS_SALT = "v1";
+export declare const JAVA_FACTS_SALT = "v2";
 export declare const KOTLIN_FACTS_SALT = "v1";
 /** edges 산출 — census 기반, 파일 기록 없음. */
 export declare function extractEdges(projectRoot: string, census: CensusReport, cache?: ScanCacheSession): Promise<EdgesReport>;

@@ -11,6 +11,12 @@ import { parseSource, startLine } from './tree-sitter.js'
 /** 클래스/인터페이스/열거/레코드 종류. */
 export type ClassKind = 'class' | 'interface' | 'enum' | 'record'
 
+/** 어노테이션 앵커 — 이름과 그 어노테이션 자체의 1-based 라인(멤버 선언 라인 아님). */
+export interface AnnotationAnchor {
+  name: string
+  line: number
+}
+
 /** 필드 팩트. */
 export interface FieldFact {
   name: string
@@ -18,6 +24,12 @@ export interface FieldFact {
   type: string
   line: number
   annotations: string[]
+  /**
+   * 어노테이션별 정확한 라인(`annotations` 와 동일 순서·길이). 정책 신호(검증/권한)가
+   * 특정 어노테이션을 그 어노테이션 라인에 앵커하기 위함 — `field.line`(선언 시작 =
+   * 첫 어노테이션 라인으로 붕괴) 대신. 구 캐시(미보유)면 소비자가 `line` 으로 폴백.
+   */
+  annotationAnchors?: AnnotationAnchor[]
 }
 
 /**
@@ -78,6 +90,8 @@ export interface MethodFact {
   line: number
   /** 메서드/생성자 선언 어노테이션(이름만, 예 `PreAuthorize`). 정책 신호(권한) 입력. */
   annotations: string[]
+  /** 어노테이션별 정확한 라인(`annotations` 와 동일 순서·길이). FieldFact 참조. */
+  annotationAnchors?: AnnotationAnchor[]
   /** 메서드 본문 지역변수 선언(선언 순서). */
   locals: JavaLocalVar[]
   /** 메서드 본문 내 호출 지점(소스 순서). */
@@ -100,6 +114,8 @@ export interface ClassFact {
   /** 모든 생성자 파라미터 타입의 외곽 식별자(선언 순서). */
   ctorParamTypes: string[]
   annotations: string[]
+  /** 어노테이션별 정확한 라인(`annotations` 와 동일 순서·길이). FieldFact 참조. */
+  annotationAnchors?: AnnotationAnchor[]
   /** 메서드 선언(선언 순서) — P3 method-call 해소 입력(추가 필드, 기존 소비자 무영향). */
   methods: MethodFact[]
 }
@@ -182,15 +198,20 @@ function typeOuterName(node: Node | null): string | null {
   }
 }
 
-/** 모디파이어 노드에서 어노테이션 이름 목록(정렬 없이 선언 순서). */
-function annotationNames(mods: Node | null): string[] {
+/** 모디파이어 노드에서 어노테이션 앵커(이름+그 어노테이션 라인, 선언 순서). */
+function annotationAnchorsOf(mods: Node | null): AnnotationAnchor[] {
   if (!mods) return []
-  const out: string[] = []
+  const out: AnnotationAnchor[] = []
   for (const a of children(mods, 'annotation', 'marker_annotation')) {
     const id = child(a, 'identifier')
-    if (id) out.push(id.text)
+    if (id) out.push({ name: id.text, line: startLine(a) })
   }
   return out
+}
+
+/** 모디파이어 노드에서 어노테이션 이름 목록(정렬 없이 선언 순서). */
+function annotationNames(mods: Node | null): string[] {
+  return annotationAnchorsOf(mods).map((a) => a.name)
 }
 
 /** 모디파이어 텍스트에 abstract 키워드가 있는지. */
@@ -443,13 +464,15 @@ function collectMethods(body: Node): MethodFact[] {
     const { calls, locals } = mbody
       ? collectBodyFacts(mbody)
       : { calls: [], locals: [] }
+    const mannotAnchors = annotationAnchorsOf(child(m, 'modifiers'))
     out.push({
       name: id.text,
       paramCount,
       paramsText: fps ? fps.text : '()',
       returnType: m.type === 'constructor_declaration' ? null : returnTypeName(m),
       line: startLine(m),
-      annotations: annotationNames(child(m, 'modifiers')),
+      annotations: mannotAnchors.map((a) => a.name),
+      annotationAnchors: mannotAnchors,
       locals,
       calls,
     })
@@ -473,7 +496,8 @@ function declToFact(decl: Node, kind: ClassKind, packageName: string | null): Cl
     for (const field of children(body, 'field_declaration')) {
       const typeName = typeOuterName(fieldTypeNode(field))
       const fmods = child(field, 'modifiers')
-      const fannots = annotationNames(fmods)
+      const fannotAnchors = annotationAnchorsOf(fmods)
+      const fannots = fannotAnchors.map((a) => a.name)
       for (const declr of children(field, 'variable_declarator')) {
         const nameId = child(declr, 'identifier')
         if (!nameId || !typeName) continue
@@ -482,6 +506,7 @@ function declToFact(decl: Node, kind: ClassKind, packageName: string | null): Cl
           type: typeName,
           line: startLine(field),
           annotations: fannots,
+          annotationAnchors: fannotAnchors,
         })
       }
     }
@@ -503,6 +528,7 @@ function declToFact(decl: Node, kind: ClassKind, packageName: string | null): Cl
     fields,
     ctorParamTypes,
     annotations: annotationNames(mods),
+    annotationAnchors: annotationAnchorsOf(mods),
     methods,
   }
 }

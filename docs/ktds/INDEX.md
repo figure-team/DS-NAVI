@@ -21,7 +21,7 @@
 | `INCIDENT_ANALYSIS_DESIGN.md` | 장애 분석 메뉴(/incident) — DS-APM RCA 리포트(.md+frontmatter) 드롭 → file:line 시드 추출 → impact 재사용 → 해결방안서 + 이력 원장 | v2 승인됨(2026-07-22) — P1 완료, P2~ 진행 중 |
 | `IMPACT_LEDGER_FEDERATION_DESIGN.md` | 영향 이력 연합 — impact-history 는 변경·영향 단독 기록, 작업 요청·장애는 자기 정본 + /change 읽기 병합(jobId 단일 키 리졸버) | 승인·구현 완료 v1.1(2026-07-22) — INCIDENT_ANALYSIS·RTM_INTAKE_WORKSPACE 의 이중 기록 서술을 대체 |
 | `EXPLORE_PROMOTION_DESIGN.md` | 탐색→작업 요청 승격 3종(프리필·유래 도달성 주입·② 델타 뷰) — /change 탐색 행에만, 원인 단정 금지 델타 | 구현 완료 v1(2026-07-22) — 실 ① LLM 승격 런은 다음 접수가 자연 검증 |
-| `INCIDENT_DROP_CONTRACT.md` | DS-APM→DS-NAVI 장애 리포트 드롭 계약(형식 명세·수용 게이트·협의 항목 C1~C5) | **초안 — DS-APM 측 협의 전**(2026-07-22); 픽스처=examples/jpetstore-6/ds-hub/장애/ 2건 |
+| `INCIDENT_DROP_CONTRACT.md` | DS-APM→DS-NAVI 장애 리포트 드롭 계약(형식 명세·수용 게이트·협의 항목 C1~C5) | **초안 — DS-APM 측 협의 전**(2026-07-22); 픽스처=examples/jpetstore-6/ds-hub/issues/ 2건 |
 | `FEATURE_VERIFICATION_GUIDE.md` | 전 기능 점검 절차 | ⚠️ emit을 fill 없이 돌리면 그래프 클로버 주의 포함 |
 | `VERSION_TRACKING.md` | 버전 체계 | Scheme A(5파일)+Scheme B(2파일) |
 | `front-redesign/` (pmpl-proto.html 등) | 디자인 프로토 원본 | 신규 메뉴 탭/표 스타일의 수치 기준 |

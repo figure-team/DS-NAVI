@@ -8,7 +8,7 @@
 ## 0. 배경 — 왜 별도 메뉴인가
 
 DS-APM(SigNoz 포크, `../ds-apm`)이 장애 RCA 리포트를 분석 프로젝트 내 드롭 폴더
-(가칭 `<projectRoot>/ds-hub/장애/`, **폴더명 미확정**)에 기록하면, 우리는 그 장애를
+(가칭 `<projectRoot>/ds-hub/issues/`, **폴더명 미확정**)에 기록하면, 우리는 그 장애를
 분석해 해결방안을 제시한다. 요청 세션(인테이크)에 파일을 넣는 것과 형태는 비슷하지만
 분리하는 이유(사용자 결정 2026-07-22):
 
@@ -79,7 +79,7 @@ confidence 클램프(high|medium|low, 미상→low)도 동일(`rcaresult.go:89-9
 
 **우리가 스키마를 발명하지 않는다 — DS-APM 실물(.md+frontmatter)이 계약이다.**
 
-- **경로**: `<projectRoot>/ds-hub/장애/<YYYY-MM-DD>_rca_<service>.md` (폴더명 가칭 —
+- **경로**: `<projectRoot>/ds-hub/issues/<YYYY-MM-DD>_rca_<service>.md` (폴더명 가칭 —
   DS-APM 측과 협의 후 확정, §5). 서버 코드에서는 **상수 1곳**(`INCIDENT_DROP_DIR`)으로
   격리해 경로 변경을 흡수한다.
 - **필수 수용 조건(파싱 게이트)**: frontmatter 에 `runId`+`service` 존재, 본문에
@@ -205,7 +205,7 @@ confidence 클램프(high|medium|low, 미상→low)도 동일(`rcaresult.go:89-9
 
 ## 5. 미해결 (사용자/외부 결정 대기)
 
-1. **드롭 폴더 경로·이름** — `ds-hub/장애/` 는 가칭(한글 폴더명 여부 포함). DS-APM 측 확정 필요.
+1. **드롭 폴더 경로·이름** — `ds-hub/issues/` 는 가칭(한글 폴더명 여부 포함). DS-APM 측 확정 필요.
 2. **푸시 방식** — 파일 드롭(현 가정, 실물 파일 존재로 사실상 확인) 시 DS-APM 이 분석
    프로젝트 파일시스템에 쓸 수 있어야 함(동일 호스트/볼륨 전제 — 계약 문서에 명시).
 3. **frontmatter 확장** — severity·알람 핑거프린트·에러 로그·딥링크 URL 추가 협의(§2.1).

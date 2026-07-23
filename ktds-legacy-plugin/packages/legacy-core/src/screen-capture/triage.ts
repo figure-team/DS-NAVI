@@ -18,6 +18,11 @@ export interface CensusRoute {
   handler?: string | null
   filePath?: string | null
   line?: number | null
+  /**
+   * 라우트 종류 — `form`/`page`/`view`/`link` 는 서버 렌더 화면(크롤 가능),
+   * `api` 는 JSON REST(화면 아님). SPA 사전판별(scaffold)에 사용.
+   */
+  kind?: string | null
 }
 
 export interface TriageOptions {
